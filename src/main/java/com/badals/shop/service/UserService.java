@@ -49,7 +49,7 @@ public class UserService {
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
     }
-
+/*
     public Optional<User> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
         return userRepository.findOneByActivationKey(key)
@@ -163,7 +163,7 @@ public class UserService {
         log.debug("Created Information for User: {}", user);
         return user;
     }
-
+*/
     /**
      * Update basic information (first name, last name, email, language) for the current user.
      *
@@ -173,6 +173,8 @@ public class UserService {
      * @param langKey   language key.
      * @param imageUrl  image URL of user.
      */
+
+ /*
     public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
         SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
@@ -187,12 +189,14 @@ public class UserService {
             });
     }
 
+  */
     /**
      * Update all information for a specific user, and return the modified user.
      *
      * @param userDTO user to update.
      * @return updated user.
      */
+    /*
     public Optional<UserDTO> updateUser(UserDTO userDTO) {
         return Optional.of(userRepository
             .findById(userDTO.getId()))
@@ -263,12 +267,14 @@ public class UserService {
     public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
     }
-
+*/
     /**
      * Not activated users should be automatically deleted after 3 days.
      * <p>
      * This is scheduled to get fired everyday, at 01:00 (am).
      */
+
+    /*
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository
@@ -279,11 +285,13 @@ public class UserService {
                 this.clearUserCaches(user);
             });
     }
-
+*/
     /**
      * Gets a list of all the authorities.
      * @return a list of all the authorities.
      */
+
+    /*
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
     }
@@ -293,4 +301,6 @@ public class UserService {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)).evict(user.getLogin());
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE)).evict(user.getEmail());
     }
+
+     */
 }
