@@ -1,0 +1,41 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.badals.shop",
+      "nativeLanguage": "en"
+    },
+    "jhipsterVersion": "6.1.2",
+    "applicationType": "monolith",
+    "baseName": "shop",
+    "packageName": "com.badals.shop",
+    "packageFolder": "com/badals/shop",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "ehcache",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "mysql",
+    "prodDatabaseType": "mysql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "NzQwMjdjZTQyZTJkMWJlNTEzOTU4ZDFhZWU1OGNkZmI5YTg5ZGEzNjkzZjU0M2U5OWY3MWI2NGJjNTVkNzM5ZTBlYWYwMWZhZmUwMmE5MDNlZjJiN2E2MWNlMDg0YTU0MjRjNTkwOTVmZWE3NGI2NTRkZjE2NzllM2ZjOTMyYjM=",
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "skipClient": true,
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": true,
+    "nativeLanguage": "en",
+    "languages": [
+      "en",
+      "ar-ly"
+    ]
+  }
+}
