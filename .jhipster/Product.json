@@ -1,0 +1,44 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "updated",
+            "fieldType": "Instant"
+        },
+        {
+            "fieldName": "sku",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "rewrite",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "parent",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "body",
+            "fieldType": "byte[]",
+            "fieldTypeBlobContent": "text"
+        },
+        {
+            "fieldName": "view_count",
+            "fieldType": "Integer"
+        },
+        {
+            "fieldName": "is_parent",
+            "fieldType": "Boolean"
+        }
+    ],
+    "changelogDate": "20191216095456",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceClass",
+    "entityTableName": "product",
+    "databaseType": "sql",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}
