@@ -1,0 +1,37 @@
+enum CartState {
+    UNCLAIMED
+    CLAIMED
+    CLOSED
+}
+
+type Customer {
+    id: ID!
+}
+
+type Address {
+    id: ID!
+}
+type Cart {
+    id: ID!,
+    secureKey: String,
+    gift: Boolean,
+    giftMessage: String,
+    #customer: Customer,
+    #cartItems: [CartItem]
+}
+
+input CartInput {
+    id: ID!,
+    secureKey: String,
+    gift: Boolean,
+    giftMessage: String
+}
+
+type CartItem {
+    id: ID!,
+    cart: Cart,
+    product: Product,
+    quantity: Int
+}
+
+

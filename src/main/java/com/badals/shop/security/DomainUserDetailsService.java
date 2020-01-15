@@ -36,10 +36,6 @@ public class DomainUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(final String login) {
         log.debug("Authenticating {}", login);
 
-
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
-        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-
         //if (new EmailValidator().isValid(login, null)) {
             return userRepository.findByEmail(login)
                 .map(user -> createSpringSecurityUser(login, user))
@@ -57,12 +53,12 @@ public class DomainUserDetailsService implements UserDetailsService {
         if (user.getActive() == 0) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
         }
-        /*List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
+        List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
             .map(authority -> new SimpleGrantedAuthority(authority.getName()))
             .collect(Collectors.toList());
-        */
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
-        grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
+
+        //Set<GrantedAuthority> grantedAuthorities = new HashSet<GrantedAuthority>();
+        //grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(),
             user.getPasswd(),

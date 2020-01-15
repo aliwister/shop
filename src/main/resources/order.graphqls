@@ -1,0 +1,39 @@
+enum OrderState {
+    AWAITING_PAYMENT
+    CONTACTED
+    PAYMENT_AUTHORIZED
+    PAYMENT_ACCEPTED
+    IN_PROGRESS
+    READY
+    PARTIALLY_DELIVERED
+    DELIVERED
+    SHIPPED
+    CANCELLED
+}
+
+type Currency {
+    id: ID!,
+    code: String
+}
+
+type Order {
+    id: ID!,
+    reference: String,
+    state: OrderState,
+    invoiceDate: LocalDate,
+    deliveryDate: LocalDate,
+    customer: Customer!,
+    cart: Cart,
+    currency: String,
+    deliveryAddress: Address!,
+    invoiceAddress: Address!
+}
+
+extend type Mutation {
+    createOrder(id: Int): Order
+    #createOrderFromCart(cart: CartInput): Order
+    #
+}
+
+
+

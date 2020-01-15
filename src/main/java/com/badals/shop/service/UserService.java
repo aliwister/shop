@@ -1,29 +1,21 @@
 package com.badals.shop.service;
 
-import com.badals.shop.config.Constants;
 import com.badals.shop.domain.Authority;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.User;
 import com.badals.shop.repository.AuthorityRepository;
 import com.badals.shop.repository.UserRepository;
-import com.badals.shop.security.AuthoritiesConstants;
-import com.badals.shop.security.SecurityUtils;
-import com.badals.shop.service.dto.UserDTO;
-import com.badals.shop.service.util.RandomUtil;
-import com.badals.shop.web.rest.errors.*;
 
+import com.badals.shop.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -252,22 +244,22 @@ public class UserService {
     public Page<UserDTO> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAllByLoginNot(pageable, Constants.ANONYMOUS_USER).map(UserDTO::new);
     }
-
+*/
     @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-        return userRepository.findOneWithAuthoritiesByLogin(login);
+    public Optional<Customer> getUserWithAuthoritiesByEmail(String login) {
+        return userRepository.findOneWithAuthoritiesByEmail(login);
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthorities(Long id) {
+    public Optional<Customer> getUserWithAuthorities(Long id) {
         return userRepository.findOneWithAuthoritiesById(id);
     }
 
     @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthorities() {
-        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
+    public Optional<Customer> getUserWithAuthorities() {
+        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByEmail);
     }
-*/
+
     /**
      * Not activated users should be automatically deleted after 3 days.
      * <p>
@@ -291,11 +283,10 @@ public class UserService {
      * @return a list of all the authorities.
      */
 
-    /*
+
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
-    }
-
+    }  /*
 
     private void clearUserCaches(User user) {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)).evict(user.getLogin());

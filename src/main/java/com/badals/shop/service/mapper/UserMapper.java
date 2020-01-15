@@ -2,8 +2,8 @@ package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.Authority;
 import com.badals.shop.domain.User;
-import com.badals.shop.service.dto.UserDTO;
 
+import com.badals.shop.service.dto.UserDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

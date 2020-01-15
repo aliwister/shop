@@ -1,0 +1,69 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [
+        {
+            "relationshipName": "customer",
+            "otherEntityName": "customer",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipName": "cart",
+            "otherEntityName": "cart",
+            "relationshipType": "one-to-one",
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "useJPADerivedIdentifier": false,
+            "otherEntityRelationshipName": "order"
+        },
+        {
+            "relationshipName": "deliveryAddress",
+            "otherEntityName": "address",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipName": "invoiceAddress",
+            "otherEntityName": "address",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipName": "orderItem",
+            "otherEntityName": "orderItem",
+            "relationshipType": "one-to-many",
+            "otherEntityRelationshipName": "order"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "reference",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "invoiceDate",
+            "fieldType": "LocalDate"
+        },
+        {
+            "fieldName": "deliveryDate",
+            "fieldType": "LocalDate"
+        },{
+            "fieldName": "state",
+            "fieldType": "State",
+            "fieldValues": "AWAITING_PAYMENT,CONTACTED,PAYMENT_AUTHORIZED,PAYMENT_ACCEPTED,IN_PROGRESS,READY,PARTIALLY_DELIVERED,DELIVERED,SHIPPED,CANCELLED"
+        },
+        {
+            "fieldName": "currency",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20191222105156",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceClass",
+    "entityTableName": "jhi_order",
+    "databaseType": "sql",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}
