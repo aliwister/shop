@@ -1,36 +1,205 @@
 package com.badals.shop.domain;
 
-import javax.persistence.Id;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.persistence.*;
+import javax.validation.constraints.*;
 
-public class Product {
-   @Id
-   Long id;
-   Long parent;
-   String rewrite;
-   String upc;
-   String title;
-   String description;
-   String brand;
-   String model;
-   List<String> features;
-   Map<String, Double> price;
-   String group;
-   String image;
-   List<String> imageSets;
-   Date releaseDate;
-   Map<String, String> variationAttributes;
-   Map<String, Set<String>> variationDimensions;
-   Map<Long, Map<String, String>> variations;
-   Boolean active;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
-   List<Integer> similarProducts;
-   String externalUrl;
-   //End
+import com.badals.shop.domain.converter.StringListConverter;
+import com.badals.shop.domain.enumeration.Condition;
+import com.badals.shop.domain.enumeration.ProductType;
+import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.Price;
+import com.badals.shop.domain.pojo.Variation;
+import com.badals.shop.domain.pojo.VariationOption;
+import com.badals.shop.xtra.IMerchantProduct;
+import com.badals.shop.xtra.IProductLang;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.Type;
 
+/**
+ * A Product.
+ */
+@Entity
+@Table(name = "product")
+public class Product implements Serializable, IMerchantProduct {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NaturalId
+    private Long ref;
+
+    //@OneToMany(fetch = FetchType.LAZY)
+    //@JoinColumn(
+    //    name = "ref",
+    //    referencedColumnName = "parent"
+    //)
+    //List<Product> children = new ArrayList<Product>();
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    @Column(name = "parent_id")
+    private Long parentId;
+
+
+
+    @ManyToOne
+    @JoinColumn(name="parent_id", referencedColumnName = "ref", insertable = false, updatable = false)
+    private Product parent;
+
+    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "parent_id",referencedColumnName = "ref")
+    private Collection<Product> children;
+
+
+    @NotNull
+    @Column(name = "sku", nullable = false, unique = true)
+    private String sku;
+
+    @Column(name = "upc")
+    private String upc;
+
+    @Column(name = "image")
+    private String image;
+
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "images")
+    List<String> images;
+
+    @Column(name = "release_date")
+    private LocalDate releaseDate;
+
+    @NotNull
+    @Column(name = "active", nullable = false)
+    private Boolean active;
+
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "similar_products")
+    private List<String> similarProducts;
+
+    @Column(name = "url")
+    private String url;
+
+    @NotNull
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "brand")
+    private String brand;
+
+    @Column(name = "jhi_group")
+    private String group;
+
+    //@NotNull
+    @Column(name = "updated", nullable = false, updatable=false, insertable=false)
+    private Instant updated;
+
+    //@NotNull
+    @Column(name = "created", nullable = false, updatable=false, insertable=false)
+    private Instant created;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "jhi_condition")
+    private Condition condition;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "jhi_type")
+    private ProductType type;
+
+    @Column(name = "is_used")
+    private Boolean isUsed;
+
+    @Column(name = "available_for_order")
+    private Boolean availableForOrder;
+
+    @Column(name = "weight", precision = 21, scale = 2)
+    private BigDecimal weight;
+
+    @Column(name = "volume_weight", precision = 21, scale = 2)
+    private BigDecimal volumeWeight;
+
+    @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductLang> productLangs = new HashSet<>();
+
+    // Variations
+    @Type(type = "json")
+    @Column(name = "variation_dimensions", columnDefinition = "string")
+    List<String> variationDimensions;
+
+    @Type(type = "json")
+    @Column(name = "variation_options", columnDefinition = "string")
+    ArrayList<VariationOption> variationOptions;
+
+    @Type(type = "json")
+    @Column(name = "variations", columnDefinition = "string")
+    List<Variation> variations;
+
+    @Type(type = "json")
+    @Column(name = "variation_attributes", columnDefinition = "string")
+    List<Attribute> variationAttributes;
+
+    @Type(type = "json")
+    @Column(name = "price", columnDefinition = "string")
+    Price price;
+
+    public Price getPrice() {
+        return price;
+    }
+
+    public void setPrice(Price price) {
+        this.price = price;
+    }
+
+    public List<String> getVariationDimensions() {
+        return variationDimensions;
+    }
+
+    public void setVariationDimensions(List<String> variationDimensions) {
+        this.variationDimensions = variationDimensions;
+    }
+
+    public List<VariationOption> getVariationOptions() {
+        return variationOptions;
+    }
+
+    public void setVariationOptions(ArrayList<VariationOption> variationOptions) {
+        this.variationOptions = variationOptions;
+    }
+
+    public List<Variation> getVariations() {
+        return variations;
+    }
+
+    public void setVariations(List<Variation> variations) {
+        this.variations = variations;
+    }
+
+    public List<Attribute> getVariationAttributes() {
+        return variationAttributes;
+    }
+
+    public void setVariationAttributes(List<Attribute> variationAttributes) {
+        this.variationAttributes = variationAttributes;
+    }
+
+
+
+    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
     }
@@ -39,238 +208,350 @@ public class Product {
         this.id = id;
     }
 
-    public Long getParent() {
-        return parent;
+    public Long getRef() {
+        return ref;
     }
 
-    public void setParent(Long parent) {
-        this.parent = parent;
+    public Product ref(Long ref) {
+        this.ref = ref;
+        return this;
     }
 
-    public String getRewrite() {
-        return rewrite;
+    public void setRef(Long ref) {
+        this.ref = ref;
     }
 
-    public void setRewrite(String rewrite) {
-        this.rewrite = rewrite;
+    public String getSku() {
+        return sku;
+    }
+
+    public Product sku(String sku) {
+        this.sku = sku;
+        return this;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
     }
 
     public String getUpc() {
         return upc;
     }
 
+    public Product upc(String upc) {
+        this.upc = upc;
+        return this;
+    }
+
     public void setUpc(String upc) {
         this.upc = upc;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public List<String> getFeatures() {
-        return features;
-    }
-
-    public void setFeatures(List<String> features) {
-        this.features = features;
-    }
-
-    public Map<String, Double> getPrice() {
-        return price;
-    }
-
-    public void setPrice(Map<String, Double> price) {
-        this.price = price;
-    }
-
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
     }
 
     public String getImage() {
         return image;
     }
 
+    public Product image(String image) {
+        this.image = image;
+        return this;
+    }
+
     public void setImage(String image) {
         this.image = image;
     }
 
-    public List<String> getImageSets() {
-        return imageSets;
+    public List<String> getImages() {
+        return images;
     }
 
-    public void setImageSets(List<String> imageSets) {
-        this.imageSets = imageSets;
+    public Product images(List<String> images) {
+        this.images = images;
+        return this;
     }
 
-    public Date getReleaseDate() {
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public Product releaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+        return this;
+    }
+
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
 
-    public Map<String, String> getVariationAttributes() {
-        return variationAttributes;
-    }
-
-    public void setVariationAttributes(Map<String, String> variationAttributes) {
-        this.variationAttributes = variationAttributes;
-    }
-
-    public Map<String, Set<String>> getVariationDimensions() {
-        return variationDimensions;
-    }
-
-    public void setVariationDimensions(Map<String, Set<String>> variationDimensions) {
-        this.variationDimensions = variationDimensions;
-    }
-
-    public Map<Long, Map<String, String>> getVariations() {
-        return variations;
-    }
-
-    public void setVariations(Map<Long, Map<String, String>> variations) {
-        this.variations = variations;
-    }
-
-    public Boolean getActive() {
+    public Boolean isActive() {
         return active;
+    }
+
+    public Product active(Boolean active) {
+        this.active = active;
+        return this;
     }
 
     public void setActive(Boolean active) {
         this.active = active;
     }
 
-    public List<Integer> getSimilarProducts() {
+    public List<String> getSimilarProducts() {
         return similarProducts;
     }
 
-    public void setSimilarProducts(List<Integer> similarProducts) {
+    public Product similarProducts(List<String> similarProducts) {
+        this.similarProducts = similarProducts;
+        return this;
+    }
+
+    public void setSimilarProducts(List<String> similarProducts) {
         this.similarProducts = similarProducts;
     }
 
-    public String getExternalUrl() {
-        return externalUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setExternalUrl(String externalUrl) {
-        this.externalUrl = externalUrl;
+    public Product url(String url) {
+        this.url = url;
+        return this;
     }
 
-/*
-   String type;
-   String store;
-   boolean active;
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-   //@DiffIgnore
-   Date updated;
-   String location;
+    public String getTitle() {
+        return title;
+    }
 
-   String price;
-   boolean display_list_price;
-   boolean top_level;
-   //Map current_variation
-   //badge
-   Integer store_id;
-   boolean in_stock;
-   String category;
-   //List labels //dispatches from us
+    public Product title(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public Product brand(String brand) {
+        this.brand = brand;
+        return this;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public Product group(String group) {
+        this.group = group;
+        return this;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public Instant getUpdated() {
+        return updated;
+    }
+
+    public Product updated(Instant updated) {
+        this.updated = updated;
+        return this;
+    }
+
+    public void setUpdated(Instant updated) {
+        this.updated = updated;
+    }
+
+    public Instant getCreated() {
+        return created;
+    }
+
+    public Product created(Instant created) {
+        this.created = created;
+        return this;
+    }
+
+    public void setCreated(Instant created) {
+        this.created = created;
+    }
+
+    public Condition getCondition() {
+        return condition;
+    }
+
+    public Product condition(Condition condition) {
+        this.condition = condition;
+        return this;
+    }
+
+    public void setCondition(Condition condition) {
+        this.condition = condition;
+    }
+
+    public ProductType getType() {
+        return type;
+    }
+
+    public void setType(ProductType type) {
+        this.type = type;
+    }
+
+    public Product type(ProductType type) {
+        this.type = type;
+        return this;
+    }
+
+    public Boolean isIsUsed() {
+        return isUsed;
+    }
+
+    public Product isUsed(Boolean isUsed) {
+        this.isUsed = isUsed;
+        return this;
+    }
+
+    public void setIsUsed(Boolean isUsed) {
+        this.isUsed = isUsed;
+    }
+
+    public Boolean isAvailableForOrder() {
+        return availableForOrder;
+    }
+
+    public Product availableForOrder(Boolean availableForOrder) {
+        this.availableForOrder = availableForOrder;
+        return this;
+    }
+
+    public void setAvailableForOrder(Boolean availableForOrder) {
+        this.availableForOrder = availableForOrder;
+    }
+
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public Product weight(BigDecimal weight) {
+        this.weight = weight;
+        return this;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
+    }
+
+    public BigDecimal getVolumeWeight() {
+        return volumeWeight;
+    }
+
+    public Product volumeWeight(BigDecimal volumeWeight) {
+        this.volumeWeight = volumeWeight;
+        return this;
+    }
+
+    public void setVolumeWeight(BigDecimal volumeWeight) {
+        this.volumeWeight = volumeWeight;
+    }
+
+    public Set<ProductLang> getProductLangs() {
+        return productLangs;
+    }
+
+    public Product productLangs(Set<ProductLang> productLangs) {
+        this.productLangs = productLangs;
+        return this;
+    }
+
+    public Product addProductLang(ProductLang productLang) {
+        this.productLangs.add(productLang);
+        productLang.setProduct(this);
+        return this;
+    }
+
+    public Product removeProductLang(ProductLang productLang) {
+        this.productLangs.remove(productLang);
+        productLang.setProduct(null);
+        return this;
+    }
+
+    public void setProductLangs(Set<IProductLang> productLangs) {
+        this.productLangs = productLangs.stream().map(a -> (ProductLang) a).collect(Collectors.toSet());
+    }
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
 
+    public Product getParent() {
+        return parent;
+    }
 
-   // Item attributes
-   String asin;
-   String parentAsin;
-   String link;
+    public void setParent(Product parent) {
+        this.parent = parent;
+    }
 
-   //ItemAttributes
-   String binding;
+    public Collection<Product> getChildren() {
+        return children;
+    }
 
-   String ean;
-   List<String> features;
+    public void setChildren(Collection<Product> children) {
+        this.children = children;
+    }
 
-   boolean adultProduct;
-   boolean memorabilia;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Product)) {
+            return false;
+        }
+        return id != null && id.equals(((Product) o).id);
+    }
 
-   //@DiffIgnore
-   Dimensions itemDimensions;
+    @Override
+    public int hashCode() {
+        return 31;
+    }
 
-   String label;
-   Price listPrice;
-   String manufacturer;
-   String model;
-   Dimensions packageDimensions;
-   String partNumber;
-   String productGroup;
-   String productType;
-   String publisher;
-   String releaseDate;
-   String studio;
-   String upc;
-
-
-   //Description
-   String description;
-
-   //Variations
-   List<String> variationDimensions;
-
-   Map<String, Set<String>> variationOptions;
-   Map<Long, Map<String, String>> variations;
-   Map<String, String> variationAttributes;
-
-   public void addVariation(Long id, Map<String, String> map) {
-      //if(map != null && variations != null)
-      variations.put(id, map);
-      map.forEach((k, v) -> variationOptions.get(k).add(v));
-   }
-
-   //@DiffIgnore
-   List<String> image_sets;
-
-   //@DiffIgnore
-   List<BrowseNode> vendor_crumbs;
-
-   //@DiffIgnore
-   List<String> similarProducts;
-
-   //@DiffIgnore
-   ProductBody parentObj;
-
-
-   String className;*/
+    @Override
+    public String toString() {
+        return "Product{" +
+            "id=" + getId() +
+            ", ref=" + getRef() +
+            ", parent=" + getParent() +
+            ", sku='" + getSku() + "'" +
+            ", upc=" + getUpc() +
+            ", price=" + getPrice() +
+            ", image='" + getImage() + "'" +
+            ", images='" + getImages() + "'" +
+            ", releaseDate='" + getReleaseDate() + "'" +
+            ", active='" + isActive() + "'" +
+            ", similarProducts='" + getSimilarProducts() + "'" +
+            ", url='" + getUrl() + "'" +
+            ", title='" + getTitle() + "'" +
+            ", brand='" + getBrand() + "'" +
+            ", group='" + getGroup() + "'" +
+            ", updated='" + getUpdated() + "'" +
+            ", created='" + getCreated() + "'" +
+            ", condition='" + getCondition() + "'" +
+            ", isUsed='" + isIsUsed() + "'" +
+            ", availableForOrder='" + isAvailableForOrder() + "'" +
+            ", weight=" + getWeight() +
+            ", volumeWeight=" + getVolumeWeight() +
+            "}";
+    }
 }

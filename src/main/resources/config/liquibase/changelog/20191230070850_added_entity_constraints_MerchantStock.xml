@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <!--
+        Added the constraints for entity MerchantStock.
+    -->
+    <changeSet id="20191230070850-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="merchant_id"
+                                 baseTableName="merchant_stock"
+                                 constraintName="fk_merchant_stock_merchant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="merchant"/>
+
+        <addForeignKeyConstraint baseColumnNames="product_id"
+                                 baseTableName="merchant_stock"
+                                 constraintName="fk_merchant_stock_product_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="product"/>
+
+    </changeSet>
+</databaseChangeLog>
