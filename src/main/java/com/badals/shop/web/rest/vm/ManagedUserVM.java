@@ -1,6 +1,7 @@
 package com.badals.shop.web.rest.vm;
 
 import com.badals.shop.service.dto.UserDTO;
+
 import javax.validation.constraints.Size;
 
 /**

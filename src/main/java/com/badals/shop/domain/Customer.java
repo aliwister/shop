@@ -1,380 +1,252 @@
 package com.badals.shop.domain;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.BatchSize;
 
+import javax.persistence.*;
+import javax.validation.constraints.*;
+
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * The persistent class for the ps_customer database table.
- *
+ * A Customer.
  */
 @Entity
-@Table(schema="prestashop7",name="ps_customer")
-@NamedQuery(name="Customer.findAll", query="SELECT p FROM Customer p")
+@Table(name = "ps_customer")
 public class Customer implements Serializable {
-	private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
-	/*@GeneratedValue(strategy=GenerationType.AUTO)
-	private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_customer")
+    private Long id;
 
+    @Column(name = "company")
+    private String company;
 
-	public int getId() {
-		return id;
-	}
+    @Column(name = "siret")
+    private String siret;
 
-	public void setId(int id) {
-		this.id = id;
-	}
-*/
-	@Column(name="oc_salt")
-	private String salt;
+    @Column(name = "ape")
+    private String ape;
 
-	public String getSalt() {
-		return salt;
-	}
+    @NotNull
+    @Column(name = "firstname", nullable = false)
+    private String firstname;
 
-	public void setSalt(String salt) {
-		this.salt = salt;
-	}
-	@Id
-	@Column(name="id_customer")
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long idCustomer;
+    @NotNull
+    @Column(name = "lastname", nullable = false)
+    private String lastname;
 
-	private int active;
+    @NotNull
+    @Column(name = "email", nullable = false)
+    private String email;
 
-	private String ape;
+    @NotNull
+    @Column(name = "passwd", nullable = false)
+    private String passwd;
 
-	@Temporal(TemporalType.DATE)
-	private Date birthday;
+    @Column(name = "secure_key")
+    private String secureKey;
 
-	private String company;
+    @Column(name = "oc_salt")
+    private String salt;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="date_add")
-	private Date dateAdd;
+    @Column(name = "active")
+    private Integer active;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="date_upd")
-	private Date dateUpd;
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "jhi_user_authority",
+        joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id_customer")},
+        inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
 
-	private int deleted;
+    @BatchSize(size = 20)
+    private Set<Authority> authorities = new HashSet<>();
 
-	private String email;
 
-	private String firstname;
+    public Set<Authority> getAuthorities() {
+        return authorities;
+    }
 
-	@Column(name="id_default_group")
-	private int idDefaultGroup;
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
+    }
 
-	@Column(name="id_gender")
-	private int idGender;
+    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
+    public Long getId() {
+        return id;
+    }
 
-	@Column(name="id_lang")
-	private int idLang;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public Customer company(String company) {
+        this.company = company;
+        return this;
+    }
 
-	@Column(name="id_risk")
-	private int idRisk;
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getSiret() {
+        return siret;
+    }
+
+    public Customer siret(String siret) {
+        this.siret = siret;
+        return this;
+    }
 
-	@Column(name="id_shop")
-	private int idShop;
-
-	@Column(name="id_shop_group")
-	private int idShopGroup;
-
-	@Column(name="ip_registration_newsletter")
-	private String ipRegistrationNewsletter;
-
-	@Column(name="is_guest")
-	private int isGuest;
-
-	@Column(name="last_passwd_gen")
-	private Timestamp lastPasswdGen;
-
-	private String lastname;
-
-	@Column(name="max_payment_days")
-	private int maxPaymentDays;
-
-	private int newsletter;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="newsletter_date_add")
-	private Date newsletterDateAdd;
-
-	@Lob
-	private String note;
-
-	private int optin;
-
-	@Column(name="outstanding_allow_amount")
-	private BigDecimal outstandingAllowAmount;
-
-	private String passwd;
-
-	@Column(name="secure_key")
-	private String secureKey;
-
-	@Column(name="show_public_prices")
-	private int showPublicPrices;
-
-	private String siret;
-
-	private String website;
-
-	public Customer() {
-	}
-
-	public Long getIdCustomer() {
-		return this.idCustomer;
-	}
-
-	public void setIdCustomer(Long idCustomer) {
-		this.idCustomer = idCustomer;
-	}
-
-	public int getActive() {
-		return this.active;
-	}
-
-	public void setActive(int active) {
-		this.active = active;
-	}
-
-	public String getApe() {
-		return this.ape;
-	}
-
-	public void setApe(String ape) {
-		this.ape = ape;
-	}
-
-	public Date getBirthday() {
-		return this.birthday;
-	}
-
-	public void setBirthday(Date birthday) {
-		this.birthday = birthday;
-	}
-
-	public String getCompany() {
-		return this.company;
-	}
-
-	public void setCompany(String company) {
-		this.company = company;
-	}
-
-	public Date getDateAdd() {
-		return this.dateAdd;
-	}
-
-	public void setDateAdd(Date dateAdd) {
-		this.dateAdd = dateAdd;
-	}
-
-	public Date getDateUpd() {
-		return this.dateUpd;
-	}
-
-	public void setDateUpd(Date dateUpd) {
-		this.dateUpd = dateUpd;
-	}
-
-	public int getDeleted() {
-		return this.deleted;
-	}
-
-	public void setDeleted(int deleted) {
-		this.deleted = deleted;
-	}
-
-	public String getEmail() {
-		return this.email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getFirstname() {
-		return this.firstname;
-	}
-
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-
-	public int getIdDefaultGroup() {
-		return this.idDefaultGroup;
-	}
-
-	public void setIdDefaultGroup(int idDefaultGroup) {
-		this.idDefaultGroup = idDefaultGroup;
-	}
-
-	public int getIdGender() {
-		return this.idGender;
-	}
-
-	public void setIdGender(int idGender) {
-		this.idGender = idGender;
-	}
-
-	public int getIdLang() {
-		return this.idLang;
-	}
-
-	public void setIdLang(int idLang) {
-		this.idLang = idLang;
-	}
-
-	public int getIdRisk() {
-		return this.idRisk;
-	}
-
-	public void setIdRisk(int idRisk) {
-		this.idRisk = idRisk;
-	}
-
-	public int getIdShop() {
-		return this.idShop;
-	}
-
-	public void setIdShop(int idShop) {
-		this.idShop = idShop;
-	}
-
-	public int getIdShopGroup() {
-		return this.idShopGroup;
-	}
-
-	public void setIdShopGroup(int idShopGroup) {
-		this.idShopGroup = idShopGroup;
-	}
-
-	public String getIpRegistrationNewsletter() {
-		return this.ipRegistrationNewsletter;
-	}
-
-	public void setIpRegistrationNewsletter(String ipRegistrationNewsletter) {
-		this.ipRegistrationNewsletter = ipRegistrationNewsletter;
-	}
-
-	public int getIsGuest() {
-		return this.isGuest;
-	}
-
-	public void setIsGuest(int isGuest) {
-		this.isGuest = isGuest;
-	}
-
-	public Timestamp getLastPasswdGen() {
-		return this.lastPasswdGen;
-	}
-
-	public void setLastPasswdGen(Timestamp lastPasswdGen) {
-		this.lastPasswdGen = lastPasswdGen;
-	}
-
-	public String getLastname() {
-		return this.lastname;
-	}
-
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
-	}
-
-	public int getMaxPaymentDays() {
-		return this.maxPaymentDays;
-	}
-
-	public void setMaxPaymentDays(int maxPaymentDays) {
-		this.maxPaymentDays = maxPaymentDays;
-	}
-
-	public int getNewsletter() {
-		return this.newsletter;
-	}
-
-	public void setNewsletter(int newsletter) {
-		this.newsletter = newsletter;
-	}
-
-	public Date getNewsletterDateAdd() {
-		return this.newsletterDateAdd;
-	}
-
-	public void setNewsletterDateAdd(Date newsletterDateAdd) {
-		this.newsletterDateAdd = newsletterDateAdd;
-	}
-
-	public String getNote() {
-		return this.note;
-	}
-
-	public void setNote(String note) {
-		this.note = note;
-	}
-
-	public int getOptin() {
-		return this.optin;
-	}
-
-	public void setOptin(int optin) {
-		this.optin = optin;
-	}
-
-	public BigDecimal getOutstandingAllowAmount() {
-		return this.outstandingAllowAmount;
-	}
-
-	public void setOutstandingAllowAmount(BigDecimal outstandingAllowAmount) {
-		this.outstandingAllowAmount = outstandingAllowAmount;
-	}
-
-	public String getPasswd() {
-		return this.passwd;
-	}
-
-	public void setPasswd(String passwd) {
-		this.passwd = passwd;
-	}
-
-	public String getSecureKey() {
-		return this.secureKey;
-	}
-
-	public void setSecureKey(String secureKey) {
-		this.secureKey = secureKey;
-	}
-
-	public int getShowPublicPrices() {
-		return this.showPublicPrices;
-	}
-
-	public void setShowPublicPrices(int showPublicPrices) {
-		this.showPublicPrices = showPublicPrices;
-	}
-
-	public String getSiret() {
-		return this.siret;
-	}
-
-	public void setSiret(String siret) {
-		this.siret = siret;
-	}
-
-	public String getWebsite() {
-		return this.website;
-	}
-
-	public void setWebsite(String website) {
-		this.website = website;
-	}
-
+    public void setSiret(String siret) {
+        this.siret = siret;
+    }
+
+    public String getApe() {
+        return ape;
+    }
+
+    public Customer ape(String ape) {
+        this.ape = ape;
+        return this;
+    }
+
+    public void setApe(String ape) {
+        this.ape = ape;
+    }
+
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public Customer firstname(String firstname) {
+        this.firstname = firstname;
+        return this;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public Customer lastname(String lastname) {
+        this.lastname = lastname;
+        return this;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Customer email(String email) {
+        this.email = email;
+        return this;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPasswd() {
+        return passwd;
+    }
+
+    public Customer passwd(String passwd) {
+        this.passwd = passwd;
+        return this;
+    }
+
+    public void setPasswd(String passwd) {
+        this.passwd = passwd;
+    }
+
+    public String getSecureKey() {
+        return secureKey;
+    }
+
+    public Customer secureKey(String secureKey) {
+        this.secureKey = secureKey;
+        return this;
+    }
+
+    public void setSecureKey(String secureKey) {
+        this.secureKey = secureKey;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public Customer salt(String salt) {
+        this.salt = salt;
+        return this;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    public Integer getActive() {
+        return active;
+    }
+
+    public Customer active(Integer active) {
+        this.active = active;
+        return this;
+    }
+
+    public void setActive(Integer active) {
+        this.active = active;
+    }
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Customer)) {
+            return false;
+        }
+        return id != null && id.equals(((Customer) o).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+            "id=" + getId() +
+            ", company='" + getCompany() + "'" +
+            ", siret='" + getSiret() + "'" +
+            ", ape='" + getApe() + "'" +
+            ", firstname='" + getFirstname() + "'" +
+            ", lastname='" + getLastname() + "'" +
+            ", email='" + getEmail() + "'" +
+            ", passwd='" + getPasswd() + "'" +
+            ", secureKey='" + getSecureKey() + "'" +
+            ", salt='" + getSalt() + "'" +
+            ", active=" + getActive() +
+            "}";
+    }
 }

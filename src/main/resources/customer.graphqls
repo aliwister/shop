@@ -1,0 +1,7 @@
+type Customer {
+    id: ID!
+}
+
+type Address {
+    id: ID!
+}

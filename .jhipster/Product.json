@@ -1,36 +1,120 @@
 {
     "fluentMethods": true,
     "clientRootFolder": "",
-    "relationships": [],
+    "relationships": [
+        {
+            "relationshipName": "productLang",
+            "otherEntityName": "productLang",
+            "relationshipType": "one-to-many",
+            "otherEntityRelationshipName": "product"
+        }
+    ],
     "fields": [
         {
-            "fieldName": "updated",
-            "fieldType": "Instant"
-        },
-        {
-            "fieldName": "sku",
-            "fieldType": "String"
-        },
-        {
-            "fieldName": "rewrite",
-            "fieldType": "String"
+            "fieldName": "ref",
+            "fieldType": "Long"
         },
         {
             "fieldName": "parent",
-            "fieldType": "Integer"
+            "fieldType": "Long"
         },
         {
-            "fieldName": "body",
+            "fieldName": "sku",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required",
+                "unique"
+            ]
+        },
+        {
+            "fieldName": "upc",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "price",
+            "fieldType": "BigDecimal",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "image",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "images",
             "fieldType": "byte[]",
             "fieldTypeBlobContent": "text"
         },
         {
-            "fieldName": "view_count",
-            "fieldType": "Integer"
+            "fieldName": "releaseDate",
+            "fieldType": "LocalDate"
         },
         {
-            "fieldName": "is_parent",
+            "fieldName": "active",
+            "fieldType": "Boolean",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "similarProducts",
+            "fieldType": "byte[]",
+            "fieldTypeBlobContent": "text"
+        },
+        {
+            "fieldName": "url",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "title",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "brand",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "group",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "updated",
+            "fieldType": "Instant",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "created",
+            "fieldType": "Instant",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "condition",
+            "fieldType": "Condition",
+            "fieldValues": "NEW,LIKENEW,VERYGOOD,GOOD,FAIR"
+        },
+        {
+            "fieldName": "isUsed",
             "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "availableForOrder",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "weight",
+            "fieldType": "BigDecimal"
+        },
+        {
+            "fieldName": "volumeWeight",
+            "fieldType": "BigDecimal"
         }
     ],
     "changelogDate": "20191216095456",

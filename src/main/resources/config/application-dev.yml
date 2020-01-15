@@ -69,7 +69,12 @@ spring:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
-
+  redis:
+    host: redis-18497.c98.us-east-1-4.ec2.cloud.redislabs.com
+    port: 18497
+    password: IFpOoXYxfcQtZx2edgtgRSkmcMKHiRFA
+  cache:
+    type: redis
 server:
   port: 8080
 
@@ -124,3 +129,15 @@ jhipster:
 # ===================================================================
 
 # application:
+pas:
+  key: AKIAJH3HSRU4OMRAU5NA
+  tag: deseneoma-20
+  secret: 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
+
+mws:
+  key: AKIAIOAQ437ZZB7K4O2A
+  secret: 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
+  merchantid: ARU2T5B3ROW0Z
+  marketplaceid: ATVPDKIKX0DER
+
+

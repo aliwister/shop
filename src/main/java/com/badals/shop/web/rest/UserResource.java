@@ -1,11 +1,13 @@
 package com.badals.shop.web.rest;
 
 import com.badals.shop.config.Constants;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.User;
 import com.badals.shop.repository.UserRepository;
 import com.badals.shop.security.AuthoritiesConstants;
 import com.badals.shop.service.MailService;
 import com.badals.shop.service.UserService;
+import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.UserDTO;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
 import com.badals.shop.web.rest.errors.EmailAlreadyUsedException;
@@ -91,7 +93,7 @@ public class UserResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      * @throws BadRequestAlertException {@code 400 (Bad Request)} if the login or email is already in use.
      */
-    @PostMapping("/users")
+    /*@PostMapping("/users")
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<User> createUser(@Valid @RequestBody UserDTO userDTO) throws URISyntaxException {
         log.debug("REST request to save User : {}", userDTO);
@@ -110,7 +112,7 @@ public class UserResource {
                 .headers(HeaderUtil.createAlert(applicationName,  "userManagement.created", newUser.getLogin()))
                 .body(newUser);
         }
-    }
+    }*/
 
     /**
      * {@code PUT /users} : Updates an existing User.
@@ -120,7 +122,7 @@ public class UserResource {
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already in use.
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already in use.
      */
-    @PutMapping("/users")
+    /*@PutMapping("/users")
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO userDTO) {
         log.debug("REST request to update User : {}", userDTO);
@@ -136,7 +138,7 @@ public class UserResource {
 
         return ResponseUtil.wrapOrNotFound(updatedUser,
             HeaderUtil.createAlert(applicationName, "userManagement.updated", userDTO.getLogin()));
-    }
+    }*/
 
     /**
      * {@code GET /users} : get all users.
@@ -157,12 +159,12 @@ public class UserResource {
      * Gets a list of all roles.
      * @return a string list of all roles.
      */
-    /*@GetMapping("/users/authorities")
+    @GetMapping("/users/authorities")
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<String> getAuthorities() {
         return userService.getAuthorities();
     }
-*/
+
     /**
      * {@code GET /users/:login} : get the "login" user.
      *
@@ -170,13 +172,20 @@ public class UserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the "login" user, or with status {@code 404 (Not Found)}.
      */
     /*@GetMapping("/users/{login:" + Constants.LOGIN_REGEX + "}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable String login) {
+    public ResponseEntity<CustomerDTO> getUser(@PathVariable String login) {
         log.debug("REST request to get User : {}", login);
         return ResponseUtil.wrapOrNotFound(
-            userService.getUserWithAuthoritiesByLogin(login)
-                .map(UserDTO::new));
-    }*/
+            userService.getUserWithAuthoritiesByEmail(login)
+                .map(CustomerDTO::new));
+    }
+*/
+    @GetMapping("/users/current")//{login:" + Constants.LOGIN_REGEX + "}")
+    public Customer getUser() {
 
+        return //ResponseUtil.wrapOrNotFound(
+            userService.getUserWithAuthorities().get(); //(login).get();
+        //.map(CustomerDTO::new));
+    }
     /**
      * {@code DELETE /users/:login} : delete the "login" User.
      *
