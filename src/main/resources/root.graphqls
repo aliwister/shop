@@ -1,0 +1,22 @@
+type Query {
+}
+type Mutation {
+}
+# java.util.Date implementation
+scalar Date
+
+# java.time.LocalDate implementation
+scalar LocalDate
+
+# java.time.LocalDateTime implementation
+scalar LocalDateTime
+
+# java.time.LocalTime implementation
+scalar LocalTime
+
+# javal.time.OffsetDateTime implementation
+scalar OffsetDateTime
+
+scalar BigDecimal
+
+

@@ -1,0 +1,6 @@
+@startuml
+OrderDone --> AwaitingPayment
+AwaitingPayment --> OrderEnd
+
+AwaitingPayment : no payment
+@enduml

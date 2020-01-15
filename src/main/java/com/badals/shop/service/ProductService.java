@@ -1,17 +1,28 @@
 package com.badals.shop.service;
 
+import com.algolia.search.SearchIndex;
 import com.badals.shop.domain.Product;
-import com.badals.shop.domain.ProductWrapper;
+import com.badals.shop.domain.ProductLang;
+import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.ProductI18;
+import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
+import com.badals.shop.domain.AlgoliaProduct;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -27,9 +38,15 @@ public class ProductService {
 
     private final ProductMapper productMapper;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper) {
+    private final AlgoliaProductMapper algoliaProductMapper;
+
+    private final SearchIndex<AlgoliaProduct> index;
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
+        this.algoliaProductMapper = algoliaProductMapper;
+        this.index = index;
     }
 
     /**
@@ -41,18 +58,8 @@ public class ProductService {
     public ProductDTO save(ProductDTO productDTO) {
         log.debug("Request to save Product : {}", productDTO);
         Product product = productMapper.toEntity(productDTO);
-        ProductWrapper wrapper = new ProductWrapper();
-        wrapper.setBody(product);
-        //wrapper.setId(product.getId());
-        wrapper.setParent(product.getParent());
-        wrapper.setRewrite(product.getRewrite());
-        wrapper.setIs_parent(false);
-        wrapper.setSku(product.getBrand());
-        wrapper.setViewCount(1);
-        //wrapper.setUpdated(Calendar.);
-
-        wrapper = productRepository.save(wrapper);
-        return productMapper.toDto(wrapper.getBody());
+        product = productRepository.save(product);
+        return productMapper.toDto(product);
     }
 
     /**
@@ -64,8 +71,6 @@ public class ProductService {
     public List<ProductDTO> findAll() {
         log.debug("Request to get all Products");
         return productRepository.findAll().stream()
-            .map(e -> e.getBody())
-            //.flatMap(productMapper.toDto(e->e.getBody()))
             .map(productMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }
@@ -80,8 +85,14 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Optional<ProductDTO> findOne(Long id) {
         log.debug("Request to get Product : {}", id);
-        return productRepository.findById(id).map(e -> e.getBody())
+        return productRepository.findById(id)
             .map(productMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Product> findOneEntity(Long id) {
+        log.debug("Request to get Product : {}", id);
+        return productRepository.findById(id);
     }
 
     /**
@@ -92,5 +103,45 @@ public class ProductService {
     public void delete(Long id) {
         log.debug("Request to delete Product : {}", id);
         productRepository.deleteById(id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public Optional<ProductDTO> getProduct(int id) {
+        return this.findOne((long) id);
+    }
+
+
+    public Optional<ProductDTO> getProductAdmin(int id) {
+        return this.findOne((long) id);
+    }
+
+    public List<ProductDTO> getAllProducts(int count) {
+        return this.findAll();
+    }
+
+    public ProductDTO createProduct(Long ref, Long parent, String sku, String upc, LocalDate releaseDate) {
+        Product product = new Product();
+        product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
+        return productMapper.toDto(product);
+    }
+
+    public ProductDTO createNewProduct(ProductDTO product) {
+        ProductDTO product2 = save(product);
+
+        return product2;
+    }
+
+    @Autowired
+    ProductLangRepository productLangRepository;
+
+    public Attribute indexProduct(long id) {
+        Product product = productRepository.getOne(id);
+        AlgoliaProduct algoliaProduct = algoliaProductMapper.producttoAlgoliaProduct(product);
+
+        for(ProductLang i: productLangRepository.findAllByProductId( id ) ){
+            algoliaProduct.getI18().put(i.getLang(), new ProductI18(i.getTitle(), "", ""));
+        }
+        index.saveObject(algoliaProduct);
+        return new Attribute("success", "1");
     }
 }

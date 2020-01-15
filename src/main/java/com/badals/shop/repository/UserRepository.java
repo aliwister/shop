@@ -1,7 +1,6 @@
 package com.badals.shop.repository;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.User;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,7 @@ public interface UserRepository extends JpaRepository<Customer, Long> {
 
     String USERS_BY_EMAIL_CACHE = "usersByEmail";
     Optional<Customer> findByEmail(String email);
-    Optional<Customer> findByIdCustomer(Long id);
+    Optional<Customer> findById(Long id);
     boolean existsByEmail(String email);
 
     //Optional<User> findOneByActivationKey(String activationKey);
@@ -40,12 +39,12 @@ public interface UserRepository extends JpaRepository<Customer, Long> {
 
     //Optional<User> findOneByLogin(String login);
 
-    //@EntityGraph(attributePaths = "authorities")
-    //Optional<User> findOneWithAuthoritiesById(Long id);
+    @EntityGraph(attributePaths = "authorities")
+    Optional<Customer> findOneWithAuthoritiesById(Long id);
 
-    //@EntityGraph(attributePaths = "authorities")
-    //@Cacheable(cacheNames = USERS_BY_LOGIN_CACHE)
-    //Optional<User> findOneWithAuthoritiesByLogin(String login);
+    @EntityGraph(attributePaths = "authorities")
+    @Cacheable(cacheNames = USERS_BY_LOGIN_CACHE)
+    Optional<Customer> findOneWithAuthoritiesByEmail(String login);
 
     //@EntityGraph(attributePaths = "authorities")
     //@Cacheable(cacheNames = USERS_BY_EMAIL_CACHE)

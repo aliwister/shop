@@ -1,0 +1,139 @@
+enum Condition {
+  NEW
+  LIKE_NEW
+  VERY_GOOD
+  GOOD
+  FAIR
+}
+
+#enum Currency {
+#    OMR
+#    AED
+#    SAR
+#    KWD
+#    BHD
+#    QAR
+#    USD
+#    EUR
+#}
+
+input PriceInput {
+    amount: Float
+    currency: String
+}
+
+type Attribute {
+    name: String
+    value: String
+}
+
+type VariationOption {
+    name: String
+    values: [String]
+}
+
+input VariationOptionInput {
+    name: String
+    values: [String]
+}
+
+type Variation {
+    ref: ID!
+    variationAttributes: [Attribute]
+}
+
+type Product {
+    id: ID!,
+    ref: Long,
+    parent: Int,
+    sku: String,
+    upc: Int,
+    #price: Price,
+    image: String,
+    images: [String],
+    releaseDate: LocalDate,
+    active: Boolean,
+    similarProducts: [Int],
+    url: String,
+    title: String,
+    brand: String,
+    group: String,
+    condition: Condition,
+    isUsed: Boolean,
+    availableForOrder: Boolean,
+    weight: Float,
+    volumeWeight: Float
+    variationDimensions: [String]
+    variationOptions: [VariationOption]
+    variationAttributes: [Attribute]
+    variations: [Variation]
+}
+
+type Attribute {
+    name: String,
+    value: String
+}
+
+input AttributeInput {
+    name: String,
+    value: String
+}
+
+type ProductI18n {
+    title: String,
+    description: String,
+    model: String,
+    features: [String],
+}
+
+input ProductI18nInput {
+    title: String,
+    description: String,
+    model: String,
+    features: [String],
+    lang: String
+}
+
+input ProductInput {
+    id: ID,
+    ref: Int,
+    parent: Int,
+    sku: String,
+    upc: Int,
+    #price: PriceInput,
+    image: String,
+    images: [String],
+    releaseDate: LocalDate,
+    active: Boolean,
+    similarProducts: [Int],
+    url: String,
+    title: String,
+    brand: String,
+    group: String,
+    condition: Condition,
+    isUsed: Boolean,
+    availableForOrder: Boolean,
+    weight: Float,
+    volumeWeight: Float,
+    variationOptions: [VariationOptionInput]
+}
+
+extend type Query {
+    products(count: Int):[Product]
+    productAny(id: ID):Product
+    product(id: ID):Product
+    productAdmin(id: ID):Product
+}
+
+extend type Mutation {
+    createProduct(ref: Int,
+              parent: Int,
+              sku: String,
+              upc: String,
+              releaseDate: LocalDate):Product,
+    createNewProduct(product: ProductInput):Product,
+    indexProduct(id: Int): Attribute,
+    addI18n(id: Int,
+            i18n: ProductI18nInput):ProductI18n,
+    pasLookup(sku: String): Product
+}
