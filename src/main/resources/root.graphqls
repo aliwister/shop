@@ -19,4 +19,8 @@ scalar OffsetDateTime
 
 scalar BigDecimal
 
+type Message {
+    value: String
+}
+
 

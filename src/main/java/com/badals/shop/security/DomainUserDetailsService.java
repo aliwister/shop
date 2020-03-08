@@ -61,7 +61,7 @@ public class DomainUserDetailsService implements UserDetailsService {
         //grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
 
         return new org.springframework.security.core.userdetails.User(user.getEmail(),
-            user.getPasswd(),
+            user.getPassword(),
             grantedAuthorities);
     }
 }

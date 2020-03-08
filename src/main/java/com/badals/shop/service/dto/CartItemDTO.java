@@ -1,4 +1,6 @@
 package com.badals.shop.service.dto;
+import lombok.Data;
+
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
@@ -6,12 +8,12 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.badals.shop.domain.CartItem} entity.
  */
+@Data
 public class CartItemDTO implements Serializable {
 
     private Long id;
 
     private Integer quantity;
-
 
     private Long cartId;
 
@@ -19,45 +21,16 @@ public class CartItemDTO implements Serializable {
 
     private Long customerId;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String price;
 
-    public Integer getQuantity() {
-        return quantity;
-    }
+    private String salePrice;
+    private String image;
+    private String url;
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Long getCartId() {
-        return cartId;
-    }
-
-    public void setCartId(Long cartId) {
-        this.cartId = cartId;
-    }
-
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
-
-    public Long getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
+    private String title;
+    private String slug;
+    private String unit = "pcs";
 
     @Override
     public boolean equals(Object o) {

@@ -5,6 +5,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,7 @@ public class Cart implements Serializable {
     @Column(name = "gift_message")
     private String giftMessage;
 
-    @NotNull
+    //@NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "cart_state", nullable = false)
     private CartState cartState = CartState.UNCLAIMED;
@@ -48,6 +49,7 @@ public class Cart implements Serializable {
     private Address invoiceAddress;
 
     @ManyToOne
+    @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties("carts")
     private Customer customer;
 
@@ -60,7 +62,7 @@ public class Cart implements Serializable {
     private Carrier carrier;
 
     @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> cartItems;
+    private List<CartItem> cartItems = new ArrayList<>();
 
     public List<CartItem> getCartItems() {
         return cartItems;
@@ -194,6 +196,11 @@ public class Cart implements Serializable {
 
     public void setCarrier(Carrier carrier) {
         this.carrier = carrier;
+    }
+
+    public void resetCartItems() {
+        this.cartItems = null;
+        this.cartItems = new ArrayList<>();
     }
 
     public Cart addCartItem(CartItem cartItem) {

@@ -8,7 +8,7 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Cart} and its DTO {@link CartDTO}.
  */
-@Mapper(componentModel = "spring", uses = {AddressMapper.class, CustomerMapper.class, CurrencyMapper.class, CarrierMapper.class})
+@Mapper(componentModel = "spring", uses = {AddressMapper.class, CustomerMapper.class, CurrencyMapper.class, CarrierMapper.class, CartItemMapper.class})
 public interface CartMapper extends EntityMapper<CartDTO, Cart> {
 
     @Mapping(source = "deliveryAddress.id", target = "deliveryAddressId")

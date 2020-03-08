@@ -1,8 +1,8 @@
 package com.badals.shop.domain.enumeration;
 
 /**
- * The Condition enumeration.
+ * The ProductType enumeration.
  */
 public enum ProductType {
-    SIMPLE,PARENT,CHILD
+    CHILDREN_BOOKS,TEEN_BOOKS,ADULT_BOOKS;
 }
