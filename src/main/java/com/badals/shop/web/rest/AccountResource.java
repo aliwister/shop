@@ -1,6 +1,7 @@
 package com.badals.shop.web.rest;
 
 
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.User;
 import com.badals.shop.repository.UserRepository;
 import com.badals.shop.security.SecurityUtils;
@@ -60,12 +61,12 @@ public class AccountResource {
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {/*
+    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);*/
+        Customer user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
+        mailService.sendActivationEmail(user);
     }
 
     /**
@@ -75,11 +76,11 @@ public class AccountResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be activated.
      */
     @GetMapping("/activate")
-    public void activateAccount(@RequestParam(value = "key") String key) {/*
-        Optional<User> user = userService.activateRegistration(key);
+    public void activateAccount(@RequestParam(value = "key") String key) {
+        Optional<Customer> user = userService.activateRegistration(key);
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this activation key");
-        }*/
+        }
     }
 
     /**
@@ -101,11 +102,11 @@ public class AccountResource {
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be returned.
      */
     @GetMapping("/account")
-    public UserDTO getAccount() {/*
+    public UserDTO getAccount() {
         return userService.getUserWithAuthorities()
             .map(UserDTO::new)
             .orElseThrow(() -> new AccountResourceException("User could not be found"));
-    */}
+    }
 
     /**
      * {@code POST  /account} : update the current user information.

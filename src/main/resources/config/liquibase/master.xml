@@ -26,6 +26,7 @@
     <include file="config/liquibase/changelog/20191223073018_added_entity_CartItem.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191230065509_added_entity_Merchant.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191230070850_added_entity_MerchantStock.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200129050205_added_entity_Category.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20191219091809_added_entity_constraints_ProductLang.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191222105156_added_entity_constraints_Order.xml" relativeToChangelogFile="false"/>
@@ -34,5 +35,6 @@
     <include file="config/liquibase/changelog/20191222132114_added_entity_constraints_Address.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191223073018_added_entity_constraints_CartItem.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191230070850_added_entity_constraints_MerchantStock.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200129050205_added_entity_constraints_Category.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

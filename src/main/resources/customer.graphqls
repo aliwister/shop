@@ -5,3 +5,27 @@ type Customer {
 type Address {
     id: ID!
 }
+
+type AddressInput {
+    address1: String
+    address2: String
+    name: String
+    landmark: String
+    city: String
+    country: String
+}
+
+
+extend type Mutation {
+    resetPassword(email: String): String
+    #signUp(email: String, password: String, firstName: String, lastName: String, mobile: String, title: String, birthDate: String): Customer
+    #updatePhone(phone: String!): Customer
+    #addAddress(address: AddressInput): [Address]
+    #removeAddress(addressId: Int): [Address]
+    #updateAddress(addressId: Int, address: AddressInput): [Address]
+}
+
+extend type Query {
+    getAddresses(customerId: Int): [Address]
+    #getAddress(addressId: Int): Address
+}

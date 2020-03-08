@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 
 import com.badals.shop.domain.converter.StringListConverter;
 import com.badals.shop.domain.enumeration.Condition;
-import com.badals.shop.domain.enumeration.ProductType;
-import com.badals.shop.domain.pojo.Attribute;
-import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.domain.pojo.Variation;
-import com.badals.shop.domain.pojo.VariationOption;
+import com.badals.shop.domain.enumeration.ProductGroup;
+import com.badals.shop.domain.enumeration.VariationType;
+import com.badals.shop.domain.pojo.*;
 import com.badals.shop.xtra.IMerchantProduct;
 import com.badals.shop.xtra.IProductLang;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Type;
 
@@ -38,13 +38,16 @@ public class Product implements Serializable, IMerchantProduct {
     @NaturalId
     private Long ref;
 
+    private String slug;
+
+    //private
+
     //@OneToMany(fetch = FetchType.LAZY)
     //@JoinColumn(
     //    name = "ref",
     //    referencedColumnName = "parent"
     //)
     //List<Product> children = new ArrayList<Product>();
-
     public Long getParentId() {
         return parentId;
     }
@@ -67,6 +70,36 @@ public class Product implements Serializable, IMerchantProduct {
     private Collection<Product> children;
 
 
+
+    @ManyToMany
+    @JoinTable(
+        name = "category_product",
+        joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id")
+        )
+    private Set<Category> categories = new HashSet<>();
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
+
+    public Product addCategory(Category category) {
+        this.categories.add(category);
+        category.getProducts().add(this);
+        return this;
+    }
+
+    public Product removeCategory(Category category) {
+        this.categories.remove(category);
+        category.getProducts().remove(this);
+        return this;
+    }
+
+
     @NotNull
     @Column(name = "sku", nullable = false, unique = true)
     private String sku;
@@ -77,9 +110,9 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "image")
     private String image;
 
-    @Convert(converter = StringListConverter.class)
-    @Column(name = "images")
-    List<String> images;
+    @Type(type = "json")
+    @Column(name = "images", columnDefinition = "string")
+    List<Gallery> gallery;
 
     @Column(name = "release_date")
     private LocalDate releaseDate;
@@ -103,7 +136,7 @@ public class Product implements Serializable, IMerchantProduct {
     private String brand;
 
     @Column(name = "jhi_group")
-    private String group;
+    private ProductGroup group;
 
     //@NotNull
     @Column(name = "updated", nullable = false, updatable=false, insertable=false)
@@ -119,7 +152,7 @@ public class Product implements Serializable, IMerchantProduct {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "jhi_type")
-    private ProductType type;
+    private VariationType variationType;
 
     @Column(name = "is_used")
     private Boolean isUsed;
@@ -136,6 +169,17 @@ public class Product implements Serializable, IMerchantProduct {
     @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true)
     private Set<ProductLang> productLangs = new HashSet<>();
 
+    public Set<MerchantStock> getMerchantStock() {
+        return merchantStock;
+    }
+
+    public void setMerchantStock(Set<MerchantStock> merchantStock) {
+        this.merchantStock = merchantStock;
+    }
+
+    @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true)
+    private Set<MerchantStock> merchantStock = new HashSet<>();
+
     // Variations
     @Type(type = "json")
     @Column(name = "variation_dimensions", columnDefinition = "string")
@@ -143,7 +187,7 @@ public class Product implements Serializable, IMerchantProduct {
 
     @Type(type = "json")
     @Column(name = "variation_options", columnDefinition = "string")
-    ArrayList<VariationOption> variationOptions;
+    List<VariationOption> variationOptions;
 
     @Type(type = "json")
     @Column(name = "variations", columnDefinition = "string")
@@ -177,7 +221,7 @@ public class Product implements Serializable, IMerchantProduct {
         return variationOptions;
     }
 
-    public void setVariationOptions(ArrayList<VariationOption> variationOptions) {
+    public void setVariationOptions(List<VariationOption> variationOptions) {
         this.variationOptions = variationOptions;
     }
 
@@ -221,6 +265,19 @@ public class Product implements Serializable, IMerchantProduct {
         this.ref = ref;
     }
 
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public Product slug(String slug) {
+        this.slug = slug;
+        return this;
+    }
+
     public String getSku() {
         return sku;
     }
@@ -260,17 +317,17 @@ public class Product implements Serializable, IMerchantProduct {
         this.image = image;
     }
 
-    public List<String> getImages() {
-        return images;
+    public List<Gallery> getGallery() {
+        return gallery;
     }
 
-    public Product images(List<String> images) {
-        this.images = images;
+    public Product gallery(List<Gallery> gallery) {
+        this.gallery = gallery;
         return this;
     }
 
-    public void setImages(List<String> images) {
-        this.images = images;
+    public void setGallery(List<Gallery> images) {
+        this.gallery = images;
     }
 
     public LocalDate getReleaseDate() {
@@ -351,16 +408,16 @@ public class Product implements Serializable, IMerchantProduct {
         this.brand = brand;
     }
 
-    public String getGroup() {
+    public ProductGroup getGroup() {
         return group;
     }
 
-    public Product group(String group) {
+    public Product group(ProductGroup group) {
         this.group = group;
         return this;
     }
 
-    public void setGroup(String group) {
+    public void setGroup(ProductGroup group) {
         this.group = group;
     }
 
@@ -403,16 +460,16 @@ public class Product implements Serializable, IMerchantProduct {
         this.condition = condition;
     }
 
-    public ProductType getType() {
-        return type;
+    public VariationType getVariationType() {
+        return variationType;
     }
 
-    public void setType(ProductType type) {
-        this.type = type;
+    public void setVariationType(VariationType variationType) {
+        this.variationType = variationType;
     }
 
-    public Product type(ProductType type) {
-        this.type = type;
+    public Product variationType(VariationType variationType) {
+        this.variationType = variationType;
         return this;
     }
 
@@ -489,6 +546,13 @@ public class Product implements Serializable, IMerchantProduct {
         return this;
     }
 
+    public Product addMerchantStock(MerchantStock merchantStock) {
+        this.merchantStock.add(merchantStock);
+        merchantStock.setProduct(this);
+        return this;
+    }
+
+
     public void setProductLangs(Set<IProductLang> productLangs) {
         this.productLangs = productLangs.stream().map(a -> (ProductLang) a).collect(Collectors.toSet());
     }
@@ -537,7 +601,7 @@ public class Product implements Serializable, IMerchantProduct {
             ", upc=" + getUpc() +
             ", price=" + getPrice() +
             ", image='" + getImage() + "'" +
-            ", images='" + getImages() + "'" +
+            ", images='" + getGallery() + "'" +
             ", releaseDate='" + getReleaseDate() + "'" +
             ", active='" + isActive() + "'" +
             ", similarProducts='" + getSimilarProducts() + "'" +

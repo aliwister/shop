@@ -174,7 +174,7 @@ public class CustomerResourceIT {
         assertThat(testCustomer.getFirstname()).isEqualTo(DEFAULT_FIRSTNAME);
         assertThat(testCustomer.getLastname()).isEqualTo(DEFAULT_LASTNAME);
         assertThat(testCustomer.getEmail()).isEqualTo(DEFAULT_EMAIL);
-        assertThat(testCustomer.getPasswd()).isEqualTo(DEFAULT_PASSWD);
+        assertThat(testCustomer.getPassword()).isEqualTo(DEFAULT_PASSWD);
         assertThat(testCustomer.getSecureKey()).isEqualTo(DEFAULT_SECURE_KEY);
         assertThat(testCustomer.getSalt()).isEqualTo(DEFAULT_SALT);
         assertThat(testCustomer.getActive()).isEqualTo(DEFAULT_ACTIVE);
@@ -263,7 +263,7 @@ public class CustomerResourceIT {
     public void checkPasswdIsRequired() throws Exception {
         int databaseSizeBeforeTest = customerRepository.findAll().size();
         // set the field null
-        customer.setPasswd(null);
+        customer.setPassword(null);
 
         // Create the Customer, which fails.
         CustomerDTO customerDTO = customerMapper.toDto(customer);
@@ -371,7 +371,7 @@ public class CustomerResourceIT {
         assertThat(testCustomer.getFirstname()).isEqualTo(UPDATED_FIRSTNAME);
         assertThat(testCustomer.getLastname()).isEqualTo(UPDATED_LASTNAME);
         assertThat(testCustomer.getEmail()).isEqualTo(UPDATED_EMAIL);
-        assertThat(testCustomer.getPasswd()).isEqualTo(UPDATED_PASSWD);
+        assertThat(testCustomer.getPassword()).isEqualTo(UPDATED_PASSWD);
         assertThat(testCustomer.getSecureKey()).isEqualTo(UPDATED_SECURE_KEY);
         assertThat(testCustomer.getSalt()).isEqualTo(UPDATED_SALT);
         assertThat(testCustomer.getActive()).isEqualTo(UPDATED_ACTIVE);

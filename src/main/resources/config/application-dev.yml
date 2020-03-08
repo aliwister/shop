@@ -61,10 +61,10 @@ spring:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
   mail:
-    host: localhost
-    port: 25
-    username:
-    password:
+    host: smtp-relay.sendinblue.com
+    port: 587
+    username: ali@badals.com
+    password: ***REMOVED***
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:

@@ -1,8 +1,10 @@
 package com.badals.shop.xtra.amazon;
 
+import com.amazon.paapi5.v1.*;
+import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
-import com.badals.shop.domain.enumeration.ProductType;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.xtra.IMerchantProduct;
@@ -12,44 +14,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.math.BigInteger;
+import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
+
 
 public class PasLookupParser {
 
     private static final Logger log = LoggerFactory.getLogger(PasService.class);
 
-    public static IMerchantProduct parseProduct(IMerchantProduct p, ItemNode i) {
+    public static <T> T opt(Supplier<T> statement) {
+        try {
+            return statement.get();
+        } catch (NullPointerException exc) {
+            return null;
+        }
+    }
 
-        boolean isChild = (i.getParentAsin() != null && !i.getParentAsin().equals(i.getAsin()));
-        boolean isParent = (i.getParentAsin() != null && i.getParentAsin().equals(i.getAsin()));
+    public static IMerchantProduct parseProduct(IMerchantProduct p, Item i, boolean isParent) {
+
+        //boolean isChild = (i.getParentASIN() != null && !i.getParentASIN().equals(i.getASIN()));
+       // boolean isParent = (i.getParentASIN() != null && i.getParentASIN().equals(i.getASIN()));
 
         String image = null;
-        if(i.getLargeImage() != null)
-            image = i.getLargeImage().getURL();
-        else if(i.getImageSets() != null && i.getImageSets().get(0).getLargeImage() != null)
-            image = i.getImageSets().get(0).getLargeImage().getURL();
+        image = opt(() -> i.getImages().getPrimary().getLarge().getURL());
+        if (image == null)
+            image = opt(() -> i.getImages().getVariants().get(0).getLarge().getURL());
 
-        log.info(i.getAsin());
-        log.info(Arrays.toString(i.getAsin().getBytes()));
+        log.info(i.getASIN());
+        log.info(Arrays.toString(i.getASIN().getBytes()));
         CRC32 checksum = new CRC32();
-        checksum.update(i.getAsin().getBytes());
+        checksum.update(i.getASIN().getBytes());
         long ref = checksum.getValue();
 
         log.info(String.valueOf(ref));
 
         // Create Product
-        p.ref(ref)
+        p.ref(ref).slug(String.valueOf(ref))
             .active(true)
-            .sku(i.getAsin())
+            .sku(i.getASIN())
             .url(i.getDetailPageURL())
             //.setImageUrl(i.getLargeImage().getURL())
 
             //.setBinding(i.getItemAttributes().getBinding())
-            .brand(i.getItemAttributes().getBrand())
+            .brand(opt(() ->i.getItemInfo().getByLineInfo().getBrand().getDisplayValue()))
             //.setEan(i.getItemAttributes().getEan())
             //.setFeatures(i.getItemAttributes().getFeatures())
             //.setItemDimensions(parseDimensions(i.getItemAttributes().getItemDimensions()))
@@ -63,90 +73,39 @@ public class PasLookupParser {
 
             //.setPackageDimensions(parseDimensions(i.getItemAttributes().getPackageDimensions()))
             //.setPartNumber(i.getItemAttributes().getPartNumber())
-            .group(i.getItemAttributes().getProductGroup())
+            //.group(i.getItemAttributes().getProductGroup())
             //.setProductType(i.getItemAttributes().getProductTypeName())
             //.setPublisher(i.getItemAttributes().getPublisher())
             //.releaseDate(i.getItemAttributes().getReleaseDate())
 
             //.setStudio(i.getItemAttributes().getStudio())
             .image(image)
-            .title(i.getItemAttributes().getTitle())
-            .upc(i.getItemAttributes().getUpc());
+            .title(i.getItemInfo().getTitle().getDisplayValue())
+            .upc(opt(() -> i.getItemInfo().getExternalIds().getUpCs().getDisplayValues().get(0)))
+            .weight(opt(() -> i.getItemInfo().getProductInfo().getItemDimensions().getWeight().getDisplayValue()));
         //.updated(Calendar.getInstance().getTime());
         //.setCreated(Calendar.getInstance().getTime())
         //.setStore("Amazon.com");
 
-        if (isParent)
-            p.type(ProductType.PARENT);
-        else if (isChild)
-            p.type(ProductType.CHILD);
-        else
-            p.type(ProductType.SIMPLE);
 
         // Images
-        List<String> images = new ArrayList<>();
+        List<Gallery> images = new ArrayList<>();
 
-        if (i.getImageSets() != null) {
-            for (ImageSetNode set : i.getImageSets()) {
-            /*Image img = new Image()
-                  .setTiny(set.getTinyImage().getURL())
-                  .setSmall(set.getSmallImage().getURL())
-                  .setMedium(set.getMediumImage().getURL())
-                  .setLarge(set.getLargeImage().getURL())
-                  .setPrimary(set.getCategory().equals("primary"));*/
-                if (set.getCategory().equals("primary"))
-                    images.add(0, set.getLargeImage().getURL());
-                else
-                    images.add(set.getLargeImage().getURL());
+        if (i.getImages().getVariants() != null) {
+            for (ImageType set : i.getImages().getVariants()) {
+                images.add(new Gallery(set.getLarge().getURL()));
             }
-
-            p.images(images);
+            p.gallery(images);
         }
         // Offer
         if (!isParent) {
 
-
-         /*if (i.getOffers() != null && i.getOffers().getTotalOffers() != null && i.getOffers().getTotalOffers().equals("1")) {
-            OfferListingNode offerNode = i.getOffers().getOffer().getOfferListing();
-            if (offerNode != null) {
-               Offer o = new Offer()
-                     .setPrice(parsePrice(offerNode.getPrice()))
-                     .setAvailability(Integer.parseInt(offerNode.getAvailabilityAttributesNode().getMaximumHours()))
-                     .setPrime(offerNode.getIsEligibleForPrime().equals("True"))
-                     .setSuperSaver(offerNode.getIsEligibleForSuperSaverShipping().equals("True"));
-
-               p.setOffer(o);
-            }
-         }*/
-        } else {
+        }
+        /*else {
             if (i.getVariations() != null) {
                 p.setVariationDimensions(i.getVariations().variationDimensions);
             }
-        }
-
-
-        if (!isChild) {
-            // Similarities
-
-            if (i.getSimilarProducts() != null) {
-                List<String> similars = i.getSimilarProducts().stream().map(SimilarProductNode::getASIN).collect(Collectors.toList());
-                if (similars != null && similars.size() > 0)
-                    p.setSimilarProducts(similars);
-            }
-
-            // if(i.getBrowseNodes() != null && !i.getBrowseNodes().browseNode.isEmpty())
-            //    p.setVendor_crumbs(parseCrumbs(i.getBrowseNodes()));
-
-
-        } else {
-            if (i.getVariationAttributes() != null) {
-
-                List<Attribute> attributes = i.getVariationAttributes().stream().map(v -> new Attribute(v.getName(), v.getValue()))
-                    .collect(Collectors.toList());
-
-                p.setVariationAttributes(attributes);
-            }
-        }
+        }*/
 
         return p;
 
@@ -154,12 +113,12 @@ public class PasLookupParser {
         // Process availability
     }
 
-    public static IProductLang parseProductI18n(IProductLang p, ItemNode i) {
-        if (i.getEditorialReviews() != null && !i.getEditorialReviews().isEmpty())
-            p.setDescription(i.getEditorialReviews().get(0).getContent());
-        p.setFeatures(i.getItemAttributes().getFeatures());
-        p.setTitle(i.getItemAttributes().getTitle());
-        p.setModel(i.getItemAttributes().getModel());
+    public static IProductLang parseProductI18n(IProductLang p, Item i) {
+        //if (i.getEditorialReviews() != null && !i.getEditorialReviews().isEmpty())
+        //    p.setDescription(i.getEditorialReviews().get(0).getContent());
+        p.setFeatures(opt(() ->i.getItemInfo().getFeatures().getDisplayValues()));
+        p.setTitle(i.getItemInfo().getTitle().getDisplayValue());
+        p.setModel(opt(() -> i.getItemInfo().getManufactureInfo().getModel().getDisplayValue()));
         p.setLang("en");
         return p;
     }
@@ -174,6 +133,85 @@ public class PasLookupParser {
 
       return new Price(dPrice, price.getCurrencyCode());
    }
+
+   public static final double USDPERLB = 4;
+   public static final double USD2OMR = .386;
+
+
+    public static MerchantStock parseStock(MerchantStock stock, Item item) throws PricingException, NoOfferException {
+        OfferListing offer = opt(() ->item.getOffers().getListings().get(0));
+        if (offer == null)
+            throw new NoOfferException("Offers is null");
+
+        BigDecimal cost = offer.getPrice().getAmount();
+        boolean isPrime = offer.getDeliveryInfo().isIsPrimeEligible();
+        boolean isFulfilledByAmazon = offer.getDeliveryInfo().isIsAmazonFulfilled();
+        boolean availability = offer.getAvailability().getType().equals("Now");
+
+        double margin = 5, risk = 2, fixed = 1.1;
+        BigDecimal weight = opt(() -> item.getItemInfo().getProductInfo().getItemDimensions().getWeight().getDisplayValue());
+        if (weight == null)
+            throw new PricingException("Unable to calculate price");
+
+        double dWeight = weight.doubleValue();
+        if (dWeight < .01) {
+            //throw new Exception("Unable to caculate the price [weight=0]");
+            fixed = 10000000;
+        }
+
+        dWeight += .3;
+        double dCost = cost.doubleValue();
+        double insurance = Math.log(dCost/dWeight)* Math.log10(dCost/dWeight) * Math.max(Math.log10(Math.sqrt(dCost)),1);
+        insurance = .1*Math.max(insurance, 0);
+        insurance = Math.min(insurance, 10);
+        insurance = Math.min(insurance, 2+dCost);
+        insurance = Math.max(insurance, .02*dCost);
+
+        double localShipping = 0;
+
+        if(!isPrime)
+            insurance += 1+.15*dWeight;
+
+        if(isPrime & dCost < 11 & dWeight < .5)
+            insurance = -1;
+
+        double c_add = (double) (margin + risk) * dCost *.01 + localShipping;
+        double w_add = (double) USDPERLB * dWeight ;
+
+        //if($isDirect) 		$w_add = 0 ;
+        //if(!isInsurance) 	$insurance = 0;
+        double dPrice = (dCost + c_add + insurance + w_add ) * USD2OMR + fixed;
+        dPrice = Math.round(dPrice*10.0)/10.0;
+
+        BigDecimal price = BigDecimal.valueOf(dPrice);
+        //BigInteger availability = BigInteger.TEN;
+
+        return new MerchantStock().store("Amazon.com").quantity(BigDecimal.valueOf(99)).cost(cost).availability(10).allow_backorder(true).price(price).link(item.getDetailPageURL()).location("USA");
+    }
+
+    public static void parseDimensions(Product p, GetVariationsResponse variationsResponse) {
+        List<VariationDimension> dims = null;
+        dims = opt(() -> variationsResponse.getVariationsResult().getVariationSummary().getVariationDimensions());
+        List<VariationOption> options = new ArrayList<>();
+        for(VariationDimension dim: dims) {
+            //List<Attribute> attributes = i.getVariationAttributes().stream().map(v -> new Attribute(v.getName(), v.getValue()))
+            //        .collect(Collectors.toList());
+            //for (dim.g)
+            options.add(new VariationOption(dim.getDisplayName(),dim.getName(), dim.getValues().stream().collect(Collectors.toList())));
+
+            //p.setVariationAttributes(attributes);
+        }
+        p.setVariationOptions(options);
+    }
+
+    public static void parseVariationAttributes(Product child, Item childItem) {
+        List<Attribute> attributes = new ArrayList<>();
+        for(VariationAttribute a : childItem.getVariationAttributes()) {
+            Attribute v= new Attribute (a.getName(), a.getValue());
+            attributes.add(v);
+        }
+        child.setVariationAttributes(attributes);
+    }
 
    /*private static Dimensions parseDimensions(DimensionsNode itemDimensions) {
       // TODO Auto-generated method stub

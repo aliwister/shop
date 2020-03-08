@@ -45,13 +45,13 @@ public class MerchantStock implements Serializable {
     @Column(name = "store")
     private String store;
 
-    @Type(type = "json")
-    @Column(name = "cost", columnDefinition = "string")
-    private String cost;
+   // @Type(type = "json")
+    //@Column(name = "cost", columnDefinition = "string")
+    private BigDecimal cost;
 
-    @Type(type = "json")
-    @Column(name = "price", columnDefinition = "string")
-    private String price;
+    //@Type(type = "json")
+    //@Column(name = "price", columnDefinition = "string")
+    private BigDecimal price;
 
     @ManyToOne(optional = false)
     @NotNull
@@ -62,6 +62,8 @@ public class MerchantStock implements Serializable {
     @NotNull
     @JsonIgnoreProperties("merchantStocks")
     private Product product;
+
+
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -163,29 +165,29 @@ public class MerchantStock implements Serializable {
         this.store = store;
     }
 
-    public String getCost() {
+    public BigDecimal getCost() {
         return cost;
     }
 
-    public MerchantStock cost(String cost) {
+    public MerchantStock cost(BigDecimal cost) {
         this.cost = cost;
         return this;
     }
 
-    public void setCost(String cost) {
+    public void setCost(BigDecimal cost) {
         this.cost = cost;
     }
 
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public MerchantStock price(String price) {
+    public MerchantStock price(BigDecimal price) {
         this.price = price;
         return this;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

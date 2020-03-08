@@ -1,6 +1,7 @@
 package com.badals.shop.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
@@ -8,6 +9,7 @@ import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -47,7 +49,7 @@ public class Customer implements Serializable {
 
     @NotNull
     @Column(name = "passwd", nullable = false)
-    private String passwd;
+    private String password;
 
     @Column(name = "secure_key")
     private String secureKey;
@@ -57,6 +59,18 @@ public class Customer implements Serializable {
 
     @Column(name = "active")
     private Integer active;
+
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnoreProperties("customer")
+    private List<Address> addresses;
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
 
     @JsonIgnore
     @ManyToMany
@@ -164,17 +178,17 @@ public class Customer implements Serializable {
         this.email = email;
     }
 
-    public String getPasswd() {
-        return passwd;
+    public String getPassword() {
+        return password;
     }
 
     public Customer passwd(String passwd) {
-        this.passwd = passwd;
+        this.password = passwd;
         return this;
     }
 
-    public void setPasswd(String passwd) {
-        this.passwd = passwd;
+    public void setPassword(String passwd) {
+        this.password = passwd;
     }
 
     public String getSecureKey() {
@@ -243,7 +257,7 @@ public class Customer implements Serializable {
             ", firstname='" + getFirstname() + "'" +
             ", lastname='" + getLastname() + "'" +
             ", email='" + getEmail() + "'" +
-            ", passwd='" + getPasswd() + "'" +
+            ", passwd='" + getPassword() + "'" +
             ", secureKey='" + getSecureKey() + "'" +
             ", salt='" + getSalt() + "'" +
             ", active=" + getActive() +

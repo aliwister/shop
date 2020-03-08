@@ -17,21 +17,42 @@ type Cart {
     gift: Boolean,
     giftMessage: String,
     #customer: Customer,
-    #cartItems: [CartItem]
+    cartItems: [CartItem]
 }
 
 input CartInput {
-    id: ID!,
+    id: ID,
     secureKey: String,
     gift: Boolean,
     giftMessage: String
+    cartState: CartState
+    customerId: Int
 }
 
 type CartItem {
-    id: ID!,
-    cart: Cart,
-    product: Product,
+    id: ID,
+    productId: Int,
+    quantity: Int
+    image: String
+    url: String
+    title: String
+    price: String
+    salePrice: String
+    slug: String
+    unit: String
+}
+
+input CartItemInput {
+    productId: Int,
     quantity: Int
 }
 
-
+type CheckoutSession {
+    redirectUrl: String,
+    secureKey: String
+}
+extend type Mutation {
+    updateCart(secureKey: String, items: [CartItemInput]): Cart
+    setCart(secureKey: String, items: [CartItemInput]): Cart
+    createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
+}

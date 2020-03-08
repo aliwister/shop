@@ -21,45 +21,38 @@
 
 package com.badals.shop.xtra.amazon;
 
-import com.badals.shop.xtra.amazon.mappings.*;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.amazon.paapi5.v1.*;
+import com.amazon.paapi5.v1.api.DefaultApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 //@Configuration
 public class PasLookup {
-
+   private final Logger log = LoggerFactory.getLogger(PasLookup.class);
    //@Autowired
    public SignedRequestsHelper helper;
 
-   private XStream xstream;
+   @Autowired
+   private LookupConfig lookupConfig;
+
+   private DefaultApi api;
+   String partnerTag = "deseneoma-20";
 
    public PasLookup() {
-      xstream = new XStream(new StaxDriver());
-      xstream.ignoreUnknownElements();
-      xstream.alias("ItemLookupResponse", ItemLookupResponse.class);
-      xstream.alias("Items", ItemsNode.class);
-      xstream.alias("Request", RequestNode.class);
-      xstream.alias("ItemLookupRequest", ItemLookupRequestNode.class);
-      xstream.addImplicitCollection(ItemLookupRequestNode.class, "ResponseGroups",  "ResponseGroup", String.class);
+      ApiClient client = new ApiClient();
+      client.setAwsAccessKey("AKIAJH3HSRU4OMRAU5NA");
+      // Please add your secret key here
+      client.setAwsSecretKey("yu6R/dsS4DD+Ws3zZcAkmLqoMx4Nhg4Utcm5DCEO");
 
+      // Enter your partner tag (store/tracking id)
 
-      xstream.alias("Item", ItemNode.class);
-      xstream.addImplicitCollection(ItemsNode.class, "items", "Item", ItemNode.class);
-      xstream.alias("ImageSet", ImageSetNode.class);
-
-      xstream.alias("VariationDimension", String.class);
-      xstream.addImplicitCollection(VariationsNode.class, "items", "Item", ItemNode.class);
-
-      xstream.alias("EditorialReview", EditorialReviewNode.class);
-      xstream.alias("SimilarProduct", SimilarProductNode.class);
-      xstream.alias("VariationAttribute", VariationAttributeNode.class);
-
-      Class [] annotClasses = {ItemNode.class, ImageSetNode.class, ItemAttributesNode.class, DimensionsNode.class, OffersNode.class, OfferNode.class, OfferAttributesNode.class, OfferListingNode.class, PriceNode.class, VariationsNode.class, BrowseNodesNode.class, BrowseNodeNode.class, AncestorsNode.class};
-      xstream.processAnnotations(annotClasses);
+      client.setHost("webservices.amazon.com");
+      client.setRegion("us-east-1");
+      this.api = new DefaultApi(client);
    }
 
    public PasLookup(SignedRequestsHelper helper) {
@@ -67,60 +60,85 @@ public class PasLookup {
       this.helper = helper;
    }
 
-   public ItemLookupResponse lookup(String asin) {
-      String requestUrl = null;
-
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("Service", "AWSECommerceService");
-      params.put("Version", "2010-06-01");
-      params.put("Operation", "ItemLookup");
-      params.put("ItemId", asin);
-      params.put("ResponseGroup", "BrowseNodes,VariationMatrix,VariationOffers,VariationImages,OfferListings,ItemAttributes,Images,Similarities,EditorialReview,Reviews");
-      params.put("AssociateTag", "deseneoma-20");
-
-      requestUrl = helper.sign(params);
-      System.out.println("Signed Request is \"" + requestUrl + "\"");
-      return fetch(requestUrl);
-   }
-
    /*
     * Utility function to fetch the response from the service and extract the title
     * from the XML.
     */
-   private ItemLookupResponse fetch(String requestUrl) {
-      ItemLookupResponse doc = null;
+   public GetItemsResponse lookup(List<String> itemIds) {
+      GetItemsRequest getItemsRequest = new GetItemsRequest().itemIds(itemIds).partnerTag(partnerTag)
+              .resources(getItemsResources()).partnerType(PartnerType.ASSOCIATES);
       try {
-      	//File file = new File("C:\\work\\face\\face-boot\\shop\\src\\main\\resources\\Response.txt");
-         //URL req = file.toURI().toURL(); //
-         URL req = new URL(requestUrl);
-
-         xstream.setClassLoader(Thread.currentThread().getContextClassLoader());// does not require XPP3 library starting with Java 6
-         doc = (ItemLookupResponse) xstream.fromXML(req.openStream());
-         return doc;
+         return api.getItems(getItemsRequest);
 
       } catch (Exception e) {
          throw new RuntimeException(e);
       }
    }
 
-    public ItemLookupResponse toXml(Object pas) {
-        ItemLookupResponse doc = null;
-        try {
-            xstream.setClassLoader(Thread.currentThread().getContextClassLoader());// does not require XPP3 library starting with Java 6
-            doc = (ItemLookupResponse) xstream.fromXML((String) pas);
-            return doc;
+   public GetVariationsResponse variationLookup(String asin, int page) {
+      log.info("Calling variationLookup on page "+page);
+      GetVariationsRequest getVariationsRequest = new GetVariationsRequest().ASIN(asin).partnerTag(partnerTag)
+              .resources(getVariationsResources()).partnerType(PartnerType.ASSOCIATES).variationPage(page);
+      try {
+         return api.getVariations(getVariationsRequest);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+      } catch (Exception e) {
+         throw new RuntimeException(e);
+      }
+   }
 
-    public String toXML(ItemLookupResponse doc) {
-        try {
-            xstream.setClassLoader(Thread.currentThread().getContextClassLoader());// does not require XPP3 library starting with Java 6
-            return xstream.toXML(doc);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+
+   List<GetItemsResource> getItemsResources() {
+      List<GetItemsResource> getItemsResources = new ArrayList<GetItemsResource>();
+      getItemsResources.add(GetItemsResource.PARENTASIN);
+      getItemsResources.add(GetItemsResource.ITEMINFO_TITLE);
+      getItemsResources.add(GetItemsResource.ITEMINFO_FEATURES);
+      getItemsResources.add(GetItemsResource.ITEMINFO_EXTERNALIDS);
+      getItemsResources.add(GetItemsResource.ITEMINFO_MANUFACTUREINFO);
+
+      getItemsResources.add(GetItemsResource.ITEMINFO_BYLINEINFO);
+      getItemsResources.add(GetItemsResource.ITEMINFO_PRODUCTINFO);
+
+      getItemsResources.add(GetItemsResource.IMAGES_PRIMARY_LARGE);
+      getItemsResources.add(GetItemsResource.IMAGES_VARIANTS_LARGE);
+
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_AVAILABILITY_MINORDERQUANTITY);
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_AVAILABILITY_TYPE);
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISAMAZONFULFILLED);
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISPRIMEELIGIBLE);
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_SHIPPINGCHARGES);
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_PRICE);
+      getItemsResources.add(GetItemsResource.OFFERS_SUMMARIES_LOWESTPRICE);
+      getItemsResources.add(GetItemsResource.OFFERS_SUMMARIES_OFFERCOUNT);
+
+      return getItemsResources;
+   }
+
+   List<GetVariationsResource> getVariationsResources() {
+      List<GetVariationsResource> GetVariationsResources = new ArrayList<GetVariationsResource>();
+      GetVariationsResources.add(GetVariationsResource.PARENTASIN);
+      GetVariationsResources.add(GetVariationsResource.ITEMINFO_TITLE);
+      GetVariationsResources.add(GetVariationsResource.ITEMINFO_FEATURES);
+      GetVariationsResources.add(GetVariationsResource.ITEMINFO_EXTERNALIDS);
+      GetVariationsResources.add(GetVariationsResource.ITEMINFO_MANUFACTUREINFO);
+
+      GetVariationsResources.add(GetVariationsResource.ITEMINFO_BYLINEINFO);
+      GetVariationsResources.add(GetVariationsResource.ITEMINFO_PRODUCTINFO);
+
+      GetVariationsResources.add(GetVariationsResource.IMAGES_PRIMARY_LARGE);
+      GetVariationsResources.add(GetVariationsResource.IMAGES_VARIANTS_LARGE);
+      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_AVAILABILITY_MINORDERQUANTITY);
+      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_AVAILABILITY_TYPE);
+      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_ISAMAZONFULFILLED);
+      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_ISPRIMEELIGIBLE);
+      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_SHIPPINGCHARGES);
+      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_PRICE);
+      GetVariationsResources.add(GetVariationsResource.OFFERS_SUMMARIES_LOWESTPRICE);
+      GetVariationsResources.add(GetVariationsResource.OFFERS_SUMMARIES_OFFERCOUNT);
+      GetVariationsResources.add(GetVariationsResource.VARIATIONSUMMARY_VARIATIONDIMENSION);
+
+
+
+      return GetVariationsResources;
+   }
 }

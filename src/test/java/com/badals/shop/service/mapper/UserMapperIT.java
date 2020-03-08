@@ -2,6 +2,7 @@ package com.badals.shop.service.mapper;
 
 
 import com.badals.shop.ShopApp;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.User;
 import com.badals.shop.service.dto.UserDTO;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -29,27 +30,27 @@ public class UserMapperIT {
     @Autowired
     private UserMapper userMapper;
 
-    private User user;
+    private Customer user;
     private UserDTO userDto;
 
     @BeforeEach
     public void init() {
-        user = new User();
-        user.setLogin(DEFAULT_LOGIN);
+        user = new Customer();
+        //user.setLogin(DEFAULT_LOGIN);
         user.setPassword(RandomStringUtils.random(60));
-        user.setActivated(true);
+        user.setActive(1);
         user.setEmail("johndoe@localhost");
-        user.setFirstName("john");
-        user.setLastName("doe");
-        user.setImageUrl("image_url");
-        user.setLangKey("en");
+        user.setFirstname("john");
+        user.setLastname("doe");
+        //user.setImageUrl("image_url");
+        //user.setLangKey("en");
 
         userDto = new UserDTO(user);
     }
 
     @Test
     public void usersToUserDTOsShouldMapOnlyNonNullUsers() {
-        List<User> users = new ArrayList<>();
+        List<Customer> users = new ArrayList<>();
         users.add(user);
         users.add(null);
 
