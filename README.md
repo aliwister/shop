@@ -1,4 +1,5 @@
 # shop
+heroku deploy:jar target/shop-0.0.1-SNAPSHOT.jar --app face-shop-api
 
 This application was generated using JHipster 6.1.2, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v6.1.2](https://www.jhipster.tech/documentation-archive/v6.1.2).
 
