@@ -27,16 +27,14 @@ public class CartItem implements Serializable {
     @JsonIgnoreProperties("cartItems")
     private Cart cart;
 
-    @ManyToOne(optional = false)
-    @NotNull
+    @ManyToOne
+    //@NotNull
     @JsonIgnoreProperties("cartItems")
+    @JoinColumn(name="product_id", referencedColumnName = "ref", insertable = false, updatable = false)
     private Product product;
 
-    @ManyToOne
-    @JsonIgnoreProperties("cartItems")
-    private Customer customer;
 
-    @Column(name = "product_id", insertable = false, updatable = false)
+    @Column(name = "product_id")
     private Long productId;
 
     public Long getProductId() {
@@ -94,20 +92,6 @@ public class CartItem implements Serializable {
     public void setProduct(Product product) {
         this.product = product;
     }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public CartItem customer(Customer customer) {
-        this.customer = customer;
-        return this;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
     public boolean equals(Object o) {
