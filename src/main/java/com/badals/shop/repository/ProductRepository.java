@@ -3,6 +3,7 @@ import com.badals.shop.domain.Product;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -13,5 +14,14 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    Optional<Product> findBySku(String asin);
+    @Query("from Product u left join u.categories where u.sku = ?1")
+    Optional<Product> findBySkuJoinCategories(String asin);
+
+    @Query("from Product u left join u.categories where u.slug = ?1")
+    Optional<Product> findBySlugJoinCategories(String slug);
+
+    @Query("select u.products from Category u where u.slug = ?1")
+    List<Product> findAllByCategorySlug(String slug);
+
+    Optional<Product> findOneByRef(Long ref);
 }

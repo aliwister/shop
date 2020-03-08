@@ -5,6 +5,7 @@ import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.ProductI18;
+import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.domain.AlgoliaProduct;
@@ -105,7 +106,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    //@PreAuthorize("isAuthenticated()")
     public Optional<ProductDTO> getProduct(int id) {
         return this.findOne((long) id);
     }
@@ -143,5 +144,22 @@ public class ProductService {
         }
         index.saveObject(algoliaProduct);
         return new Attribute("success", "1");
+    }
+
+    public ProductDTO getProductBySlug(String slug) {
+        return productRepository.findBySlugJoinCategories(slug).map(productMapper::toDto).orElse(null);
+    }
+
+    public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {
+        List<Product> products = productRepository.findAllByCategorySlug(slug);
+        ProductResponse response = new ProductResponse();
+        response.setTotal(products.size());
+        response.setItems(products.stream().map(productMapper::toDto).collect(Collectors.toList()));
+        return response;
+    }
+    public List<ProductDTO> findRelated(String slug) {
+        List<Product> products = productRepository.findAllByCategorySlug(slug);
+
+        return products.stream().map(productMapper::toDto).collect(Collectors.toList());
     }
 }

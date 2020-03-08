@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<Customer, Long> {
     Optional<Customer> findById(Long id);
     boolean existsByEmail(String email);
 
-    //Optional<User> findOneByActivationKey(String activationKey);
+    Optional<Customer> findOneBySecureKey(String activationKey);
 
 
     //List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant dateTime);

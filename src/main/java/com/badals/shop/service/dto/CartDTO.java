@@ -1,6 +1,8 @@
 package com.badals.shop.service.dto;
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import com.badals.shop.domain.enumeration.CartState;
 
@@ -18,7 +20,17 @@ public class CartDTO implements Serializable {
 
     private String giftMessage;
 
-    @NotNull
+    private List<CartItemDTO> cartItems = new ArrayList<>();
+
+    public List<CartItemDTO> getCartItems() {
+        return cartItems;
+    }
+
+    public void setCartItems(List<CartItemDTO> cartItems) {
+        this.cartItems = cartItems;
+    }
+
+    //@NotNull
     private CartState cartState;
 
 

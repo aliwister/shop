@@ -3,6 +3,7 @@ package com.badals.shop.service.dto;
 import com.badals.shop.config.Constants;
 
 import com.badals.shop.domain.Authority;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.User;
 
 import javax.validation.constraints.Email;
@@ -20,7 +21,7 @@ public class UserDTO {
 
     private Long id;
 
-    @NotBlank
+    //@NotBlank
     @Pattern(regexp = Constants.LOGIN_REGEX)
     @Size(min = 1, max = 50)
     private String login;
@@ -57,19 +58,19 @@ public class UserDTO {
         // Empty constructor needed for Jackson.
     }
 
-    public UserDTO(User user) {
+    public UserDTO(Customer user) {
         this.id = user.getId();
-        this.login = user.getLogin();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
+        //this.login = user.getLogin();
+        this.firstName = user.getFirstname();
+        this.lastName = user.getLastname();
         this.email = user.getEmail();
-        this.activated = user.getActivated();
-        this.imageUrl = user.getImageUrl();
-        this.langKey = user.getLangKey();
-        this.createdBy = user.getCreatedBy();
-        this.createdDate = user.getCreatedDate();
-        this.lastModifiedBy = user.getLastModifiedBy();
-        this.lastModifiedDate = user.getLastModifiedDate();
+        this.activated = user.getActive().equals(1);
+        //this.imageUrl = user.getImageUrl();
+        //this.langKey = user.getLangKey();
+        //this.createdBy = user.getCreatedBy();
+        //this.createdDate = user.getCreatedDate();
+        //this.lastModifiedBy = user.getLastModifiedBy();
+        //this.lastModifiedDate = user.getLastModifiedDate();
         this.authorities = user.getAuthorities().stream()
             .map(Authority::getName)
             .collect(Collectors.toSet());

@@ -32,7 +32,12 @@ type Order {
 extend type Mutation {
     createOrder(id: Int): Order
     #createOrderFromCart(cart: CartInput): Order
-    #
+}
+
+extend type Query {
+
+    #getOrders(): [Orders]
+    getOrder(orderId: Int): Order
 }
 
 

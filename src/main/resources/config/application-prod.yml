@@ -33,9 +33,9 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/shop?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
-    username: root
-    password:
+    url: jdbc:mysql://badal-website-fra.cuv8f0sngmtx.eu-central-1.rds.amazonaws.com/shop?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: shop-api
+    password: 4158yORAQ64ipEXobeFO385O6olo7oKp~
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -58,10 +58,10 @@ spring:
   liquibase:
     contexts: prod
   mail:
-    host: localhost
-    port: 25
-    username:
-    password:
+    host: smtp-relay.sendinblue.com
+    port: 587
+    username: ali@badals.com
+    password: j2zZ5T0XAMr6KdHS
   thymeleaf:
     cache: true
 

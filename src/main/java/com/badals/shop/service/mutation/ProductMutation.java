@@ -15,9 +15,15 @@ import java.time.LocalDate;
 
 /*
 mutation {
-  createNewProduct(product: {ref: 12, parent: 13, sku: "abc", upc: 334343, release_date: "2017-07-09"}) {
-    ref,
-    release_date
+  createNewProduct(product: {sku: "9789996910180",
+    upc: "9789996910180",
+    price: "1.5", currency: "OMR", title: "Asnan Majid", active: true}) {
+    ref
+    releaseDate
+    variationOptions {
+      name
+      values
+    }
   }
 }
 mutation {
@@ -38,6 +44,25 @@ mutation {
     features
   }
 }
+
+mutation {
+  pasLookup(sku: "B01HLV5HR6") {
+    id
+    ref
+    parent
+    sku
+    image
+    price
+    gallery {
+      url
+    }
+    variations {
+      ref
+    }
+  }
+}
+
+
  */
 
 @Component
@@ -70,5 +95,7 @@ public class ProductMutation implements GraphQLMutationResolver {
     public ProductDTO pasLookup(String asin) {
         return this.pasService.lookup(asin);
     }
+
+
 }
 

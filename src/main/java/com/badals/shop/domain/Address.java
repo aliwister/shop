@@ -40,6 +40,7 @@ public class Address implements Serializable {
     private String active;
 
     @ManyToOne
+    @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties("addresses")
     private Customer customer;
 

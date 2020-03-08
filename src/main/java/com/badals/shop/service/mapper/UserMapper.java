@@ -1,6 +1,7 @@
 package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.Authority;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.User;
 
 import com.badals.shop.service.dto.UserDTO;
@@ -18,14 +19,14 @@ import java.util.stream.Collectors;
 @Service
 public class UserMapper {
 
-    public List<UserDTO> usersToUserDTOs(List<User> users) {
+    public List<UserDTO> usersToUserDTOs(List<Customer> users) {
         return users.stream()
             .filter(Objects::nonNull)
             .map(this::userToUserDTO)
             .collect(Collectors.toList());
     }
 
-    public UserDTO userToUserDTO(User user) {
+    public UserDTO userToUserDTO(Customer user) {
         return new UserDTO(user);
     }
 

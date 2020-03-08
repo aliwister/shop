@@ -3,6 +3,7 @@ package com.badals.shop.service;
 import com.badals.shop.config.Constants;
 
 import com.badals.shop.ShopApp;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.User;
 import io.github.jhipster.config.JHipsterProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -139,10 +140,10 @@ public class MailServiceIT {
 
     @Test
     public void testSendEmailFromTemplate() throws Exception {
-        User user = new User();
-        user.setLogin("john");
+        Customer user = new Customer();
+        //user.setLogin("john");
         user.setEmail("john.doe@example.com");
-        user.setLangKey("en");
+        //user.setLangKey("en");
         mailService.sendEmailFromTemplate(user, "mail/testEmail", "email.test.title");
         verify(javaMailSender).send(messageCaptor.capture());
         MimeMessage message = messageCaptor.getValue();
@@ -155,9 +156,9 @@ public class MailServiceIT {
 
     @Test
     public void testSendActivationEmail() throws Exception {
-        User user = new User();
-        user.setLangKey(Constants.DEFAULT_LANGUAGE);
-        user.setLogin("john");
+        Customer user = new Customer();
+        //user.setLangKey(Constants.DEFAULT_LANGUAGE);
+        //user.setLogin("john");
         user.setEmail("john.doe@example.com");
         mailService.sendActivationEmail(user);
         verify(javaMailSender).send(messageCaptor.capture());
@@ -170,9 +171,9 @@ public class MailServiceIT {
 
     @Test
     public void testCreationEmail() throws Exception {
-        User user = new User();
-        user.setLangKey(Constants.DEFAULT_LANGUAGE);
-        user.setLogin("john");
+        Customer user = new Customer();
+        //user.setLangKey(Constants.DEFAULT_LANGUAGE);
+        //user.setLogin("john");
         user.setEmail("john.doe@example.com");
         mailService.sendCreationEmail(user);
         verify(javaMailSender).send(messageCaptor.capture());
@@ -185,9 +186,9 @@ public class MailServiceIT {
 
     @Test
     public void testSendPasswordResetMail() throws Exception {
-        User user = new User();
-        user.setLangKey(Constants.DEFAULT_LANGUAGE);
-        user.setLogin("john");
+        Customer user = new Customer();
+        //user.setLangKey(Constants.DEFAULT_LANGUAGE);
+        //user.setLogin("john");
         user.setEmail("john.doe@example.com");
         mailService.sendPasswordResetMail(user);
         verify(javaMailSender).send(messageCaptor.capture());
@@ -206,11 +207,12 @@ public class MailServiceIT {
 
     @Test
     public void testSendLocalizedEmailForAllSupportedLanguages() throws Exception {
-        User user = new User();
-        user.setLogin("john");
+        Customer user = new Customer();
+        //user.setLangKey(Constants.DEFAULT_LANGUAGE);
+        //user.setLogin("john");
         user.setEmail("john.doe@example.com");
         for (String langKey : languages) {
-            user.setLangKey(langKey);
+            //user.setLangKey(langKey);
             mailService.sendEmailFromTemplate(user, "mail/testEmail", "email.test.title");
             verify(javaMailSender, atLeastOnce()).send(messageCaptor.capture());
             MimeMessage message = messageCaptor.getValue();

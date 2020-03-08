@@ -3,12 +3,17 @@ package com.badals.shop.service;
 import com.badals.shop.domain.Cart;
 import com.badals.shop.domain.CartItem;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.domain.checkout.helper.CheckoutCartMapper;
+import com.badals.shop.repository.CheckoutCartRepository;
 import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.repository.CartRepository;
+import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.mapper.CartItemMapper;
 import com.badals.shop.service.mapper.CartMapper;
+import com.badals.shop.service.pojo.CheckoutSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +37,11 @@ public class CartService {
     private final CartMapper cartMapper;
     private final CartItemMapper cartItemMapper;
 
+    private final CheckoutCartMapper checkoutCartMapper;
+    private final CheckoutCartRepository checkoutCartRepository;
+
     private final UserService userService;
+    private final ProductRepository productRepository;
 
     public static String createUIUD() {
         // Creating a random UUID (Universally unique identifier).
@@ -40,11 +49,14 @@ public class CartService {
         return uuid.toString();
     }
 
-    public CartService(CartRepository cartRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, UserService userService) {
+    public CartService(CartRepository cartRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, UserService userService, ProductRepository productRepository) {
         this.cartRepository = cartRepository;
         this.cartMapper = cartMapper;
         this.cartItemMapper = cartItemMapper;
         this.userService = userService;
+        this.checkoutCartMapper = checkoutCartMapper;
+        this.checkoutCartRepository = checkoutCartRepository;
+        this.productRepository = productRepository;
     }
 
     /**
@@ -58,6 +70,20 @@ public class CartService {
         Cart cart = cartMapper.toEntity(cartDTO);
         cart = cartRepository.save(cart);
         return cartMapper.toDto(cart);
+    }
+
+
+    /**
+     * Save a cart.
+     *
+     * @param cartDTO the entity to save.
+     * @return the persisted entity.
+     */
+    public CartDTO save(CartDTO cartDTO, List<CartItemDTO> items) {
+        log.debug("Request to save Cart : {}", cartDTO);
+        Cart cart = cartMapper.toEntity(cartDTO);
+        //cart = cartRepository.save(cart);
+        return save(cart, items); //cartMapper.toDto(cart);
     }
 
     /**
@@ -97,14 +123,16 @@ public class CartService {
         cartRepository.deleteById(id);
     }
 
-    public CartDTO updateCart(String secureKey, List<CartItemDTO> items) {
+    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge) {
         Cart cart = null;
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
-
+        log.info("Logged in user " + loginUser);
+        // secureKey always null
         if(secureKey != null) {
             cart = cartRepository.findBySecureKey(secureKey).orElse(null);
         }
 
+        // Never get called if user not logged in
         if(loginUser == null) {
             if (cart == null || cart.getCartState() != CartState.UNCLAIMED) {
                 cart = new Cart();
@@ -113,21 +141,32 @@ public class CartService {
             return this.save(cart, items);
         }
 
-        //logged in user
+        //logged in user - always
         if (cart == null || cart.getCartState() == CartState.UNCLAIMED) {
             cart = this.getCartByCustomer(loginUser);
-            return this.mergeCart(cart, items);
+            if (isMerge)
+                return this.mergeCart(cart, items);
+            else
+                return this.save(cart, items);
         }
+
+        //Not reachable
         if (cart.getCartState() == CartState.CLAIMED) {
             if( loginUser.getId() == cart.getCustomer().getId() )
                 return this.save(cart, items);
 
             cart = this.getCartByCustomer(loginUser);
-            return this.mergeCart(cart, items);
+            if (isMerge)
+                return this.mergeCart(cart, items);
+            else
+                return this.save(cart, items);
         }
         //if (cart.getCartState() == CartState.CLOSED) {
         cart = this.getCartByCustomer(loginUser);
-        return this.mergeCart(cart, items);
+        if (isMerge)
+            return this.mergeCart(cart, items);
+        else
+            return this.save(cart, items);
         //}
     }
 
@@ -135,12 +174,16 @@ public class CartService {
         List<CartItem> cartItems = cart.getCartItems();
 
         for(CartItemDTO dto : items) {
-            CartItem existing = cartItems.stream().filter(x -> x.getProductId() == dto.getProductId()).findAny().orElse(null);
+            CartItem existing = cartItems.stream().filter(x -> x.getProductId().equals(dto.getProductId())).findAny().orElse(null);
             if(existing != null)
                 existing.setQuantity(existing.getQuantity() + dto.getQuantity());
-            else
-                cart.addCartItem(cartItemMapper.toEntity(dto));
+            else {
+                // Check product exists
+                if(productRepository.findOneByRef(dto.getProductId()).orElse(null) != null)
+                    cart.addCartItem(cartItemMapper.toEntity(dto));
+            }
         }
+
         cart = cartRepository.save(cart);
         return cartMapper.toDto(cart);
     }
@@ -177,12 +220,24 @@ public class CartService {
     }
 
     private void setItems(Cart cart, List<CartItemDTO> items) {
-        List<CartItem> cartItems = new ArrayList<>();
+        //List<CartItem> cartItems = new ArrayList<>();
+        cart.getCartItems().clear();;
         for(CartItemDTO dto : items) {
-            CartItem item = cartItemMapper.toEntity(dto);
-            item.setCart(cart);
-            cartItems.add(cartItemMapper.toEntity(dto));
+            Long ref = dto.getProductId();
+            if(ref != null && productRepository.findOneByRef(ref).orElse(null) != null) {
+                CartItem item = cartItemMapper.toEntity(dto);
+                cart.addCartItem(item);
+            }
         }
-        cart.setCartItems(cartItems);
+        //cart.setCartItems(cartItems);
+    }
+
+    public CheckoutSession createCheckout(String secureKey, List<CartItemDTO> items) {
+        Cart cart = cartRepository.findBySecureKey(secureKey).get(); //.orElse(new Cart()); //cartMapper.toEntity(cartDTO);
+        setItems(cart, items); //cartMapper.toDto(cart);
+        cart = cartRepository.save(cart);
+        CheckoutCart checkoutCart = checkoutCartMapper.cartToCheckoutCart(cart);
+        checkoutCartRepository.save(checkoutCart);
+        return new CheckoutSession("http://www.google.com", checkoutCart.getSecureKey());
     }
 }

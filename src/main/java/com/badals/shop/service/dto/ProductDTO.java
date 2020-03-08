@@ -8,14 +8,18 @@ import javax.persistence.Lob;
 
 import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.enumeration.Condition;
-import com.badals.shop.domain.pojo.Attribute;
-import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.domain.pojo.Variation;
-import com.badals.shop.domain.pojo.VariationOption;
+import com.badals.shop.domain.enumeration.ProductGroup;
+//import com.badals.shop.domain.enumeration.ProductType;
+import com.badals.shop.domain.enumeration.ProductType;
+import com.badals.shop.domain.pojo.*;
+import com.badals.shop.service.pojo.Meta;
+import lombok.Data;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.Product} entity.
  */
+
+@Data
 public class ProductDTO implements Serializable {
 
     private Long id;
@@ -27,34 +31,22 @@ public class ProductDTO implements Serializable {
     @NotNull
     private String sku;
 
-    private Long upc;
+    private String upc;
 
     @NotNull
     private String price;
 
+    private String salePrice;
+
+    private float discountInPercent = 10;
+
     @NotNull
     private String currency;
-
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
 
     private String image;
 
     @Lob
-    private List<String> images;
+    private List<Gallery> gallery;
 
     private LocalDate releaseDate;
 
@@ -69,9 +61,15 @@ public class ProductDTO implements Serializable {
     @NotNull
     private String title;
 
+    private String description;
+
+    private Set<CategoryDTO> categories;
+
     private String brand;
 
-    private String group;
+    private ProductGroup group;
+
+    private String slug;
 
     //@NotNull
     //private Instant updated;
@@ -89,200 +87,19 @@ public class ProductDTO implements Serializable {
 
     private BigDecimal volumeWeight;
 
-    public Long getId() {
-        return id;
-    }
+    private ProductType type = ProductType.CHILDREN_BOOKS;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String author = "Fatma Anwar";
 
-    public Long getRef() {
-        return ref;
-    }
+    private String unit = "pcs";
 
-    public void setRef(Long ref) {
-        this.ref = ref;
-    }
-
-    public Long getParent() {
-        return parent;
-    }
-
-    public void setParent(Long parent) {
-        this.parent = parent;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
-    public Long getUpc() {
-        return upc;
-    }
-
-    public void setUpc(Long upc) {
-        this.upc = upc;
-    }
-
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public List<String> getImages() {
-        return images;
-    }
-
-    public void setImages(List<String> images) {
-        this.images = images;
-    }
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-
-    public Boolean isActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public List<String> getSimilarProducts() {
-        return similarProducts;
-    }
-
-    public void setSimilarProducts(List<String> similarProducts) {
-        this.similarProducts = similarProducts;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getBrand() {
-        return brand;
-    }
-
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
-    public Condition getCondition() {
-        return condition;
-    }
-
-    public void setCondition(Condition condition) {
-        this.condition = condition;
-    }
-
-    public Boolean isIsUsed() {
-        return isUsed;
-    }
-
-    public void setIsUsed(Boolean isUsed) {
-        this.isUsed = isUsed;
-    }
-
-    public Boolean isAvailableForOrder() {
-        return availableForOrder;
-    }
-
-    public void setAvailableForOrder(Boolean availableForOrder) {
-        this.availableForOrder = availableForOrder;
-    }
-
-    public BigDecimal getWeight() {
-        return weight;
-    }
-
-    public void setWeight(BigDecimal weight) {
-        this.weight = weight;
-    }
-
-    public BigDecimal getVolumeWeight() {
-        return volumeWeight;
-    }
-
-    public void setVolumeWeight(BigDecimal volumeWeight) {
-        this.volumeWeight = volumeWeight;
-    }
-
+   private Meta meta = new Meta();
 
     // Variations
-
     List<String> variationDimensions;
     List<VariationOption> variationOptions;
     List<Variation> variations;
     List<Attribute> variationAttributes;
-
-    List<ProductLang> i18n;
-
-    public List<String> getVariationDimensions() {
-        return variationDimensions;
-    }
-
-    public void setVariationDimensions(List<String> variationDimensions) {
-        this.variationDimensions = variationDimensions;
-    }
-
-    public List<VariationOption> getVariationOptions() {
-        return variationOptions;
-    }
-
-    public void setVariationOptions(List<VariationOption> variationOptions) {
-        this.variationOptions = variationOptions;
-    }
-
-    public List<Variation> getVariations() {
-        return variations;
-    }
-
-    public void setVariations(List<Variation> variations) {
-        this.variations = variations;
-    }
-
-    public List<Attribute> getVariationAttributes() {
-        return variationAttributes;
-    }
-
-    public void setVariationAttributes(List<Attribute> variationAttributes) {
-        this.variationAttributes = variationAttributes;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -315,17 +132,17 @@ public class ProductDTO implements Serializable {
             ", upc=" + getUpc() +
             ", price=" + getPrice() +
             ", image='" + getImage() + "'" +
-            ", images='" + getImages() + "'" +
+            //", images='" + getImages() + "'" +
             ", releaseDate='" + getReleaseDate() + "'" +
-            ", active='" + isActive() + "'" +
+            ", active='" + getActive() + "'" +
             ", similarProducts='" + getSimilarProducts() + "'" +
             ", url='" + getUrl() + "'" +
             ", title='" + getTitle() + "'" +
             ", brand='" + getBrand() + "'" +
             ", group='" + getGroup() + "'" +
             ", condition='" + getCondition() + "'" +
-            ", isUsed='" + isIsUsed() + "'" +
-            ", availableForOrder='" + isAvailableForOrder() + "'" +
+            ", isUsed='" + getIsUsed() + "'" +
+            ", availableForOrder='" + getAvailableForOrder() + "'" +
             ", weight=" + getWeight() +
             ", volumeWeight=" + getVolumeWeight() +
             "}";
