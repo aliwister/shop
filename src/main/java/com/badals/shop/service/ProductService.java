@@ -3,6 +3,7 @@ package com.badals.shop.service;
 import com.algolia.search.SearchIndex;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
+import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.ProductI18;
 import com.badals.shop.domain.pojo.ProductResponse;
@@ -12,11 +13,11 @@ import com.badals.shop.domain.AlgoliaProduct;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
+import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,8 +147,20 @@ public class ProductService {
         return new Attribute("success", "1");
     }
 
-    public ProductDTO getProductBySlug(String slug) {
-        return productRepository.findBySlugJoinCategories(slug).map(productMapper::toDto).orElse(null);
+    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException {
+        Product product = productRepository.findBySlugJoinCategories(slug).get();
+        if(product == null)
+            throw new ProductNotFoundException("Invalid Product");
+
+        if(product.getVariationType().equals(VariationType.PARENT)) {
+            if(product.getChildren().size() <1)
+                throw new ProductNotFoundException("Lonely Parent");
+            product = product.getChildren().iterator().next();
+        }
+
+
+        return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
+        //return productRepository.findBySlugJoinCategories(slug).map(productMapper::toDto).orElse(null);
     }
 
     public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {
@@ -161,5 +174,21 @@ public class ProductService {
         List<Product> products = productRepository.findAllByCategorySlug(slug);
 
         return products.stream().map(productMapper::toDto).collect(Collectors.toList());
+    }
+
+    public ProductDTO getProductBySku(String sku) throws ProductNotFoundException {
+        Product product = productRepository.findBySkuJoinCategories( sku).get();
+        if(product == null)
+            throw new ProductNotFoundException("Invalid Product");
+
+        if(product.getVariationType().equals(VariationType.PARENT)) {
+            if(product.getChildren().size() <1)
+                throw new ProductNotFoundException("Lonely Parent");
+            product = product.getChildren().iterator().next();
+        }
+
+
+        return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
+
     }
 }

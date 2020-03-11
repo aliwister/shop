@@ -12,7 +12,9 @@ public interface CheckoutCartMapper {
 
    @Mapping(source = "cartItems", target = "items")
    @Mapping(target = "carrier", ignore = true)
-   @Mapping(target = "currency", ignore = true)
    @Mapping(source = "customer.addresses", target = "addresses")
+   @Mapping(source = "customer.firstname", target = "name")
+   @Mapping(source = "customer.email", target = "email")
+   @Mapping(source = "currency.code", target = "currency")
    CheckoutCart cartToCheckoutCart(Cart cart);
 }

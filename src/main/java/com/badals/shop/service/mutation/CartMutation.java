@@ -6,6 +6,8 @@ import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.pojo.CheckoutSession;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -44,6 +46,9 @@ public class CartMutation implements GraphQLMutationResolver {
     @Autowired
     private CartService cartService;
 
+    @Value("${badals.checkout-app}")
+    String checkoutAppUrl;
+
     public CartDTO updateCart(final String secureKey, final List<CartItemDTO> items) {
         return this.cartService.updateCart(secureKey, items, true);
     }
@@ -52,8 +57,10 @@ public class CartMutation implements GraphQLMutationResolver {
         return this.cartService.updateCart(secureKey, items, false);
     }
 
+    @PreAuthorize("isAuthenticated()")
     public CheckoutSession createCheckoutSession(final String secureKey, final List<CartItemDTO> items) {
-        return cartService.createCheckout(secureKey, items);
+        String token = cartService.createCheckout(secureKey, items);
+        return new CheckoutSession(checkoutAppUrl + "?token=" + token, token);
     }
 }
 
