@@ -1,11 +1,16 @@
 package com.badals.shop.service.query;
 
+import com.badals.shop.domain.Product;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.service.CategoryService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.dto.CategoryDTO;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.PasService;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -79,14 +84,18 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
     @Autowired
     private ProductService productService;
 
+   @Autowired
+   private PasService pasService;
+
     @Autowired
     private CategoryService categoryService;
+   private static final Logger log = LoggerFactory.getLogger(ProductQuery.class);
 
-    public List<ProductDTO> products(final int count) {
+   public List<ProductDTO> products(final int count) {
         return productService.getAllProducts(count);
         //return null;
     }
-   public ProductDTO product (String slug) {
+   public ProductDTO product (String slug)  throws ProductNotFoundException  {
       ProductDTO dto = this.productService.getProductBySlug(slug);
       return dto;
    }
@@ -116,6 +125,13 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    public CategoryDTO category(int id) {
       return categoryService.findOne((long) id).orElse(null);
+   }
+
+   public ProductDTO getProductBySku(final String sku) throws ProductNotFoundException {
+      //return new Product();
+      log.info("GetProductBySky: pasService.lookup("+sku+")");
+      ProductDTO parent =  pasService.lookup(sku);
+      return this.productService.getProductBySku(sku);
    }
 }
 

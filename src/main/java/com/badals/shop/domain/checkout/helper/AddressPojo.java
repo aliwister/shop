@@ -6,10 +6,13 @@ import java.io.Serializable;
 
 @Data
 public class AddressPojo implements Serializable {
-    String name;
+    Long id;
+    String firstName;
+    String lastName;
     String line1;
     String line2;
     String city;
+    String state;
     String country;
     String postalCode;
 }
