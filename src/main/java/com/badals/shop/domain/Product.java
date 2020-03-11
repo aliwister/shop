@@ -197,16 +197,26 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "variation_attributes", columnDefinition = "string")
     List<Attribute> variationAttributes;
 
-    @Type(type = "json")
-    @Column(name = "price", columnDefinition = "string")
-    Price price;
+    @Column(name = "price")
+    BigDecimal price;
 
-    public Price getPrice() {
+    @Column
+    String currency;
+
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Price price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public List<String> getVariationDimensions() {
@@ -519,6 +529,12 @@ public class Product implements Serializable, IMerchantProduct {
     public Product volumeWeight(BigDecimal volumeWeight) {
         this.volumeWeight = volumeWeight;
         return this;
+    }
+
+    @Override
+    public void setPrice(Price price) {
+        this.setPrice(price.getAmount());
+        this.setCurrency(price.getCurrency());
     }
 
     public void setVolumeWeight(BigDecimal volumeWeight) {

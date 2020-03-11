@@ -9,7 +9,6 @@ import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.xtra.IMerchantProduct;
 import com.badals.shop.xtra.IProductLang;
-import com.badals.shop.xtra.amazon.mappings.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +123,7 @@ public class PasLookupParser {
     }
 
 
-   private static Price parsePrice(PriceNode price) {
+   /*private static Price parsePrice(PriceNode price) {
       // TODO Auto-generated method stub
       if(price == null)
          return null;
@@ -132,11 +131,12 @@ public class PasLookupParser {
       BigDecimal dPrice = BigDecimal.valueOf(Double.parseDouble(price.getAmount())).movePointRight(2);
 
       return new Price(dPrice, price.getCurrencyCode());
-   }
+   }*/
 
-   public static final double USDPERLB = 4;
-   public static final double USD2OMR = .386;
 
+    private static final double USD2OMR = .386;
+    private static final double LB2KG = 0.453592;
+    private static final double OMRPERKG = 3.5;
 
     public static MerchantStock parseStock(MerchantStock stock, Item item) throws PricingException, NoOfferException {
         OfferListing offer = opt(() ->item.getOffers().getListings().get(0));
@@ -149,17 +149,20 @@ public class PasLookupParser {
         boolean availability = offer.getAvailability().getType().equals("Now");
 
         double margin = 5, risk = 2, fixed = 1.1;
+
         BigDecimal weight = opt(() -> item.getItemInfo().getProductInfo().getItemDimensions().getWeight().getDisplayValue());
         if (weight == null)
             throw new PricingException("Unable to calculate price");
 
-        double dWeight = weight.doubleValue();
-        if (dWeight < .01) {
+        double dWeight = weight.doubleValue()*LB2KG;
+        if (dWeight < .0001) {
             //throw new Exception("Unable to caculate the price [weight=0]");
             fixed = 10000000;
         }
+        if (dWeight < .05)
+            dWeight += .4;
 
-        dWeight += .3;
+        dWeight = Math.max(dWeight, .3);
         double dCost = cost.doubleValue();
         double insurance = Math.log(dCost/dWeight)* Math.log10(dCost/dWeight) * Math.max(Math.log10(Math.sqrt(dCost)),1);
         insurance = .1*Math.max(insurance, 0);
@@ -176,11 +179,11 @@ public class PasLookupParser {
             insurance = -1;
 
         double c_add = (double) (margin + risk) * dCost *.01 + localShipping;
-        double w_add = (double) USDPERLB * dWeight ;
+        double w_add = (double) OMRPERKG * dWeight ;
 
         //if($isDirect) 		$w_add = 0 ;
         //if(!isInsurance) 	$insurance = 0;
-        double dPrice = (dCost + c_add + insurance + w_add ) * USD2OMR + fixed;
+        double dPrice = (dCost + c_add + insurance  ) * USD2OMR + fixed + w_add;
         dPrice = Math.round(dPrice*10.0)/10.0;
 
         BigDecimal price = BigDecimal.valueOf(dPrice);

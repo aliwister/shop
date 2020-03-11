@@ -12,18 +12,18 @@ import org.mapstruct.*;
 public interface CartItemMapper extends EntityMapper<CartItemDTO, CartItem> {
 
     @Mapping(source = "cart.id", target = "cartId")
-    @Mapping(source = "product.ref", target = "id")
+    @Mapping(source = "product.ref", target = "productId")
     @Mapping(source = "product.title", target = "title")
     @Mapping(source = "product.slug", target = "slug")
     @Mapping(source = "product.image", target = "image")
     @Mapping(source = "product.url", target = "url")
-    @Mapping(source = "product.price.amount", target = "price", qualifiedByName = "doubleToString")
-    @Mapping(source = "product.price.amount", target = "salePrice", qualifiedByName = "doubleToString")
+    @Mapping(source = "product.price", target = "price", qualifiedByName = "doubleToString")
+    @Mapping(source = "product.price", target = "salePrice", qualifiedByName = "doubleToString")
     CartItemDTO toDto(CartItem cartItem);
 
     @Mapping(source = "cartId", target = "cart")
-    @Mapping(source = "id", target = "product")
-    //@Mapping(source = "customerId", target = "customer")
+    //@Mapping(source = "productId", target = "product.ref")
+    @Mapping(source = "productId", target = "productId")
     CartItem toEntity(CartItemDTO cartItemDTO);
 
     default CartItem fromId(Long id) {

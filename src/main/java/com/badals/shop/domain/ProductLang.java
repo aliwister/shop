@@ -13,7 +13,7 @@ import java.util.List;
  * A ProductLang.
  */
 @Entity
-@Table(name = "product_lang")
+@Table(name = "product_lang", schema="shop")
 public class ProductLang implements Serializable, IProductLang {
 
     private static final long serialVersionUID = 1L;
