@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Table(name = "cart_item")
 public class CartItem implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 22L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,15 +27,6 @@ public class CartItem implements Serializable {
     @JsonIgnoreProperties("cartItems")
     private Cart cart;
 
-    @ManyToOne
-    //@NotNull
-    @JsonIgnoreProperties("cartItems")
-    @JoinColumn(name="product_id", referencedColumnName = "ref", insertable = false, updatable = false)
-    private Product product;
-
-
-    @Column(name = "product_id")
-    private Long productId;
 
     public Long getProductId() {
         return productId;
@@ -44,6 +35,33 @@ public class CartItem implements Serializable {
     public void setProductId(Long productId) {
         this.productId = productId;
     }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    @Column(name = "product_id")
+    private Long productId;
+
+
+
+    @ManyToOne
+    @JoinColumn(name="product_id", referencedColumnName = "ref", insertable = false, updatable = false)
+    private Product product;
+   // @Column(name = "product_id")
+   // private Long productId;
+
+    //public Long getProductId() {
+     //   return productId;
+   // }
+
+    //public void setProductId(Long productId) {
+     //   this.productId = productId;
+  //  }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -78,19 +96,6 @@ public class CartItem implements Serializable {
 
     public void setCart(Cart cart) {
         this.cart = cart;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public CartItem product(Product product) {
-        this.product = product;
-        return this;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
     }
 
     @Override

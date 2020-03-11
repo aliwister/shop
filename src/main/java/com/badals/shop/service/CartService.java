@@ -4,16 +4,19 @@ import com.badals.shop.domain.Cart;
 import com.badals.shop.domain.CartItem;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
 import com.badals.shop.domain.checkout.helper.CheckoutCartMapper;
+import com.badals.shop.domain.checkout.helper.CheckoutLineItemMapper;
+import com.badals.shop.repository.CartItemRepository;
 import com.badals.shop.repository.CheckoutCartRepository;
 import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.repository.CartRepository;
 import com.badals.shop.repository.ProductRepository;
+import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.mapper.CartItemMapper;
 import com.badals.shop.service.mapper.CartMapper;
-import com.badals.shop.service.pojo.CheckoutSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +36,15 @@ public class CartService {
     private final Logger log = LoggerFactory.getLogger(CartService.class);
 
     private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
 
     private final CartMapper cartMapper;
     private final CartItemMapper cartItemMapper;
 
     private final CheckoutCartMapper checkoutCartMapper;
+    private final CheckoutLineItemMapper checkoutLineItemMapper;
     private final CheckoutCartRepository checkoutCartRepository;
+    private final CheckoutAddressMapper checkoutAddressMapper;
 
     private final UserService userService;
     private final ProductRepository productRepository;
@@ -49,14 +55,17 @@ public class CartService {
         return uuid.toString();
     }
 
-    public CartService(CartRepository cartRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, UserService userService, ProductRepository productRepository) {
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, UserService userService, ProductRepository productRepository, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
         this.cartMapper = cartMapper;
         this.cartItemMapper = cartItemMapper;
         this.userService = userService;
         this.checkoutCartMapper = checkoutCartMapper;
         this.checkoutCartRepository = checkoutCartRepository;
         this.productRepository = productRepository;
+        this.checkoutLineItemMapper = checkoutLineItemMapper;
+        this.checkoutAddressMapper = checkoutAddressMapper;
     }
 
     /**
@@ -232,12 +241,30 @@ public class CartService {
         //cart.setCartItems(cartItems);
     }
 
-    public CheckoutSession createCheckout(String secureKey, List<CartItemDTO> items) {
-        Cart cart = cartRepository.findBySecureKey(secureKey).get(); //.orElse(new Cart()); //cartMapper.toEntity(cartDTO);
+    public String createCheckout(String secureKey, List<CartItemDTO> items) {
+        //Cart cart = cartRepository.findBySecureKey(secureKey).orElse(new Cart()); //cartMapper.toEntity(cartDTO);
+        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+        Cart cart = this.getCartByCustomer(loginUser);
+
         setItems(cart, items); //cartMapper.toDto(cart);
         cart = cartRepository.save(cart);
-        CheckoutCart checkoutCart = checkoutCartMapper.cartToCheckoutCart(cart);
-        checkoutCartRepository.save(checkoutCart);
-        return new CheckoutSession("http://www.google.com", checkoutCart.getSecureKey());
+
+        List<CartItemInfo> cartItems = cartItemRepository.findCartItemsWithProductNative(cart.getId());
+
+
+        CheckoutCart checkoutCart = checkoutCartRepository.findBySecureKey(cart.getSecureKey()).orElse(new CheckoutCart());
+        checkoutCart.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
+        checkoutCart.setAddresses(cart.getCustomer().getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).collect(Collectors.toList()));
+        checkoutCart.setSecureKey(cart.getSecureKey());
+        checkoutCart.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
+        checkoutCart.setEmail(cart.getCustomer().getEmail());
+        //checkoutCart.setPhone(cart.getCustomer().g);
+        //CheckoutCart checkoutCart = checkoutCartMapper.cartToCheckoutCart(cart);
+
+        //checkoutCart.setAddresses(cart.getCustomer().getAddresses());
+
+
+        checkoutCart = checkoutCartRepository.save(checkoutCart);
+        return checkoutCart.getSecureKey();
     }
 }
