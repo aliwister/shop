@@ -6,6 +6,8 @@ import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.service.dto.ProductDTO;
 import org.mapstruct.*;
 
+import java.util.ArrayList;
+
 /**
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
  */
@@ -69,6 +71,9 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     }
     @AfterMapping
     default void afterMapping(@MappingTarget ProductDTO target, Product source) {
+        if (target.getGallery() == null) {
+            target.setGallery(new ArrayList<Gallery>());
+        }
         target.getGallery().add(0, new Gallery(source.getImage()));
     }
 }

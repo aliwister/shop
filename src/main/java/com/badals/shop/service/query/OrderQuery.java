@@ -54,11 +54,8 @@ public class OrderQuery extends ShopQuery implements GraphQLQueryResolver {
     private ProductService productService;
 
     public OrderDTO orderConfirmation(String ref, String key) throws OrderNotFoundException {
-        OrderDTO order = orderService.getOrderConfirmation(ref,key).orElse(null);
-        if (order == null)
-            throw new OrderNotFoundException("Unknown Order");
 
-        return order;
+        return orderService.getOrderConfirmation(ref,key);
     }
 
     public List<OrderDTO> orders(int limit) throws OrderNotFoundException {
