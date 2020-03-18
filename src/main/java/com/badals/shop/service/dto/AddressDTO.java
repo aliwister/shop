@@ -1,10 +1,14 @@
 package com.badals.shop.service.dto;
+import com.badals.shop.domain.checkout.helper.AddressPojo;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.Address} entity.
  */
+@Data
 public class AddressDTO implements Serializable {
 
     private Long id;
@@ -13,9 +17,9 @@ public class AddressDTO implements Serializable {
 
     private String lastName;
 
-    private String address1;
+    private String line1;
 
-    private String address2;
+    private String line2;
 
     private String city;
 
@@ -26,111 +30,36 @@ public class AddressDTO implements Serializable {
 
     private Long customerId;
 
-    public Long getId() {
-        return id;
+    public AddressDTO() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
+    public AddressDTO(String firstName, String lastName, String line1, String line2, String city) {
         this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getAddress1() {
-        return address1;
-    }
-
-    public void setAddress1(String address1) {
-        this.address1 = address1;
-    }
-
-    public String getAddress2() {
-        return address2;
-    }
-
-    public void setAddress2(String address2) {
-        this.address2 = address2;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
+        this.line1 = line1;
+        this.line2 = line2;
         this.city = city;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getActive() {
-        return active;
-    }
-
-    public void setActive(String active) {
-        this.active = active;
-    }
-
-    public Long getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        AddressDTO addressDTO = (AddressDTO) o;
-        if (addressDTO.getId() == null || getId() == null) {
-            return false;
-        }
-        return Objects.equals(getId(), addressDTO.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
+        //this.mobile = mobile;
     }
 
     @Override
     public String toString() {
         return "AddressDTO{" +
-            "id=" + getId() +
-            ", firstName='" + getFirstName() + "'" +
-            ", lastName='" + getLastName() + "'" +
-            ", address1='" + getAddress1() + "'" +
-            ", address2='" + getAddress2() + "'" +
-            ", city='" + getCity() + "'" +
-            ", mobile='" + getMobile() + "'" +
-            ", active='" + getActive() + "'" +
-            ", customer=" + getCustomerId() +
-            "}";
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", line1='" + line1 + '\'' +
+                ", line2='" + line2 + '\'' +
+                ", city='" + city + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", active='" + active + '\'' +
+                ", customerId=" + customerId +
+                '}';
+    }
+
+    public static AddressDTO fromAddressPojo(AddressPojo pojo) {
+        if(pojo == null)
+            return null;
+        return new AddressDTO(pojo.getFirstName(),pojo.getLastName(),pojo.getLine1(),pojo.getLine2(),pojo.getCity());
     }
 }

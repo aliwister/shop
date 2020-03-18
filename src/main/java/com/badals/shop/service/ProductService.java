@@ -14,6 +14,7 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.PricingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,17 +177,21 @@ public class ProductService {
         return products.stream().map(productMapper::toDto).collect(Collectors.toList());
     }
 
-    public ProductDTO getProductBySku(String sku) throws ProductNotFoundException {
+    public ProductDTO getProductBySku(String sku) throws ProductNotFoundException, PricingException {
         Product product = productRepository.findBySkuJoinCategories( sku).get();
-        if(product == null)
+        if(product == null )
             throw new ProductNotFoundException("Invalid Product");
 
+
+
         if(product.getVariationType().equals(VariationType.PARENT)) {
-            if(product.getChildren().size() <1)
+            if(product.getChildren().size() < 1)
                 throw new ProductNotFoundException("Lonely Parent");
             product = product.getChildren().iterator().next();
         }
 
+        //if(product.getPrice() == null)
+        //    throw new PricingException("Invalid price");
 
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
 
