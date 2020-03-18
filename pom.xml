@@ -391,22 +391,22 @@
             <groupId>com.amazonservices</groupId>
             <artifactId>mws-client</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/MWSClientJavaRuntime-1.0.jar</systemPath>
+            <!--<scope>system</scope>
+            <systemPath>${basedir}/lib/MWSClientJavaRuntime-1.0.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>com.amazonservices</groupId>
             <artifactId>mws-products</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/MWSProductsServiceJavaClientLibrary-2013-08-01.jar</systemPath>
+<!--            <scope>system</scope>
+            <systemPath>${basedir}/lib/MWSProductsServiceJavaClientLibrary-2013-08-01.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>com.amazonservices</groupId>
             <artifactId>paapi5</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/paapi5-java-sdk-1.0.0.jar</systemPath>
+<!--            <scope>system</scope>
+            <systemPath>${basedir}/lib/paapi5-java-sdk-1.0.0.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
