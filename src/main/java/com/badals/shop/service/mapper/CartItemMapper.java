@@ -13,6 +13,7 @@ public interface CartItemMapper extends EntityMapper<CartItemDTO, CartItem> {
 
     @Mapping(source = "cart.id", target = "cartId")
     @Mapping(source = "product.ref", target = "productId")
+    @Mapping(source = "product.ref", target = "id")
     @Mapping(source = "product.title", target = "title")
     @Mapping(source = "product.slug", target = "slug")
     @Mapping(source = "product.image", target = "image")
