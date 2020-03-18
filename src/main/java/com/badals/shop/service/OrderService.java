@@ -87,7 +87,7 @@ public class OrderService {
         orderRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public OrderDTO getOrderConfirmation(String reference, String confirmationKey) throws OrderNotFoundException {
         Order order = orderRepository.findOrderByReferenceAndConfirmationKey(reference, confirmationKey).orElse(null);
         if(order == null) {
