@@ -1,5 +1,6 @@
 package com.badals.shop.service;
 
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
 import com.badals.shop.repository.OrderRepository;
 import com.badals.shop.service.dto.OrderDTO;
@@ -27,10 +28,12 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     private final OrderMapper orderMapper;
+    private UserService userService;
 
-    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper) {
+    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
+        this.userService = userService;
     }
 
     /**
@@ -81,5 +84,18 @@ public class OrderService {
     public void delete(Long id) {
         log.debug("Request to delete Order : {}", id);
         orderRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<OrderDTO> getOrderConfirmation(String reference, String confirmationKey) {
+        Optional<Order> order = orderRepository.findOrderByReferenceAndConfirmationKey(reference, confirmationKey);
+        return order.map(orderMapper::toDto);
+    }
+
+    public List<OrderDTO> getCustomerOrders() {
+        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+        return orderRepository.findOrdersByCustomer(loginUser).stream()
+                .map(orderMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
     }
 }

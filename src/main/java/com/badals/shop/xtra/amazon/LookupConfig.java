@@ -1,9 +1,16 @@
 package com.badals.shop.xtra.amazon;
 
 //import com.amazonservices.mws.products.MarketplaceWebServiceProductsAsyncClient;
+import com.amazonservices.mws.products.MarketplaceWebServiceProductsClient;
+import com.badals.shop.xtra.amazon.mws.MwsLookup;
+import com.badals.shop.xtra.amazon.mws.MwsRequestHelper;
+import com.badals.shop.xtra.amazon.paapi5.PasLookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.badals.shop.xtra.amazon.paapi4.Pas4Lookup;
+
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -18,17 +25,6 @@ public class LookupConfig {
    @Value("${pas.secret}")
    private String pasSecretKey;
 
-   @Bean
-   public PasLookup pasLookup() throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException {
-
-      System.out.println("======================================================"+pasAccessKeyId);
-
-      final SignedRequestsHelper signedRequestsHelper = new SignedRequestsHelper(pasAccessKeyId, pasSecretKey);
-      final PasLookup pasLookup = new PasLookup(signedRequestsHelper);
-      return pasLookup;
-   }
-
-
    @Value("${mws.key}")
    private String mwsAccessKeyId;
 
@@ -40,6 +36,42 @@ public class LookupConfig {
 
    @Value("${mws.marketplaceid}")
    private String mwsMarketPlaceId;
+
+
+   @Bean
+   public PasLookup pasLookup() throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException {
+
+      System.out.println("======================================================"+pasAccessKeyId);
+
+      final SignedRequestsHelper signedRequestsHelper = new SignedRequestsHelper(pasAccessKeyId, pasSecretKey);
+      final PasLookup pasLookup = new PasLookup(signedRequestsHelper);
+      return pasLookup;
+   }
+
+   @Bean
+   public Pas4Lookup pas4Lookup() throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException {
+
+      System.out.println("======================================================"+pasAccessKeyId);
+
+      final SignedRequestsHelper signedRequestsHelper = new SignedRequestsHelper(pasAccessKeyId, pasSecretKey);
+      final Pas4Lookup pasLookup = new Pas4Lookup(signedRequestsHelper);
+      return pasLookup;
+   }
+
+   @Bean
+   public MwsLookup mwsLookup() throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException {
+
+      System.out.println("======================================================"+pasAccessKeyId);
+      //final MarketplaceWebServiceProductsClient client = MwsRequestHelper.getClient("***REMOVED***", "***REMOVED***");
+      //MwsLookup mwsLookup = new MwsLookup(client);
+
+      final MarketplaceWebServiceProductsClient client = MwsRequestHelper.getClient(mwsAccessKeyId, mwsSecretKey);
+      final MwsLookup mwsLookup = new MwsLookup(client, mwsMerchantId, mwsMarketPlaceId );
+      return mwsLookup;
+   }
+
+
+
 
 
    /*

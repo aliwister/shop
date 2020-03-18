@@ -11,11 +11,11 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {MerchantMapper.class, ProductMapper.class})
 public interface MerchantStockMapper extends EntityMapper<MerchantStockDTO, MerchantStock> {
 
-    @Mapping(source = "merchant.id", target = "merchantId")
+    //@Mapping(source = "merchant.id", target = "merchantId")
     @Mapping(source = "product.id", target = "productId")
     MerchantStockDTO toDto(MerchantStock merchantStock);
 
-    @Mapping(source = "merchantId", target = "merchant")
+    //@Mapping(source = "merchantId", target = "merchant")
     @Mapping(source = "productId", target = "product")
     MerchantStock toEntity(MerchantStockDTO merchantStockDTO);
 

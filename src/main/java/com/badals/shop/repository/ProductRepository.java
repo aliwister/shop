@@ -24,4 +24,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAllByCategorySlug(String slug);
 
     Optional<Product> findOneByRef(Long ref);
+
+    @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.children c left join fetch c.productLangs left join fetch c.merchantStock where u.sku = ?1")
+    Optional<Product> findBySkuJoinChildren(String asin);
 }

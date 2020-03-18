@@ -1,6 +1,7 @@
 package com.badals.shop.domain;
 import com.badals.shop.xtra.IProductLang;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.SelectBeforeUpdate;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "product_lang", schema="shop")
+@SelectBeforeUpdate(false)
 public class ProductLang implements Serializable, IProductLang {
 
     private static final long serialVersionUID = 1L;

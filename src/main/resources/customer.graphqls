@@ -4,11 +4,16 @@ type Customer {
 
 type Address {
     id: ID!
+    firstName: String
+    lastName: String
+        line1: String
+        line2: String
+    city: String
 }
 
 type AddressInput {
-    address1: String
-    address2: String
+    line1: String
+    line2: String
     name: String
     landmark: String
     city: String

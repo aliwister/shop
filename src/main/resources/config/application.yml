@@ -75,6 +75,7 @@ spring:
       hibernate.jdbc.time_zone: UTC
     hibernate:
       ddl-auto: none
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       naming:
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
