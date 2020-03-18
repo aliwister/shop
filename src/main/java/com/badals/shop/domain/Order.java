@@ -1,4 +1,5 @@
 package com.badals.shop.domain;
+import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.domain.checkout.helper.AddressPojo;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -50,7 +51,7 @@ public class Order implements Serializable {
 
     @OneToOne
     @JoinColumn(unique = true)
-    private Cart cart;
+    private CheckoutCart cart;
 
     @ManyToOne
     @JsonIgnoreProperties("orders")
@@ -252,16 +253,11 @@ public class Order implements Serializable {
         this.customer = customer;
     }
 
-    public Cart getCart() {
+    public CheckoutCart getCart() {
         return cart;
     }
 
-    public Order cart(Cart cart) {
-        this.cart = cart;
-        return this;
-    }
-
-    public void setCart(Cart cart) {
+    public void setCart(CheckoutCart cart) {
         this.cart = cart;
     }
 

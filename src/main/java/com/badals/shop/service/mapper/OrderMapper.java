@@ -11,12 +11,15 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Order} and its DTO {@link OrderDTO}.
  */
-@Mapper(componentModel = "spring", uses = {CustomerMapper.class, CartMapper.class, AddressMapper.class, OrderItemMapper.class})
+@Mapper(componentModel = "spring", uses = {CustomerMapper.class, AddressMapper.class, OrderItemMapper.class})
 public interface OrderMapper extends EntityMapper<OrderDTO, Order> {
 
     @Mapping(target = "orderItems", ignore = true)
     @Mapping(target = "removeOrderItem", ignore = true)
     Order toEntity(OrderDTO orderDTO);
+
+    @Mapping(target="cart", ignore = true)
+    OrderDTO toDto(Order order);
 
     default Order fromId(Long id) {
         if (id == null) {
