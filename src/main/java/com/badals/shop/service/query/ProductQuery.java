@@ -1,13 +1,14 @@
 package com.badals.shop.service.query;
 
-import com.badals.shop.domain.Product;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.service.CategoryService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.dto.CategoryDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import com.badals.shop.xtra.amazon.PasService;
+import com.badals.shop.xtra.amazon.Pas4Service;
+import com.badals.shop.xtra.amazon.Pas5Service;
+import com.badals.shop.xtra.amazon.PricingException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,10 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
     private ProductService productService;
 
    @Autowired
-   private PasService pasService;
+   private Pas5Service pas5Service;
+
+   @Autowired
+   private Pas4Service pas4Service;
 
     @Autowired
     private CategoryService categoryService;
@@ -127,10 +131,15 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return categoryService.findOne((long) id).orElse(null);
    }
 
-   public ProductDTO getProductBySku(final String sku) throws ProductNotFoundException {
+   public ProductDTO getProductBySku(final String sku, final boolean isFive) throws ProductNotFoundException, PricingException {
       //return new Product();
       log.info("GetProductBySky: pasService.lookup("+sku+")");
-      ProductDTO parent =  pasService.lookup(sku);
+      ProductDTO parent;
+      if(isFive)
+         parent =  pas5Service.lookup(sku);
+      else
+         parent =  pas4Service.lookup(sku);
+
       return this.productService.getProductBySku(sku);
    }
 }

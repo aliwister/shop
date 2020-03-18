@@ -16,9 +16,9 @@ package com.badals.shop.xtra.amazon;
  */
 
 
-import com.amazonservices.mws.client.*;
 import com.amazonservices.mws.products.*;
 import com.amazonservices.mws.products.model.*;
+import com.badals.shop.xtra.amazon.mws.MarketplaceWebServiceProductsSampleConfig;
 import org.w3c.dom.Node;
 
 import java.util.List;

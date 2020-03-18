@@ -9,12 +9,13 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
  */
-@Mapper(componentModel = "spring", uses = {CategoryMapper.class})
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class, MerchantStockMapper.class})
 public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
 
 
     @Mapping(target = "productLangs", ignore = true)
     @Mapping(target = "removeProductLang", ignore = true)
+    @Mapping(target = "merchantStock", ignore = true)
     @Mapping(source = "parent", target = "parentId")
     Product toEntity(ProductDTO productDTO);
 

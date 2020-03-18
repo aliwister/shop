@@ -1,11 +1,16 @@
 package com.badals.shop.domain;
+import com.badals.shop.domain.checkout.helper.AddressPojo;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +45,7 @@ public class Order implements Serializable {
 
     @ManyToOne
     @JsonIgnoreProperties("orders")
+    @JoinColumn(name="customer_id", referencedColumnName = "id_customer")
     private Customer customer;
 
     @OneToOne
@@ -48,11 +54,112 @@ public class Order implements Serializable {
 
     @ManyToOne
     @JsonIgnoreProperties("orders")
+    @JoinColumn(name = "delivery_address_id",referencedColumnName = "id_address")
     private Address deliveryAddress;
 
     @ManyToOne
     @JsonIgnoreProperties("orders")
+    @JoinColumn(name = "invoice_address_id",referencedColumnName = "id_address")
     private Address invoiceAddress;
+
+    @Type(type = "json")
+    @Column(name = "delivery_address", columnDefinition = "string")
+    private AddressPojo deliveryAddressPojo;
+
+    public AddressPojo getDeliveryAddressPojo() {
+        return deliveryAddressPojo;
+    }
+
+    public void setDeliveryAddressPojo(AddressPojo deliveryAddressPojo) {
+        this.deliveryAddressPojo = deliveryAddressPojo;
+    }
+
+    @Column(name="confirmation_key")
+    private String confirmationKey;
+
+    private BigDecimal subtotal;
+
+    private BigDecimal total;
+
+    @Column(name="delivery_total")
+    private BigDecimal deliveryTotal;
+
+    @Column(name="discounts_total")
+    private BigDecimal discountsTotal;
+
+    @CreatedDate
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @Column
+    private String carrier;
+
+    @Column
+    private String paymentMethod;
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getCarrier() {
+        return carrier;
+    }
+
+    public void setCarrier(String carrier) {
+        this.carrier = carrier;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public BigDecimal getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(BigDecimal subtotal) {
+        this.subtotal = subtotal;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public BigDecimal getDeliveryTotal() {
+        return deliveryTotal;
+    }
+
+    public void setDeliveryTotal(BigDecimal deliveryTotal) {
+        this.deliveryTotal = deliveryTotal;
+    }
+
+    public BigDecimal getDiscountsTotal() {
+        return discountsTotal;
+    }
+
+    public void setDiscountsTotal(BigDecimal discountsTotal) {
+        this.discountsTotal = discountsTotal;
+    }
+
+    public String getConfirmationKey() {
+        return confirmationKey;
+    }
+
+    public void setConfirmationKey(String confirmationKey) {
+        this.confirmationKey = confirmationKey;
+    }
 
     @OneToMany(mappedBy = "order")
     private Set<OrderItem> orderItems = new HashSet<>();

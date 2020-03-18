@@ -1,5 +1,6 @@
 package com.badals.shop.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.SelectBeforeUpdate;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
  */
 @Entity
 @Table(name = "merchant_stock")
+@SelectBeforeUpdate(false)
 public class MerchantStock implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -53,10 +55,20 @@ public class MerchantStock implements Serializable {
     //@Column(name = "price", columnDefinition = "string")
     private BigDecimal price;
 
-    @ManyToOne(optional = false)
-    @NotNull
-    @JsonIgnoreProperties("merchantStocks")
-    private Merchant merchant;
+    //@ManyToOne(optional = false)
+   // @NotNull
+   // @JsonIgnoreProperties("merchantStocks")
+   // private Merchant merchant;
+
+   public Long getMerchantId() {
+      return merchantId;
+   }
+
+   public void setMerchantId(Long merchantId) {
+      this.merchantId = merchantId;
+   }
+   @Column(name = "merchant_id")
+   private Long merchantId;
 
     @ManyToOne(optional = false)
     @NotNull
@@ -191,7 +203,7 @@ public class MerchantStock implements Serializable {
         this.price = price;
     }
 
-    public Merchant getMerchant() {
+ /*   public Merchant getMerchant() {
         return merchant;
     }
 
@@ -203,7 +215,7 @@ public class MerchantStock implements Serializable {
     public void setMerchant(Merchant merchant) {
         this.merchant = merchant;
     }
-
+*/
     public Product getProduct() {
         return product;
     }

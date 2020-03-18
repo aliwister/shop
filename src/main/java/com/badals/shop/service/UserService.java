@@ -48,13 +48,13 @@ public class UserService {
         this.cacheManager = cacheManager;
     }
 
-    public Optional<Customer> activateRegistration(String key) {
+    public Optional<Customer> activateRegistration(String key, String email) {
         log.debug("Activating user for activation key {}", key);
-        return userRepository.findOneBySecureKey(key)
+        return userRepository.findOneBySecureKeyAndEmail(key, email)
             .map(user -> {
                 // activate given user for the registration key.
                 user.setActive(1);
-                user.setSecureKey(null);
+                //user.setSecureKey(null);
                 //this.clearUserCaches(user);
                 log.debug("Activated user: {}", user);
                 return user;

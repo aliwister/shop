@@ -1,4 +1,7 @@
 package com.badals.shop.service.dto;
+import lombok.Data;
+
+import javax.persistence.Column;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -7,6 +10,7 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.badals.shop.domain.OrderItem} entity.
  */
+@Data
 public class OrderItemDTO implements Serializable {
 
     private Long id;
@@ -23,72 +27,21 @@ public class OrderItemDTO implements Serializable {
 
     private String shippingInstructions;
 
+    private String image;
+
+
+    private BigDecimal weight;
+
+
+    private String unit;
+
+
+    private BigDecimal lineTotal;
+
 
     private Long orderId;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Integer getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(Integer sequence) {
-        this.sequence = sequence;
-    }
-
-    public String getShippingInstructions() {
-        return shippingInstructions;
-    }
-
-    public void setShippingInstructions(String shippingInstructions) {
-        this.shippingInstructions = shippingInstructions;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
 
     @Override
     public boolean equals(Object o) {

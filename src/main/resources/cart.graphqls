@@ -31,7 +31,7 @@ input CartInput {
 
 type CartItem {
     id: ID,
-    productId: Int,
+    productId: Long,
     quantity: Int
     image: String
     url: String
@@ -43,7 +43,7 @@ type CartItem {
 }
 
 input CartItemInput {
-    productId: Int,
+    productId: Long,
     quantity: Int
 }
 

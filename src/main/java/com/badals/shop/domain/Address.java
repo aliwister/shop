@@ -1,48 +1,86 @@
 package com.badals.shop.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * A Address.
  */
 @Entity
-@Table(name = "address")
+@Table(catalog="prestashop7", name = "ps_address")
 public class Address implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_address")
     private Long id;
 
-    @Column(name = "first_name")
+    @Column(name = "firstname")
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "lastname")
     private String lastName;
 
-    @Column(name = "address_1")
-    private String address1;
+    @Column(name = "address1")
+    private String line1;
 
-    @Column(name = "address_2")
-    private String address2;
+    @Column(name = "address2")
+    private String line2;
+
+    @Column(name="postcode")
+    private String postCode;
 
     @Column(name = "city")
     private String city;
 
-    @Column(name = "mobile")
+    @Column(name = "phone")
     private String mobile;
 
     @Column(name = "active")
     private String active;
 
+    @Column(name = "deleted")
+    private String deleted;
+
+    @CreatedDate
+    @Column(name="date_add")
+    private Date createdDate;
+
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "id_customer")
     @JsonIgnoreProperties("addresses")
     private Customer customer;
+
+
+    public String getPostCode() {
+        return postCode;
+    }
+
+    public void setPostCode(String postCode) {
+        this.postCode = postCode;
+    }
+
+    public String getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(String deleted) {
+        this.deleted = deleted;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -79,30 +117,31 @@ public class Address implements Serializable {
         this.lastName = lastName;
     }
 
-    public String getAddress1() {
-        return address1;
+    public String getLine1() {
+        return line1;
     }
 
-    public Address address1(String address1) {
-        this.address1 = address1;
+    public void setLine1(String line1) {
+        this.line1 = line1;
+    }
+
+    public Address line1(String line1) {
+        this.line1 = line1;
         return this;
     }
 
-    public void setAddress1(String address1) {
-        this.address1 = address1;
-    }
-
-    public String getAddress2() {
-        return address2;
-    }
-
-    public Address address2(String address2) {
-        this.address2 = address2;
+    public Address line2(String line2) {
+        this.line1 = line1;
         return this;
     }
 
-    public void setAddress2(String address2) {
-        this.address2 = address2;
+
+    public String getLine2() {
+        return line2;
+    }
+
+    public void setLine2(String line2) {
+        this.line2 = line2;
     }
 
     public String getCity() {
@@ -180,8 +219,7 @@ public class Address implements Serializable {
             "id=" + getId() +
             ", firstName='" + getFirstName() + "'" +
             ", lastName='" + getLastName() + "'" +
-            ", address1='" + getAddress1() + "'" +
-            ", address2='" + getAddress2() + "'" +
+
             ", city='" + getCity() + "'" +
             ", mobile='" + getMobile() + "'" +
             ", active='" + getActive() + "'" +

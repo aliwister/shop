@@ -95,11 +95,15 @@ public class ProductDTO implements Serializable {
 
    private Meta meta = new Meta();
 
+   private Integer availability;
+
     // Variations
     List<String> variationDimensions;
     List<VariationOption> variationOptions;
     List<Variation> variations;
     List<Attribute> variationAttributes;
+
+    List<MerchantStockDTO> merchantStock;
 
     @Override
     public boolean equals(Object o) {

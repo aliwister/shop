@@ -16,7 +16,7 @@ import java.util.Set;
  * A Customer.
  */
 @Entity
-@Table(name = "ps_customer")
+@Table(name = "ps_customer", catalog = "prestashop7")
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;

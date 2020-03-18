@@ -1,11 +1,12 @@
 package com.badals.shop.service.mutation;
 
+import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.service.ProductLangService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
-import com.badals.shop.xtra.amazon.PasService;
+import com.badals.shop.xtra.amazon.Pas4Service;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -71,7 +72,7 @@ public class ProductMutation implements GraphQLMutationResolver {
     private ProductService productService;
 
     @Autowired
-    private PasService pasService;
+    private Pas4Service pasService;
 
     @Autowired
     private ProductLangService productLangService;
@@ -96,6 +97,6 @@ public class ProductMutation implements GraphQLMutationResolver {
         return this.pasService.lookup(asin);
     }
 
-
+    public Message addToPricingQ(String asin) {return new Message("done deal");}
 }
 

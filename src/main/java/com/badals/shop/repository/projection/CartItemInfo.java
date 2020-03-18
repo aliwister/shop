@@ -8,4 +8,6 @@ public interface CartItemInfo {
    BigDecimal getQuantity();
    String getImage();
    String getTitle();
+   BigDecimal getWeight();
+
 }

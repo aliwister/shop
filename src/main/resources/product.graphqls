@@ -208,7 +208,7 @@ extend type Query {
     productAny(id: ID):Product
 
     productAdmin(id: ID):Product
-    getProductBySku(sku: String):Product
+    getProductBySku(sku: String, isFive: Boolean = true):Product
 }
 
 extend type Mutation {
@@ -222,5 +222,5 @@ extend type Mutation {
     addI18n(id: Int,
             i18n: ProductI18nInput):ProductI18n,
     pasLookup(sku: String): Product
-
+    addToPricingQ(sku: String):Message
 }

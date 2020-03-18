@@ -12,5 +12,6 @@ import org.mapstruct.factory.Mappers;
 public interface CheckoutLineItemMapper {
    //@Mapping(source = "cartItems", target = "price")
    @Mapping(source = "title", target = "name")
+   @Mapping(target="unit", ignore = true)
    LineItem cartItemToLineItem(CartItemInfo cartItem);
 }

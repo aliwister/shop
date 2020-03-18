@@ -2,13 +2,16 @@ package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.*;
 
+import com.badals.shop.domain.pojo.Gallery;
+import com.badals.shop.service.dto.AddressDTO;
 import com.badals.shop.service.dto.OrderDTO;
+import com.badals.shop.service.dto.ProductDTO;
 import org.mapstruct.*;
 
 /**
  * Mapper for the entity {@link Order} and its DTO {@link OrderDTO}.
  */
-@Mapper(componentModel = "spring", uses = {CustomerMapper.class, CartMapper.class, AddressMapper.class})
+@Mapper(componentModel = "spring", uses = {CustomerMapper.class, CartMapper.class, AddressMapper.class, OrderItemMapper.class})
 public interface OrderMapper extends EntityMapper<OrderDTO, Order> {
 
     @Mapping(target = "orderItems", ignore = true)
@@ -22,5 +25,11 @@ public interface OrderMapper extends EntityMapper<OrderDTO, Order> {
         Order order = new Order();
         order.setId(id);
         return order;
+    }
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget OrderDTO target, Order source) {
+        if(target.getDeliveryAddress() ==  null)
+            target.setDeliveryAddress(AddressDTO.fromAddressPojo(source.getDeliveryAddressPojo()));
     }
 }
