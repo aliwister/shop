@@ -161,7 +161,7 @@ mws:
   marketplaceid: ATVPDKIKX0DER
 
 badals:
-  checkout-app: https://checkout.badals.com
+  checkout-app: https://checkout.badals.com/checkout/start
 
 
 graphiql:
