@@ -161,7 +161,7 @@ mws:
   marketplaceid: ***REMOVED***
 
 badals:
-  checkout-app: https://checkout.badals.com
+  checkout-app: https://checkout.badals.com/checkout/start
 
 
 graphiql:
