@@ -3,6 +3,7 @@ package com.badals.shop.service;
 import com.badals.shop.domain.Cart;
 import com.badals.shop.domain.CartItem;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.Product;
 import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
 import com.badals.shop.domain.checkout.helper.CheckoutCartMapper;
@@ -188,12 +189,18 @@ public class CartService {
                 existing.setQuantity(existing.getQuantity() + dto.getQuantity());
             else {
                 // Check product exists
-                if(productRepository.findOneByRef(dto.getProductId()).orElse(null) != null)
-                    cart.addCartItem(cartItemMapper.toEntity(dto));
+                Product p = productRepository.findOneByRef(dto.getProductId()).orElse(null);
+                if(p != null) {
+                    CartItem newCartItem = cartItemMapper.toEntity(dto);
+                    newCartItem.setProduct(p);
+                    cart.addCartItem(newCartItem);
+                }
             }
         }
 
         cart = cartRepository.save(cart);
+
+        //cartRepository.getOne(cart.getId())
         return cartMapper.toDto(cart);
     }
 
