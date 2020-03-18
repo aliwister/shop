@@ -20,13 +20,16 @@ import com.badals.shop.xtra.IProductLang;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.SelectBeforeUpdate;
 import org.hibernate.annotations.Type;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * A Product.
  */
 @Entity
 @Table(name = "product")
+@SelectBeforeUpdate(false)
 public class Product implements Serializable, IMerchantProduct {
 
     private static final long serialVersionUID = 1L;
@@ -61,13 +64,13 @@ public class Product implements Serializable, IMerchantProduct {
 
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="parent_id", referencedColumnName = "ref", insertable = false, updatable = false)
     private Product parent;
 
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "parent_id",referencedColumnName = "ref")
-    private Collection<Product> children;
+    private Set<Product> children;
 
 
 
@@ -139,11 +142,11 @@ public class Product implements Serializable, IMerchantProduct {
     private ProductGroup group;
 
     //@NotNull
-    @Column(name = "updated", nullable = false, updatable=false, insertable=false)
+    @Column(name = "last_modified_date", nullable = false, updatable=false, insertable=false)
     private Instant updated;
 
     //@NotNull
-    @Column(name = "created", nullable = false, updatable=false, insertable=false)
+    @Column(name = "created_date", nullable = false, updatable=false, insertable=false)
     private Instant created;
 
     @Enumerated(EnumType.STRING)
@@ -533,8 +536,12 @@ public class Product implements Serializable, IMerchantProduct {
 
     @Override
     public void setPrice(Price price) {
-        this.setPrice(price.getAmount());
-        this.setCurrency(price.getCurrency());
+        if (price == null)
+            this.price = null;
+        else {
+            this.setPrice(price.getAmount());
+            this.setCurrency(price.getCurrency());
+        }
     }
 
     public void setVolumeWeight(BigDecimal volumeWeight) {
@@ -583,11 +590,11 @@ public class Product implements Serializable, IMerchantProduct {
         this.parent = parent;
     }
 
-    public Collection<Product> getChildren() {
+    public Set<Product> getChildren() {
         return children;
     }
 
-    public void setChildren(Collection<Product> children) {
+    public void setChildren(Set<Product> children) {
         this.children = children;
     }
 
@@ -625,8 +632,8 @@ public class Product implements Serializable, IMerchantProduct {
             ", title='" + getTitle() + "'" +
             ", brand='" + getBrand() + "'" +
             ", group='" + getGroup() + "'" +
-            ", updated='" + getUpdated() + "'" +
-            ", created='" + getCreated() + "'" +
+           // ", updated='" + getUpdated() + "'" +
+            //", created='" + getCreated() + "'" +
             ", condition='" + getCondition() + "'" +
             ", isUsed='" + isIsUsed() + "'" +
             ", availableForOrder='" + isAvailableForOrder() + "'" +

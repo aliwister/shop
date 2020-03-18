@@ -1,10 +1,12 @@
 package com.badals.shop.service.query;
 
 import com.badals.shop.service.CartService;
+import com.badals.shop.service.OrderService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.dto.AddressDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,16 +47,25 @@ query {
 public class OrderQuery extends ShopQuery implements GraphQLQueryResolver {
 
     @Autowired
-    CartService cartService;
+    OrderService orderService;
 
 
     @Autowired
     private ProductService productService;
 
-    public OrderDTO getOrder(int orderId) {
-        return null;
+    public OrderDTO orderConfirmation(String ref, String key) throws OrderNotFoundException {
+        OrderDTO order = orderService.getOrderConfirmation(ref,key).orElse(null);
+        if (order == null)
+            throw new OrderNotFoundException("Unknown Order");
+
+        return order;
     }
 
+    public List<OrderDTO> orders(int limit) throws OrderNotFoundException {
+        List<OrderDTO> orders = orderService.getCustomerOrders();
+
+        return orders;
+    }
 
 
     //public String getCheckout()

@@ -1,14 +1,21 @@
 package com.badals.shop.service.dto;
 import com.badals.shop.domain.enumeration.OrderState;
+import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 
+import javax.persistence.Column;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 
 /**
  * A DTO for the {@link com.badals.shop.domain.Order} entity.
  */
+@Data
 public class OrderDTO implements Serializable {
 
     private Long id;
@@ -19,47 +26,8 @@ public class OrderDTO implements Serializable {
 
     private LocalDate deliveryDate;
 
-    private OrderState state;
+    private OrderState orderState;
 
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public CustomerDTO getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(CustomerDTO customer) {
-        this.customer = customer;
-    }
-
-    public CartDTO getCart() {
-        return cart;
-    }
-
-    public void setCart(CartDTO cart) {
-        this.cart = cart;
-    }
-
-    public AddressDTO getDeliveryAddress() {
-        return deliveryAddress;
-    }
-
-    public void setDeliveryAddress(AddressDTO deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
-    }
-
-    public AddressDTO getInvoiceAddress() {
-        return invoiceAddress;
-    }
-
-    public void setInvoiceAddress(AddressDTO invoiceAddress) {
-        this.invoiceAddress = invoiceAddress;
-    }
 
     private String currency;
 
@@ -72,45 +40,26 @@ public class OrderDTO implements Serializable {
 
     private AddressDTO invoiceAddress;
 
-    public Long getId() {
-        return id;
-    }
+    private List<OrderItemDTO> orderItems;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public String getReference() {
-        return reference;
-    }
+    private BigDecimal subtotal;
 
-    public void setReference(String reference) {
-        this.reference = reference;
-    }
+    private BigDecimal total;
 
-    public LocalDate getInvoiceDate() {
-        return invoiceDate;
-    }
+    private BigDecimal deliveryTotal;
 
-    public void setInvoiceDate(LocalDate invoiceDate) {
-        this.invoiceDate = invoiceDate;
-    }
+    private BigDecimal discountsTotal;
 
-    public LocalDate getDeliveryDate() {
-        return deliveryDate;
-    }
 
-    public void setDeliveryDate(LocalDate deliveryDate) {
-        this.deliveryDate = deliveryDate;
-    }
+    private Date createdDate;
 
-    public OrderState getState() {
-        return state;
-    }
 
-    public void setState(OrderState state) {
-        this.state = state;
-    }
+    private String carrier;
+
+
+    private String paymentMethod;
+
 
     @Override
     public boolean equals(Object o) {
@@ -140,7 +89,7 @@ public class OrderDTO implements Serializable {
             ", reference='" + getReference() + "'" +
             ", invoiceDate='" + getInvoiceDate() + "'" +
             ", deliveryDate='" + getDeliveryDate() + "'" +
-            ", state='" + getState() + "'" +
+            ", state='" + getOrderState() + "'" +
             ", currency='" + getCurrency() + "'" +
             "}";
     }

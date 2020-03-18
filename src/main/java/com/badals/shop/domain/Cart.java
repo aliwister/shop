@@ -42,10 +42,12 @@ public class Cart implements Serializable {
 
     @ManyToOne
     @JsonIgnoreProperties("carts")
+    @JoinColumn(name = "delivery_address_id")
     private Address deliveryAddress;
 
     @ManyToOne
     @JsonIgnoreProperties("carts")
+    @JoinColumn(name = "invoice_address_id")
     private Address invoiceAddress;
 
     @ManyToOne
