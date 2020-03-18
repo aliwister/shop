@@ -160,5 +160,3 @@ graphql:
     exception-handlers-enabled: true
     contextSetting: PER_REQUEST_WITH_INSTRUMENTATION
 
-badals:
-  checkout-app: http://127.0.0.1:8081/checkout/start
