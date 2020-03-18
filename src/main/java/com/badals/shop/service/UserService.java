@@ -54,7 +54,7 @@ public class UserService {
             .map(user -> {
                 // activate given user for the registration key.
                 user.setActive(1);
-                //user.setSecureKey(null);
+                user.setSecureKey(null);
                 //this.clearUserCaches(user);
                 log.debug("Activated user: {}", user);
                 return user;

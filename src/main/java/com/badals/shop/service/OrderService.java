@@ -5,6 +5,7 @@ import com.badals.shop.domain.Order;
 import com.badals.shop.repository.OrderRepository;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.mapper.OrderMapper;
+import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,9 +88,15 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<OrderDTO> getOrderConfirmation(String reference, String confirmationKey) {
-        Optional<Order> order = orderRepository.findOrderByReferenceAndConfirmationKey(reference, confirmationKey);
-        return order.map(orderMapper::toDto);
+    public OrderDTO getOrderConfirmation(String reference, String confirmationKey) throws OrderNotFoundException {
+        Order order = orderRepository.findOrderByReferenceAndConfirmationKey(reference, confirmationKey).orElse(null);
+        if(order == null) {
+            throw new OrderNotFoundException("Order Not Found");
+        }
+        order.setCustomer(userService.getUserWithAuthorities().orElse(null));
+        order.setConfirmationKey(null);
+        order = orderRepository.save(order);
+        return orderMapper.toDto(order);
     }
 
     public List<OrderDTO> getCustomerOrders() {
