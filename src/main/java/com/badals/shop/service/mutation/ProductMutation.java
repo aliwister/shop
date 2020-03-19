@@ -2,6 +2,7 @@ package com.badals.shop.service.mutation;
 
 import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.service.PricingRequestService;
 import com.badals.shop.service.ProductLangService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.dto.ProductDTO;
@@ -9,6 +10,9 @@ import com.badals.shop.service.dto.ProductLangDTO;
 import com.badals.shop.xtra.amazon.Pas4Service;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -77,26 +81,40 @@ public class ProductMutation implements GraphQLMutationResolver {
     @Autowired
     private ProductLangService productLangService;
 
+    @Autowired
+    private PricingRequestService pricingRequestService;
+
+    @Autowired
+    MessageSource messageSource;
+
+    @PreAuthorize("isAuthenticated()")
     public ProductDTO createProduct(final Long ref, final Long parent, final String sku, final String upc, final LocalDate releaseDate) {
         return this.productService.createProduct(ref, parent, sku, upc, releaseDate);
     }
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDTO createNewProduct(final ProductDTO product) {
         return this.productService.createNewProduct(product);
     }
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Attribute indexProduct(final long id) {
         return this.productService.indexProduct(id);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductLangDTO addI18n(Long id, final ProductLangDTO productI18n) {
         return this.productLangService.addI18n(id, productI18n);
     }
 
+    @PreAuthorize("isAuthenticated()")
     public ProductDTO pasLookup(String asin) {
         return this.pasService.lookup(asin);
     }
 
-    public Message addToPricingQ(String asin) {return new Message("done deal");}
+    //@PreAuthorize("isAuthenticated()")
+    public Message addToPricingQ(String asin) {
+        pricingRequestService.push(asin);
+        messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale());
+        return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));
+    }
 }
 

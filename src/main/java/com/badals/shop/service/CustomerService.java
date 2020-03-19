@@ -82,4 +82,9 @@ public class CustomerService {
         log.debug("Request to delete Customer : {}", id);
         customerRepository.deleteById(id);
     }
+
+
+    public Customer findByEmail(String email) {
+        return customerRepository.findByEmail(email).orElse(null);
+    }
 }

@@ -53,6 +53,17 @@ public class Order implements Serializable {
     @JoinColumn(unique = true)
     private CheckoutCart cart;
 
+    @Column
+    private String email;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @ManyToOne
     @JsonIgnoreProperties("orders")
     @JoinColumn(name = "delivery_address_id",referencedColumnName = "id_address")
