@@ -29,6 +29,7 @@
     <include file="config/liquibase/changelog/20200129050205_added_entity_Category.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200310075916_added_entity_OrderPayment.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200315143114_added_entity_ProductOverride.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200319083349_added_entity_PricingRequest.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20191219091809_added_entity_constraints_ProductLang.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191222105156_added_entity_constraints_Order.xml" relativeToChangelogFile="false"/>

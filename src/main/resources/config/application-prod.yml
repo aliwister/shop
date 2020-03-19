@@ -18,6 +18,7 @@ logging:
     ROOT: INFO
     com.badals.shop: INFO
     io.github.jhipster: INFO
+    io.netty.util: ERROR
 
 management:
   metrics:
