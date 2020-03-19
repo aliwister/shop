@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "pricing_request")
-public class PricingRequest implements Serializable {
+public class PricingRequest extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

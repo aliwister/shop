@@ -7,10 +7,13 @@ import com.badals.shop.service.pojo.CheckoutSession;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.List;
+import java.util.Locale;
 
 
 /*
@@ -49,7 +52,11 @@ public class CartMutation implements GraphQLMutationResolver {
     @Value("${badals.checkout-app}")
     String checkoutAppUrl;
 
+    @Autowired
+    private LocaleResolver locale;
+
     public CartDTO updateCart(final String secureKey, final List<CartItemDTO> items) {
+        Locale l = LocaleContextHolder.getLocale();
         return this.cartService.updateCart(secureKey, items, true);
     }
 

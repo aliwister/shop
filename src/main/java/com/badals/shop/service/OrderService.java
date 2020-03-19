@@ -31,10 +31,13 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private UserService userService;
 
-    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService) {
+    private final CustomerService customerService;
+
+    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
+        this.customerService = customerService;
     }
 
     /**
@@ -93,7 +96,8 @@ public class OrderService {
         if(order == null) {
             throw new OrderNotFoundException("Order Not Found");
         }
-        order.setCustomer(userService.getUserWithAuthorities().orElse(null));
+        Customer customer = customerService.findByEmail(order.getEmail());
+        order.setCustomer(customer);
         order.setConfirmationKey(null);
         order = orderRepository.save(order);
         return orderMapper.toDto(order);

@@ -70,4 +70,10 @@ public class PricingRequestService {
         log.debug("Request to delete PricingRequest : {}", id);
         pricingRequestRepository.deleteById(id);
     }
+
+    public void push(String asin) {
+        PricingRequest p = new PricingRequest();
+        p.sku(asin);
+        this.save(p);
+    }
 }
