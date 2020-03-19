@@ -1,6 +1,9 @@
-package com.badals.checkout.domain;
+package com.badals.shop.domain;
 
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
@@ -11,15 +14,19 @@ import java.util.Date;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class Auditable<T> {
+   @CreatedBy
+   @Column(name = "created_by")
+   private String createdBy;
+
    @CreatedDate
    @Column(name = "created_date")
    private Date createdDate;
 
-   public Date getCreatedDate() {
-      return createdDate;
-   }
+   @LastModifiedBy
+   @Column(name = "last_modified_by")
+   private String lastModifiedBy;
 
-   public void setCreatedDate(Date createdDate) {
-      this.createdDate = createdDate;
-   }
+   @LastModifiedDate
+   @Column(name = "last_modified_date")
+   private Date lastModifiedDate;
 }
