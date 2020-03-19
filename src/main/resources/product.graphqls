@@ -128,6 +128,16 @@ type Product {
     unit: String
     description: String
     meta: Meta
+    merchantStock: [MerchantStock]
+}
+
+type MerchantStock {
+    quantity: BigDecimal
+    availability: Int
+    allow_backorder: Boolean
+    link: String
+    location: String
+    price: BigDecimal
 }
 
 type Attribute {
