@@ -20,4 +20,6 @@ public interface ProductOverrideRepository extends JpaRepository<ProductOverride
     List<ProductOverride> findByLastModifiedByIsCurrentUser();
 
     List<ProductOverride> findBySku(String sku);
+
+   List<ProductOverride> findBySkuIn(List<String> asins);
 }

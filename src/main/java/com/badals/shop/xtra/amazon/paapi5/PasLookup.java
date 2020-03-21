@@ -97,6 +97,8 @@ public class PasLookup {
       getItemsResources.add(GetItemsResource.ITEMINFO_FEATURES);
       getItemsResources.add(GetItemsResource.ITEMINFO_EXTERNALIDS);
       getItemsResources.add(GetItemsResource.ITEMINFO_MANUFACTUREINFO);
+      getItemsResources.add(GetItemsResource.ITEMINFO_CLASSIFICATIONS);
+
 
       getItemsResources.add(GetItemsResource.ITEMINFO_BYLINEINFO);
       getItemsResources.add(GetItemsResource.ITEMINFO_PRODUCTINFO);
@@ -106,12 +108,21 @@ public class PasLookup {
 
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_AVAILABILITY_MINORDERQUANTITY);
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_AVAILABILITY_TYPE);
+      getItemsResources.add(GetItemsResource.ITEMINFO_TECHNICALINFO);
+      getItemsResources.add(GetItemsResource.ITEMINFO_CONTENTINFO);
+      getItemsResources.add(GetItemsResource.ITEMINFO_CONTENTRATING);
+
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISAMAZONFULFILLED);
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISPRIMEELIGIBLE);
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_SHIPPINGCHARGES);
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_PRICE);
       getItemsResources.add(GetItemsResource.OFFERS_SUMMARIES_LOWESTPRICE);
       getItemsResources.add(GetItemsResource.OFFERS_SUMMARIES_OFFERCOUNT);
+
+      getItemsResources.add(GetItemsResource.BROWSENODEINFO_BROWSENODES);
+      getItemsResources.add(GetItemsResource.BROWSENODEINFO_BROWSENODES_ANCESTOR);
+      getItemsResources.add(GetItemsResource.BROWSENODEINFO_BROWSENODES_SALESRANK);
+      getItemsResources.add(GetItemsResource.BROWSENODEINFO_WEBSITESALESRANK);
 
       return getItemsResources;
    }
@@ -123,6 +134,7 @@ public class PasLookup {
       GetVariationsResources.add(GetVariationsResource.ITEMINFO_FEATURES);
       GetVariationsResources.add(GetVariationsResource.ITEMINFO_EXTERNALIDS);
       GetVariationsResources.add(GetVariationsResource.ITEMINFO_MANUFACTUREINFO);
+      GetVariationsResources.add(GetVariationsResource.ITEMINFO_CLASSIFICATIONS);
 
       GetVariationsResources.add(GetVariationsResource.ITEMINFO_BYLINEINFO);
       GetVariationsResources.add(GetVariationsResource.ITEMINFO_PRODUCTINFO);

@@ -1,8 +1,12 @@
 package com.badals.shop.service.query;
 
+import com.badals.shop.domain.Customer;
 import com.badals.shop.service.ProductService;
+import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.AddressDTO;
+import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.mapper.CustomerMapper;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,14 +46,21 @@ query {
 @Component
 public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
 
-
-
-
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private CustomerMapper customerMapper;
+
+    @Autowired
+    private UserService userService;
+
     public List<AddressDTO> getAddresses(final int id) {
 return null;
+    }
+
+    public CustomerDTO me() {
+        return  userService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
     }
 }
 

@@ -1,12 +1,14 @@
 package com.badals.shop.service.query;
 
+import com.algolia.search.SearchIndex;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.service.CategoryService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.dto.CategoryDTO;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import com.badals.shop.xtra.amazon.Pas4Service;
+
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
@@ -85,15 +87,13 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
     @Autowired
     private ProductService productService;
 
-   @Autowired
-   private Pas5Service pas5Service;
 
-   @Autowired
-   private Pas4Service pas4Service;
+
 
     @Autowired
     private CategoryService categoryService;
    private static final Logger log = LoggerFactory.getLogger(ProductQuery.class);
+
 
    public List<ProductDTO> products(final int count) {
         return productService.getAllProducts(count);
@@ -116,6 +116,10 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
     }
 
     public ProductResponse products(String slug, String text, String type, Integer offset, Integer limit, String lang) {
+      switch(type){
+         case "LATEST":
+            return productService.getLatest(10);
+      }
        return productService.findAllByCategory(slug, offset, limit);
     }
 
@@ -134,13 +138,9 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    public ProductDTO getProductBySku(final String sku, final boolean isFive) throws ProductNotFoundException, PricingException {
       //return new Product();
       log.info("GetProductBySky: pasService.lookup("+sku+")");
-      ProductDTO parent;
-      if(isFive)
-         parent =  pas5Service.lookup(sku);
-      else
-         parent =  pas4Service.lookup(sku);
+      ProductDTO product;
+      return productService.lookupPas(sku, false, false);
 
-      return this.productService.getProductBySku(sku);
    }
 }
 

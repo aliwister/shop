@@ -249,6 +249,10 @@ public class CartService {
     }
 
     public String createCheckout(String secureKey, List<CartItemDTO> items) {
+        return this.createCheckoutWithCart(secureKey, items).getSecureKey();
+    }
+
+    public CheckoutCart createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
         //Cart cart = cartRepository.findBySecureKey(secureKey).orElse(new Cart()); //cartMapper.toEntity(cartDTO);
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
         Cart cart = this.getCartByCustomer(loginUser);
@@ -265,13 +269,8 @@ public class CartService {
         checkoutCart.setSecureKey(cart.getSecureKey());
         checkoutCart.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
         checkoutCart.setEmail(cart.getCustomer().getEmail());
-        //checkoutCart.setPhone(cart.getCustomer().g);
-        //CheckoutCart checkoutCart = checkoutCartMapper.cartToCheckoutCart(cart);
-
-        //checkoutCart.setAddresses(cart.getCustomer().getAddresses());
-
 
         checkoutCart = checkoutCartRepository.save(checkoutCart);
-        return checkoutCart.getSecureKey();
+        return checkoutCart;
     }
 }
