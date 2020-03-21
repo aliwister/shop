@@ -14,18 +14,21 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,11 +48,17 @@ public class ProductService {
 
     private final SearchIndex<AlgoliaProduct> index;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index) {
+    private final Pas5Service pas5Service;
+
+    @Autowired
+    MessageSource messageSource;
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.algoliaProductMapper = algoliaProductMapper;
         this.index = index;
+        this.pas5Service = pas5Service;
     }
 
     /**
@@ -141,9 +150,9 @@ public class ProductService {
         Product product = productRepository.getOne(id);
         AlgoliaProduct algoliaProduct = algoliaProductMapper.producttoAlgoliaProduct(product);
 
-        for(ProductLang i: productLangRepository.findAllByProductId( id ) ){
+        /*for(ProductLang i: productLangRepository.findAllByProductId( id ) ){
             algoliaProduct.getI18().put(i.getLang(), new ProductI18(i.getTitle(), "", ""));
-        }
+        }*/
         index.saveObject(algoliaProduct);
         return new Attribute("success", "1");
     }
@@ -182,8 +191,6 @@ public class ProductService {
         if(product == null )
             throw new ProductNotFoundException("Invalid Product");
 
-
-
         if(product.getVariationType().equals(VariationType.PARENT)) {
             if(product.getChildren().size() < 1)
                 throw new ProductNotFoundException("Lonely Parent");
@@ -196,4 +203,21 @@ public class ProductService {
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
 
     }
+
+   public ProductResponse getLatest(Integer limit) {
+       List<Product> products = productRepository.findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(Arrays.asList(new VariationType[]{VariationType.PARENT, VariationType.SIMPLE}), PageRequest.of(0,20));
+       ProductResponse response = new ProductResponse();
+       response.setTotal(products.size());
+       response.setItems(products.stream().map(productMapper::toDto).collect(Collectors.toList()));
+       return response;
+   }
+
+    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException {
+        Product p = this.pas5Service.lookup(sku, isRedis, isRebuild);
+        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
+            this.indexProduct(p.getId());
+        return this.getProductBySku(sku);
+    }
+
+
 }

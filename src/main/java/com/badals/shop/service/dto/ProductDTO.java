@@ -38,7 +38,7 @@ public class ProductDTO implements Serializable {
 
     private String salePrice;
 
-    private float discountInPercent = 10;
+    private float discountInPercent = 0;
 
     @NotNull
     private String currency;
@@ -95,7 +95,8 @@ public class ProductDTO implements Serializable {
 
    private Meta meta = new Meta();
 
-   private Integer availability;
+   private String availability;
+   private int hours;
 
     // Variations
     List<String> variationDimensions;
@@ -104,6 +105,8 @@ public class ProductDTO implements Serializable {
     List<Attribute> variationAttributes;
 
     List<MerchantStockDTO> merchantStock;
+
+    String browseNode;
 
     @Override
     public boolean equals(Object o) {

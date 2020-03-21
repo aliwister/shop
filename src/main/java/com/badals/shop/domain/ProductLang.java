@@ -41,6 +41,17 @@ public class ProductLang implements Serializable, IProductLang {
     @Column(name = "lang", nullable = false)
     private String lang;
 
+    @Column(name = "browse_node", nullable = false)
+    private String browseNode;
+
+    public String getBrowseNode() {
+        return browseNode;
+    }
+
+    public void setBrowseNode(String browseNode) {
+        this.browseNode = browseNode;
+    }
+
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties("productLangs")

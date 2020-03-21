@@ -1,19 +1,38 @@
-package com.badals.shop.xtra.amazon.paapi4;
+package com.badals.shop.xtra.amazon;
 
+import com.badals.shop.domain.MerchantStock;
+import com.badals.shop.domain.ProductOverride;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.Gallery;
 import lombok.Data;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class PasItemNode {
+class PasBrowseNode {
+   public PasBrowseNode(String id, String displayName) {
+      this.id = id;
+      this.displayName = displayName;
+   }
+
+   String id;
+   String displayName;
+}
+
+@Data
+public class PasItemNode implements Serializable {
    String asin;
    String parentAsin;
+   String url;
    String brand;
-   String ean;
+
    String manufacturer;
-   String price;
+   BigDecimal listPrice;
+   BigDecimal savingsAmount;
+   Integer savingsPercentage;
    String maxHours;
    String title;
    String description;
@@ -26,34 +45,71 @@ public class PasItemNode {
    String productGroup;
    String productType;
    String partNumber;
+   String releaseDate;
+   String color;
+   boolean adult;
+   String unitCount;
+   String size;
 
+   String starRating;
 
    List<PasItemNode> children;
    List<String> features;
 
    List<String> similarities = new ArrayList<>();
+   List<String> HierarchialCategories = new ArrayList<>();
+   List<String> numHierarchialCategories = new ArrayList<>();
+   List<String> categories = new ArrayList<>();
+   List<String> numCategories = new ArrayList<>();
 
+   String browseNode;
    String editorial;
 
    String upc;
+   String ean;
+   String isbn;
 
    List<Attribute> variationAttributes = new ArrayList<>();
 
    boolean superSaver = false;
    boolean prime = false;
+   String availabilityType;
+   String availabilityMessage;
 
-   String cost;
-   String listPrice;
+   BigDecimal cost;
    String merchant;
-   String url;
+
 
    List<String> gallery = new ArrayList<>();
    String image;
+
+   public PasItemNode() {
+   }
 
    public PasItemNode(boolean isParent) {
       if(isParent)
          children = new ArrayList<PasItemNode>();
    }
+
+   public BigDecimal getParsedWeight() {
+      String weight = (this.packageWeight== null)?this.getItemWeight():this.getPackageWeight();
+      if(weight != null)
+         return BigDecimal.valueOf(Double.parseDouble(weight));
+      return null;
+   }
+
+   public List<Gallery> gallerizeImages() {
+      if(this.gallery == null)
+         return null;
+
+      List<Gallery> images = new ArrayList<>();
+      for(String gUrl : this.gallery) {
+         images.add(new Gallery(gUrl));
+      }
+      return images;
+   }
+
+
 
    @Override
    public String toString() {
@@ -62,7 +118,6 @@ public class PasItemNode {
               ", brand='" + brand + '\'' +
               ", ean='" + ean + '\'' +
               ", manufacturer='" + manufacturer + '\'' +
-              ", price='" + price + '\'' +
               ", maxHours='" + maxHours + '\'' +
               ", title='" + title + '\'' +
               ", description='" + description + '\'' +
@@ -73,7 +128,6 @@ public class PasItemNode {
               ", partNumber='" + partNumber + '\'' +
               ", children=" + children +
               ", features=" + features +
-              ", upc='" + upc + '\'' +
               ", variationAttributes=" + variationAttributes +
               ", isSuperSaver='" + superSaver + '\'' +
               ", isPrime='" + prime + '\'' +

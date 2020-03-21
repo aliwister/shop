@@ -12,4 +12,6 @@ public interface IProductLang {
     public void setFeatures(List<String> features);
 
     public void setLang(String lang);
+
+    public void setBrowseNode(String browseNode);
 }

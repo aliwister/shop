@@ -19,4 +19,6 @@ public class AlgoliaConfiguration {
         SearchIndex<AlgoliaProduct> index = client.initIndex("product", AlgoliaProduct.class);
         return index;
     }
+
+
 }

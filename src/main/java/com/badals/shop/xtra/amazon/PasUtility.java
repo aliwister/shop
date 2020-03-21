@@ -1,6 +1,13 @@
 package com.badals.shop.xtra.amazon;
 
+import com.badals.shop.xtra.amazon.mws.MwsItemNode;
+
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PasUtility {
    private static final double USD2OMR = .386;
@@ -40,5 +47,64 @@ public class PasUtility {
 
       BigDecimal price = BigDecimal.valueOf(dPrice);
       return price;
+   }
+
+   public static int parseAvailability (PasItemNode item) {
+      int availability = 5*24;
+      if(!item.getAvailabilityType().equals("Now"))
+         availability += 72;
+
+      if(!item.isPrime())
+         availability += 72;
+
+      if(item.getAvailabilityMessage() == null)
+         return availability;
+      String msg = item.getAvailabilityMessage().toLowerCase();
+      if(msg.equals("in stock")) return availability;
+
+      int maxNum = parseMaxNumber(msg);
+      if(msg.contains("day"))
+         availability += maxNum*24;
+      else if(msg.contains("week"))
+         availability += maxNum*24*7;
+      else if(msg.contains("month"))
+         availability += maxNum*24*30;
+      else {
+         LocalDate date = parseDate(item.getAvailabilityMessage());
+         if(date != null)
+            availability += Math.abs(Period.between(date, LocalDate.now()).getDays())*24;
+      }
+      return availability;
+   }
+
+   private static int parseMaxNumber(String msg) {
+      String regex = "\\d+";
+      Pattern p = Pattern.compile(regex);
+      Matcher m = p.matcher(msg);
+      int MAX = 0;
+      while(m.find()) {
+         int num = Integer.parseInt(m.group());
+         if(num > MAX)
+            MAX = num;
+      }
+      return MAX;
+   }
+
+   private static LocalDate parseDate(String msg) {
+      String regex = "\\d+";
+      Pattern p = Pattern.compile("\\w+\\s\\d+(st)?(nd)?(rd)?(th)?,\\s+\\d+");
+      Matcher m = p.matcher(msg);
+      try {
+         LocalDate localDate = null;
+         while (m.find()) {
+            m.find();
+            String date = m.group();
+            localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+         }
+         return localDate;
+      }
+      catch (Exception e) {
+         return null;
+      }
    }
 }

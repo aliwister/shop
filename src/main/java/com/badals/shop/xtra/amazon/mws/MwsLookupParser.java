@@ -20,13 +20,16 @@ public class MwsLookupParser {
       boolean isPrime = offer.isPrime();
       boolean isFulfilledByAmazon = offer.isPrime();
       String m = offer.getMaxShipping();
-      Integer availability = getMaxHours(m);
+      Integer availability = getMaxHours(m) + 5*24;
+      if(!isPrime) availability += 48;
+      if(!isFulfilledByAmazon) availability+= 24;
+
 
       double margin = 5, risk = 2, fixed = 1.1;
       double localShipping = 0;
 
       BigDecimal price = PasUtility.calculatePrice(offer.getCost(), weight, localShipping, margin, risk, fixed, isPrime, isFulfilledByAmazon);
-      return new MerchantStock().store("Amazon.com").quantity(BigDecimal.valueOf(99)).cost(BigDecimal.valueOf(dCost)).availability(5+availability/24).allow_backorder(true).price(price).link("http://www.amazon.com/dp/").location("USA");
+      return stock.store("Amazon.com").quantity(BigDecimal.valueOf(99)).cost(BigDecimal.valueOf(dCost)).availability(availability).allow_backorder(true).price(price).location("USA");
    }
 
    private static OfferNode selectOffer(MwsItemNode node) {

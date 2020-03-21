@@ -1,13 +1,18 @@
 package com.badals.shop.service.mutation;
 
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.service.PricingRequestService;
 import com.badals.shop.service.ProductLangService;
 import com.badals.shop.service.ProductService;
+import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
-import com.badals.shop.xtra.amazon.Pas4Service;
+
+import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.Pas5Service;
+import com.badals.shop.xtra.amazon.PricingException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -16,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 
 /*
@@ -76,7 +82,7 @@ public class ProductMutation implements GraphQLMutationResolver {
     private ProductService productService;
 
     @Autowired
-    private Pas4Service pasService;
+    private Pas5Service pasService;
 
     @Autowired
     private ProductLangService productLangService;
@@ -86,6 +92,9 @@ public class ProductMutation implements GraphQLMutationResolver {
 
     @Autowired
     MessageSource messageSource;
+
+    @Autowired
+    private UserService userService;
 
     @PreAuthorize("isAuthenticated()")
     public ProductDTO createProduct(final Long ref, final Long parent, final String sku, final String upc, final LocalDate releaseDate) {
@@ -106,12 +115,16 @@ public class ProductMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("isAuthenticated()")
-    public ProductDTO pasLookup(String asin) {
-        return this.pasService.lookup(asin);
+    public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException {
+        return this.productService.lookupPas(asin, false, false);
     }
 
     //@PreAuthorize("isAuthenticated()")
     public Message addToPricingQ(String asin) {
+        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+        if(loginUser == null)
+            return new Message("You have to be logged in to request a price");
+
         pricingRequestService.push(asin);
         messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale());
         return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));
