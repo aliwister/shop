@@ -1,5 +1,7 @@
 type Customer {
     id: ID!
+    firstname: String
+    lastname: String
 }
 
 type Address {
@@ -33,4 +35,5 @@ extend type Mutation {
 extend type Query {
     getAddresses(customerId: Int): [Address]
     #getAddress(addressId: Int): Address
+    me: Customer
 }

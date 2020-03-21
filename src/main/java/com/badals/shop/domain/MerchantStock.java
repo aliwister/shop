@@ -55,7 +55,21 @@ public class MerchantStock implements Serializable {
     //@Column(name = "price", columnDefinition = "string")
     private BigDecimal price;
 
-    //@ManyToOne(optional = false)
+
+    private Integer discount;
+
+   public Integer getDiscount() {
+      return discount;
+   }
+
+   public void setDiscount(Integer discount) {
+      this.discount = discount;
+   }
+   public MerchantStock discount(Integer discount) {
+      this.discount = discount;
+      return this;
+   }
+   //@ManyToOne(optional = false)
    // @NotNull
    // @JsonIgnoreProperties("merchantStocks")
    // private Merchant merchant;
