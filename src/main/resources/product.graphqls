@@ -129,6 +129,13 @@ type Product {
     description: String
     meta: Meta
     merchantStock: [MerchantStock]
+    hours: Int
+    availability: String
+}
+
+type LocalizedValue {
+    lang: String
+    value: string
 }
 
 type MerchantStock {

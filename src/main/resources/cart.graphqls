@@ -47,6 +47,32 @@ input CartItemInput {
     quantity: Int
 }
 
+type CheckoutCartItem {
+    productId: Int
+    sku: String
+    image: String
+    name: String
+    quantity: Float
+    price: Float
+    subTotal: Float
+}
+type CheckoutCart {
+    id: ID!
+    ref: String
+    name: String
+    phone: String
+    email: String
+    secureKey: String
+    deliveryAddress: Address
+    invoiceAddress: Address
+    addresses: [Address]
+    paymentMethods: [PaymentMethod]
+    carrier: String
+    currency: String
+    items: [CartItem]
+    tenantId: Long
+}
+
 type CheckoutSession {
     redirectUrl: String,
     secureKey: String

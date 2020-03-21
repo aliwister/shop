@@ -1,5 +1,6 @@
 package com.badals.shop.service.mutation;
 
+import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.service.CartService;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
@@ -68,6 +69,12 @@ public class CartMutation implements GraphQLMutationResolver {
     public CheckoutSession createCheckoutSession(final String secureKey, final List<CartItemDTO> items) {
         String token = cartService.createCheckout(secureKey, items);
         return new CheckoutSession(checkoutAppUrl + "?token=" + token, token);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public CheckoutCart createCheckoutSessionWithCart(final String secureKey, final List<CartItemDTO> items) {
+        CheckoutCart cart = cartService.createCheckoutWithCart(secureKey, items);
+        return cart;
     }
 }
 

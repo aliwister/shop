@@ -90,6 +90,11 @@ public class GetItems {
 		 * resources-parameter
 		 */
 		List<GetItemsResource> getItemsResources = new ArrayList<GetItemsResource>();
+		getItemsResources.add(GetItemsResource.BROWSENODEINFO_BROWSENODES);
+		getItemsResources.add(GetItemsResource.BROWSENODEINFO_BROWSENODES_ANCESTOR);
+		getItemsResources.add(GetItemsResource.BROWSENODEINFO_BROWSENODES_SALESRANK);
+		getItemsResources.add(GetItemsResource.BROWSENODEINFO_WEBSITESALESRANK);
+
 		getItemsResources.add(GetItemsResource.ITEMINFO_BYLINEINFO);
 		getItemsResources.add(GetItemsResource.ITEMINFO_PRODUCTINFO);
         getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_AVAILABILITY_MINORDERQUANTITY);
