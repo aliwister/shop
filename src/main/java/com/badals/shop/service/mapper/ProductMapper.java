@@ -102,6 +102,13 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
              */
             target.setAvailability(processAvailability(hours, null).get("en"));
         }
+
+        ProductLang lang = source.getProductLangs().stream().findFirst().orElse(null);
+        if(lang != null) {
+            target.setFeatures(lang.getFeatures());
+            target.setDescription(lang.getDescription());
+            target.setBrowseNode(lang.getBrowseNode());
+        }
     }
 
     public static Map<String, String> processAvailability (int hours, String locale) {

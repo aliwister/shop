@@ -131,6 +131,7 @@ type Product {
     merchantStock: [MerchantStock]
     hours: Int
     availability: String
+    features: [String]
 }
 
 type LocalizedValue {
