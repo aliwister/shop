@@ -106,7 +106,7 @@ public class Order implements Serializable {
     @Column
     private String carrier;
 
-    @Column
+    @Column(name = "payment_method")
     private String paymentMethod;
 
     public Date getCreatedDate() {

@@ -1,8 +1,8 @@
 package com.badals.shop.web.rest;
 
-import com.badals.shop.domain.PricingRequest;
 import com.badals.shop.service.PricingRequestService;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
+import com.badals.shop.service.dto.PricingRequestDTO;
 
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -42,17 +42,17 @@ public class PricingRequestResource {
     /**
      * {@code POST  /pricing-requests} : Create a new pricingRequest.
      *
-     * @param pricingRequest the pricingRequest to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new pricingRequest, or with status {@code 400 (Bad Request)} if the pricingRequest has already an ID.
+     * @param pricingRequestDTO the pricingRequestDTO to create.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new pricingRequestDTO, or with status {@code 400 (Bad Request)} if the pricingRequest has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/pricing-requests")
-    public ResponseEntity<PricingRequest> createPricingRequest(@Valid @RequestBody PricingRequest pricingRequest) throws URISyntaxException {
-        log.debug("REST request to save PricingRequest : {}", pricingRequest);
-        if (pricingRequest.getId() != null) {
+    public ResponseEntity<PricingRequestDTO> createPricingRequest(@Valid @RequestBody PricingRequestDTO pricingRequestDTO) throws URISyntaxException {
+        log.debug("REST request to save PricingRequest : {}", pricingRequestDTO);
+        if (pricingRequestDTO.getId() != null) {
             throw new BadRequestAlertException("A new pricingRequest cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        PricingRequest result = pricingRequestService.save(pricingRequest);
+        PricingRequestDTO result = pricingRequestService.save(pricingRequestDTO);
         return ResponseEntity.created(new URI("/api/pricing-requests/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -61,21 +61,21 @@ public class PricingRequestResource {
     /**
      * {@code PUT  /pricing-requests} : Updates an existing pricingRequest.
      *
-     * @param pricingRequest the pricingRequest to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated pricingRequest,
-     * or with status {@code 400 (Bad Request)} if the pricingRequest is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the pricingRequest couldn't be updated.
+     * @param pricingRequestDTO the pricingRequestDTO to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated pricingRequestDTO,
+     * or with status {@code 400 (Bad Request)} if the pricingRequestDTO is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the pricingRequestDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/pricing-requests")
-    public ResponseEntity<PricingRequest> updatePricingRequest(@Valid @RequestBody PricingRequest pricingRequest) throws URISyntaxException {
-        log.debug("REST request to update PricingRequest : {}", pricingRequest);
-        if (pricingRequest.getId() == null) {
+    public ResponseEntity<PricingRequestDTO> updatePricingRequest(@Valid @RequestBody PricingRequestDTO pricingRequestDTO) throws URISyntaxException {
+        log.debug("REST request to update PricingRequest : {}", pricingRequestDTO);
+        if (pricingRequestDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        PricingRequest result = pricingRequestService.save(pricingRequest);
+        PricingRequestDTO result = pricingRequestService.save(pricingRequestDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, pricingRequest.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, pricingRequestDTO.getId().toString()))
             .body(result);
     }
 
@@ -85,7 +85,7 @@ public class PricingRequestResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pricingRequests in body.
      */
     @GetMapping("/pricing-requests")
-    public List<PricingRequest> getAllPricingRequests() {
+    public List<PricingRequestDTO> getAllPricingRequests() {
         log.debug("REST request to get all PricingRequests");
         return pricingRequestService.findAll();
     }
@@ -93,20 +93,20 @@ public class PricingRequestResource {
     /**
      * {@code GET  /pricing-requests/:id} : get the "id" pricingRequest.
      *
-     * @param id the id of the pricingRequest to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the pricingRequest, or with status {@code 404 (Not Found)}.
+     * @param id the id of the pricingRequestDTO to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the pricingRequestDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/pricing-requests/{id}")
-    public ResponseEntity<PricingRequest> getPricingRequest(@PathVariable Long id) {
+    public ResponseEntity<PricingRequestDTO> getPricingRequest(@PathVariable Long id) {
         log.debug("REST request to get PricingRequest : {}", id);
-        Optional<PricingRequest> pricingRequest = pricingRequestService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(pricingRequest);
+        Optional<PricingRequestDTO> pricingRequestDTO = pricingRequestService.findOne(id);
+        return ResponseUtil.wrapOrNotFound(pricingRequestDTO);
     }
 
     /**
      * {@code DELETE  /pricing-requests/:id} : delete the "id" pricingRequest.
      *
-     * @param id the id of the pricingRequest to delete.
+     * @param id the id of the pricingRequestDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/pricing-requests/{id}")

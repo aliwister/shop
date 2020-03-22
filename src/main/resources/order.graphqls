@@ -47,12 +47,36 @@ type Order {
     carrier: String
     paymentMethod: String
     createdDate: Date
+}
+type Purchase {
+    id: ID
+    po: Int
+}
+type PurchaseItem {
+    id: ID
+    sequence: Int
+    price: BigDecimal
+    qunatity: BigDecimal
+    description: String
+}
 
+input OrderItemInput {
+    id: ID
+}
+
+input PurchaseItemInput {
+    sequence: Int
+    price: BigDecimal
+    qunatity: BigDecimal
+    description: String
+    orderItems: [OrderItemInput]
 }
 
 extend type Mutation {
     createOrder(id: Int): Order
+    contact(id: Int): Message
     #createOrderFromCart(cart: CartInput): Order
+    createPurchase(items: [PurchaseItemInput]): Purchase
 }
 
 extend type Query {
@@ -60,6 +84,7 @@ extend type Query {
     #getOrders(): [Orders]
     orderConfirmation(ref: String, key: String): Order
     orders(limit: Int = 10): [Order]
+    ordersA(state: [OrderState], limit: Int, searchText: String): [Order]
 }
 
 
