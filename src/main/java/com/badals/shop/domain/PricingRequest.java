@@ -22,6 +22,29 @@ public class PricingRequest extends Auditable implements Serializable {
     @Column(name = "sku", nullable = false)
     private String sku;
 
+    @Column(name = "done", nullable = false)
+    private Boolean done;
+
+    public Boolean getDone() {
+        return done;
+    }
+
+    public void setDone(Boolean done) {
+        this.done = done;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="sku", referencedColumnName = "ref", insertable = false, updatable = false)
+    private Product product;
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;

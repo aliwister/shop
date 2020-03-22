@@ -183,7 +183,7 @@ public class UserResource {
     public Customer getUser() {
 
         return //ResponseUtil.wrapOrNotFound(
-            userService.getUserWithAuthorities().get(); //(login).get();
+            userService.getUserWithAuthorities().orElse(null);//(login).get();
         //.map(CustomerDTO::new));
     }
     /**

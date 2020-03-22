@@ -4,11 +4,24 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
 import com.badals.shop.domain.enumeration.OverrideType;
+import lombok.Data;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.ProductOverride} entity.
  */
+@Data
 public class ProductOverrideDTO implements Serializable {
+
+    public ProductOverrideDTO() {
+    }
+
+    public ProductOverrideDTO(@NotNull String sku, @NotNull OverrideType type, String override, @NotNull Boolean active, @NotNull Boolean lazy) {
+        this.sku = sku;
+        this.type = type;
+        this.override = override;
+        this.active = active;
+        this.lazy = lazy;
+    }
 
     private Long id;
 
@@ -39,101 +52,6 @@ public class ProductOverrideDTO implements Serializable {
 
     private String lastModifiedByLogin;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
-    public OverrideType getType() {
-        return type;
-    }
-
-    public void setType(OverrideType type) {
-        this.type = type;
-    }
-
-    public String getOverride() {
-        return override;
-    }
-
-    public void setOverride(String override) {
-        this.override = override;
-    }
-
-    public Boolean isActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public Boolean isLazy() {
-        return lazy;
-    }
-
-    public void setLazy(Boolean lazy) {
-        this.lazy = lazy;
-    }
-
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Instant getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public Long getCreatedById() {
-        return createdById;
-    }
-
-    public void setCreatedById(Long userId) {
-        this.createdById = userId;
-    }
-
-    public String getCreatedByLogin() {
-        return createdByLogin;
-    }
-
-    public void setCreatedByLogin(String userLogin) {
-        this.createdByLogin = userLogin;
-    }
-
-    public Long getLastModifiedById() {
-        return lastModifiedById;
-    }
-
-    public void setLastModifiedById(Long userId) {
-        this.lastModifiedById = userId;
-    }
-
-    public String getLastModifiedByLogin() {
-        return lastModifiedByLogin;
-    }
-
-    public void setLastModifiedByLogin(String userLogin) {
-        this.lastModifiedByLogin = userLogin;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -163,8 +81,7 @@ public class ProductOverrideDTO implements Serializable {
             ", sku='" + getSku() + "'" +
             ", type='" + getType() + "'" +
             ", override='" + getOverride() + "'" +
-            ", active='" + isActive() + "'" +
-            ", lazy='" + isLazy() + "'" +
+
             ", createdDate='" + getCreatedDate() + "'" +
             ", lastModifiedDate='" + getLastModifiedDate() + "'" +
             ", createdBy=" + getCreatedById() +
