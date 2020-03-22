@@ -105,7 +105,7 @@ public class OrderService {
 
     public List<OrderDTO> getCustomerOrders() {
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
-        return orderRepository.findOrdersByCustomer(loginUser).stream()
+        return orderRepository.findOrdersByCustomerOrderByCreatedDateDesc(loginUser).stream()
                 .map(orderMapper::toDto)
                 .collect(Collectors.toCollection(LinkedList::new));
     }

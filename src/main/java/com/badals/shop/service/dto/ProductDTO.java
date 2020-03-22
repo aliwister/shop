@@ -108,6 +108,8 @@ public class ProductDTO implements Serializable {
 
     String browseNode;
 
+    List<String> features;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
