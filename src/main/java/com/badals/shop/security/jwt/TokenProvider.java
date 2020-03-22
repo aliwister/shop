@@ -82,11 +82,14 @@ public class TokenProvider implements InitializingBean {
     }
 
     public Authentication getAuthentication(String token) {
+        log.info("JWT Token: " + token);
         Claims claims = Jwts.parser()
             .setSigningKey(key)
             .parseClaimsJws(token)
             .getBody();
 
+        log.info(claims.toString());
+        log.info(claims.get(AUTHORITIES_KEY).toString());
         Collection<? extends GrantedAuthority> authorities =
             Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
