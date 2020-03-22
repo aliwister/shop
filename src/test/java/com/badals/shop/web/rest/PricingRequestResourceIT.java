@@ -4,6 +4,8 @@ import com.badals.shop.ShopApp;
 import com.badals.shop.domain.PricingRequest;
 import com.badals.shop.repository.PricingRequestRepository;
 import com.badals.shop.service.PricingRequestService;
+import com.badals.shop.service.dto.PricingRequestDTO;
+import com.badals.shop.service.mapper.PricingRequestMapper;
 import com.badals.shop.web.rest.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +41,9 @@ public class PricingRequestResourceIT {
 
     @Autowired
     private PricingRequestRepository pricingRequestRepository;
+
+    @Autowired
+    private PricingRequestMapper pricingRequestMapper;
 
     @Autowired
     private PricingRequestService pricingRequestService;
@@ -108,9 +113,10 @@ public class PricingRequestResourceIT {
         int databaseSizeBeforeCreate = pricingRequestRepository.findAll().size();
 
         // Create the PricingRequest
+        PricingRequestDTO pricingRequestDTO = pricingRequestMapper.toDto(pricingRequest);
         restPricingRequestMockMvc.perform(post("/api/pricing-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(pricingRequest)))
+            .content(TestUtil.convertObjectToJsonBytes(pricingRequestDTO)))
             .andExpect(status().isCreated());
 
         // Validate the PricingRequest in the database
@@ -127,11 +133,12 @@ public class PricingRequestResourceIT {
 
         // Create the PricingRequest with an existing ID
         pricingRequest.setId(1L);
+        PricingRequestDTO pricingRequestDTO = pricingRequestMapper.toDto(pricingRequest);
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restPricingRequestMockMvc.perform(post("/api/pricing-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(pricingRequest)))
+            .content(TestUtil.convertObjectToJsonBytes(pricingRequestDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the PricingRequest in the database
@@ -148,10 +155,11 @@ public class PricingRequestResourceIT {
         pricingRequest.setSku(null);
 
         // Create the PricingRequest, which fails.
+        PricingRequestDTO pricingRequestDTO = pricingRequestMapper.toDto(pricingRequest);
 
         restPricingRequestMockMvc.perform(post("/api/pricing-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(pricingRequest)))
+            .content(TestUtil.convertObjectToJsonBytes(pricingRequestDTO)))
             .andExpect(status().isBadRequest());
 
         List<PricingRequest> pricingRequestList = pricingRequestRepository.findAll();
@@ -198,7 +206,7 @@ public class PricingRequestResourceIT {
     @Transactional
     public void updatePricingRequest() throws Exception {
         // Initialize the database
-        pricingRequestService.save(pricingRequest);
+        pricingRequestRepository.saveAndFlush(pricingRequest);
 
         int databaseSizeBeforeUpdate = pricingRequestRepository.findAll().size();
 
@@ -208,10 +216,11 @@ public class PricingRequestResourceIT {
         em.detach(updatedPricingRequest);
         updatedPricingRequest
             .sku(UPDATED_SKU);
+        PricingRequestDTO pricingRequestDTO = pricingRequestMapper.toDto(updatedPricingRequest);
 
         restPricingRequestMockMvc.perform(put("/api/pricing-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(updatedPricingRequest)))
+            .content(TestUtil.convertObjectToJsonBytes(pricingRequestDTO)))
             .andExpect(status().isOk());
 
         // Validate the PricingRequest in the database
@@ -227,11 +236,12 @@ public class PricingRequestResourceIT {
         int databaseSizeBeforeUpdate = pricingRequestRepository.findAll().size();
 
         // Create the PricingRequest
+        PricingRequestDTO pricingRequestDTO = pricingRequestMapper.toDto(pricingRequest);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restPricingRequestMockMvc.perform(put("/api/pricing-requests")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(pricingRequest)))
+            .content(TestUtil.convertObjectToJsonBytes(pricingRequestDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the PricingRequest in the database
@@ -243,7 +253,7 @@ public class PricingRequestResourceIT {
     @Transactional
     public void deletePricingRequest() throws Exception {
         // Initialize the database
-        pricingRequestService.save(pricingRequest);
+        pricingRequestRepository.saveAndFlush(pricingRequest);
 
         int databaseSizeBeforeDelete = pricingRequestRepository.findAll().size();
 
@@ -270,5 +280,28 @@ public class PricingRequestResourceIT {
         assertThat(pricingRequest1).isNotEqualTo(pricingRequest2);
         pricingRequest1.setId(null);
         assertThat(pricingRequest1).isNotEqualTo(pricingRequest2);
+    }
+
+    @Test
+    @Transactional
+    public void dtoEqualsVerifier() throws Exception {
+        TestUtil.equalsVerifier(PricingRequestDTO.class);
+        PricingRequestDTO pricingRequestDTO1 = new PricingRequestDTO();
+        pricingRequestDTO1.setId(1L);
+        PricingRequestDTO pricingRequestDTO2 = new PricingRequestDTO();
+        assertThat(pricingRequestDTO1).isNotEqualTo(pricingRequestDTO2);
+        pricingRequestDTO2.setId(pricingRequestDTO1.getId());
+        assertThat(pricingRequestDTO1).isEqualTo(pricingRequestDTO2);
+        pricingRequestDTO2.setId(2L);
+        assertThat(pricingRequestDTO1).isNotEqualTo(pricingRequestDTO2);
+        pricingRequestDTO1.setId(null);
+        assertThat(pricingRequestDTO1).isNotEqualTo(pricingRequestDTO2);
+    }
+
+    @Test
+    @Transactional
+    public void testEntityFromId() {
+        assertThat(pricingRequestMapper.fromId(42L).getId()).isEqualTo(42);
+        assertThat(pricingRequestMapper.fromId(null)).isNull();
     }
 }
