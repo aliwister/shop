@@ -1,5 +1,6 @@
 package com.badals.shop.service.query;
 
+import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.service.CartService;
 import com.badals.shop.service.OrderService;
 import com.badals.shop.service.ProductService;
@@ -13,35 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-/*
-query {
-  product(id: 1) {
-    id,
-    ref,
-    parent,
-    sku,
-    image,
-    images
-  }
-}
-query {
-  product(id: 1) {
-    ref
-    releaseDate
-    variationOptions {
-      name
-      values
-    }
-    variationAttributes {
-      name
-      value
-    }
-    variationDimensions
-  }
-}
-
- */
 
 @Component
 public class OrderQuery extends ShopQuery implements GraphQLQueryResolver {
@@ -64,6 +36,12 @@ public class OrderQuery extends ShopQuery implements GraphQLQueryResolver {
         return orders;
     }
 
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<OrderDTO> ordersA(List<OrderState> orderState, Integer limit, String searchText) throws OrderNotFoundException {
+        List<OrderDTO> orders = orderService.getOrders(null, null, null);
+
+        return orders;
+    }
 
     //public String getCheckout()
 }

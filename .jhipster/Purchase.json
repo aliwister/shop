@@ -1,0 +1,105 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [
+        {
+            "relationshipName": "deliveryAddress",
+            "otherEntityName": "address",
+            "relationshipType": "one-to-one",
+            "otherEntityField": "id_address",
+            "ownerSide": true,
+            "useJPADerivedIdentifier": false,
+            "otherEntityRelationshipName": "purchase"
+        },
+        {
+            "relationshipName": "invoiceAddress",
+            "otherEntityName": "address",
+            "relationshipType": "one-to-one",
+            "otherEntityField": "id_address",
+            "ownerSide": true,
+            "useJPADerivedIdentifier": false,
+            "otherEntityRelationshipName": "purchase"
+        },
+        {
+            "relationshipName": "merchant",
+            "otherEntityName": "merchant",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        },
+        {
+            "relationshipName": "orderState",
+            "otherEntityName": "orderState",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "n"
+        },
+        {
+            "relationshipName": "purchaseItem",
+            "otherEntityName": "purchaseItem",
+            "relationshipType": "one-to-many",
+            "otherEntityRelationshipName": "purchase"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "po",
+            "fieldType": "Long",
+            "fieldValidateRules": [
+                "required",
+                "unique"
+            ]
+        },
+        {
+            "fieldName": "ref",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "shippingInstructions",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "currency",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "invoiceDate",
+            "fieldType": "LocalDate"
+        },
+        {
+            "fieldName": "estimatedDeliveryDate",
+            "fieldType": "LocalDate",
+            "fieldValidateRules": []
+        },
+        {
+            "fieldName": "orderDate",
+            "fieldType": "LocalDate"
+        },
+        {
+            "fieldName": "subtotal",
+            "fieldType": "BigDecimal"
+        },
+        {
+            "fieldName": "deliveryTotal",
+            "fieldType": "BigDecimal"
+        },
+        {
+            "fieldName": "taxesTotal",
+            "fieldType": "BigDecimal"
+        },
+        {
+            "fieldName": "discountTotal",
+            "fieldType": "BigDecimal"
+        },
+        {
+            "fieldName": "total",
+            "fieldType": "BigDecimal"
+        }
+    ],
+    "changelogDate": "20200322172447",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceClass",
+    "entityTableName": "purchase",
+    "databaseType": "sql",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}

@@ -12,7 +12,7 @@
         }
     ],
     "changelogDate": "20200319083349",
-    "dto": "no",
+    "dto": "mapstruct",
     "searchEngine": false,
     "service": "serviceClass",
     "entityTableName": "pricing_request",
