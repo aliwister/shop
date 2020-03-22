@@ -112,8 +112,8 @@ jhipster:
       max-entries: 1000 # Number of objects in each cache entry
   cors:
     allowed-origins: 'https://www.badals.com,https://badals.com'
-    allowed-methods: '*'
-    allowed-headers: '*'
+    allowed-methods: 'GET,PUT,POST,DELETE,OPTIONS'
+    allowed-headers: 'Authorization,Content-Type,x-requested-with,origin'
     exposed-headers: 'Authorization,Link,X-Total-Count'
     allow-credentials: true
     max-age: 1800
