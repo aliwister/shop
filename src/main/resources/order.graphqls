@@ -25,6 +25,7 @@ type OrderItem {
     image: String
     weight: BigDecimal
     unit: String
+    lineTotal: BigDecimal
 }
 
 type Order {

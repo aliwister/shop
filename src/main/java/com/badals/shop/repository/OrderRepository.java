@@ -15,5 +15,5 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
    public Optional<Order> findOrderByReferenceAndConfirmationKey(String reference, String confirmationKey);
-   public List<Order> findOrdersByCustomer(Customer customer);
+   public List<Order> findOrdersByCustomerOrderByCreatedDateDesc(Customer customer);
 }
