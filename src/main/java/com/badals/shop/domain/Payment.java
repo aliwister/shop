@@ -13,7 +13,7 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "payment")
-public class Payment implements Serializable {
+public class Payment extends SimpleAuditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,9 +38,7 @@ public class Payment implements Serializable {
     @Column(name = "transaction_id")
     private String transactionId;
 
-    @NotNull
-    @Column(name = "created_date", nullable = false)
-    private Instant created_date;
+
 
     @ManyToOne
     @JsonIgnoreProperties("orderPayments")
@@ -120,19 +118,6 @@ public class Payment implements Serializable {
         this.transactionId = transactionId;
     }
 
-    public Instant getCreated_date() {
-        return created_date;
-    }
-
-    public Payment created_date(Instant created_date) {
-        this.created_date = created_date;
-        return this;
-    }
-
-    public void setCreated_date(Instant created_date) {
-        this.created_date = created_date;
-    }
-
     public Order getOrder() {
         return order;
     }
@@ -172,7 +157,6 @@ public class Payment implements Serializable {
             ", cardNumber='" + getCardNumber() + "'" +
             ", amount=" + getAmount() +
             ", transactionId='" + getTransactionId() + "'" +
-            ", created_date='" + getCreated_date() + "'" +
             "}";
     }
 }
