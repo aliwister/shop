@@ -160,6 +160,7 @@ public class PasLookup {
       getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_PRICE);
       getVariationsResources.add(GetVariationsResource.OFFERS_SUMMARIES_LOWESTPRICE);
       getVariationsResources.add(GetVariationsResource.OFFERS_SUMMARIES_OFFERCOUNT);
+      getVariationsResources.add(GetVariationsResource.VARIATIONSUMMARY_VARIATIONDIMENSION);
 
       return getVariationsResources;
    }

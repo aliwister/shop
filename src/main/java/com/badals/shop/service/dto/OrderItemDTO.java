@@ -41,7 +41,8 @@ public class OrderItemDTO implements Serializable {
 
     private Long orderId;
 
-
+private String sku;
+private String url;
 
     @Override
     public boolean equals(Object o) {

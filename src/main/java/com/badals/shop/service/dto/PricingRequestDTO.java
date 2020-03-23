@@ -18,6 +18,7 @@ public class PricingRequestDTO implements Serializable {
 
     private String ref;
     private String email;
+    private String parent;
 
 
     @Override
