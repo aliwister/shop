@@ -274,6 +274,6 @@ extend type Mutation {
             i18n: ProductI18nInput):ProductI18n,
     pasLookup(sku: String): Product
     addToPricingQ(sku: String):Message
-    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean): ProductOverride
+    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean): Product
     completePricingRequest(id: Long):Message
 }

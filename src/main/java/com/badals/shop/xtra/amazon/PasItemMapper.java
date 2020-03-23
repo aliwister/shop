@@ -70,6 +70,8 @@ public interface PasItemMapper {
          target.setCost(offer.getPrice().getAmount());
          target.setPrime(offer.getDeliveryInfo().isIsPrimeEligible());
          target.setSuperSaver(offer.getDeliveryInfo().isIsAmazonFulfilled());
+         target.setFreeShipping(offer.getDeliveryInfo().isIsFreeShippingEligible());
+         target.setShippingCharges(opt(() -> offer.getDeliveryInfo().getShippingCharges().get(0).getAmount()));
          target.setAvailabilityType(offer.getAvailability().getType());
          target.setAvailabilityMessage(offer.getAvailability().getMessage());
          target.setSavingsAmount(opt(() -> offer.getPrice().getSavings().getAmount()));

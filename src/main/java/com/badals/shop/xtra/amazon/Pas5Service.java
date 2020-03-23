@@ -64,7 +64,7 @@ public class Pas5Service implements IProductService {
     @Autowired
     private PasItemMapper pasItemMapper;
 
-    public Product lookup(String asin, boolean isRedis, boolean isRebuild) {
+    public Product lookup(String asin, boolean isRedis, boolean isRebuild) throws NoOfferException {
         return lookup(asin, false, isRedis, isRebuild);
     }
 
@@ -83,7 +83,7 @@ public class Pas5Service implements IProductService {
     }
 
     @Transactional
-    public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild) {
+    public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild) throws NoOfferException {
 
         Product product = productRepo.findBySkuJoinChildren(asin).orElse(null);
         if (product == null) {
@@ -207,7 +207,8 @@ public class Pas5Service implements IProductService {
         return product;
     }
 
-    Product priceMws(Product p, List<ProductOverride> overrides) {
+    Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
+
         if (p.getWeight() == null) return p;
         MwsItemNode n = mwsLookup.fetch(p.getSku());
         Product product = p;
@@ -216,7 +217,7 @@ public class Pas5Service implements IProductService {
         } catch (PricingException e) {
             //e.printStackTrace();
         } catch (NoOfferException e) {
-            //e.printStackTrace();
+            throw e;
         }
         return product;
     }
@@ -228,7 +229,7 @@ public class Pas5Service implements IProductService {
     }
 
     Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
-        product = (Product) PasLookupParser.parseProduct(product, item, isParent);
+        product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides);
         ProductLang lang = getLang(product);
 
         lang = (ProductLang) PasLookupParser.parseProductI18n(lang, item);
