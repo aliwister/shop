@@ -131,6 +131,12 @@ public class OrderService {
 
     }
 
+    public void sendRequestPaymentSms(Long id, String mobile) throws Exception {
+        Order order = orderRepository.getOne(id);
+        String message = "Thank you for your order " + order.getReference() + ". Please deposit OMR " + order.getTotal() + " in our Bank Muscat account # 0333";
+        sendSms(message, mobile, false);
+    }
+
     private static final String USERNAME = "badals";
     private static final String PASSWORD = "***REMOVED***";
     public void sendSms(String message, String phone, boolean isUnicode) throws Exception {
@@ -182,4 +188,9 @@ public class OrderService {
         }
         return ret;
     }
+
+   public Optional<OrderDTO> getOrderWithOrderItems(Long id) {
+        return orderRepository.findOrderJoinCustomerJoinOrderItemsJoinDeliveryAddress(id).map(orderMapper::toDto);
+   }
+
 }

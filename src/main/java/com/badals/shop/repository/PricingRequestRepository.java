@@ -14,6 +14,6 @@ import java.util.List;
 @Repository
 public interface PricingRequestRepository extends JpaRepository<PricingRequest, Long> {
 
-   @Query(" from PricingRequest u join fetch u.product where u.done = false")
+   @Query(" from PricingRequest u join fetch u.product p left join fetch p.parent where u.done = false")
    List<PricingRequest> findWithProduct();
 }

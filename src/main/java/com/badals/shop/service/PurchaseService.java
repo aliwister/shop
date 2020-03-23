@@ -1,12 +1,17 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Purchase;
+import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.repository.PurchaseRepository;
 import com.badals.shop.service.dto.PurchaseDTO;
+import com.badals.shop.service.dto.PurchaseItemDTO;
+import com.badals.shop.service.mapper.PurchaseItemMapper;
 import com.badals.shop.service.mapper.PurchaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +32,12 @@ public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
 
     private final PurchaseMapper purchaseMapper;
+    private final PurchaseItemMapper purchaseItemMapper;
 
-    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper) {
+    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper, PurchaseItemMapper purchaseItemMapper) {
         this.purchaseRepository = purchaseRepository;
         this.purchaseMapper = purchaseMapper;
+        this.purchaseItemMapper = purchaseItemMapper;
     }
 
     /**
@@ -81,5 +88,25 @@ public class PurchaseService {
     public void delete(Long id) {
         log.debug("Request to delete Purchase : {}", id);
         purchaseRepository.deleteById(id);
+    }
+
+    public Optional<PurchaseDTO> findPurchaseJoinMerchantJoinPurchaseItemsJoinDeliveryAddress(Long id) {
+        return purchaseRepository.findPurchaseJoinMerchantJoinPurchaseItemsJoinDeliveryAddress(id).map(purchaseMapper::toDto);
+    }
+
+    public List<PurchaseDTO> findAllByOrderByCreatedDateDesc(List<OrderState> orderState, Integer limit, String searchText) {
+        return purchaseRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(0,limit)).stream().map(purchaseMapper::toDto).collect(Collectors.toList());
+    }
+
+    public PurchaseDTO createOrUpdatePurchase(PurchaseDTO dto, List<PurchaseItemDTO> items) {
+        Purchase p = purchaseRepository.findById(dto.getId()).orElse(null);
+
+        if(p != null) {
+            dto.setId(p.getId());
+        }
+        Purchase n = purchaseMapper.toEntity(dto);
+        n.setPurchaseItems(items.stream().map(purchaseItemMapper::toEntity).collect(Collectors.toSet()));
+        n = purchaseRepository.save(n);
+        return purchaseMapper.toDto(n);
     }
 }

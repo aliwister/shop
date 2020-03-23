@@ -82,6 +82,13 @@ public class Pas5Service implements IProductService {
         return productOverrideRepository.findBySkuIn(Arrays.asList(new String[]{asin, parent}));
     }
 
+    private boolean setVariationType(Product p, VariationType v) {
+        p.setVariationType(v);
+        if(v == VariationType.PARENT)
+            return true;
+        return false;
+    }
+
     @Transactional
     public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild) throws NoOfferException {
 
@@ -121,9 +128,9 @@ public class Pas5Service implements IProductService {
             //Map<String, Item> responseList = parse_response(response.getItemsResult().getItems());
 
         if(isParent)
-            product.setVariationType(VariationType.PARENT);
+            isParent = setVariationType(product, VariationType.PARENT);
         else
-            product.setVariationType(VariationType.SIMPLE);
+            isParent = setVariationType(product, VariationType.SIMPLE);
 
         if (item.getParentAsin() != null && !item.getParentAsin().equals("asin")) {
             if(!existsBySku(item.getParentAsin()) || isRebuild)
@@ -137,11 +144,8 @@ public class Pas5Service implements IProductService {
 
         if(isRebuild) {
             GetVariationsResponse variationsResponse = pasLookup.variationLookup(asin, 1);
-            if (isParent) {
-                //get dimensions
-                PasLookupParser.parseDimensions(product, variationsResponse);
-            }
             if (variationsResponse != null && variationsResponse.getVariationsResult() != null) {
+                PasLookupParser.parseDimensions(product, variationsResponse);
                 int page = 1;
                 boolean more = true;
                 Set<Product> children = product.getChildren();
@@ -176,7 +180,8 @@ public class Pas5Service implements IProductService {
                 }
                 product.setChildren(children);
                 product.setVariations(variations);
-                product.setVariationType(VariationType.PARENT);
+                isParent = setVariationType(product, VariationType.PARENT);
+
             }
         }
         if(!isParent && product.getPrice() == null)

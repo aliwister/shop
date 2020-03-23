@@ -240,6 +240,7 @@ type PricingRequest {
     sku: String
     ref: String
     email: String
+    parent: String
 }
 
 extend type Query {
@@ -260,6 +261,7 @@ extend type Query {
     productAdmin(id: ID):Product
     getProductBySku(sku: String, isFive: Boolean = true):Product
     pricingRequests:[PricingRequest]
+    parentOf(sku: String): String
 }
 
 extend type Mutation {
