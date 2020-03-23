@@ -9,6 +9,7 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 
+import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
@@ -20,85 +21,20 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/*
-query {
-category(id: 1) {
-  children{
-    title
-  }
-}
-}
-query {
-product(slug:"681464590") {
-  ref
-  categories {
-    id
-    title
-  }
-  variations {
-    ref
-    variationAttributes {
-      name
-      value
-    }
-  }
-  variationOptions {
-    label
-    name
-    values
-  }
-  variationAttributes {
-      name
-      value
-  }
-}
-}
-query {
-products(category:"home", text:"", type:"") {
-  total
-  items {
-    id
-    title
-    description
-  }
-}
-}
-query {
-  product(id: 1) {
-    ref
-    releaseDate
-    variationOptions {
-      name
-      values
-    }
-    variationAttributes {
-      name
-      value
-    }
-    variationDimensions
-  }
-}
-
- */
-
 @Component
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
-    @Autowired
-    private ProductService productService;
+   @Autowired
+   private ProductService productService;
 
-
-
-
-    @Autowired
-    private CategoryService categoryService;
+   @Autowired
+   private CategoryService categoryService;
    private static final Logger log = LoggerFactory.getLogger(ProductQuery.class);
 
-
    public List<ProductDTO> products(final int count) {
-        return productService.getAllProducts(count);
-        //return null;
-    }
+      return productService.getAllProducts(count);
+      //return null;
+   }
    public ProductDTO product (String slug)  throws ProductNotFoundException  {
       ProductDTO dto = this.productService.getProductBySlug(slug);
       return dto;
@@ -135,12 +71,10 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return categoryService.findOne((long) id).orElse(null);
    }
 
-   public ProductDTO getProductBySku(final String sku, final boolean isFive) throws ProductNotFoundException, PricingException {
-      //return new Product();
+   public ProductDTO getProductBySku(final String sku, final boolean isFive) throws ProductNotFoundException, PricingException, NoOfferException {
       log.info("GetProductBySky: pasService.lookup("+sku+")");
       ProductDTO product;
-      return productService.lookupPas(sku, false, false);
-
+      return productService.lookupPas(sku, true, false);
    }
 }
 

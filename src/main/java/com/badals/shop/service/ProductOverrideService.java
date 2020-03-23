@@ -82,4 +82,10 @@ public class ProductOverrideService {
         log.debug("Request to delete ProductOverride : {}", id);
         productOverrideRepository.deleteById(id);
     }
+
+    public void saveOrUpdate(ProductOverrideDTO dto) {
+        ProductOverride productOverride = productOverrideRepository.findBySkuEqualsAndTypeEquals(dto.getSku(), dto.getType()).orElse(productOverrideMapper.toEntity(dto));
+        productOverride.setOverride(dto.getOverride());
+        productOverrideRepository.save(productOverride);
+    }
 }

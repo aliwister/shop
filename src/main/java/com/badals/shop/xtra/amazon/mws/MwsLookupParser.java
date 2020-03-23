@@ -16,7 +16,6 @@ public class MwsLookupParser {
       OfferNode offer = selectOffer(i);
 
       Double dCost = offer.getCost().doubleValue();
-
       boolean isPrime = offer.isPrime();
       boolean isFulfilledByAmazon = offer.isPrime();
       String m = offer.getMaxShipping();
@@ -28,15 +27,15 @@ public class MwsLookupParser {
       double margin = 5, risk = 2, fixed = 1.1;
       double localShipping = 0;
 
-      BigDecimal price = PasUtility.calculatePrice(offer.getCost(), weight, localShipping, margin, risk, fixed, isPrime, isFulfilledByAmazon);
+      BigDecimal price = PasUtility.calculatePrice(offer.getCost(), weight, localShipping, margin, risk, fixed, isPrime, isFulfilledByAmazon, null);
       return stock.store("Amazon.com").quantity(BigDecimal.valueOf(99)).cost(BigDecimal.valueOf(dCost)).availability(availability).allow_backorder(true).price(price).location("USA");
    }
 
-   private static OfferNode selectOffer(MwsItemNode node) {
+   private static OfferNode selectOffer(MwsItemNode node) throws NoOfferException {
       double selOfferWeight = -10000000;
       double selCost = node.getOffers().get(0).cost.doubleValue();
       int offerSize = node.getOffers().size();
-      OfferNode selOffer = null;
+      OfferNode selOffer = null;//node.getOffers().get(0);
 
       for(OfferNode offer : node.getOffers()) {
          double cost = offer.getCost().doubleValue();
@@ -64,6 +63,9 @@ public class MwsLookupParser {
             selOffer = offer;
          }
       }
+      if(selOffer == null)
+         throw new NoOfferException("Unable to bring this item as it is not available from any trusted sellers");
+
       return selOffer;
    }
 

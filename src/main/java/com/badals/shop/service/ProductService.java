@@ -14,6 +14,7 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import org.slf4j.Logger;
@@ -212,7 +213,7 @@ public class ProductService {
        return response;
    }
 
-    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException {
+    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.pas5Service.lookup(sku, isRedis, isRebuild);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             this.indexProduct(p.getId());
