@@ -8,6 +8,7 @@ import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.*;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
@@ -57,9 +58,10 @@ public class AdminMutation implements GraphQLMutationResolver {
         return null;
     }
 
-    public ProductOverrideDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy) {
+    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy) throws PricingException, NoOfferException, ProductNotFoundException {
         ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
-        return productOverrideService.save(dto);
+        productOverrideService.saveOrUpdate(dto);
+        return productService.lookupPas(sku, true, false);
     }
 
     public Message completePricingRequest(Long id) {

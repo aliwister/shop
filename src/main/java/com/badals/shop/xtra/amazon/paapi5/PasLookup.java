@@ -89,7 +89,6 @@ public class PasLookup {
       }
    }
 
-
    List<GetItemsResource> getItemsResources() {
       List<GetItemsResource> getItemsResources = new ArrayList<GetItemsResource>();
       getItemsResources.add(GetItemsResource.PARENTASIN);
@@ -114,7 +113,10 @@ public class PasLookup {
 
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISAMAZONFULFILLED);
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISPRIMEELIGIBLE);
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISFREESHIPPINGELIGIBLE);
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_DELIVERYINFO_SHIPPINGCHARGES);
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_PRICE);
+      getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_MERCHANTINFO);
       getItemsResources.add(GetItemsResource.OFFERS_LISTINGS_PRICE);
       getItemsResources.add(GetItemsResource.OFFERS_SUMMARIES_LOWESTPRICE);
       getItemsResources.add(GetItemsResource.OFFERS_SUMMARIES_OFFERCOUNT);
@@ -128,31 +130,37 @@ public class PasLookup {
    }
 
    List<GetVariationsResource> getVariationsResources() {
-      List<GetVariationsResource> GetVariationsResources = new ArrayList<GetVariationsResource>();
-      GetVariationsResources.add(GetVariationsResource.PARENTASIN);
-      GetVariationsResources.add(GetVariationsResource.ITEMINFO_TITLE);
-      GetVariationsResources.add(GetVariationsResource.ITEMINFO_FEATURES);
-      GetVariationsResources.add(GetVariationsResource.ITEMINFO_EXTERNALIDS);
-      GetVariationsResources.add(GetVariationsResource.ITEMINFO_MANUFACTUREINFO);
-      GetVariationsResources.add(GetVariationsResource.ITEMINFO_CLASSIFICATIONS);
-
-      GetVariationsResources.add(GetVariationsResource.ITEMINFO_BYLINEINFO);
-      GetVariationsResources.add(GetVariationsResource.ITEMINFO_PRODUCTINFO);
-
-      GetVariationsResources.add(GetVariationsResource.IMAGES_PRIMARY_LARGE);
-      GetVariationsResources.add(GetVariationsResource.IMAGES_VARIANTS_LARGE);
-      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_AVAILABILITY_MINORDERQUANTITY);
-      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_AVAILABILITY_TYPE);
-      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_ISAMAZONFULFILLED);
-      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_ISPRIMEELIGIBLE);
-      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_SHIPPINGCHARGES);
-      GetVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_PRICE);
-      GetVariationsResources.add(GetVariationsResource.OFFERS_SUMMARIES_LOWESTPRICE);
-      GetVariationsResources.add(GetVariationsResource.OFFERS_SUMMARIES_OFFERCOUNT);
-      GetVariationsResources.add(GetVariationsResource.VARIATIONSUMMARY_VARIATIONDIMENSION);
+      List<GetVariationsResource> getVariationsResources = new ArrayList<GetVariationsResource>();
+      getVariationsResources.add(GetVariationsResource.PARENTASIN);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_TITLE);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_FEATURES);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_EXTERNALIDS);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_MANUFACTUREINFO);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_CLASSIFICATIONS);
 
 
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_BYLINEINFO);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_PRODUCTINFO);
 
-      return GetVariationsResources;
+      getVariationsResources.add(GetVariationsResource.IMAGES_PRIMARY_LARGE);
+      getVariationsResources.add(GetVariationsResource.IMAGES_VARIANTS_LARGE);
+
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_AVAILABILITY_MINORDERQUANTITY);
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_AVAILABILITY_TYPE);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_TECHNICALINFO);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_CONTENTINFO);
+      getVariationsResources.add(GetVariationsResource.ITEMINFO_CONTENTRATING);
+
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_ISAMAZONFULFILLED);
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_ISPRIMEELIGIBLE);
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_ISFREESHIPPINGELIGIBLE);
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_DELIVERYINFO_SHIPPINGCHARGES);
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_PRICE);
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_MERCHANTINFO);
+      getVariationsResources.add(GetVariationsResource.OFFERS_LISTINGS_PRICE);
+      getVariationsResources.add(GetVariationsResource.OFFERS_SUMMARIES_LOWESTPRICE);
+      getVariationsResources.add(GetVariationsResource.OFFERS_SUMMARIES_OFFERCOUNT);
+
+      return getVariationsResources;
    }
 }

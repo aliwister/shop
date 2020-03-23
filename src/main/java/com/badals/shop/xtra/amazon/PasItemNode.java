@@ -73,8 +73,12 @@ public class PasItemNode implements Serializable {
 
    boolean superSaver = false;
    boolean prime = false;
+   boolean freeShipping = false;
+   BigDecimal shippingCharges;
    String availabilityType;
    String availabilityMessage;
+   String merchantName;
+   String shippingCountry;
 
    BigDecimal cost;
    String merchant;

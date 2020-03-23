@@ -11,6 +11,7 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
 
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
@@ -115,7 +116,7 @@ public class ProductMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("isAuthenticated()")
-    public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException {
+    public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException, NoOfferException {
         return this.productService.lookupPas(asin, false, false);
     }
 
