@@ -1,5 +1,6 @@
 package com.badals.shop.service;
 
+import com.badals.shop.domain.Order;
 import com.badals.shop.domain.Payment;
 import com.badals.shop.repository.PaymentRepository;
 import com.badals.shop.service.dto.PaymentDTO;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -82,4 +84,11 @@ public class PaymentService {
         log.debug("Request to delete Payment : {}", id);
         paymentRepository.deleteById(id);
     }
+
+   public PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod) {
+        Payment p = new Payment();
+        p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod);
+        p = paymentRepository.save(p);
+        return paymentMapper.toDto(p);
+   }
 }
