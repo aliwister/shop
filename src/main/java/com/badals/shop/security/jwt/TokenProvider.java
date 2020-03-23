@@ -90,8 +90,13 @@ public class TokenProvider implements InitializingBean {
 
         log.info(claims.toString());
         log.info(claims.get(AUTHORITIES_KEY).toString());
+        String auths = claims.get(AUTHORITIES_KEY).toString();
+        if (auths == null || auths.trim().equals("")) {
+            log.info("NO ROLE SO ASSIGNING ROLE_USER");
+            auths = "ROLE_USER";
+        }
         Collection<? extends GrantedAuthority> authorities =
-            Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+            Arrays.stream(auths.split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
