@@ -11,14 +11,10 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface ProductOverrideMapper extends EntityMapper<ProductOverrideDTO, ProductOverride> {
 
-    @Mapping(source = "createdBy.id", target = "createdById")
-    @Mapping(source = "createdBy.login", target = "createdByLogin")
-    @Mapping(source = "lastModifiedBy.id", target = "lastModifiedById")
-    @Mapping(source = "lastModifiedBy.login", target = "lastModifiedByLogin")
+
     ProductOverrideDTO toDto(ProductOverride productOverride);
 
-    @Mapping(source = "createdById", target = "createdBy")
-    @Mapping(source = "lastModifiedById", target = "lastModifiedBy")
+
     ProductOverride toEntity(ProductOverrideDTO productOverrideDTO);
 
     default ProductOverride fromId(Long id) {
