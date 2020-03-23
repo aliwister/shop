@@ -19,6 +19,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,9 @@ public class AdminMutation implements GraphQLMutationResolver {
 
     @Autowired
     private PurchaseService purchaseService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message contact(final Long id) {
@@ -94,6 +98,12 @@ public class AdminMutation implements GraphQLMutationResolver {
     }
     Message sendProductLevelEmail(Long orderId, ArrayList<Long> orderItems, String template){
         return null;
+    }
+
+    PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod) {
+        PaymentDTO payment = paymentService.addPayment(orderId, amount, paymentMethod);
+        orderService.setOrderState(orderId, OrderState.PAYMENT_ACCEPTED);
+        return payment;
     }
 }
 

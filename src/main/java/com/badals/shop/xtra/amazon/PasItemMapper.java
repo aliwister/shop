@@ -66,7 +66,7 @@ public interface PasItemMapper {
 
       // Offer
       OfferListing offer = opt(() ->source.getOffers().getListings().get(0));
-      if(offer != null) {
+      if(offer != null && offer.getPrice() != null) {
          target.setCost(offer.getPrice().getAmount());
          target.setPrime(offer.getDeliveryInfo().isIsPrimeEligible());
          target.setSuperSaver(offer.getDeliveryInfo().isIsAmazonFulfilled());

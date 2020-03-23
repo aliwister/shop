@@ -88,6 +88,12 @@ input PurchaseItemInput {
     orderItems: [OrderItemInput]
 }
 
+type Payment {
+    paymentMethod: String
+    orderId: Long
+    amount: BigDecimal
+}
+
 extend type Mutation {
     createOrder(id: Int): Order
     contact(id: Int): Message
@@ -97,6 +103,7 @@ extend type Mutation {
     discountOrder(id: ID): Order
     setOrderState(id: ID, state: OrderState): Order
     cancelOrder(id: ID): Order
+    addPayment(id: ID, amount: BigDecimal, method: String): Payment
     sendOrderLevelEmail(id:ID, template:String): Message
     sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
 }

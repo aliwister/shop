@@ -56,7 +56,14 @@ public class Order implements Serializable {
     @Column
     private String email;
 
-    public String getEmail() {
+   public Order() {
+   }
+
+   public Order(Long id) {
+      this.id = id;
+   }
+
+   public String getEmail() {
         return email;
     }
 

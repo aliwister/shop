@@ -193,4 +193,7 @@ public class OrderService {
         return orderRepository.findOrderJoinCustomerJoinOrderItemsJoinDeliveryAddress(id).map(orderMapper::toDto);
    }
 
+    public void setOrderState(Long orderId, OrderState os) {
+        orderRepository.save(orderRepository.getOne(orderId).orderState(os));
+    }
 }

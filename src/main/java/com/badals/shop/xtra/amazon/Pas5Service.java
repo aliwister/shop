@@ -222,7 +222,8 @@ public class Pas5Service implements IProductService {
         } catch (PricingException e) {
             //e.printStackTrace();
         } catch (NoOfferException e) {
-            throw e;
+            if(p.getVariationType() == VariationType.SIMPLE)
+                throw e;
         }
         return product;
     }
