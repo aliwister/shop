@@ -244,7 +244,7 @@ public class Pas5Service implements IProductService {
 
         MerchantStock stock = this.getMerchantStock(product);
         try {
-            product = setMerchantStock(product, PasLookupParser.parseStock(stock, item, overrides));
+            product = setMerchantStock(product, PasLookupParser.parseStock(product, stock, item, overrides));
         } catch (PricingException e) {
             //e.printStackTrace();
         } catch (NoOfferException e) {
