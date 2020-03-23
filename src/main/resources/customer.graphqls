@@ -11,6 +11,7 @@ type Address {
     line1: String
     line2: String
     city: String
+    mobile: String
 }
 
 type AddressInput {

@@ -13,6 +13,7 @@ import org.mapstruct.*;
 public interface PricingRequestMapper extends EntityMapper<PricingRequestDTO, PricingRequest> {
 
     @Mapping(source = "product.sku", target = "ref")
+    @Mapping(source = "product.parent.sku", target = "parent")
     @Mapping(source = "createdBy", target="email")
     PricingRequestDTO toDto(PricingRequest productLang);
 

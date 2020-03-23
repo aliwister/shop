@@ -43,6 +43,14 @@ public class OrderItem implements Serializable {
     @JsonIgnoreProperties("orderItems")
     private Order order;
 
+    @ManyToOne
+    private Product product;
+
+    @Column
+    private String url;
+
+    @Column
+    private String sku;
 
     @Column
     private String image;
@@ -55,6 +63,30 @@ public class OrderItem implements Serializable {
 
     @Column(name="line_total")
     private BigDecimal lineTotal;
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
 
     public BigDecimal getLineTotal() {
         return lineTotal;
