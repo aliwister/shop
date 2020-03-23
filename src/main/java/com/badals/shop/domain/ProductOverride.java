@@ -14,7 +14,7 @@ import com.badals.shop.domain.enumeration.OverrideType;
  */
 @Entity
 @Table(name = "product_override")
-public class ProductOverride implements Serializable {
+public class ProductOverride extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -42,19 +42,6 @@ public class ProductOverride implements Serializable {
     @Column(name = "lazy", nullable = false)
     private Boolean lazy;
 
-    @Column(name = "created_date")
-    private Instant createdDate;
-
-    @Column(name = "last_modified_date")
-    private Instant lastModifiedDate;
-
-    @ManyToOne
-    @JsonIgnoreProperties("productOverrides")
-    private User createdBy;
-
-    @ManyToOne
-    @JsonIgnoreProperties("productOverrides")
-    private User lastModifiedBy;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -126,62 +113,7 @@ public class ProductOverride implements Serializable {
         return this;
     }
 
-    public void setLazy(Boolean lazy) {
-        this.lazy = lazy;
-    }
 
-    public Instant getCreatedDate() {
-        return createdDate;
-    }
-
-    public ProductOverride createdDate(Instant createdDate) {
-        this.createdDate = createdDate;
-        return this;
-    }
-
-    public void setCreatedDate(Instant createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public Instant getLastModifiedDate() {
-        return lastModifiedDate;
-    }
-
-    public ProductOverride lastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-        return this;
-    }
-
-    public void setLastModifiedDate(Instant lastModifiedDate) {
-        this.lastModifiedDate = lastModifiedDate;
-    }
-
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public ProductOverride createdBy(User user) {
-        this.createdBy = user;
-        return this;
-    }
-
-    public void setCreatedBy(User user) {
-        this.createdBy = user;
-    }
-
-    public User getLastModifiedBy() {
-        return lastModifiedBy;
-    }
-
-    public ProductOverride lastModifiedBy(User user) {
-        this.lastModifiedBy = user;
-        return this;
-    }
-
-    public void setLastModifiedBy(User user) {
-        this.lastModifiedBy = user;
-    }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
     public boolean equals(Object o) {
