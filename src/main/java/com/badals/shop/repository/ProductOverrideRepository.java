@@ -13,12 +13,6 @@ import java.util.List;
 @Repository
 public interface ProductOverrideRepository extends JpaRepository<ProductOverride, Long> {
 
-    @Query("select productOverride from ProductOverride productOverride where productOverride.createdBy.login = ?#{principal.username}")
-    List<ProductOverride> findByCreatedByIsCurrentUser();
-
-    @Query("select productOverride from ProductOverride productOverride where productOverride.lastModifiedBy.login = ?#{principal.username}")
-    List<ProductOverride> findByLastModifiedByIsCurrentUser();
-
     List<ProductOverride> findBySku(String sku);
 
    List<ProductOverride> findBySkuIn(List<String> asins);
