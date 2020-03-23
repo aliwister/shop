@@ -221,4 +221,7 @@ public class ProductService {
     }
 
 
+    public String getParentOf(String sku) {
+        return productRepository.findOneBySku(sku).get().getParent().getSku();
+    }
 }

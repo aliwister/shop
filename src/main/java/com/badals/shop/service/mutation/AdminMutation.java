@@ -3,6 +3,7 @@ package com.badals.shop.service.mutation;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.ProductOverride;
 import com.badals.shop.domain.checkout.helper.Message;
+import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.enumeration.OverrideType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.service.*;
@@ -19,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -47,6 +49,8 @@ public class AdminMutation implements GraphQLMutationResolver {
     @Autowired
     private ProductOverrideService productOverrideService;
 
+    @Autowired
+    private PurchaseService purchaseService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message contact(final Long id) {
@@ -54,19 +58,42 @@ public class AdminMutation implements GraphQLMutationResolver {
         return new Message("SMS Sent successfully");
     }
 
-    public PurchaseDTO createPurchase(List<PurchaseItemDTO> items) {
+    public PurchaseDTO createOrUpdatePurchase(PurchaseDTO dto, List<PurchaseItemDTO> items) {
+        PurchaseDTO purchase = purchaseService.createOrUpdatePurchase(dto, items);
         return null;
     }
 
     public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy) throws PricingException, NoOfferException, ProductNotFoundException {
         ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
         productOverrideService.saveOrUpdate(dto);
-        return productService.lookupPas(sku, true, false);
+        return productService.lookupPas(sku, false, true);
     }
 
     public Message completePricingRequest(Long id) {
         pricingRequestService.complete(id);
         return new Message("done");
+    }
+
+
+
+    Message sendPaymentSms(Long id, String mobile) throws Exception {
+        orderService.sendRequestPaymentSms(id, mobile);
+        return new Message("done");
+    }
+    OrderDTO discountOrder(Long id){
+        return null;
+    }
+    OrderDTO setOrderState(Long id, OrderState state){
+        return null;
+    }
+    OrderDTO cancelOrder(Long id){
+        return null;
+    }
+    Message sendOrderLevelEmail(Long i, String template){
+        return null;
+    }
+    Message sendProductLevelEmail(Long orderId, ArrayList<Long> orderItems, String template){
+        return null;
     }
 }
 

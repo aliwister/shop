@@ -26,6 +26,7 @@ type OrderItem {
     weight: BigDecimal
     unit: String
     lineTotal: BigDecimal
+    sku: String
 }
 
 type Order {
@@ -64,6 +65,21 @@ input OrderItemInput {
     id: ID
 }
 
+input PurchaseInput {
+    id: ID
+    po: Int
+    currency: String
+    subtotal: BigDecimal
+    deliveryTotal: BigDecimal
+    taxesTotal: BigDecimal
+    discountTotal: BigDecimal
+    total: BigDecimal
+    deliveryAddressId: Long
+    invoiceAddressId: Long
+    merchantId: Long
+    orderState: OrderState
+}
+
 input PurchaseItemInput {
     sequence: Int
     price: BigDecimal
@@ -76,16 +92,21 @@ extend type Mutation {
     createOrder(id: Int): Order
     contact(id: Int): Message
     #createOrderFromCart(cart: CartInput): Order
-    createPurchase(items: [PurchaseItemInput]): Purchase
+    createOrUpdatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
+    sendPaymentSms(id: ID, mobile: String): Message
+    discountOrder(id: ID): Order
+    setOrderState(id: ID, state: OrderState): Order
+    cancelOrder(id: ID): Order
+    sendOrderLevelEmail(id:ID, template:String): Message
+    sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
 }
 
 extend type Query {
-
     #getOrders(): [Orders]
     orderConfirmation(ref: String, key: String): Order
     orders(limit: Int = 10): [Order]
     ordersA(state: [OrderState], limit: Int, searchText: String): [Order]
+    orderA(id: ID): Order
+    purchasesA(state: [OrderState], limit: Int, searchText: String): [Purchase]
+    purchaseA(id: ID): Purchase
 }
-
-
-

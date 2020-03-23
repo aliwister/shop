@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "purchase")
-public class Purchase implements Serializable {
+public class Purchase extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -78,7 +78,7 @@ public class Purchase implements Serializable {
     @Column(name = "state")
     private OrderState orderState;
 
-    @OneToMany(mappedBy = "purchase")
+    @OneToMany(mappedBy = "purchase",cascade=CascadeType.ALL, orphanRemoval = true)
     private Set<PurchaseItem> purchaseItems = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
