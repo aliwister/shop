@@ -62,12 +62,12 @@ public class PasLookupParser {
         return p;
     }
 
-    public static MerchantStock parseStock(MerchantStock stock, PasItemNode item, List<ProductOverride> overrides) throws PricingException, NoOfferException {
+    public static MerchantStock parseStock(Product product, MerchantStock stock, PasItemNode item, List<ProductOverride> overrides) throws PricingException, NoOfferException {
         BigDecimal cost = item.getCost();
         if (cost == null)
             throw new NoOfferException("Offers is null");
 
-        BigDecimal weight = item.getParsedWeight();
+        BigDecimal weight = product.getWeight();
         //weight = ;
 
         if(weight == null)
