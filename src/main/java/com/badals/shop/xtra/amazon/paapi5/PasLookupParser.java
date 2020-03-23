@@ -31,7 +31,7 @@ public class PasLookupParser {
 
     private static final Logger log = LoggerFactory.getLogger(PasLookupParser.class);
 
-    public static IMerchantProduct parseProduct(IMerchantProduct p, PasItemNode i, boolean isParent) {
+    public static IMerchantProduct parseProduct(IMerchantProduct p, PasItemNode i, boolean isParent, List<ProductOverride> overrides) {
         //Reset price
         p.setPrice(null);
 
@@ -44,7 +44,7 @@ public class PasLookupParser {
                 .url(i.getUrl())
                 .image(i.getImage())
                 .brand(i.getBrand())
-                .weight(i.getParsedWeight())
+                .weight(PasUtility.calculateWeight(i.getParsedWeight(), getOverride(overrides, OverrideType.WEIGHT)))
                 .title(i.getTitle())
                 .upc(i.getUpc())
                 .gallery(i.gallerizeImages());
@@ -68,32 +68,22 @@ public class PasLookupParser {
             throw new NoOfferException("Offers is null");
 
         BigDecimal weight = item.getParsedWeight();
-        weight = calculateWeight(weight, getOverride(overrides, OverrideType.WEIGHT));
+        //weight = ;
 
         if(weight == null)
             throw new NoOfferException("Weight is null");
 
+        if(item.getShippingCharges() == null && !item.isPrime() && !item.isSuperSaver() && !item.isFreeShipping())
+            throw new NoOfferException("Non prime/free shipping item");
+
         double margin = 5, risk = 2, fixed = 1.1;
         double localShipping = 0;
 
-        BigDecimal price = PasUtility.calculatePrice(cost, weight, localShipping, margin, risk, fixed, item.isPrime(), item.isSuperSaver());
+        BigDecimal price = PasUtility.calculatePrice(cost, weight, localShipping, margin, risk, fixed, item.isPrime(), item.isSuperSaver(), item.getShippingCountry());
         price = calculatePrice(price, getOverride(overrides, OverrideType.PRICE));
         int availability =  PasUtility.parseAvailability(item);
 
         return stock.store("Amazon.com").quantity(BigDecimal.valueOf(99)).cost(cost).availability(availability).allow_backorder(true).price(price).location("USA").discount(item.getSavingsPercentage());
-    }
-
-
-
-
-
-
-
-    private static BigDecimal calculateWeight(BigDecimal weight, ProductOverride override) {
-        if (override == null) return weight;
-        if(!override.isLazy()  ||  (override.isLazy() && weight == null))
-            return new BigDecimal(override.getOverride());
-        return weight;
     }
 
     private static BigDecimal calculatePrice(BigDecimal price, ProductOverride override) {

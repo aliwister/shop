@@ -1,6 +1,6 @@
 package com.badals.shop.xtra.amazon;
 
-import com.badals.shop.xtra.amazon.mws.MwsItemNode;
+import com.badals.shop.domain.ProductOverride;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +14,7 @@ public class PasUtility {
    private static final double LB2KG = 0.453592;
    private static final double OMRPERKG = 3.5;
 
-   public static BigDecimal calculatePrice(BigDecimal cost, BigDecimal weight, double localShipping, double margin, double risk, double fixed, boolean isPrime, boolean isFulfilledByAmazon) {
+   public static BigDecimal calculatePrice(BigDecimal cost, BigDecimal weight, double localShipping, double margin, double risk, double fixed, boolean isPrime, boolean isFulfilledByAmazon, String shippingCountry) {
       double dWeight = weight.doubleValue()*LB2KG;
       if (dWeight < .0001) {
          //throw new Exception("Unable to caculate the price [weight=0]");
@@ -36,6 +36,9 @@ public class PasUtility {
 
       if(isPrime & dCost < 11 & dWeight < .5)
          insurance = -1;
+
+      if(shippingCountry != null && !shippingCountry.equalsIgnoreCase("us"))
+         risk ++;
 
       double c_add = (double) (margin + risk) * dCost *.01 + localShipping;
       double w_add = (double) OMRPERKG * dWeight ;
@@ -74,6 +77,10 @@ public class PasUtility {
          if(date != null)
             availability += Math.abs(Period.between(date, LocalDate.now()).getDays())*24;
       }
+
+      if(!item.getShippingCountry().equalsIgnoreCase("us"))
+         availability *= 1.2;
+
       return availability;
    }
 
@@ -106,5 +113,12 @@ public class PasUtility {
       catch (Exception e) {
          return null;
       }
+   }
+
+   public static BigDecimal calculateWeight(BigDecimal weight, ProductOverride override) {
+      if (override == null) return weight;
+      if(!override.isLazy()  ||  (override.isLazy() && weight == null))
+         return new BigDecimal(override.getOverride());
+      return weight;
    }
 }
