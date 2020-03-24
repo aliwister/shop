@@ -1,6 +1,8 @@
 package com.badals.shop.service.mutation;
 
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.Order;
+import com.badals.shop.domain.Payment;
 import com.badals.shop.domain.ProductOverride;
 import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.domain.enumeration.OrderState;
@@ -56,6 +58,9 @@ public class AdminMutation implements GraphQLMutationResolver {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private MailService mailService;
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message contact(final Long id) {
         orderService.sendPaymnetMessage(id);
@@ -78,31 +83,50 @@ public class AdminMutation implements GraphQLMutationResolver {
         return new Message("done");
     }
 
-
-
-    Message sendPaymentSms(Long id, String mobile) throws Exception {
+    public Message sendPaymentSms(Long id, String mobile) throws Exception {
         orderService.sendRequestPaymentSms(id, mobile);
         return new Message("done");
     }
-    OrderDTO discountOrder(Long id){
-        return null;
-    }
-    OrderDTO setOrderState(Long id, OrderState state){
-        return null;
-    }
-    OrderDTO cancelOrder(Long id){
-        return null;
-    }
-    Message sendOrderLevelEmail(Long i, String template){
-        return null;
-    }
-    Message sendProductLevelEmail(Long orderId, ArrayList<Long> orderItems, String template){
+
+    public OrderDTO discountOrder(Long id){
         return null;
     }
 
-    PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod) {
-        PaymentDTO payment = paymentService.addPayment(orderId, amount, paymentMethod);
-        orderService.setOrderState(orderId, OrderState.PAYMENT_ACCEPTED);
+    public OrderDTO setOrderState(Long id, OrderState state){
+        return null;
+    }
+
+    public OrderDTO cancelOrder(Long id){
+        return null;
+    }
+
+    public Message sendOrderLevelEmail(Long id, String template){
+
+        if(template.equalsIgnoreCase("NEW_ORDER")) {
+            OrderDTO order = orderService.getOrderWithOrderItems(id).orElse(null);
+            CustomerDTO customer = order.getCustomer();
+            mailService.sendOrderCreationMail(customer, order);
+        }
+        else if(template.equalsIgnoreCase("NEW_PAYMENT")) {
+            PaymentDTO payment = paymentService.findOne(id).orElse(null);
+            OrderDTO order = orderService.getOrderWithOrderItems(payment.getOrderId()).orElse(null);
+            CustomerDTO customer = order.getCustomer();
+            mailService.sendPaymentAddedMail(customer, payment);
+        }
+        return new Message("Success");
+    }
+    public Message sendProductLevelEmail(Long orderId, ArrayList<Long> orderItems, String template){
+        return null;
+    }
+
+    public PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod, String authCode) {
+        PaymentDTO payment = paymentService.addPayment(orderId, amount, paymentMethod, authCode);
+        OrderDTO order = orderService.setOrderState(orderId, OrderState.PAYMENT_ACCEPTED);
+        // Send Email
+        payment = paymentService.findOne(payment.getId()).orElse(null);
+        CustomerDTO customer = order.getCustomer();
+        mailService.sendPaymentAddedMail(customer, payment);
+        // Return
         return payment;
     }
 }

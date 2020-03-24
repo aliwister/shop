@@ -103,7 +103,7 @@ extend type Mutation {
     discountOrder(id: ID): Order
     setOrderState(id: ID, state: OrderState): Order
     cancelOrder(id: ID): Order
-    addPayment(id: ID, amount: BigDecimal, method: String): Payment
+    addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
     sendOrderLevelEmail(id:ID, template:String): Message
     sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
 }
