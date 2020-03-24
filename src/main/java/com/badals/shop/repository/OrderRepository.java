@@ -22,9 +22,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    List<Order> findAllByOrderStateInOrderByCreatedDateDesc(OrderState[] orderStates, Pageable page);
    List<Order> findAllByOrderByCreatedDateDesc(Pageable page);
 
-   @Query("from Order o left join o.customer left join o.deliveryAddress where o.id = ?1")
+   @Query("from Order o left join o.customer left join fetch o.deliveryAddress where o.id = ?1")
    Optional<Order> findJoinCustomerJoinAddress(Long orderId);
 
-   @Query("from Order o left join o.customer left join o.orderItems left join o.deliveryAddress where o.id = ?1")
+   @Query("select o from Order o left join fetch o.customer left join fetch o.orderItems left join fetch o.deliveryAddress where o.id = ?1")
    Optional<Order> findOrderJoinCustomerJoinOrderItemsJoinDeliveryAddress(Long id);
 }
