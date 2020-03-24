@@ -22,80 +22,30 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
-
-/*
-mutation {
-  createNewProduct(product: {sku: "9789996910180",
-    upc: "9789996910180",
-    price: "1.5", currency: "OMR", title: "Asnan Majid", active: true}) {
-    ref
-    releaseDate
-    variationOptions {
-      name
-      values
-    }
-  }
-}
-mutation {
-  createNewProduct(product: {ref: 12, parent: 13, sku: "adxbdcdd", upc: 334343, releaseDate: "2017-07-09", price: 123, title: "Title", active: true,
-    	variationOptions: [{ name : "Color", values:["REd", "Blue"]}, {name: "Size", values:["Green","Yellow"]}] }) {
-    ref
-    releaseDate
-    variationOptions {
-      name
-      values
-    }
-  }
-}
-mutation {
-  addI18n(id: 13, i18n: {lang: "en", title: "Asnan Majid", description:"<h1>Some really cool description</h1>", model: "18839", features:["great book", "for all ages"]}){
-    title
-    description
-    features
-  }
-}
-
-mutation {
-  pasLookup(sku: "B01HLV5HR6") {
-    id
-    ref
-    parent
-    sku
-    image
-    price
-    gallery {
-      url
-    }
-    variations {
-      ref
-    }
-  }
-}
-
-
- */
 
 @Component
 public class ProductMutation implements GraphQLMutationResolver {
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private Pas5Service pasService;
+    private final Pas5Service pasService;
 
-    @Autowired
-    private ProductLangService productLangService;
+    private final ProductLangService productLangService;
 
-    @Autowired
-    private PricingRequestService pricingRequestService;
+    private final PricingRequestService pricingRequestService;
 
-    @Autowired
-    MessageSource messageSource;
+    private final MessageSource messageSource;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public ProductMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
+        this.productService = productService;
+        this.pasService = pasService;
+        this.productLangService = productLangService;
+        this.pricingRequestService = pricingRequestService;
+        this.messageSource = messageSource;
+        this.userService = userService;
+    }
 
     @PreAuthorize("isAuthenticated()")
     public ProductDTO createProduct(final Long ref, final Long parent, final String sku, final String upc, final LocalDate releaseDate) {
@@ -126,8 +76,12 @@ public class ProductMutation implements GraphQLMutationResolver {
         if(loginUser == null)
             return new Message("You have to be logged in to request a price");
 
-        pricingRequestService.push(asin);
-        messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale());
+        try {
+            pricingRequestService.push(asin, loginUser.getEmail());
+        }
+        catch(PricingException e) {
+            return new Message(messageSource.getMessage("pricing.request.exists", null, LocaleContextHolder.getLocale()));
+        }
         return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));
     }
 }
