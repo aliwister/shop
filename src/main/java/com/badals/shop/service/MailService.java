@@ -1,8 +1,12 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.Order;
 import com.badals.shop.domain.User;
 
+import com.badals.shop.service.dto.CustomerDTO;
+import com.badals.shop.service.dto.OrderDTO;
+import com.badals.shop.service.dto.PaymentDTO;
 import io.github.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
@@ -19,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import static com.badals.shop.domain.checkout.CheckoutCart_.ITEMS;
+
 /**
  * Service for sending emails.
  * <p>
@@ -30,6 +36,9 @@ public class MailService {
     private final Logger log = LoggerFactory.getLogger(MailService.class);
 
     private static final String USER = "user";
+    private static final String ORDER = "order";
+    private static final String ITEMS = "items";
+    private static final String PAYMENT = "payment";
 
     private static final String BASE_URL = "baseUrl";
 
@@ -60,7 +69,7 @@ public class MailService {
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, StandardCharsets.UTF_8.name());
             message.setTo(to);
-            message.setFrom(jHipsterProperties.getMail().getFrom());
+            message.setFrom(jHipsterProperties.getMail().getFrom(), "Badals.com");
             message.setSubject(subject);
             message.setText(content, isHtml);
             javaMailSender.send(mimeMessage);
@@ -84,6 +93,32 @@ public class MailService {
         String subject = messageSource.getMessage(titleKey, null, locale);
         sendEmail(user.getEmail(), subject, content, false, true);
     }
+    @Async
+    public void sendEmailFromTemplate(CustomerDTO user, OrderDTO order, String templateName, String titleKey) {
+        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable(USER, user);
+        context.setVariable(ORDER, order);
+        context.setVariable(ITEMS, order.getOrderItems());
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        String content = templateEngine.process(templateName, context);
+        final String[] params = new String[]{order.getReference()};
+        String subject = messageSource.getMessage(titleKey, params, locale);
+        sendEmail(user.getEmail(), subject, content, false, true);
+    }
+
+    @Async
+    public void sendEmailFromTemplate(CustomerDTO user, PaymentDTO payment, String templateName, String titleKey) {
+        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable(USER, user);
+        context.setVariable(PAYMENT, payment);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        String content = templateEngine.process(templateName, context);
+        final String[] params = new String[]{payment.getOrderReference()};
+        String subject = messageSource.getMessage(titleKey, params, locale);
+        sendEmail(user.getEmail(), subject, content, false, true);
+    }
 
     @Async
     public void sendActivationEmail(Customer user) {
@@ -101,5 +136,17 @@ public class MailService {
     public void sendPasswordResetMail(Customer user) {
         log.debug("Sending password reset email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "mail/passwordResetEmail", "email.reset.title");
+    }
+
+    @Async
+    public void sendOrderCreationMail(CustomerDTO user, OrderDTO order) {
+        log.debug("Sending order creation email to '{}'", user.getEmail());
+        sendEmailFromTemplate(user, order,"mail/orderCreationEmail", "email.order.title");
+    }
+
+    @Async
+    public void sendPaymentAddedMail(CustomerDTO user, PaymentDTO order) {
+        log.debug("Sending order creation email to '{}'", user.getEmail());
+        sendEmailFromTemplate(user, order,"mail/paymentCreationEmail", "email.payment.title");
     }
 }

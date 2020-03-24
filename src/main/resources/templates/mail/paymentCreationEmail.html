@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="#{email.order.title}">Badals.com New Order</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
+    </head>
+    <body>
+        <p th:text="#{email.payment.greeting(${user.firstname})}">
+            Dear
+        </p>
+        <p th:text="#{email.payment.intro(${payment.orderReference})}">
+            Thank you for your order # {0}
+        </p>
+        <p>
+        <div><span th:text="#{email.payment.amount}">Delivery Method:</span> <span th:text="${payment.amount}"/></div>
+        <div><span th:text="#{email.payment.method}">Payment Method:</span> <span th:text="${payment.paymentMethod}"/></div>
+        </p>
+
+        <p th:text="#{email.payment.message}">>
+            Your order is as follows:
+        </p>
+
+        <p>
+            <span th:text="#{email.order.thanks}">Regards, </span>
+            <br/>
+            <em th:text="#{email.signature}">Badals.com.</em>
+        </p>
+    </body>
+</html>
