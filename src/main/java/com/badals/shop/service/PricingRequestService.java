@@ -4,6 +4,7 @@ import com.badals.shop.domain.PricingRequest;
 import com.badals.shop.repository.PricingRequestRepository;
 import com.badals.shop.service.dto.PricingRequestDTO;
 import com.badals.shop.service.mapper.PricingRequestMapper;
+import com.badals.shop.xtra.amazon.PricingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +88,9 @@ public class PricingRequestService {
         return pricingRequestRepository.findWithProduct().stream().map(pricingRequestMapper::toDto).collect(Collectors.toCollection(LinkedList::new));
     }
 
-    public void push(String asin) {
+    public void push(String asin, String email) throws PricingException {
+        if(pricingRequestRepository.existsBySkuAndCreatedBy(asin,email))
+            throw new PricingException("Request already exists and we are still processing it");
         PricingRequest p = new PricingRequest();
         p.sku(asin);
         pricingRequestRepository.save(p);

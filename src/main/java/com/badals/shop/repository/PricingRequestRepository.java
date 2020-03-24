@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -16,4 +17,6 @@ public interface PricingRequestRepository extends JpaRepository<PricingRequest, 
 
    @Query(" from PricingRequest u join fetch u.product p left join fetch p.parent where u.done = false or u.done is null")
    List<PricingRequest> findWithProduct();
+
+   Boolean existsBySkuAndCreatedBy(String sku, String createdBy);
 }
