@@ -6,16 +6,17 @@ import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.repository.OrderRepository;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.mapper.OrderMapper;
+import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -23,6 +24,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,12 +43,14 @@ public class OrderService {
     private UserService userService;
 
     private final CustomerService customerService;
+    private final MessageSource messageSource;
 
-    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService) {
+    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
         this.customerService = customerService;
+        this.messageSource = messageSource;
     }
 
     /**
@@ -128,13 +132,19 @@ public class OrderService {
     public void sendPaymnetMessage(Long id) {
         Optional<Order> o = orderRepository.findJoinCustomerJoinAddress(id);
         OrderDTO order = o.map(orderMapper::toDto).orElse(null);
-
     }
 
     public void sendRequestPaymentSms(Long id, String mobile) throws Exception {
         Order order = orderRepository.getOne(id);
-        String message = "Thank you for your order " + order.getReference() + ". Please deposit OMR " + order.getTotal() + " in our Bank Muscat account # 0333";
-        sendSms(message, mobile, false);
+        mobile = order.getDeliveryAddress().getMobile();
+        if(mobile == null)
+            throw new InvalidPhoneException("Mobile not provided");
+        mobile = mobile.trim();
+        mobile = mobile.substring(mobile.length()-8, mobile.length());
+        final String[] params = new String[]{order.getReference(), String.valueOf(order.getTotal())};
+        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+        String message = messageSource.getMessage("sms.payment.request", params, locale);
+        sendSms(message, "968"+mobile, false);
     }
 
     private static final String USERNAME = "badals";
@@ -193,7 +203,8 @@ public class OrderService {
         return orderRepository.findOrderJoinCustomerJoinOrderItemsJoinDeliveryAddress(id).map(orderMapper::toDto);
    }
 
-    public void setOrderState(Long orderId, OrderState os) {
-        orderRepository.save(orderRepository.getOne(orderId).orderState(os));
+    public OrderDTO setOrderState(Long orderId, OrderState os) {
+        Order order = orderRepository.save(orderRepository.getOne(orderId).orderState(os));
+        return orderMapper.toDto(order);
     }
 }

@@ -38,8 +38,6 @@ public class Payment extends SimpleAuditable implements Serializable {
     @Column(name = "transaction_id")
     private String transactionId;
 
-
-
     @ManyToOne
     @JsonIgnoreProperties("orderPayments")
     private Order order;

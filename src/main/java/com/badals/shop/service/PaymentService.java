@@ -85,9 +85,9 @@ public class PaymentService {
         paymentRepository.deleteById(id);
     }
 
-   public PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod) {
+   public PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod, String authCode) {
         Payment p = new Payment();
-        p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod);
+        p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod).authCode(authCode);
         p = paymentRepository.save(p);
         return paymentMapper.toDto(p);
    }
