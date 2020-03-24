@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet author="alial (generated)" id="1585068478537-17">
+        <createTable tableName="jhi_order_aud">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="jhi_order_audPK"/>
+            </column>
+            <column name="rev" type="INT">
+                <constraints primaryKey="true" primaryKeyName="jhi_order_audPK"/>
+            </column>
+            <column name="revtype" type="TINYINT"/>
+            <column name="carrier" type="VARCHAR(255)"/>
+            <column name="created_date" type="datetime"/>
+            <column name="currency" type="VARCHAR(255)"/>
+            <column name="delivery_date" type="date"/>
+            <column name="delivery_total" type="DECIMAL(19, 2)"/>
+            <column name="discounts_total" type="DECIMAL(19, 2)"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="invoice_date" type="date"/>
+            <column name="state" type="VARCHAR(255)"/>
+            <column name="payment_method" type="VARCHAR(255)"/>
+            <column name="reference" type="VARCHAR(255)"/>
+            <column name="subtotal" type="DECIMAL(19, 2)"/>
+            <column name="total" type="DECIMAL(19, 2)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alial (generated)" id="1585068478537-20">
+        <createTable tableName="revinfo">
+            <column autoIncrement="true" name="rev" type="INT">
+                <constraints primaryKey="true" primaryKeyName="revinfoPK"/>
+            </column>
+            <column name="revtstmp" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="alial (generated)" id="1585068478537-21">
+        <addColumn tableName="purchase">
+            <column name="state" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

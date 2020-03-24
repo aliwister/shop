@@ -1,7 +1,9 @@
 package com.badals.shop.repository;
 
 import com.badals.shop.domain.PricingRequest;
+import com.google.common.io.Files;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +21,10 @@ public interface PricingRequestRepository extends JpaRepository<PricingRequest, 
    List<PricingRequest> findWithProduct();
 
    Boolean existsBySkuAndCreatedBy(String sku, String createdBy);
+
+   List<PricingRequest> findAllByCreatedByAndDone(String email, boolean done);
+
+   @Modifying
+   @Query("update PricingRequest p set p.emailSent = true where p.id in :list")
+   void updateEmailSentWhereIdIn(@Param("list") List<Long> list);
 }
