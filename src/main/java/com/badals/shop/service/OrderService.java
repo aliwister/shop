@@ -8,9 +8,12 @@ import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.mapper.OrderMapper;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.query.AuditQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,10 +25,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,12 +45,15 @@ public class OrderService {
     private final CustomerService customerService;
     private final MessageSource messageSource;
 
-    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource) {
+    private final AuditReader auditReader;
+
+    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, AuditReader auditReader) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
         this.customerService = customerService;
         this.messageSource = messageSource;
+        this.auditReader = auditReader;
     }
 
     /**
@@ -206,5 +209,19 @@ public class OrderService {
     public OrderDTO setOrderState(Long orderId, OrderState os) {
         Order order = orderRepository.save(orderRepository.getOne(orderId).orderState(os));
         return orderMapper.toDto(order);
+    }
+
+    public OrderDTO setStatus(Long id, OrderState state) {
+        Order order = orderRepository.getOne(id);
+        List<Order> versions = new ArrayList<>();
+
+        order.setOrderState(state);
+        List<Number> revisions = auditReader.getRevisions(Order.class, id);
+        for (Number rev : revisions) {
+            Order v = auditReader.find(Order.class, order, rev);
+            versions.add(v);
+        }
+
+        return orderMapper.toDto(orderRepository.save(order));
     }
 }
