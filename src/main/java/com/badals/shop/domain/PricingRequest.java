@@ -25,6 +25,18 @@ public class PricingRequest extends Auditable implements Serializable {
     @Column(name = "done", nullable = false)
     private Boolean done;
 
+    @Column(name = "email_sent", nullable = false)
+    private Boolean emailSent;
+    
+
+    public Boolean getEmailSent() {
+        return emailSent;
+    }
+
+    public void setEmailSent(Boolean emailSent) {
+        this.emailSent = emailSent;
+    }
+
     public Boolean getDone() {
         return done;
     }

@@ -4,6 +4,8 @@ import com.badals.shop.domain.checkout.helper.AddressPojo;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -20,9 +22,16 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "jhi_order")
+@Audited
 public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;
+   public Order() {
+   }
+
+   public Order(Long id) {
+      this.id = id;
+   }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,11 +53,13 @@ public class Order implements Serializable {
     @Column(name = "currency")
     private String currency;
 
+   @NotAudited
     @ManyToOne
     @JsonIgnoreProperties("orders")
     @JoinColumn(name="customer_id", referencedColumnName = "id_customer")
     private Customer customer;
 
+   @NotAudited
     @OneToOne
     @JoinColumn(unique = true)
     private CheckoutCart cart;
@@ -56,34 +67,50 @@ public class Order implements Serializable {
     @Column
     private String email;
 
-   public Order() {
-   }
-
-   public Order(Long id) {
-      this.id = id;
-   }
-
-   public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
+    @NotAudited
     @ManyToOne
     @JsonIgnoreProperties("orders")
     @JoinColumn(name = "delivery_address_id",referencedColumnName = "id_address")
     private Address deliveryAddress;
 
+   @NotAudited
     @ManyToOne
     @JsonIgnoreProperties("orders")
     @JoinColumn(name = "invoice_address_id",referencedColumnName = "id_address")
     private Address invoiceAddress;
 
+   @NotAudited
     @Type(type = "json")
     @Column(name = "delivery_address", columnDefinition = "string")
     private AddressPojo deliveryAddressPojo;
+
+   @NotAudited
+   @Column(name="confirmation_key")
+   private String confirmationKey;
+
+   private BigDecimal subtotal;
+
+   private BigDecimal total;
+
+   @Column(name="delivery_total")
+   private BigDecimal deliveryTotal;
+
+   @Column(name="discounts_total")
+   private BigDecimal discountsTotal;
+
+   @CreatedDate
+   @Column(name = "created_date")
+   private Date createdDate;
+
+   @Column
+   private String carrier;
+
+   @Column(name = "payment_method")
+   private String paymentMethod;
+
+@NotAudited
+   @OneToMany(mappedBy = "order")
+   private Set<OrderItem> orderItems = new HashSet<>();
 
     public AddressPojo getDeliveryAddressPojo() {
         return deliveryAddressPojo;
@@ -93,28 +120,13 @@ public class Order implements Serializable {
         this.deliveryAddressPojo = deliveryAddressPojo;
     }
 
-    @Column(name="confirmation_key")
-    private String confirmationKey;
+   public String getEmail() {
+      return email;
+   }
 
-    private BigDecimal subtotal;
-
-    private BigDecimal total;
-
-    @Column(name="delivery_total")
-    private BigDecimal deliveryTotal;
-
-    @Column(name="discounts_total")
-    private BigDecimal discountsTotal;
-
-    @CreatedDate
-    @Column(name = "created_date")
-    private Date createdDate;
-
-    @Column
-    private String carrier;
-
-    @Column(name = "payment_method")
-    private String paymentMethod;
+   public void setEmail(String email) {
+      this.email = email;
+   }
 
     public Date getCreatedDate() {
         return createdDate;
@@ -180,8 +192,7 @@ public class Order implements Serializable {
         this.confirmationKey = confirmationKey;
     }
 
-    @OneToMany(mappedBy = "order")
-    private Set<OrderItem> orderItems = new HashSet<>();
+
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {

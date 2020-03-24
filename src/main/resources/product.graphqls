@@ -278,4 +278,5 @@ extend type Mutation {
     addToPricingQ(sku: String):Message
     createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean): Product
     completePricingRequest(id: Long):Message
+    completePricingRequestAndEmail(id: Long):Message
 }

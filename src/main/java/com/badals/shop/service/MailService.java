@@ -7,9 +7,11 @@ import com.badals.shop.domain.User;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.PaymentDTO;
+import com.badals.shop.service.dto.PricingRequestDTO;
 import io.github.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 import javax.mail.internet.MimeMessage;
 
@@ -36,6 +38,7 @@ public class MailService {
     private final Logger log = LoggerFactory.getLogger(MailService.class);
 
     private static final String USER = "user";
+    private static final String PRICINGREQUESTS = "pricingrequests";
     private static final String ORDER = "order";
     private static final String ITEMS = "items";
     private static final String PAYMENT = "payment";
@@ -93,6 +96,19 @@ public class MailService {
         String subject = messageSource.getMessage(titleKey, null, locale);
         sendEmail(user.getEmail(), subject, content, false, true);
     }
+
+    @Async
+    public void sendEmailFromTemplate(Customer user, List<PricingRequestDTO> dtos, String templateName, String titleKey) {
+        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable(USER, user);
+        context.setVariable(PRICINGREQUESTS, dtos);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        String content = templateEngine.process(templateName, context);
+        String subject = messageSource.getMessage(titleKey, null, locale);
+        sendEmail(user.getEmail(), subject, content, false, true);
+    }
+
     @Async
     public void sendEmailFromTemplate(CustomerDTO user, OrderDTO order, String templateName, String titleKey) {
         Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
@@ -149,4 +165,12 @@ public class MailService {
         log.debug("Sending order creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, order,"mail/paymentCreationEmail", "email.payment.title");
     }
+
+    @Async
+    public void sendPricingMail(Customer user, List<PricingRequestDTO> dtos) {
+        log.debug("Sending order creation email to '{}'", user.getEmail());
+        sendEmailFromTemplate(user, dtos,"mail/pricingRequestEmail", "email.pricing.title");
+    }
+
+
 }
