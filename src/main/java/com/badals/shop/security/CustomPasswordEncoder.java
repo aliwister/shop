@@ -18,6 +18,12 @@ public class CustomPasswordEncoder implements PasswordEncoder {
         return hashed;
     }
 
+    public static void main (String args[]) {
+        String rawPassword = "testtest123";
+        String hashed = BCrypt.hashpw(rawPassword.toString(), BCrypt.gensalt(12));
+        System.out.println(hashed);
+    }
+
     @Override
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
 

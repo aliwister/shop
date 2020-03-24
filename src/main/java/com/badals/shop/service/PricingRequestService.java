@@ -96,9 +96,20 @@ public class PricingRequestService {
         pricingRequestRepository.save(p);
     }
 
-    public void complete(Long id) {
+    public PricingRequestDTO complete(Long id) {
         PricingRequest p = pricingRequestRepository.getOne(id);
         p.setDone(true);
-        pricingRequestRepository.save(p);
+        return pricingRequestMapper.toDto(pricingRequestRepository.save(p));
+    }
+
+    public List<PricingRequestDTO> findAllByCreatedByAndDone(String email, boolean done) {
+        return pricingRequestRepository.findAllByCreatedByAndDone(email, done).stream()
+                .map(pricingRequestMapper::toDto)
+                .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    public void setEmailSent(List<PricingRequestDTO> dtos) {
+        List<Long> list = dtos.stream().map(PricingRequestDTO::getId).collect(Collectors.toList());
+        pricingRequestRepository.updateEmailSentWhereIdIn(list);
     }
 }

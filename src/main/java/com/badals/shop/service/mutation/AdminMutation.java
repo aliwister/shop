@@ -15,6 +15,8 @@ import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.query.AuditQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,38 +30,46 @@ import java.util.List;
 
 @Component
 public class AdminMutation implements GraphQLMutationResolver {
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private Pas5Service pasService;
+    private final Pas5Service pasService;
 
-    @Autowired
-    private ProductLangService productLangService;
+    private final ProductLangService productLangService;
 
-    @Autowired
-    private PricingRequestService pricingRequestService;
+    private final PricingRequestService pricingRequestService;
 
-    @Autowired
+    final
     MessageSource messageSource;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
 
-    @Autowired
-    private ProductOverrideService productOverrideService;
+    private final ProductOverrideService productOverrideService;
 
-    @Autowired
-    private PurchaseService purchaseService;
+    private final PurchaseService purchaseService;
 
-    @Autowired
-    private PaymentService paymentService;
+    private final PaymentService paymentService;
 
-    @Autowired
-    private MailService mailService;
+    private final MailService mailService;
+
+    private final CustomerService customerService;
+
+    public AdminMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService) {
+        this.productService = productService;
+        this.pasService = pasService;
+        this.productLangService = productLangService;
+        this.pricingRequestService = pricingRequestService;
+        this.messageSource = messageSource;
+        this.customerService = customerService;
+        this.userService = userService;
+        this.orderService = orderService;
+        this.productOverrideService = productOverrideService;
+        this.purchaseService = purchaseService;
+        this.paymentService = paymentService;
+        this.mailService = mailService;
+    }
+
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message contact(final Long id) {
@@ -75,7 +85,21 @@ public class AdminMutation implements GraphQLMutationResolver {
     public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy) throws PricingException, NoOfferException, ProductNotFoundException {
         ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
         productOverrideService.saveOrUpdate(dto);
-        return productService.lookupPas(sku, false, true);
+        ProductDTO productDTO = productService.lookupPas(sku, true, false);
+        return productDTO;
+    }
+
+    public Message completePricingRequestAndEmail(Long id) throws PricingException, NoOfferException, ProductNotFoundException {
+        PricingRequestDTO dto = pricingRequestService.complete(id);
+
+        // Get all overrides for this customer
+        // Send email
+        // Update overrides
+        List<PricingRequestDTO> dtos = pricingRequestService.findAllByCreatedByAndDone(dto.getEmail(), true);
+        Customer customer = customerService.findByEmail(dto.getEmail());
+        mailService.sendPricingMail(customer, dtos);
+        pricingRequestService.setEmailSent(dtos);
+        return new Message("done");
     }
 
     public Message completePricingRequest(Long id) {
@@ -93,7 +117,10 @@ public class AdminMutation implements GraphQLMutationResolver {
     }
 
     public OrderDTO setOrderState(Long id, OrderState state){
-        return null;
+        return orderService.setStatus(id, state);
+
+
+
     }
 
     public OrderDTO cancelOrder(Long id){
