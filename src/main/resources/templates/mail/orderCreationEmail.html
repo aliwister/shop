@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="#{email.order.title}">Badals.com New Order</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
+    </head>
+    <body>
+        <p th:text="#{email.order.greeting(${user.firstname})}">
+            Dear
+        </p>
+        <p th:text="#{email.order.intro(${order.reference})}">
+            Thank you for your order # {0}
+        </p>
+        <p th:text="#{email.order.details}">>
+            Your order is as follows:
+
+        </p>
+        <table>
+            <th></th><th>Item Name</th><th>Quantity</th><th>Price</th>
+            <tr th:each="o: ${items}">
+                <td><img th:src="${o.image}" style="max-width: 70px"/></td>
+                <td th:text="${o.productName}" />
+                <td th:text="${o.quantity}" />
+                <td th:text="${o.price}" />
+            </tr>
+        </table>
+        <p th:text="#{email.order.total(${order.currency},${order.total})}">>
+            Total is {0} {1}
+        </p>
+        <p th:text="#{email.order.delivery.address}">>
+            Delivering to:
+        </p>
+        <div th:object="${order.deliveryAddress}">
+            <div><span th:text="#{email.order.name}">Name</span>: <span th:text="*{firstName}">Name</span> <span th:text="*{lastName}">Last</span></div>
+            <div><span th:text="#{email.order.address}">Address</span>: <span th:text="*{line1}">Name</span> <span th:text="*{line2}">Name</span></div>
+            <div><span th:text="#{email.order.city}">City</span>: <span th:text="*{city}">City</span></div>
+            <div><span th:text="#{email.order.phone}">Phone</span>: <span th:text="*{mobile}">Mobile</span></div>
+        </div>
+        <p>
+            <div><span th:text="#{email.order.carrier}">Delivery Method:</span> <span th:text="${order.carrier}"/></div>
+            <div><span th:text="#{email.order.payment.method}">Payment Method:</span> <span th:text="${order.paymentMethod}"/></div>
+        </p>
+        <div th:switch="${order.paymentMethod}">
+            <p th:case="'checkoutcom'"><span th:text="#{email.order.payment.received}">Payment Received</span></p>
+            <p th:case="'bankwire'"><span th:text="#{email.order.payment.transfer}">Please transfer your payment to our Bank Muscat Account # 0333015845260014. Then confirm</span></p>
+        </div>
+        <p>
+            <span th:text="#{email.order.thanks}">Regards, </span>
+            <br/>
+            <em th:text="#{email.signature}">Badals.com.</em>
+        </p>
+    </body>
+</html>
