@@ -4,16 +4,15 @@ import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.repository.OrderRepository;
+import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.mapper.OrderMapper;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import org.hibernate.envers.AuditReader;
-import org.hibernate.envers.query.AuditQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -44,15 +43,16 @@ public class OrderService {
 
     private final CustomerService customerService;
     private final MessageSource messageSource;
-
+    private final MailService mailService;
     private final AuditReader auditReader;
 
-    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, AuditReader auditReader) {
+    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
         this.customerService = customerService;
         this.messageSource = messageSource;
+        this.mailService = mailService;
         this.auditReader = auditReader;
     }
 
@@ -116,6 +116,7 @@ public class OrderService {
         order.setCustomer(customer);
         order.setConfirmationKey(null);
         order = orderRepository.save(order);
+        sendConfirmationEmail(order.getId());
         return orderMapper.toDto(order);
     }
 
@@ -223,5 +224,11 @@ public class OrderService {
         }
 
         return orderMapper.toDto(orderRepository.save(order));
+    }
+
+    public void sendConfirmationEmail(Long id) {
+        OrderDTO order = getOrderWithOrderItems(id).orElse(null);
+        CustomerDTO customer = order.getCustomer();
+        mailService.sendOrderCreationMail(customer, order);
     }
 }

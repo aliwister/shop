@@ -31,10 +31,9 @@ public class PurchaseItemDTO implements Serializable {
 
     private String comment;
 
-
     private Long purchaseId;
 
-    private Set<OrderItemDTO> orderItems = new HashSet<>();
+    private Long orderItemId;
 
 
 

@@ -16,8 +16,6 @@ public class PurchaseDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
-    private Long po;
 
     private String ref;
 
@@ -81,7 +79,6 @@ public class PurchaseDTO implements Serializable {
     public String toString() {
         return "PurchaseDTO{" +
             "id=" + getId() +
-            ", po=" + getPo() +
             ", ref='" + getRef() + "'" +
             ", shippingInstructions='" + getShippingInstructions() + "'" +
             ", currency='" + getCurrency() + "'" +
