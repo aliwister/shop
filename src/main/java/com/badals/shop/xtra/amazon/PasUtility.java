@@ -14,11 +14,10 @@ public class PasUtility {
    private static final double LB2KG = 0.453592;
    private static final double OMRPERKG = 3.5;
 
-   public static BigDecimal calculatePrice(BigDecimal cost, BigDecimal weight, double localShipping, double margin, double risk, double fixed, boolean isPrime, boolean isFulfilledByAmazon, String shippingCountry) {
+   public static BigDecimal calculatePrice(BigDecimal cost, BigDecimal weight, double localShipping, double margin, double risk, double fixed, boolean isPrime, boolean isFulfilledByAmazon, String shippingCountry) throws PricingException {
       double dWeight = weight.doubleValue()*LB2KG;
       if (dWeight < .0001) {
-         //throw new Exception("Unable to caculate the price [weight=0]");
-         fixed = 10000000;
+         throw new PricingException("Unable to caculate the price [weight=0]");
       }
       if (dWeight < .05)
          dWeight += .4;
