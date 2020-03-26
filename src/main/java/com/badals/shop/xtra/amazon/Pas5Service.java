@@ -64,10 +64,6 @@ public class Pas5Service implements IProductService {
     @Autowired
     private PasItemMapper pasItemMapper;
 
-    public Product lookup(String asin, boolean isRedis, boolean isRebuild) throws NoOfferException {
-        return lookup(asin, false, isRedis, isRebuild);
-    }
-
     public Boolean existsBySku(String sku) {
         return productRepo.existsBySku(sku);
     }
@@ -94,10 +90,9 @@ public class Pas5Service implements IProductService {
 
         Product product = productRepo.findBySkuJoinChildren(asin).orElse(null);
         if (product == null) {
-            if(isParent) isRebuild = true;
             product = new Product();
         }
-
+        if(isParent) isRebuild = true;
         //if (product != null) // && product.getUpdated())
         List<Product> mws = new ArrayList<>();
         GetItemsResponse response = null;

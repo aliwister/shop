@@ -2,12 +2,12 @@ package com.badals.shop.repository.projection;
 
 import java.math.BigDecimal;
 
-public interface CartItemInfo {
-   BigDecimal getPrice();
-   Long getRef();
+public interface PurchaseQueue {
+   Long getId();
+   String getProductName();
    BigDecimal getQuantity();
+   BigDecimal getPrice();
    String getImage();
-   String getTitle();
    BigDecimal getWeight();
-   String getSku();
+   String getUrl();
 }

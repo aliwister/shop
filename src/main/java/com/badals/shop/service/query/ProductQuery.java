@@ -71,9 +71,11 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return categoryService.findOne((long) id).orElse(null);
    }
 
-   public ProductDTO getProductBySku(final String sku, final boolean isFive) throws ProductNotFoundException, PricingException, NoOfferException {
+   public ProductDTO getProductBySku(final String sku, final boolean isParent) throws ProductNotFoundException, PricingException, NoOfferException {
       log.info("GetProductBySky: pasService.lookup("+sku+")");
       ProductDTO product;
+      if(isParent)
+         return  productService.lookupPas(sku, true,true, false);
       return productService.lookupPas(sku, true, false);
    }
 }

@@ -103,7 +103,7 @@ public class PricingRequestService {
     }
 
     public List<PricingRequestDTO> findAllByCreatedByAndDone(String email, boolean done) {
-        return pricingRequestRepository.findAllByCreatedByAndDone(email, done).stream()
+        return pricingRequestRepository.findAllByCreatedByAndDoneAndEmailSentIsNull(email, done).stream()
                 .map(pricingRequestMapper::toDto)
                 .collect(Collectors.toCollection(LinkedList::new));
     }

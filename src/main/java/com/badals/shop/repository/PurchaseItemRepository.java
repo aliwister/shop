@@ -16,14 +16,5 @@ import java.util.Optional;
 @Repository
 public interface PurchaseItemRepository extends JpaRepository<PurchaseItem, Long> {
 
-    @Query(value = "select distinct purchaseItem from PurchaseItem purchaseItem left join fetch purchaseItem.orderItems",
-        countQuery = "select count(distinct purchaseItem) from PurchaseItem purchaseItem")
-    Page<PurchaseItem> findAllWithEagerRelationships(Pageable pageable);
-
-    @Query("select distinct purchaseItem from PurchaseItem purchaseItem left join fetch purchaseItem.orderItems")
-    List<PurchaseItem> findAllWithEagerRelationships();
-
-    @Query("select purchaseItem from PurchaseItem purchaseItem left join fetch purchaseItem.orderItems where purchaseItem.id =:id")
-    Optional<PurchaseItem> findOneWithEagerRelationships(@Param("id") Long id);
 
 }

@@ -1,5 +1,6 @@
 enum OrderState {
     AWAITING_PAYMENT
+    DRAFT
     CONTACTED
     PAYMENT_AUTHORIZED
     PAYMENT_ACCEPTED
@@ -51,7 +52,6 @@ type Order {
 }
 type Purchase {
     id: ID
-    po: Int
 }
 type PurchaseItem {
     id: ID
@@ -67,7 +67,6 @@ input OrderItemInput {
 
 input PurchaseInput {
     id: ID
-    po: Int
     currency: String
     subtotal: BigDecimal
     deliveryTotal: BigDecimal
@@ -85,7 +84,7 @@ input PurchaseItemInput {
     price: BigDecimal
     qunatity: BigDecimal
     description: String
-    orderItems: [OrderItemInput]
+    orderItemId: Long
 }
 
 type Payment {
@@ -94,11 +93,25 @@ type Payment {
     amount: BigDecimal
 }
 
+type PurchaseQueue {
+    id: ID
+    productName: String
+    quantity: BigDecimal
+    price: BigDecimal
+    image: String
+    weight: BigDecimal
+    url: String
+}
+
 extend type Mutation {
     createOrder(id: Int): Order
     contact(id: Int): Message
     #createOrderFromCart(cart: CartInput): Order
-    createOrUpdatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
+
+    createPurchase(dto: PurchaseInput): Purchase
+    updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
+
+
     sendPaymentSms(id: ID, mobile: String): Message
     discountOrder(id: ID): Order
     setOrderState(id: ID, state: OrderState): Order
@@ -114,6 +127,8 @@ extend type Query {
     orders(limit: Int = 10): [Order]
     ordersA(state: [OrderState], limit: Int, searchText: String): [Order]
     orderA(id: ID): Order
-    purchasesA(state: [OrderState], limit: Int, searchText: String): [Purchase]
-    purchaseA(id: ID): Purchase
+
+    purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
+    purchase(id: ID): Purchase
+    purchaseQueue: [PurchaseQueue]
 }

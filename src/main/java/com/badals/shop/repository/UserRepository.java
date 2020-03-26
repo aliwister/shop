@@ -33,7 +33,7 @@ public interface UserRepository extends JpaRepository<Customer, Long> {
     //List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant dateTime);
 
 
-    //Optional<User> findOneByResetKey(String resetKey);
+    Optional<Customer> findOneByResetKey(String resetKey);
 
     Optional<Customer> findOneByEmailIgnoreCase(String email);
 
