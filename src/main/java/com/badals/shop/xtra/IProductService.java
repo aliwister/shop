@@ -5,5 +5,5 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.xtra.amazon.NoOfferException;
 
 public interface IProductService {
-    Product lookup(String sku, boolean isRedis, boolean isRebuild) throws NoOfferException;
+    Product lookup(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws NoOfferException;
 }

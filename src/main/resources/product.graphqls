@@ -259,7 +259,7 @@ extend type Query {
     productAny(id: ID):Product
 
     productAdmin(id: ID):Product
-    getProductBySku(sku: String, isFive: Boolean = true):Product
+    getProductBySku(sku: String, isParent: Boolean = false):Product
     pricingRequests:[PricingRequest]
     parentOf(sku: String): String
 }

@@ -214,7 +214,10 @@ public class ProductService {
    }
 
     public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
-        Product p = this.pas5Service.lookup(sku, isRedis, isRebuild);
+        return lookupPas(sku, false, isRedis, isRebuild);
+    }
+    public ProductDTO lookupPas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
+        Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             this.indexProduct(p.getId());
         return this.getProductBySku(sku);

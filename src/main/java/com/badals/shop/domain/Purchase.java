@@ -24,10 +24,6 @@ public class Purchase extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "po", nullable = false, unique = true)
-    private Long po;
-
     @Column(name = "ref")
     private String ref;
 
@@ -75,7 +71,7 @@ public class Purchase extends Auditable implements Serializable {
     private Merchant merchant;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "state")
+    @Column(name = "order_state")
     private OrderState orderState;
 
     @OneToMany(mappedBy = "purchase",cascade=CascadeType.ALL, orphanRemoval = true)
@@ -88,19 +84,6 @@ public class Purchase extends Auditable implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getPo() {
-        return po;
-    }
-
-    public Purchase po(Long po) {
-        this.po = po;
-        return this;
-    }
-
-    public void setPo(Long po) {
-        this.po = po;
     }
 
     public String getRef() {
@@ -344,7 +327,6 @@ public class Purchase extends Auditable implements Serializable {
     public String toString() {
         return "Purchase{" +
             "id=" + getId() +
-            ", po=" + getPo() +
             ", ref='" + getRef() + "'" +
             ", shippingInstructions='" + getShippingInstructions() + "'" +
             ", currency='" + getCurrency() + "'" +

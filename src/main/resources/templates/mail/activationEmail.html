@@ -13,7 +13,7 @@
             Your Badals.com account has been created, please click on the URL below to activate it:
         </p>
         <p>
-            <a th:with="url=(@{|${baseUrl}/activate?key=${user.secureKey}|})" th:href="${url}"
+            <a th:with="url=(@{|${baseUrl}/activate?key=${user.secureKey}&email=${user.email}|})" th:href="${url}"
             th:text="${url}">Activation link</a>
         </p>
         <p>

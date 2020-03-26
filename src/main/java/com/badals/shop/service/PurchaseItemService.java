@@ -48,49 +48,4 @@ public class PurchaseItemService {
         return purchaseItemMapper.toDto(purchaseItem);
     }
 
-    /**
-     * Get all the purchaseItems.
-     *
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<PurchaseItemDTO> findAll() {
-        log.debug("Request to get all PurchaseItems");
-        return purchaseItemRepository.findAllWithEagerRelationships().stream()
-            .map(purchaseItemMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
-    }
-
-    /**
-     * Get all the purchaseItems with eager load of many-to-many relationships.
-     *
-     * @return the list of entities.
-     */
-    public Page<PurchaseItemDTO> findAllWithEagerRelationships(Pageable pageable) {
-        return purchaseItemRepository.findAllWithEagerRelationships(pageable).map(purchaseItemMapper::toDto);
-    }
-    
-
-    /**
-     * Get one purchaseItem by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
-    @Transactional(readOnly = true)
-    public Optional<PurchaseItemDTO> findOne(Long id) {
-        log.debug("Request to get PurchaseItem : {}", id);
-        return purchaseItemRepository.findOneWithEagerRelationships(id)
-            .map(purchaseItemMapper::toDto);
-    }
-
-    /**
-     * Delete the purchaseItem by id.
-     *
-     * @param id the id of the entity.
-     */
-    public void delete(Long id) {
-        log.debug("Request to delete PurchaseItem : {}", id);
-        purchaseItemRepository.deleteById(id);
-    }
 }

@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 public class CustomPasswordEncoder implements PasswordEncoder {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomPasswordEncoder.class);

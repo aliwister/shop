@@ -213,6 +213,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <scope>provided</scope>
@@ -725,7 +730,7 @@
                         <url>jdbc:mysql://localhost:3306/shop</url>
                         <defaultSchemaName>shop</defaultSchemaName>
                         <username>root</username>
-                        <password></password>
+                        <password>root!</password>
                         <referenceUrl>hibernate:spring:com.badals.shop.domain?dialect=org.hibernate.dialect.MySQL5InnoDBDialect&amp;hibernate.physical_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy&amp;hibernate.implicit_naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy</referenceUrl>
                         <verbose>true</verbose>
                         <logging>debug</logging>

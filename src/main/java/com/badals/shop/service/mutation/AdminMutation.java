@@ -77,8 +77,13 @@ public class AdminMutation implements GraphQLMutationResolver {
         return new Message("SMS Sent successfully");
     }
 
-    public PurchaseDTO createOrUpdatePurchase(PurchaseDTO dto, List<PurchaseItemDTO> items) {
-        PurchaseDTO purchase = purchaseService.createOrUpdatePurchase(dto, items);
+    public PurchaseDTO createPurchase(PurchaseDTO dto) {
+        PurchaseDTO purchase = purchaseService.save(dto);
+        return null;
+    }
+
+    public PurchaseDTO updatePurchase(PurchaseDTO dto, List<PurchaseItemDTO> items) {
+        PurchaseDTO purchase = purchaseService.updatePurchase(dto, items);
         return null;
     }
 
@@ -118,9 +123,6 @@ public class AdminMutation implements GraphQLMutationResolver {
 
     public OrderDTO setOrderState(Long id, OrderState state){
         return orderService.setStatus(id, state);
-
-
-
     }
 
     public OrderDTO cancelOrder(Long id){
@@ -130,9 +132,7 @@ public class AdminMutation implements GraphQLMutationResolver {
     public Message sendOrderLevelEmail(Long id, String template){
 
         if(template.equalsIgnoreCase("NEW_ORDER")) {
-            OrderDTO order = orderService.getOrderWithOrderItems(id).orElse(null);
-            CustomerDTO customer = order.getCustomer();
-            mailService.sendOrderCreationMail(customer, order);
+            orderService.sendConfirmationEmail(id);
         }
         else if(template.equalsIgnoreCase("NEW_PAYMENT")) {
             PaymentDTO payment = paymentService.findOne(id).orElse(null);

@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,6 +60,39 @@ public class Customer implements Serializable {
 
     @Column(name = "active")
     private Integer active;
+
+    @Column(name = "reset_password_token")
+    private String resetKey;
+
+    @Column(name = "reset_password_validity")
+    private Instant resetDate;
+
+    @Column
+    private String mobile;
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getResetKey() {
+        return resetKey;
+    }
+
+    public void setResetKey(String resetKey) {
+        this.resetKey = resetKey;
+    }
+
+    public Instant getResetDate() {
+        return resetDate;
+    }
+
+    public void setResetDate(Instant resetDate) {
+        this.resetDate = resetDate;
+    }
 
     @OneToMany(mappedBy = "customer")
     @JsonIgnoreProperties("customer")
@@ -217,19 +251,19 @@ public class Customer implements Serializable {
         this.salt = salt;
     }
 
-    public Integer getActive() {
-        return active;
-    }
 
     public Customer active(Integer active) {
         this.active = active;
         return this;
     }
 
+    public Integer getActive() {
+        return active;
+    }
+
     public void setActive(Integer active) {
         this.active = active;
     }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
     public boolean equals(Object o) {
@@ -262,5 +296,9 @@ public class Customer implements Serializable {
             ", salt='" + getSalt() + "'" +
             ", active=" + getActive() +
             "}";
+    }
+
+    public boolean isActive() {
+        return active == 1;
     }
 }
