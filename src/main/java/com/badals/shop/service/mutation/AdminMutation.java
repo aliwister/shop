@@ -79,12 +79,12 @@ public class AdminMutation implements GraphQLMutationResolver {
 
     public PurchaseDTO createPurchase(PurchaseDTO dto) {
         PurchaseDTO purchase = purchaseService.save(dto);
-        return null;
+        return purchase;
     }
 
     public PurchaseDTO updatePurchase(PurchaseDTO dto, List<PurchaseItemDTO> items) {
         PurchaseDTO purchase = purchaseService.updatePurchase(dto, items);
-        return null;
+        return purchase;
     }
 
     public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy) throws PricingException, NoOfferException, ProductNotFoundException {

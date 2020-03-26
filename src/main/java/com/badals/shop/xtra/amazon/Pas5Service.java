@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -209,12 +210,13 @@ public class Pas5Service implements IProductService {
 
     Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
 
-        if (p.getWeight() == null) return p;
+        if (p.getWeight() == null || p.getWeight().doubleValue() < .01) return p;
         MwsItemNode n = mwsLookup.fetch(p.getSku());
         Product product = p;
         try {
             product = setMerchantStock(p, MwsLookupParser.parseStock(getMerchantStock(p),n, p.getWeight(), overrides));
         } catch (PricingException e) {
+            product.setPrice((BigDecimal) null);
             //e.printStackTrace();
         } catch (NoOfferException e) {
             if(p.getVariationType() == VariationType.SIMPLE)

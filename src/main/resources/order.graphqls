@@ -52,12 +52,13 @@ type Order {
 }
 type Purchase {
     id: ID
+    #items: [PurchaseItem]
 }
 type PurchaseItem {
     id: ID
     sequence: Int
     price: BigDecimal
-    qunatity: BigDecimal
+    quantity: BigDecimal
     description: String
 }
 
@@ -68,23 +69,23 @@ input OrderItemInput {
 input PurchaseInput {
     id: ID
     currency: String
-    subtotal: BigDecimal
-    deliveryTotal: BigDecimal
-    taxesTotal: BigDecimal
-    discountTotal: BigDecimal
-    total: BigDecimal
-    deliveryAddressId: Long
-    invoiceAddressId: Long
-    merchantId: Long
+    subtotal: Float
+    deliveryTotal: Float
+    taxesTotal: Float
+    discountTotal: Float
+    total: Float
+    deliveryAddressId: Int
+    invoiceAddressId: Int
+    merchantId: Int
     orderState: OrderState
 }
 
 input PurchaseItemInput {
     sequence: Int
-    price: BigDecimal
-    qunatity: BigDecimal
+    price: Float
+    quantity: Float
     description: String
-    orderItemId: Long
+    orderItemId: Int
 }
 
 type Payment {
