@@ -49,11 +49,19 @@ public class PurchaseItem implements Serializable {
     @JsonIgnoreProperties("purchaseItems")
     private Purchase purchase;
 
-    @ManyToMany
+    @ManyToOne
     @JoinTable(name = "purchase_item_order_item",
                joinColumns = @JoinColumn(name = "purchase_item_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "order_item_id", referencedColumnName = "id"))
-    private Set<OrderItem> orderItems = new HashSet<>();
+    private OrderItem orderItem;
+
+    public OrderItem getOrderItem() {
+        return orderItem;
+    }
+
+    public void setOrderItem(OrderItem orderItem) {
+        this.orderItem = orderItem;
+    }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -168,31 +176,6 @@ public class PurchaseItem implements Serializable {
         this.purchase = purchase;
     }
 
-    public Set<OrderItem> getOrderItems() {
-        return orderItems;
-    }
-
-    public PurchaseItem orderItems(Set<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-        return this;
-    }
-
-    public PurchaseItem addOrderItem(OrderItem orderItem) {
-        this.orderItems.add(orderItem);
-        //orderItem.getPurchaseItems().add(this);
-        return this;
-    }
-
-    public PurchaseItem removeOrderItem(OrderItem orderItem) {
-        this.orderItems.remove(orderItem);
-        //orderItem.getPurchaseItems().remove(this);
-        return this;
-    }
-
-    public void setOrderItems(Set<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-    }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
     public boolean equals(Object o) {

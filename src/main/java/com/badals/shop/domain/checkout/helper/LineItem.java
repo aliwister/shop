@@ -12,6 +12,7 @@ public class LineItem implements Serializable {
     Integer productId;
     String sku;
     String unit;
+    String ref;
     String image;
     String name;
     BigDecimal price;

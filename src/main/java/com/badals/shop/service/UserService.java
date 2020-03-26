@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -61,8 +62,8 @@ public class UserService {
             });
     }
 
-    /*
-    public Optional<User> completePasswordReset(String newPassword, String key) {
+
+    public Optional<Customer> completePasswordReset(String newPassword, String key) {
         log.debug("Reset user password for reset key {}", key);
         return userRepository.findOneByResetKey(key)
             .filter(user -> user.getResetDate().isAfter(Instant.now().minusSeconds(86400)))
@@ -70,22 +71,22 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(newPassword));
                 user.setResetKey(null);
                 user.setResetDate(null);
-                this.clearUserCaches(user);
+                //this.clearUserCaches(user);
                 return user;
             });
     }
 
-    public Optional<User> requestPasswordReset(String mail) {
+    public Optional<Customer> requestPasswordReset(String mail) {
         return userRepository.findOneByEmailIgnoreCase(mail)
-            .filter(User::getActivated)
+            .filter(Customer::isActive)
             .map(user -> {
                 user.setResetKey(RandomUtil.generateResetKey());
                 user.setResetDate(Instant.now());
-                this.clearUserCaches(user);
+                //this.clearUserCaches(user);
                 return user;
             });
     }
-*/
+
     public Customer registerUser(UserDTO userDTO, String password) {
         /*userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).ifPresent(existingUser -> {
             boolean removed = removeNonActivatedUser(existingUser);
@@ -94,7 +95,7 @@ public class UserService {
             }
         });*/
         userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).ifPresent(existingUser -> {
-            boolean removed = true; //removeNonActivatedUser(existingUser);
+            boolean removed = false; //removeNonActivatedUser(existingUser);
             if (!removed) {
                 throw new EmailAlreadyUsedException();
             }
@@ -119,6 +120,7 @@ public class UserService {
         newUser.setFirstname(userDTO.getFirstName());
         newUser.setLastname(userDTO.getLastName());
         newUser.setEmail(userDTO.getEmail().toLowerCase());
+        newUser.setMobile(userDTO.getMobile());
         newUser.setActive(0);
 
         newUser.setSecureKey(RandomUtil.generateActivationKey());

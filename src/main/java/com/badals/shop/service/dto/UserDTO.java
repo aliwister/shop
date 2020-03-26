@@ -32,6 +32,9 @@ public class UserDTO {
     @Size(max = 50)
     private String lastName;
 
+    @Size(max = 50)
+    private String mobile;
+
     @Email
     @Size(min = 5, max = 254)
     private String email;
@@ -178,6 +181,14 @@ public class UserDTO {
 
     public void setAuthorities(Set<String> authorities) {
         this.authorities = authorities;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     @Override

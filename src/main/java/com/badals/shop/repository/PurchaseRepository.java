@@ -2,8 +2,11 @@ package com.badals.shop.repository;
 
 import com.badals.shop.domain.Order;
 import com.badals.shop.domain.Purchase;
+import com.badals.shop.repository.projection.CartItemInfo;
+import com.badals.shop.repository.projection.PurchaseQueue;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,6 +21,12 @@ import java.util.Optional;
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
    List<Purchase> findAllByOrderByCreatedDateDesc(Pageable page);
 
-   @Query("from Purchase p left join p.merchant left join p.purchaseItems where p.id = ?1")
-   Optional<Purchase> findPurchaseJoinMerchantJoinPurchaseItemsJoinDeliveryAddress(Long id);
+   @Query("from Purchase p left join p.merchant left join p.purchaseItems")
+   List<Purchase> findForPurchaseList(Long id);
+
+   @Query("from Purchase p left join fetch p.merchant left join fetch p.deliveryAddress left join p.purchaseItems i left join fetch i.orderItem where p.id = ?1")
+   Optional<Purchase> findForPurchaseDetails(Long id);
+
+   @Query(value="Select id, product_name as productName, outstanding as quantity, image, weight, price, url from purchase_queue", nativeQuery=true)
+   List<PurchaseQueue> getPurchaseQueue();
 }

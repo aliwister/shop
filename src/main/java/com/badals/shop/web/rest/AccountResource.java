@@ -152,10 +152,10 @@ public class AccountResource {
      */
     @PostMapping(path = "/account/reset-password/init")
     public void requestPasswordReset(@RequestBody String mail) {
-       //mailService.sendPasswordResetMail(
-       //    userService.requestPasswordReset(mail)
-       //        .orElseThrow(EmailNotFoundException::new)
-       //);
+       mailService.sendPasswordResetMail(
+           userService.requestPasswordReset(mail)
+               .orElseThrow(EmailNotFoundException::new)
+       );
     }
 
     /**
@@ -170,12 +170,12 @@ public class AccountResource {
         if (!checkPasswordLength(keyAndPassword.getNewPassword())) {
             throw new InvalidPasswordException();
         }
-        //Optional<User> user =
-            //userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
+        Optional<Customer> user =
+            userService.completePasswordReset(keyAndPassword.getNewPassword(), keyAndPassword.getKey());
 
-        //if (!user.isPresent()) {
+        if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this reset key");
-        //}
+        }
     }
 
     private static boolean checkPasswordLength(String password) {

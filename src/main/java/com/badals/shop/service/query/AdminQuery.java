@@ -3,6 +3,7 @@ package com.badals.shop.service.query;
 
 import com.badals.shop.domain.PricingRequest;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.repository.projection.PurchaseQueue;
 import com.badals.shop.service.OrderService;
 import com.badals.shop.service.PricingRequestService;
 import com.badals.shop.service.ProductService;
@@ -47,15 +48,19 @@ public class AdminQuery extends ShopQuery implements GraphQLQueryResolver {
 
         return orders;
     }
-    public PurchaseDTO purchaseA(Long id) throws OrderNotFoundException {
-        PurchaseDTO o = purchaseService.findPurchaseJoinMerchantJoinPurchaseItemsJoinDeliveryAddress(id).orElse(null);
+    public PurchaseDTO purchase(Long id) throws OrderNotFoundException {
+        PurchaseDTO o = purchaseService.findForPurchaseDetails(id).orElse(null);
         if(o == null) throw new OrderNotFoundException("No order found with this name");
         return o;
     }
-    public List<PurchaseDTO> purchasesA(List<OrderState> orderState, Integer limit, String searchText) throws OrderNotFoundException {
+    public List<PurchaseDTO> purchases(List<OrderState> orderState, Integer limit, String searchText) throws OrderNotFoundException {
         List<PurchaseDTO> orders = purchaseService.findAllByOrderByCreatedDateDesc(orderState, limit, searchText);
         return orders;
     }
+    public List<PurchaseQueue> purchaseQueue() {
+        return purchaseService.getPurchaseQueue();
+    }
+
 
     public String parentOf(String sku) {
         return productService.getParentOf(sku);

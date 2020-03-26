@@ -22,7 +22,7 @@ public interface PricingRequestRepository extends JpaRepository<PricingRequest, 
 
    Boolean existsBySkuAndCreatedBy(String sku, String createdBy);
 
-   List<PricingRequest> findAllByCreatedByAndDone(String email, boolean done);
+   List<PricingRequest> findAllByCreatedByAndDoneAndEmailSentIsNull(String email, boolean done);
 
    @Modifying
    @Query("update PricingRequest p set p.emailSent = true where p.id in :list")
