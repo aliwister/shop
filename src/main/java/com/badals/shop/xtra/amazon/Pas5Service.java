@@ -93,6 +93,9 @@ public class Pas5Service implements IProductService {
         if (product == null) {
             product = new Product();
         }
+        else {
+            isParent = product.getVariationType().equals(VariationType.PARENT);
+        }
         if(isParent) isRebuild = true;
         //if (product != null) // && product.getUpdated())
         List<Product> mws = new ArrayList<>();

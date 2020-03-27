@@ -7,6 +7,7 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.Purchase} entity.
@@ -50,9 +51,11 @@ public class PurchaseDTO implements Serializable {
 
     private Long merchantId;
 
+    private MerchantDTO merchantObj;
 
     private OrderState orderState;
 
+    private Set<PurchaseItemDTO> purchaseItems;
 
     @Override
     public boolean equals(Object o) {

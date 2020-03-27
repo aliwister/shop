@@ -67,7 +67,7 @@ public class Purchase extends Auditable implements Serializable {
     @JoinColumn(name = "invoice_address_id",referencedColumnName = "id_address")
     private Address invoiceAddress;
 
-    @ManyToOne
+    @ManyToOne()
     private Merchant merchant;
 
     @Enumerated(EnumType.STRING)
