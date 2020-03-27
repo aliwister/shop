@@ -20,23 +20,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class AdminQuery extends ShopQuery implements GraphQLQueryResolver {
-
-    @Autowired
-    private PricingRequestService pricingRequestService;
+public class OrderAdminQuery extends ShopQuery implements GraphQLQueryResolver {
 
     @Autowired
     private OrderService orderService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private PurchaseService purchaseService;
-
-    public List<PricingRequestDTO> pricingRequests() {
-        return pricingRequestService.findUnprocessed();
-    }
 
     public OrderDTO orderA(Long id) throws OrderNotFoundException {
         OrderDTO o = orderService.getOrderWithOrderItems(id).orElse(null);
@@ -45,24 +32,6 @@ public class AdminQuery extends ShopQuery implements GraphQLQueryResolver {
     }
     public List<OrderDTO> ordersA(List<OrderState> orderState, Integer limit, String searchText) throws OrderNotFoundException {
         List<OrderDTO> orders = orderService.getOrders(null, null, null);
-
         return orders;
-    }
-    public PurchaseDTO purchase(Long id) throws OrderNotFoundException {
-        PurchaseDTO o = purchaseService.findForPurchaseDetails(id).orElse(null);
-        if(o == null) throw new OrderNotFoundException("No order found with this name");
-        return o;
-    }
-    public List<PurchaseDTO> purchases(List<OrderState> orderState, Integer limit, String searchText) throws OrderNotFoundException {
-        List<PurchaseDTO> orders = purchaseService.findAllByOrderByCreatedDateDesc(orderState, limit, searchText);
-        return orders;
-    }
-    public List<PurchaseQueue> purchaseQueue() {
-        return purchaseService.getPurchaseQueue();
-    }
-
-
-    public String parentOf(String sku) {
-        return productService.getParentOf(sku);
     }
 }
