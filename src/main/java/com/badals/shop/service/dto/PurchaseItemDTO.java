@@ -35,7 +35,7 @@ public class PurchaseItemDTO implements Serializable {
 
     private Long orderItemId;
 
-
+    private Long orderId;
 
     @Override
     public boolean equals(Object o) {

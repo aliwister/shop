@@ -21,10 +21,13 @@ import java.util.Optional;
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
    List<Purchase> findAllByOrderByCreatedDateDesc(Pageable page);
 
-   @Query("from Purchase p left join p.merchant left join p.purchaseItems")
-   List<Purchase> findForPurchaseList(Long id);
+   @Query("from Purchase p left join fetch p.merchant left join fetch p.purchaseItems")
+   List<Purchase> findForPurchaseList(Pageable page);
 
-   @Query("from Purchase p left join fetch p.merchant left join fetch p.deliveryAddress left join p.purchaseItems i left join fetch i.orderItem where p.id = ?1")
+   @Query("from Purchase p left join fetch p.purchaseItems i left join fetch i.orderItem where p.id = ?1")
+   Optional<Purchase>  findForUpdate(Long id);
+
+   @Query("from Purchase p left join fetch p.merchant left join fetch p.deliveryAddress left join fetch p.purchaseItems i left join fetch i.orderItem where p.id = ?1")
    Optional<Purchase> findForPurchaseDetails(Long id);
 
    @Query(value="Select id, product_name as productName, outstanding as quantity, image, weight, price, url from purchase_queue", nativeQuery=true)

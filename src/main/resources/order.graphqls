@@ -50,9 +50,21 @@ type Order {
     paymentMethod: String
     createdDate: Date
 }
+type Merchant {
+    id: ID
+    name: String
+}
 type Purchase {
     id: ID
-    #items: [PurchaseItem]
+    purchaseItems : [PurchaseItem]
+    currency: String
+    invoiceDate: LocalDate
+    subtotal: BigDecimal
+    deliveryTotal: BigDecimal
+    taxesTotal: BigDecimal
+    discountTotal: BigDecimal
+    total: BigDecimal
+    merchantObj: Merchant
 }
 type PurchaseItem {
     id: ID
@@ -60,6 +72,8 @@ type PurchaseItem {
     price: BigDecimal
     quantity: BigDecimal
     description: String
+    orderItemId: Long
+    orderId: Long
 }
 
 input OrderItemInput {
@@ -132,4 +146,5 @@ extend type Query {
     purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
     purchase(id: ID): Purchase
     purchaseQueue: [PurchaseQueue]
+    merchants: [Merchant]
 }
