@@ -116,7 +116,7 @@ public class PasUtility {
 
    public static BigDecimal calculateWeight(BigDecimal weight, ProductOverride override) {
       if (override == null) return weight;
-      if(!override.isLazy()  ||  (override.isLazy() && weight == null))
+      if(!override.isLazy()  ||  (override.isLazy() && (weight == null || weight.doubleValue() < .001)))
          return new BigDecimal(override.getOverride());
       return weight;
    }
