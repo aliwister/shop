@@ -160,6 +160,9 @@ public class Pas5Service implements IProductService {
                         child.setParent(product);
                         child.setParentId(product.getRef());
 
+                        if(child.getPrice() == null)
+                            mws.add(child);
+
                         if (child.getId() == null)
                             children.add(child);
                         child.setVariationType(VariationType.CHILD);
