@@ -231,6 +231,12 @@ public class Pas5Service implements IProductService {
 
     Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
         product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides);
+
+
+        if((product.getWeight() == null || product.getWeight().doubleValue() < .001) && !isParent) {
+            BigDecimal weight = productRepo.lookupWeight(product.getSku());
+            product.setWeight(weight);
+        }
         ProductLang lang = getLang(product);
 
         lang = (ProductLang) PasLookupParser.parseProductI18n(lang, item);
