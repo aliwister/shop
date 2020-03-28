@@ -78,13 +78,13 @@ public interface PasItemMapper {
          target.setSavingsPercentage(opt(() -> offer.getPrice().getSavings().getPercentage()));
          target.setListPrice(opt(() -> offer.getSavingBasis().getAmount()));
       }
-      // Variation
-      if(source.getVariationAttributes() != null) {
-         for(VariationAttribute a : source.getVariationAttributes()) {
-            Attribute v= new Attribute (a.getName(), a.getValue());
-            target.getVariationAttributes().add(v);
-         }
-      }
+      // Variation - get mapped by mapper
+//      if(source.getVariationAttributes() != null) {
+//         for(VariationAttribute a : source.getVariationAttributes()) {
+//            Attribute v= new Attribute (a.getName(), a.getValue());
+//            target.getVariationAttributes().add(v);
+//         }
+//      }
       // Gallery
       if(source.getImages().getVariants() != null) {
          for (ImageType set : source.getImages().getVariants()) {
