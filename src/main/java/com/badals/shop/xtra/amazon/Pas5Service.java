@@ -199,7 +199,7 @@ public class Pas5Service implements IProductService {
         return product.getMerchantStock().stream().findFirst().orElse(new MerchantStock());
     }
 
-    Product setMerchantStock(Product product, MerchantStock stock) {
+    Product setMerchantStock(Product product, MerchantStock stock, BigDecimal quantity) {
         if(stock.getId() == null) {
             stock.setMerchantId(1L);
             product.addMerchantStock(stock.link("amazon.com/dp/"+product.getSku()));
@@ -215,11 +215,12 @@ public class Pas5Service implements IProductService {
         MwsItemNode n = mwsLookup.fetch(p.getSku());
         Product product = p;
         try {
-            product = setMerchantStock(p, MwsLookupParser.parseStock(getMerchantStock(p),n, p.getWeight(), overrides));
+            product = setMerchantStock(p, MwsLookupParser.parseStock(getMerchantStock(p),n, p.getWeight(), overrides), BigDecimal.valueOf(99L));
         } catch (PricingException e) {
             product.setPrice((BigDecimal) null);
             //e.printStackTrace();
         } catch (NoOfferException e) {
+            product = setMerchantStock(p, getMerchantStock(p),BigDecimal.ZERO);
             if(p.getVariationType() == VariationType.SIMPLE)
                 throw e;
         }
@@ -254,9 +255,9 @@ public class Pas5Service implements IProductService {
 
         MerchantStock stock = this.getMerchantStock(product);
         try {
-            product = setMerchantStock(product, PasLookupParser.parseStock(product, stock, item, overrides));
+            product = setMerchantStock(product, PasLookupParser.parseStock(product, stock, item, overrides),BigDecimal.valueOf(99L));
         } catch (PricingException e) {
-            //e.printStackTrace();
+            //e.printStackTrace();//@Todo set stock quantity to 0
         } catch (NoOfferException e) {
             //e.printStackTrace();
         }

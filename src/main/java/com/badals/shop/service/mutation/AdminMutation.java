@@ -4,10 +4,12 @@ import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
 import com.badals.shop.domain.Payment;
 import com.badals.shop.domain.ProductOverride;
+import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.enumeration.OverrideType;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.repository.CheckoutCartRepository;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.*;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
@@ -55,7 +57,9 @@ public class AdminMutation implements GraphQLMutationResolver {
 
     private final CustomerService customerService;
 
-    public AdminMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService) {
+    private final CheckoutCartRepository checkoutCartRepository;
+
+    public AdminMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, CheckoutCartRepository checkoutCartRepository) {
         this.productService = productService;
         this.pasService = pasService;
         this.productLangService = productLangService;
@@ -68,6 +72,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         this.purchaseService = purchaseService;
         this.paymentService = paymentService;
         this.mailService = mailService;
+        this.checkoutCartRepository = checkoutCartRepository;
     }
 
 
@@ -156,5 +161,12 @@ public class AdminMutation implements GraphQLMutationResolver {
         // Return
         return payment;
     }
+
+    public CheckoutCart createCart(CheckoutCart cart) {
+        cart.setSecureKey(CartService.createUIUD());
+        cart = checkoutCartRepository.save(cart);
+        return cart;
+    }
+
 }
 

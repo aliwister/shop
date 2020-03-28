@@ -33,6 +33,8 @@ public class MwsLookupParser {
 
    private static OfferNode selectOffer(MwsItemNode node) throws NoOfferException {
       double selOfferWeight = -10000000;
+      if(node == null || node.getOffers() == null || node.getOffers().size() == 0)
+         throw new NoOfferException("Item not available");
       double selCost = node.getOffers().get(0).cost.doubleValue();
       int offerSize = node.getOffers().size();
       OfferNode selOffer = null;//node.getOffers().get(0);
