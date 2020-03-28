@@ -37,33 +37,27 @@ import java.util.stream.Collectors;
 public class Pas5Service implements IProductService {
 
     private final Logger log = LoggerFactory.getLogger(Pas5Service.class);
+    private final ProductRepository productRepo;
+    private final CategoryRepository categoryRepository;
+    private final MerchantRepository merchantRepository;
+    private final ProductOverrideRepository productOverrideRepository;
+    private final PasLookup pasLookup;
+    private final MwsLookup mwsLookup;
+    private final RedisPasRepository redisPasRepository;
+    private final ProductMapper productMapper;
+    private final PasItemMapper pasItemMapper;
 
-    @Autowired
-    ProductRepository productRepo;
-
-    @Autowired
-    CategoryRepository categoryRepository;
-
-    @Autowired
-    MerchantRepository merchantRepository;
-
-    @Autowired
-    ProductOverrideRepository productOverrideRepository;
-
-    @Autowired
-    private PasLookup pasLookup;
-
-    @Autowired
-    private MwsLookup mwsLookup;
-
-    @Autowired
-    private RedisPasRepository redisPasRepository;
-
-    @Autowired
-    private ProductMapper productMapper;
-
-    @Autowired
-    private PasItemMapper pasItemMapper;
+    public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper) {
+        this.productRepo = productRepo;
+        this.categoryRepository = categoryRepository;
+        this.merchantRepository = merchantRepository;
+        this.productOverrideRepository = productOverrideRepository;
+        this.pasLookup = pasLookup;
+        this.mwsLookup = mwsLookup;
+        this.redisPasRepository = redisPasRepository;
+        this.productMapper = productMapper;
+        this.pasItemMapper = pasItemMapper;
+    }
 
     public Boolean existsBySku(String sku) {
         return productRepo.existsBySku(sku);
@@ -92,6 +86,7 @@ public class Pas5Service implements IProductService {
         Product product = productRepo.findBySkuJoinChildren(asin).orElse(null);
         if (product == null) {
             product = new Product();
+            isRebuild = true;
         }
         else {
             isParent = product.getVariationType().equals(VariationType.PARENT);
