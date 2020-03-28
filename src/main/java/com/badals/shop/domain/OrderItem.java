@@ -44,6 +44,7 @@ public class OrderItem implements Serializable {
     private Order order;
 
     @ManyToOne
+    @JoinColumn(name = "product_id", referencedColumnName = "ref")
     private Product product;
 
     @Column

@@ -118,6 +118,56 @@ type PurchaseQueue {
     url: String
 }
 
+type LineItem {
+    productId: Int
+    sku: String
+    image: String
+    name: String
+    quantity: Float
+    price: Float
+    cost: Float
+    subTotal: Float
+    url: String
+}
+type CheckoutCart {
+    id: ID!
+    ref: String
+    name: String
+    phone: String
+    email: String
+    secureKey: String
+    carrier: String
+    currency: String
+    items: [LineItem]
+    #tenantId: Long
+}
+input LineItemInput {
+    productId: Int
+    sku: String
+    image: String
+    name: String
+    quantity: Float
+    price: Float
+    cost: Float
+    subTotal: Float
+    url: String
+}
+input CheckoutCartInput {
+    id: ID
+    ref: String
+    name: String
+    phone: String
+    email: String
+    secureKey: String
+    #addresses: [Address]
+    carrier: String
+    currency: String
+    items: [LineItemInput]
+    #tenantId: Long
+}
+
+
+
 extend type Mutation {
     createOrder(id: Int): Order
     contact(id: Int): Message
@@ -134,6 +184,8 @@ extend type Mutation {
     addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
     sendOrderLevelEmail(id:ID, template:String): Message
     sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
+
+    createCart(cart: CheckoutCartInput): CheckoutCart
 }
 
 extend type Query {

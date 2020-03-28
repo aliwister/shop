@@ -114,7 +114,7 @@ public class OrderService {
         }
         Customer customer = customerService.findByEmail(order.getEmail());
         order.setCustomer(customer);
-        order.setConfirmationKey(null);
+        order.setConfirmationKey(order.getConfirmationKey()+order.getId());
         order = orderRepository.save(order);
         sendConfirmationEmail(order.getId());
         return orderMapper.toDto(order);
