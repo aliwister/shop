@@ -3,8 +3,10 @@ import com.badals.shop.domain.Product;
 import com.badals.shop.domain.enumeration.VariationType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +31,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Boolean existsBySku(String sku);
 
+    @Query(value="Select weight from weight_lookup where sku = :sku", nativeQuery=true)
+    BigDecimal lookupWeight(@Param(value = "sku") String sku);
+
     @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.children c left join fetch c.productLangs left join fetch c.merchantStock where u.sku = ?1")
     Optional<Product> findBySkuJoinChildren(String asin);
 
     Optional<Product> findOneBySku(String sku);
 
     List<Product> findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(List<VariationType> types, Pageable pageable);
+
+
 }
