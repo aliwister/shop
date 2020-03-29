@@ -116,6 +116,7 @@ type PurchaseQueue {
     image: String
     weight: BigDecimal
     url: String
+    sku: String
 }
 
 type LineItem {
