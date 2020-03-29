@@ -220,7 +220,7 @@ public class Pas5Service implements IProductService {
             product.setPrice((BigDecimal) null);
             //e.printStackTrace();
         } catch (NoOfferException e) {
-            product = setMerchantStock(p, getMerchantStock(p),BigDecimal.ZERO);
+            //product = setMerchantStock(p, getMerchantStock(p),BigDecimal.ZERO);
             if(p.getVariationType() == VariationType.SIMPLE)
                 throw e;
         }
