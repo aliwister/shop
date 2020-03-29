@@ -10,4 +10,5 @@ public interface PurchaseQueue {
    String getImage();
    BigDecimal getWeight();
    String getUrl();
+   String getSku();
 }
