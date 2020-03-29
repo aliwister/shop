@@ -31,7 +31,7 @@ public class MerchantStock implements Serializable {
     @Column(name = "availability", nullable = false)
     private Integer availability;
 
-    @NotNull
+    //@NotNull
     @Column(name = "allow_backorder", nullable = false)
     private Boolean allow_backorder;
 
