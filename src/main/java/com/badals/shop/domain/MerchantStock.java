@@ -23,11 +23,11 @@ public class MerchantStock implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    //@NotNull
     @Column(name = "quantity", precision = 21, scale = 2, nullable = false)
     private BigDecimal quantity;
 
-    @NotNull
+    //@NotNull
     @Column(name = "availability", nullable = false)
     private Integer availability;
 
