@@ -92,6 +92,7 @@ input PurchaseInput {
     invoiceAddressId: Int
     merchantId: Int
     orderState: OrderState
+    ref: String
 }
 
 input PurchaseItemInput {
