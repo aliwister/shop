@@ -113,6 +113,7 @@ type PurchaseQueue {
     productName: String
     quantity: BigDecimal
     price: BigDecimal
+    cost: BigDecimal
     image: String
     weight: BigDecimal
     url: String
