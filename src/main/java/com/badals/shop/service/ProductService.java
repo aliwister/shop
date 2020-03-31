@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
@@ -205,6 +206,7 @@ public class ProductService {
 
     }
 
+    @Cacheable(value="latest-products")
    public ProductResponse getLatest(Integer limit) {
        List<Product> products = productRepository.findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(Arrays.asList(new VariationType[]{VariationType.PARENT, VariationType.SIMPLE}), PageRequest.of(0,20));
        ProductResponse response = new ProductResponse();

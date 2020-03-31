@@ -34,6 +34,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     @Mapping(target = "variations", ignore = true)
     @Mapping(target = "variationOptions", ignore = true)
     @Mapping(source = "ref", target = "id")
+    @Mapping(target = "categories", ignore = true)
     ProductDTO toDto(Product product);
 
 
