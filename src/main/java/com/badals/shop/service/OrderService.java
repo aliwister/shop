@@ -2,10 +2,12 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
+import com.badals.shop.domain.OrderItem;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.repository.OrderRepository;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
+import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.mapper.OrderMapper;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -230,5 +233,34 @@ public class OrderService {
         OrderDTO order = getOrderWithOrderItems(id).orElse(null);
         CustomerDTO customer = order.getCustomer();
         mailService.sendOrderCreationMail(customer, order);
+    }
+
+   public OrderDTO editOrderItems(Long id, List<OrderItemDTO> orderItems) {
+       Order order = orderRepository.findOrderJoinCustomerJoinOrderItemsJoinDeliveryAddress(id).get();
+
+       for(OrderItemDTO item : orderItems) {
+           order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
+                   .findFirst().get()
+                   .quantity(item.getQuantity())
+                   .price(item.getPrice())
+                   .lineTotal(item.getPrice().doubleValue()*item.getQuantity());
+       }
+       order.setSubtotal(calculateSubtotal(order));
+       order.setTotal(calculateTotal(order));
+       order = orderRepository.save(order);
+       return orderMapper.toDto(order);
+   }
+    public BigDecimal calculateSubtotal(Order order) {
+        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        return sum;
+    }
+
+    public BigDecimal calculateTotal(Order order) {
+        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        if(order.getDeliveryTotal() != null)
+            sum.add(order.getDeliveryTotal());
+        if(order.getDiscountsTotal() != null)
+            sum.subtract(order.getDiscountsTotal());
+        return sum;
     }
 }
