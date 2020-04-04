@@ -121,7 +121,10 @@ public class OrderItem implements Serializable {
         this.weight = weight;
     }
 
-
+    public OrderItem lineTotal(double v) {
+        this.lineTotal = BigDecimal.valueOf(v);
+        return this;
+    }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -252,4 +255,6 @@ public class OrderItem implements Serializable {
             ", shippingInstructions='" + getShippingInstructions() + "'" +
             "}";
     }
+
+
 }
