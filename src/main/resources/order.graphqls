@@ -78,6 +78,9 @@ type PurchaseItem {
 
 input OrderItemInput {
     id: ID
+    sequence: Int
+    quantity: Int
+    price: BigDecimal
 }
 
 input PurchaseInput {
@@ -189,6 +192,7 @@ extend type Mutation {
     sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
 
     createCart(cart: CheckoutCartInput): CheckoutCart
+    editOrder(id: ID, orderItems: [OrderItemInput]): Order
 }
 
 extend type Query {
