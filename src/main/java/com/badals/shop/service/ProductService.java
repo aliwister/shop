@@ -206,9 +206,9 @@ public class ProductService {
 
     }
 
-    @Cacheable(value="latest-products")
+   // @Cacheable(value="latest-products")
    public ProductResponse getLatest(Integer limit) {
-       List<Product> products = productRepository.findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(Arrays.asList(new VariationType[]{VariationType.PARENT, VariationType.SIMPLE}), PageRequest.of(0,20));
+       List<Product> products = productRepository.findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(Arrays.asList(new VariationType[]{VariationType.SIMPLE}), PageRequest.of(0,20));
        ProductResponse response = new ProductResponse();
        response.setTotal(products.size());
        response.setItems(products.stream().map(productMapper::toDto).collect(Collectors.toList()));
