@@ -258,9 +258,9 @@ public class OrderService {
     public BigDecimal calculateTotal(Order order) {
         BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
         if(order.getDeliveryTotal() != null)
-            sum.add(order.getDeliveryTotal());
+            sum = sum.add(order.getDeliveryTotal());
         if(order.getDiscountsTotal() != null)
-            sum.subtract(order.getDiscountsTotal());
+            sum = sum.subtract(order.getDiscountsTotal());
         return sum;
     }
 }
