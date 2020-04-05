@@ -207,7 +207,7 @@ public class OrderService {
     }
 
    public Optional<OrderDTO> getOrderWithOrderItems(Long id) {
-        return orderRepository.findOrderJoinCustomerJoinOrderItemsJoinDeliveryAddress(id).map(orderMapper::toDto);
+        return orderRepository.findForOrderDetails(id, String.valueOf(id)).map(orderMapper::toDto);
    }
 
     public OrderDTO setOrderState(Long orderId, OrderState os) {
@@ -236,7 +236,7 @@ public class OrderService {
     }
 
    public OrderDTO editOrderItems(Long id, List<OrderItemDTO> orderItems) {
-       Order order = orderRepository.findOrderJoinCustomerJoinOrderItemsJoinDeliveryAddress(id).get();
+       Order order = orderRepository.findForOrderDetails(id, String.valueOf(id)).get();
 
        for(OrderItemDTO item : orderItems) {
            order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
