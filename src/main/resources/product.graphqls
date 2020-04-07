@@ -148,6 +148,15 @@ type MerchantStock {
     price: BigDecimal
 }
 
+input MerchantStockInput {
+    quantity: BigDecimal
+    availability: Int
+    allow_backorder: Boolean
+    link: String
+    location: String
+    price: BigDecimal
+}
+
 type Attribute {
     name: String,
     value: String
@@ -173,29 +182,36 @@ input ProductI18nInput {
     lang: String
 }
 
+
 input ProductInput {
-    id: ID,
-    ref: Int,
-    parent: Int,
     sku: String,
     upc: String,
-    price: String,
-    currency: String,
+    price: BigDecimal,
+    salePrice: BigDecimal,
+    #currency: String,
     image: String,
-    images: [String],
-    releaseDate: LocalDate,
-    active: Boolean,
-    similarProducts: [Int],
-    url: String,
-    title: String,
+    #images: [String],
+    #releaseDate: LocalDate,
+    #active: Boolean,
+    #similarProducts: [Int],
+    #url: String,
+    name: String,
     brand: String,
     group: String,
-    condition: Condition,
-    isUsed: Boolean,
-    availableForOrder: Boolean,
+    features: String,
+    name_ar: String,
+    brand_ar: String,
+    group_ar: String,
+    features_ar: String,
+    #condition: Condition,
+    #isUsed: Boolean,
+    #availableForOrder: Boolean,
+    cost: BigDecimal,
     weight: Float,
-    volumeWeight: Float,
-    variationOptions: [VariationOptionInput]
+    availability: Int,
+    quantity: Int
+    #volumeWeight: Float,
+    #variationOptions: [VariationOptionInput]
 }
 
 type ProductResponse {

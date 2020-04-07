@@ -33,30 +33,18 @@ import java.util.List;
 @Component
 public class AdminMutation implements GraphQLMutationResolver {
     private final ProductService productService;
-
     private final Pas5Service pasService;
-
     private final ProductLangService productLangService;
-
     private final PricingRequestService pricingRequestService;
-
-    final
-    MessageSource messageSource;
-
     private final UserService userService;
-
     private final OrderService orderService;
-
+    private final PurchaseService purchaseService;
+    private final PaymentService paymentService;
+    private final MailService mailService;
+    private final CustomerService customerService;
     private final ProductOverrideService productOverrideService;
 
-    private final PurchaseService purchaseService;
-
-    private final PaymentService paymentService;
-
-    private final MailService mailService;
-
-    private final CustomerService customerService;
-
+    private final MessageSource messageSource;
     private final CheckoutCartRepository checkoutCartRepository;
 
     public AdminMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, CheckoutCartRepository checkoutCartRepository) {
@@ -74,7 +62,6 @@ public class AdminMutation implements GraphQLMutationResolver {
         this.mailService = mailService;
         this.checkoutCartRepository = checkoutCartRepository;
     }
-
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message contact(final Long id) {
@@ -101,7 +88,6 @@ public class AdminMutation implements GraphQLMutationResolver {
 
     public Message completePricingRequestAndEmail(Long id) throws PricingException, NoOfferException, ProductNotFoundException {
         PricingRequestDTO dto = pricingRequestService.complete(id);
-
         // Get all overrides for this customer
         // Send email
         // Update overrides
@@ -134,7 +120,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         return null;
     }
 
-    public Message sendOrderLevelEmail(Long id, String template){
+    public Message sendOrderLevelEmail(Long id, String template) {
 
         if(template.equalsIgnoreCase("NEW_ORDER")) {
             orderService.sendConfirmationEmail(id);
@@ -167,6 +153,5 @@ public class AdminMutation implements GraphQLMutationResolver {
         cart = checkoutCartRepository.save(cart);
         return cart;
     }
-
 }
 

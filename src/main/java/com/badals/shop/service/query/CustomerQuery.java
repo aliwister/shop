@@ -59,6 +59,10 @@ public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
 return null;
     }
 
+    public List<CustomerDTO> customers() {
+        return null;
+    }
+
     public CustomerDTO me() {
         return  userService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
     }

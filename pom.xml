@@ -94,6 +94,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>2.11.9</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!-- jhipster-needle-maven-add-dependency-management -->
         </dependencies>
     </dependencyManagement>
@@ -452,6 +459,49 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>3.3.5</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/sdk-core -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sdk-core</artifactId>
+            <version>2.11.9</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/core -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>core</artifactId>
+            <version>2.11.9</version>
+            <type>pom</type>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/regions -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>regions</artifactId>
+            <version>2.11.9</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/auth -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>auth</artifactId>
+            <version>2.11.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.11.9</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>protocol-core</artifactId>
+            <version>2.11.9</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/utils -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>utils</artifactId>
+            <version>2.11.9</version>
         </dependency>
 
     </dependencies>

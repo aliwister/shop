@@ -47,8 +47,9 @@ public class PasLookupParser {
                 .weight(PasUtility.calculateWeight(i.getParsedWeight(), getOverride(overrides, OverrideType.WEIGHT)))
                 .title(i.getTitle())
                 .upc(i.getUpc())
+                .tenantId(11L)
                 .gallery(i.gallerizeImages());
-
+        //p.setTenantId()
         return p;
     }
 

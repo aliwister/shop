@@ -275,4 +275,9 @@ public class MerchantStock implements Serializable {
             ", price='" + getPrice() + "'" +
             "}";
     }
+
+   public MerchantStock merchantId(long l) {
+       this.merchantId = l;
+       return this;
+   }
 }

@@ -51,7 +51,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     database: MYSQL
-    show-sql: false
+    show-sql: true
     properties:
       hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: true
@@ -142,6 +142,9 @@ mws:
   merchantid: ***REMOVED***
   marketplaceid: ***REMOVED***
 
+aws:
+  accessKeyId: AKIAIG3DJ4KLYNPBH2EA
+  secretAccessKey: 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
 
 badals:
   checkout-app: http://127.0.0.1:8081/checkout/start

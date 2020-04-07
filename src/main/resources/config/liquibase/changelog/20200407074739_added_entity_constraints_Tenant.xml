@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <!--
+        Added the constraints for entity Tenant.
+    -->
+    <changeSet id="20200407074739-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="tenant_merchant"
+                                 constraintName="fk_tenant_merchant_tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"/>
+
+        <addForeignKeyConstraint baseColumnNames="merchant_id"
+                                 baseTableName="tenant_merchant"
+                                 constraintName="fk_tenant_merchant_merchant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="merchant"/>
+        
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="tenant_customer"
+                                 constraintName="fk_tenant_customer_tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="tenant"/>
+
+        <addForeignKeyConstraint baseColumnNames="customer_id"
+                                 baseTableName="tenant_customer"
+                                 constraintName="fk_tenant_customer_customer_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="customer"/>
+        
+    </changeSet>
+</databaseChangeLog>
