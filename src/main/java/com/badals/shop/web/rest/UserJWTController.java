@@ -6,6 +6,7 @@ import com.badals.shop.web.rest.vm.LoginVM;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Data;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,10 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Controller to authenticate users.
@@ -35,7 +41,7 @@ public class UserJWTController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginVM loginVM) {
+    public ResponseEntity<JwtAuthenticationResponse> authorize(@Valid @RequestBody LoginVM loginVM) {
         LocaleContextHolder.getLocale();
         UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
@@ -46,7 +52,7 @@ public class UserJWTController {
         String jwt = tokenProvider.createToken(authentication, rememberMe);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-        return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new JwtAuthenticationResponse(jwt, authentication.getPrincipal()), httpHeaders, HttpStatus.OK);
     }
 
     /**
@@ -67,6 +73,24 @@ public class UserJWTController {
 
         void setIdToken(String idToken) {
             this.idToken = idToken;
+        }
+    }
+
+    @Data
+    static class JwtAuthenticationResponse {
+        private final String authorities;
+        @JsonProperty("id_token")
+        private final String idToken;
+        private final String tokenType = "Bearer";
+        private final String username;
+
+        public JwtAuthenticationResponse(String accessToken, Object user) {
+            this.idToken = accessToken;
+            User userP = (User) user;
+            //this.id = userP.
+            this.username = userP.getUsername();
+            //this.firstName = userP.getName();
+            this.authorities = String.join(",",userP.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()));
         }
     }
 }

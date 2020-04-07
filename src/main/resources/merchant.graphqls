@@ -1,0 +1,81 @@
+type PresignedUrl {
+    uploadUrl: String
+    imageUrl: String
+    status: String
+}
+
+type MerchantProduct {
+      id: ID
+      sku: String
+      upc: String
+      ref: String
+      slug: String
+      price: BigDecimal
+      image: String
+      name: String
+      name_ar: String
+      brand: String
+      brand_ar: String
+      description: String
+      description_ar: String
+      features: String
+      features_ar: String
+      cost: BigDecimal
+      weight: BigDecimal
+      #slug
+      type: String
+      unit: String
+      availability: Int
+      salePrice: BigDecimal
+      quantity: BigDecimal
+      discountInPercent: Int
+}
+
+type MerchantProductResponse {
+  items: [MerchantProduct]
+  total: Int!
+  hasMore: Boolean!
+}
+
+input AddProductInput {
+      id: Long
+      sku: String
+      upc: String
+      price: BigDecimal
+      image: String
+      name: String
+      name_ar: String
+      brand: String
+      brand_ar: String
+      description: String
+      description_ar: String
+      features: String
+      features_ar: String
+      cost: BigDecimal
+      weight: BigDecimal
+      #slug
+      type: String
+      unit: String
+      availability: Int
+      salePrice: BigDecimal
+      quantity: BigDecimal
+      merchantStock: [MerchantStockInput]
+      productLangs: [ProductI18nInput]
+}
+
+extend type Query {
+    merchantProducts(
+            text: String = ""
+            type: String = ""
+            offset: Int = 0
+            limit: Int = 10
+            lang: Int = 1
+    ): MerchantProductResponse
+    pendingMerchantProducts(merchantId: Long) : [Product]
+}
+
+extend type Mutation {
+    createMerchantProduct(product: AddProductInput) : MerchantProduct
+    approveProduct(id: ID): Product
+    getImageUploadUrl(filename: String, contentType: String): PresignedUrl
+}

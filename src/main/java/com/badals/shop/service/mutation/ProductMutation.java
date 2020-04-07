@@ -10,6 +10,7 @@ import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
 
+import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
@@ -19,8 +20,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.stereotype.Component;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.SystemPropertyCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
+import java.net.URL;
+import java.time.Duration;
 import java.time.LocalDate;
 
 
@@ -37,6 +49,7 @@ public class ProductMutation implements GraphQLMutationResolver {
     private final MessageSource messageSource;
 
     private final UserService userService;
+
 
     public ProductMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
         this.productService = productService;
@@ -84,5 +97,12 @@ public class ProductMutation implements GraphQLMutationResolver {
         }
         return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));
     }
+
+    public ProductDTO approveProduct(Long id){
+        return null;
+    }
+
+
+
 }
 

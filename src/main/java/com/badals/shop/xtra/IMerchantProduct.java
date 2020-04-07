@@ -51,4 +51,6 @@ public interface IMerchantProduct {
     void setProductLangs(Set<IProductLang> i18n);
 
     List<String> getVariationDimensions();
+
+   IMerchantProduct tenantId(Long l);
 }
