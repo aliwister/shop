@@ -206,6 +206,36 @@ public class Product implements Serializable, IMerchantProduct {
     @Column
     String currency;
 
+
+    @ManyToOne
+    @JoinColumn(name="tenant_id", insertable = false, updatable = false)
+    Tenant tenant;
+
+    @Column(name = "tenant_id")
+    private Long tenantId;
+
+    public Tenant getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(Tenant tenant) {
+        this.tenant = tenant;
+    }
+
+    public Long getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(Long tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+
+
     public BigDecimal getPrice() {
         return price;
     }
@@ -224,6 +254,12 @@ public class Product implements Serializable, IMerchantProduct {
 
     public List<String> getVariationDimensions() {
         return variationDimensions;
+    }
+
+    @Override
+    public Product tenantId(Long l) {
+        this.tenantId = l;
+        return this;
     }
 
     public void setVariationDimensions(List<String> variationDimensions) {

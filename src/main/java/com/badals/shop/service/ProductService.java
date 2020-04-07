@@ -1,18 +1,23 @@
 package com.badals.shop.service;
 
 import com.algolia.search.SearchIndex;
+import com.badals.shop.aop.logging.TenantContext;
+import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.MerchantProductResponse;
 import com.badals.shop.domain.pojo.ProductI18;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.domain.AlgoliaProduct;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
+import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
@@ -29,9 +34,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.CRC32;
 
 /**
  * Service Implementation for managing {@link Product}.
@@ -41,26 +48,24 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final Logger log = LoggerFactory.getLogger(ProductService.class);
-
     private final ProductRepository productRepository;
+    private final SearchIndex<AlgoliaProduct> index;
+    private final Pas5Service pas5Service;
+    private final MessageSource messageSource;
 
     private final ProductMapper productMapper;
-
     private final AlgoliaProductMapper algoliaProductMapper;
+    private final AddProductMapper addProductMapper;
 
-    private final SearchIndex<AlgoliaProduct> index;
-
-    private final Pas5Service pas5Service;
-
-    @Autowired
-    MessageSource messageSource;
-
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.algoliaProductMapper = algoliaProductMapper;
         this.index = index;
         this.pas5Service = pas5Service;
+        this.messageSource = messageSource;
+        this.addProductMapper = addProductMapper;
+        this.productLangRepository = productLangRepository;
     }
 
     /**
@@ -145,7 +150,7 @@ public class ProductService {
         return product2;
     }
 
-    @Autowired
+    final
     ProductLangRepository productLangRepository;
 
     public Attribute indexProduct(long id) {
@@ -215,6 +220,14 @@ public class ProductService {
        return response;
    }
 
+   public MerchantProductResponse getForMerchant(Long merchantId, Integer limit) {
+       List<Product> products = productRepository.listForMerchantsAll(merchantId, PageRequest.of(0,20));
+       MerchantProductResponse response = new MerchantProductResponse();
+       response.setTotal(products.size());
+       response.setItems(products.stream().map(addProductMapper::toDto).collect(Collectors.toList()));
+       return response;
+   }
+
     public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         return lookupPas(sku, false, isRedis, isRebuild);
     }
@@ -229,4 +242,54 @@ public class ProductService {
     public String getParentOf(String sku) {
         return productRepository.findOneBySku(sku).get().getParent().getSku();
     }
+
+    public AddProductDTO createMerchantProduct(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId) {
+        Product product = null;
+        if(dto.getId() == null) {
+            product = addProductMapper.toEntity(dto);
+            product.setSku(currentMerchant + "-" + dto.getSku());
+            CRC32 checksum = new CRC32();
+            checksum.update(dto.getSku().getBytes());
+            String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
+            product.setRef(Long.valueOf(ref));
+            product.setSlug(ref);
+        }
+        else
+            product = productRepository.findById(dto.getId()).get();
+
+
+        product.setActive(false);
+
+
+        product.setTitle(dto.getName());
+        product.setTenantId(tenantId);
+        product.getMerchantStock().clear();
+        product.getProductLangs().clear();
+
+        //product.getProductLangs().add(new ProductLang().title("Fuck").product(product).lang("ar"));
+        int discount = 100 * (int)((dto.getPrice().doubleValue() - dto.getSalePrice().doubleValue())/dto.getPrice().doubleValue());
+
+        product.getMerchantStock().add(new MerchantStock().quantity(dto.getQuantity()).availability(dto.getAvailability()).cost(dto.getCost()).allow_backorder(false)
+                .price(dto.getSalePrice()).discount(discount).product(product).merchantId(currentMerchantId));
+
+        ProductLang langAr = new ProductLang().lang("ar").description(dto.getDescription_ar()).title(dto.getName_ar());
+        if(dto.getFeatures_ar() != null)
+            langAr.setFeatures(Arrays.asList(dto.getFeatures_ar().split(";")));
+
+        ProductLang langEn = new ProductLang().lang("en").description(dto.getDescription()).title(dto.getName());
+        if(dto.getFeatures() != null)
+            langEn.setFeatures(Arrays.asList(dto.getFeatures().split(";")));
+
+        product.getProductLangs().add(langAr.product(product));
+        product.getProductLangs().add(langEn.product(product));
+
+
+        //product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
+        product = productRepository.save(product);
+        return  addProductMapper.toDto(product);
+    }
+
+//    public List<ProductDTO> listForMerchantsAll(Long merchantId) {
+//        return productRepository.listForMerchantsAll(merchantId).stream().map(productMapper::toDto).collect(Collectors.toList());
+//    }
 }

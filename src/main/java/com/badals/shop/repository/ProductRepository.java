@@ -1,6 +1,7 @@
 package com.badals.shop.repository;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.enumeration.VariationType;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
@@ -39,7 +40,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findOneBySku(String sku);
 
+
     List<Product> findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(List<VariationType> types, Pageable pageable);
 
-
+    @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock where u.tenantId = ?1")
+    List<Product> listForMerchantsAll(Long merchantId, Pageable pageable);
 }

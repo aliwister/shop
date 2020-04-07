@@ -39,4 +39,5 @@ extend type Query {
     getAddresses(customerId: Int): [Address]
     #getAddress(addressId: Int): Address
     me: Customer
+    customers: [Customer]
 }

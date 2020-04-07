@@ -4,6 +4,7 @@ package com.badals.shop.xtra.amazon;
 import com.amazonservices.mws.products.MarketplaceWebServiceProductsClient;
 import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import com.badals.shop.xtra.amazon.mws.MwsRequestHelper;
+import com.badals.shop.xtra.amazon.paapi4.Pas4Lookup;
 import com.badals.shop.xtra.amazon.paapi5.PasLookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +44,16 @@ public class LookupConfig {
 
       final SignedRequestsHelper signedRequestsHelper = new SignedRequestsHelper(pasAccessKeyId, pasSecretKey);
       final PasLookup pasLookup = new PasLookup(signedRequestsHelper);
+      return pasLookup;
+   }
+
+   @Bean
+   public Pas4Lookup pas4Lookup() throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException {
+
+      System.out.println("======================================================"+pasAccessKeyId);
+
+      final SignedRequestsHelper signedRequestsHelper = new SignedRequestsHelper(pasAccessKeyId, pasSecretKey);
+      final Pas4Lookup pasLookup = new Pas4Lookup(signedRequestsHelper);
       return pasLookup;
    }
 
