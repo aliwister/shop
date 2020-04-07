@@ -1,9 +1,11 @@
 package com.badals.shop.service.query;
 
 import com.algolia.search.SearchIndex;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.service.CategoryService;
 import com.badals.shop.service.ProductService;
+import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.CategoryDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.ProductMapper;
@@ -24,12 +26,18 @@ import java.util.List;
 @Component
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
-   @Autowired
-   private ProductService productService;
+   private final ProductService productService;
 
-   @Autowired
-   private CategoryService categoryService;
+   private final CategoryService categoryService;
    private static final Logger log = LoggerFactory.getLogger(ProductQuery.class);
+
+   private final UserService userService;
+
+   public ProductQuery(ProductService productService, CategoryService categoryService, UserService userService) {
+      this.productService = productService;
+      this.categoryService = categoryService;
+      this.userService = userService;
+   }
 
    public List<ProductDTO> products(final int count) {
       return productService.getAllProducts(count);
@@ -77,6 +85,10 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       if(isParent)
          return  productService.lookupPas(sku, true,true, false);
       return productService.lookupPas(sku, true, false);
+   }
+
+   public List<ProductDTO> pendingMerchantProducts(Long merchantId) {
+      return null;
    }
 }
 

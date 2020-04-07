@@ -178,7 +178,6 @@ public class Pas5Service implements IProductService {
                 product.setChildren(children);
                 product.setVariations(variations);
                 isParent = setVariationType(product, VariationType.PARENT);
-
             }
         }
         if(!isParent && product.getPrice() == null)
@@ -235,8 +234,6 @@ public class Pas5Service implements IProductService {
 
     Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
         product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides);
-
-
         if((product.getWeight() == null || product.getWeight().doubleValue() < .001) && !isParent) {
             BigDecimal weight = productRepo.lookupWeight(product.getSku());
             product.setWeight(weight);

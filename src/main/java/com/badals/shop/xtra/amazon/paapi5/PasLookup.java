@@ -70,8 +70,15 @@ public class PasLookup {
       GetItemsRequest getItemsRequest = new GetItemsRequest().itemIds(itemIds).partnerTag(partnerTag)
               .resources(getItemsResources()).partnerType(PartnerType.ASSOCIATES);
       try {
-         return api.getItems(getItemsRequest);
+         GetItemsResponse response = api.getItems(getItemsRequest);
 
+         if(response.getErrors() != null && response.getErrors().size() > 0) {
+            switch(response.getErrors().get(0).getCode()) {
+               case "ItemNotAccessible":
+                  //Do mws lookup
+            }
+         }
+         return response;
       } catch (Exception e) {
          throw new RuntimeException(e);
       }
