@@ -1,10 +1,7 @@
 package com.badals.shop.service.mapper;
 
 import com.badals.shop.aop.logging.TenantContext;
-import com.badals.shop.domain.MerchantStock;
-import com.badals.shop.domain.Product;
-import com.badals.shop.domain.ProductLang;
-import com.badals.shop.domain.Purchase;
+import com.badals.shop.domain.*;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
@@ -15,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
@@ -98,15 +96,19 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
                     target.setFeatures(String.join(";",lang.getFeatures()));
                 target.setName(lang.getTitle());
                 target.setDescription(lang.getDescription());
+                target.setBrand(lang.getBrand());
             }
             else if(lang.getLang().equals("ar")) {
                 if(lang.getFeatures() != null)
                     target.setFeatures_ar(String.join(";",lang.getFeatures()));
                 target.setName_ar(lang.getTitle());
                 target.setDescription_ar(lang.getDescription());
+                target.setBrand_ar(lang.getBrand());
             }
-
         }
+        if(source.getCategories() != null)
+            target.setShopIds(source.getCategories().stream().map(Category::getId).collect(Collectors.toList()));
+
     }
 
     default Product fromId(Long id) {
