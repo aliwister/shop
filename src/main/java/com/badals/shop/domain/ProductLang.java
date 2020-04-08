@@ -44,6 +44,9 @@ public class ProductLang implements Serializable, IProductLang {
     @Column(name = "browse_node", nullable = false)
     private String browseNode;
 
+    @Column(name = "brand", nullable = false)
+    private String brand;
+
     public String getBrowseNode() {
         return browseNode;
     }
@@ -85,6 +88,14 @@ public class ProductLang implements Serializable, IProductLang {
 
     public ProductLang description(String description) {
         this.description = description;
+        return this;
+    }
+    public ProductLang brand(String brand) {
+        this.brand = brand;
+        return this;
+    }
+    public ProductLang browseNode(String browseNode) {
+        this.browseNode = browseNode;
         return this;
     }
 

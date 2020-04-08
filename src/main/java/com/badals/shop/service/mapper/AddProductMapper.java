@@ -25,6 +25,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(target = "productLangs", ignore = true)
     @Mapping(target = "removeProductLang", ignore = true)
     @Mapping(target = "merchantStock", ignore = true)
+    //@Mapping(target = "")
     Product toEntity(AddProductDTO productDTO);
 
     AddProductDTO toDto(Product product);
