@@ -1,5 +1,7 @@
 package com.badals.shop.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -43,7 +45,8 @@ public class OrderItem implements Serializable {
     @JsonIgnoreProperties("orderItems")
     private Order order;
 
-    @ManyToOne
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "product_id", referencedColumnName = "ref")
     private Product product;
 
