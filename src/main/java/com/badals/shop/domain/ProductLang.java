@@ -47,6 +47,14 @@ public class ProductLang implements Serializable, IProductLang {
     @Column(name = "brand", nullable = false)
     private String brand;
 
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
     public String getBrowseNode() {
         return browseNode;
     }
