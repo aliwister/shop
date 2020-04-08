@@ -43,6 +43,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(List<VariationType> types, Pageable pageable);
 
-    @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock where u.tenantId = ?1")
+    @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.categories where u.tenantId = ?1")
     List<Product> listForMerchantsAll(Long merchantId, Pageable pageable);
 }

@@ -110,6 +110,9 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "upc")
     private String upc;
 
+    @Column(name = "unit")
+    private String unit;
+
     @Column(name = "image")
     private String image;
 
@@ -182,6 +185,15 @@ public class Product implements Serializable, IMerchantProduct {
 
     @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true)
     private Set<MerchantStock> merchantStock = new HashSet<>();
+
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     // Variations
     @Type(type = "json")

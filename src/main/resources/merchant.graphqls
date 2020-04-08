@@ -29,6 +29,7 @@ type MerchantProduct {
       salePrice: BigDecimal
       quantity: BigDecimal
       discountInPercent: Int
+      shopIds: [Long]
 }
 
 type MerchantProductResponse {
