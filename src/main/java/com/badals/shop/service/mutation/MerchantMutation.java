@@ -67,6 +67,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
         String t =  TenantContext.getCurrentTenant();
         log.info("Tenant: " + t);
         return productService.createMerchantProduct(dto, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
+        //return productService.createMerchantProduct(dto, 11L, "Mayaseen", 11L);
     }
 
 
