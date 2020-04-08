@@ -19,6 +19,10 @@ public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public Category() {
+    }
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,6 +47,10 @@ public class Category implements Serializable {
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "parent_id",referencedColumnName = "id")
     private Collection<Category> children;
+
+    public Category(Long id) {
+        this.id = id;
+    }
 
     public Collection<Category> getChildren() {
         return children;
