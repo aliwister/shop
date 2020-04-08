@@ -2,9 +2,7 @@ package com.badals.shop.service;
 
 import com.algolia.search.SearchIndex;
 import com.badals.shop.aop.logging.TenantContext;
-import com.badals.shop.domain.MerchantStock;
-import com.badals.shop.domain.Product;
-import com.badals.shop.domain.ProductLang;
+import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.MerchantProductResponse;
@@ -12,7 +10,6 @@ import com.badals.shop.domain.pojo.ProductI18;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
-import com.badals.shop.domain.AlgoliaProduct;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
@@ -265,6 +262,11 @@ public class ProductService {
         product.setTenantId(tenantId);
         product.getMerchantStock().clear();
         product.getProductLangs().clear();
+        product.getCategories().clear();
+
+        for(Long id: dto.getShopIds()) {
+            product.getCategories().add(new Category(id));
+        }
 
         //product.getProductLangs().add(new ProductLang().title("Fuck").product(product).lang("ar"));
         int discount = 100 * (int)((dto.getPrice().doubleValue() - dto.getSalePrice().doubleValue())/dto.getPrice().doubleValue());
@@ -272,11 +274,12 @@ public class ProductService {
         product.getMerchantStock().add(new MerchantStock().quantity(dto.getQuantity()).availability(dto.getAvailability()).cost(dto.getCost()).allow_backorder(false)
                 .price(dto.getSalePrice()).discount(discount).product(product).merchantId(currentMerchantId));
 
-        ProductLang langAr = new ProductLang().lang("ar").description(dto.getDescription_ar()).title(dto.getName_ar());
+        ProductLang langAr = new ProductLang().lang("ar").description(dto.getDescription_ar()).title(dto.getName_ar()).brand(dto.getBrand_ar()).browseNode(dto.getBrowseNode());
         if(dto.getFeatures_ar() != null)
             langAr.setFeatures(Arrays.asList(dto.getFeatures_ar().split(";")));
 
-        ProductLang langEn = new ProductLang().lang("en").description(dto.getDescription()).title(dto.getName());
+
+        ProductLang langEn = new ProductLang().lang("en").description(dto.getDescription()).title(dto.getName()).brand(dto.getBrand()).browseNode(dto.getBrowseNode());
         if(dto.getFeatures() != null)
             langEn.setFeatures(Arrays.asList(dto.getFeatures().split(";")));
 

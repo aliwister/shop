@@ -53,6 +53,8 @@ input AddProductInput {
       features_ar: String
       cost: BigDecimal
       weight: BigDecimal
+      shopIds: [Long]
+      browseNode: String
       #slug
       type: String
       unit: String

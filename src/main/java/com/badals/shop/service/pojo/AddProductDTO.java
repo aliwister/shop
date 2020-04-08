@@ -39,4 +39,6 @@ public class AddProductDTO {
    Integer discountInPercent;
    List<MerchantStockDTO> merchantStock;
    List<ProductLangDTO> productLangs;
+   List<Long> shopIds;
+   String browseNode;
 }
