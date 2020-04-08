@@ -27,7 +27,8 @@ type OrderItem {
     weight: BigDecimal
     unit: String
     lineTotal: BigDecimal
-    sku: String
+    productUrl: String
+    productSku: String
 }
 
 type Order {
