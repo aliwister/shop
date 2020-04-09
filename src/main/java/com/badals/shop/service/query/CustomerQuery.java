@@ -63,6 +63,7 @@ return null;
         return null;
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     public CustomerDTO me() {
         return  userService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
     }

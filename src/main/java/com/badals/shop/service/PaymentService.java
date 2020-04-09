@@ -91,4 +91,8 @@ public class PaymentService {
         p = paymentRepository.save(p);
         return paymentMapper.toDto(p);
    }
+
+   public List<PaymentDTO> findForOrder(Long orderId) {
+       return paymentRepository.findAllByOrderId(orderId).stream().map(paymentMapper::toDto).collect(Collectors.toList());
+   }
 }

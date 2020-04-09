@@ -62,7 +62,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
     }
 
 
-
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public AddProductDTO createMerchantProduct(AddProductDTO dto){
         String t =  TenantContext.getCurrentTenant();
         log.info("Tenant: " + t);
@@ -70,7 +70,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
         //return productService.createMerchantProduct(dto, 11L, "Mayaseen", 11L);
     }
 
-
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {
         String bucketName = "face-content";
         String t =  TenantContext.getCurrentTenant();
