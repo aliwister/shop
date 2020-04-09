@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    @Query("from Order o left join o.customer left join fetch o.deliveryAddress where o.id = ?1")
    Optional<Order> findJoinCustomerJoinAddress(Long orderId);
 
-   @Query("select o from Order o left join fetch o.customer left join fetch o.orderItems left join fetch o.deliveryAddress where o.id = ?1 or o.reference= ?2")
+   @Query("select o from Order o left join fetch o.customer left join fetch o.orderItems left join fetch o.deliveryAddress left join fetch o.payments where o.id = ?1 or o.reference= ?2")
    Optional<Order> findForOrderDetails(Long id, String ref);
+
+   @Query("select o from Order o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress where o.id = ?1 and oi.id in ?2")
+   Optional<Order> getOrderWithSomeOrderItems(Long orderId, ArrayList<Long> orderItems);
 }

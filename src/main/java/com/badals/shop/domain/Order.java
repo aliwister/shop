@@ -112,7 +112,19 @@ public class Order implements Serializable {
    @OneToMany(mappedBy = "order")
    private Set<OrderItem> orderItems = new HashSet<>();
 
-    public AddressPojo getDeliveryAddressPojo() {
+@NotAudited
+   @OneToMany(mappedBy = "order")
+   private Set<Payment> payments = new HashSet<>();
+
+   public Set<Payment> getPayments() {
+      return payments;
+   }
+
+   public void setPayments(Set<Payment> payments) {
+      this.payments = payments;
+   }
+
+   public AddressPojo getDeliveryAddressPojo() {
         return deliveryAddressPojo;
     }
 

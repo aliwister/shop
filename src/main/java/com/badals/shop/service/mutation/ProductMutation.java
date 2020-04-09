@@ -60,7 +60,7 @@ public class ProductMutation implements GraphQLMutationResolver {
         this.userService = userService;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ProductDTO createProduct(final Long ref, final Long parent, final String sku, final String upc, final LocalDate releaseDate) {
         return this.productService.createProduct(ref, parent, sku, upc, releaseDate);
     }
@@ -78,12 +78,13 @@ public class ProductMutation implements GraphQLMutationResolver {
         return this.productLangService.addI18n(id, productI18n);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException, NoOfferException {
         return this.productService.lookupPas(asin, false, false);
     }
 
     //@PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Message addToPricingQ(String asin) {
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
         if(loginUser == null)
@@ -98,6 +99,7 @@ public class ProductMutation implements GraphQLMutationResolver {
         return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDTO approveProduct(Long id){
         return null;
     }

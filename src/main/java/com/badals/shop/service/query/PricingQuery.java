@@ -13,6 +13,7 @@ import com.badals.shop.service.dto.PurchaseDTO;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class PricingQuery extends ShopQuery implements GraphQLQueryResolver {
     @Autowired
     private ProductService productService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<PricingRequestDTO> pricingRequests() {
         return pricingRequestService.findUnprocessed();
     }
