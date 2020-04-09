@@ -124,6 +124,7 @@ type PurchaseQueue {
     weight: BigDecimal
     url: String
     sku: String
+    orderId: Long
 }
 
 type LineItem {
