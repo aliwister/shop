@@ -12,4 +12,5 @@ public interface PurchaseQueue {
    BigDecimal getWeight();
    String getUrl();
    String getSku();
+   Long getOrderId();
 }
