@@ -69,16 +69,19 @@ public class AdminMutation implements GraphQLMutationResolver {
         return new Message("SMS Sent successfully");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PurchaseDTO createPurchase(PurchaseDTO dto) {
         PurchaseDTO purchase = purchaseService.save(dto);
         return purchase;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PurchaseDTO updatePurchase(PurchaseDTO dto, List<PurchaseItemDTO> items) {
         PurchaseDTO purchase = purchaseService.updatePurchase(dto, items);
         return purchase;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy) throws PricingException, NoOfferException, ProductNotFoundException {
         ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
         productOverrideService.saveOrUpdate(dto);
@@ -86,6 +89,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         return productDTO;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message completePricingRequestAndEmail(Long id) throws PricingException, NoOfferException, ProductNotFoundException {
         PricingRequestDTO dto = pricingRequestService.complete(id);
         // Get all overrides for this customer
@@ -98,28 +102,34 @@ public class AdminMutation implements GraphQLMutationResolver {
         return new Message("done");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message completePricingRequest(Long id) {
         pricingRequestService.complete(id);
         return new Message("done");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message sendPaymentSms(Long id, String mobile) throws Exception {
         orderService.sendRequestPaymentSms(id, mobile);
         return new Message("done");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO discountOrder(Long id){
         return null;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO setOrderState(Long id, OrderState state){
         return orderService.setStatus(id, state);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO cancelOrder(Long id){
         return null;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message sendOrderLevelEmail(Long id, String template) {
 
         if(template.equalsIgnoreCase("NEW_ORDER")) {
@@ -131,12 +141,20 @@ public class AdminMutation implements GraphQLMutationResolver {
             CustomerDTO customer = order.getCustomer();
             mailService.sendPaymentAddedMail(customer, payment);
         }
+
         return new Message("Success");
     }
-    public Message sendProductLevelEmail(Long orderId, ArrayList<Long> orderItems, String template){
-        return null;
+
+
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Message sendProductLevelEmail(Long orderId, ArrayList<Long> orderItems, String template) {
+        if (template.equalsIgnoreCase("VOLTAGE")) {
+            orderService.sendVoltageEmail(orderId, orderItems);
+        }
+        return new Message("Success");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod, String authCode) {
         PaymentDTO payment = paymentService.addPayment(orderId, amount, paymentMethod, authCode);
         OrderDTO order = orderService.setOrderState(orderId, OrderState.PAYMENT_ACCEPTED);
@@ -148,6 +166,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         return payment;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CheckoutCart createCart(CheckoutCart cart) {
         cart.setSecureKey(CartService.createUIUD());
         cart = checkoutCartRepository.save(cart);

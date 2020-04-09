@@ -18,6 +18,7 @@ type Currency {
 }
 
 type OrderItem {
+    id: ID
     sequence: Int
     productName: String
     quantity: Int
@@ -194,6 +195,10 @@ extend type Mutation {
 
     createCart(cart: CheckoutCartInput): CheckoutCart
     editOrder(id: ID, orderItems: [OrderItemInput]): Order
+    #cancelOrder(id: ID): Order
+    #refundPayment(id: ID, amount: BigDecimal): Payment
+
+
 }
 
 extend type Query {
@@ -207,4 +212,5 @@ extend type Query {
     purchase(id: ID): Purchase
     purchaseQueue: [PurchaseQueue]
     merchants: [Merchant]
+     payments(orderId: ID) : [Payment]
 }
