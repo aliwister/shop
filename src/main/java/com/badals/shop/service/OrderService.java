@@ -263,4 +263,11 @@ public class OrderService {
             sum = sum.subtract(order.getDiscountsTotal());
         return sum;
     }
+
+    public void sendVoltageEmail(Long orderId, ArrayList<Long> orderItems) {
+        Order order = orderRepository.getOrderWithSomeOrderItems(orderId, orderItems).orElse(null);
+        OrderDTO dto = orderMapper.toDto(order);
+        CustomerDTO customer = dto.getCustomer();
+        mailService.sendVoltageMail(customer, dto);
+    }
 }

@@ -172,5 +172,9 @@ public class MailService {
         sendEmailFromTemplate(user, dtos,"mail/pricingRequestEmail", "email.pricing.title");
     }
 
-
+    @Async
+    public void sendVoltageMail(CustomerDTO user, OrderDTO order) {
+        log.debug("Sending order creation email to '{}'", user.getEmail());
+        sendEmailFromTemplate(user, order,"mail/voltageEmail", "email.voltage.title");
+    }
 }

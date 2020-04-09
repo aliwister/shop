@@ -8,6 +8,7 @@ import com.badals.shop.service.dto.PurchaseDTO;
 import com.badals.shop.service.dto.PurchaseItemDTO;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,12 +28,14 @@ public class OrderMutation implements GraphQLMutationResolver {
     @Autowired
     private OrderService orderService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO createOrder(final Long id) {
         OrderDTO order = new OrderDTO();//this.orderService.createOrder(CartDTO cart);
         order.setId(id);
         return order;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO editOrder(Long id, List<OrderItemDTO> orderItems) {
         OrderDTO order = orderService.editOrderItems(id, orderItems);
         return order;
