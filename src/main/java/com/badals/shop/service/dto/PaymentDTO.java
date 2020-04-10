@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link com.badals.shop.domain.OrderPayment} entity.
+ * A DTO for the {@link com.badals.shop.domain.Payment} entity.
  */
 @Data
 public class PaymentDTO implements Serializable {

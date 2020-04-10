@@ -51,6 +51,8 @@ type Order {
     carrier: String
     paymentMethod: String
     createdDate: Date
+    payments: [Payment]
+    balance: BigDecimal
 }
 type Merchant {
     id: ID
@@ -109,9 +111,11 @@ input PurchaseItemInput {
 }
 
 type Payment {
+    id: ID
     paymentMethod: String
     orderId: Long
     amount: BigDecimal
+    authCode: String
 }
 
 type PurchaseQueue {
