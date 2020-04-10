@@ -40,6 +40,7 @@ public class PasItemNode implements Serializable {
    String model;
 
    String itemWeight;
+   String itemWeightUnit;
    String packageWeight;
 
    String productGroup;
@@ -94,11 +95,18 @@ public class PasItemNode implements Serializable {
       if(isParent)
          children = new ArrayList<PasItemNode>();
    }
-
-   public BigDecimal getParsedWeight() {
+   private static final BigDecimal LB2KG = BigDecimal.valueOf(0.453592);
+   public BigDecimal getParsedWeightInKG() {
       String weight = (this.packageWeight== null)?this.getItemWeight():this.getPackageWeight();
-      if(weight != null)
-         return BigDecimal.valueOf(Double.parseDouble(weight));
+
+      if(weight != null) {
+         BigDecimal w = new BigDecimal(weight);
+         if(getItemWeightUnit().equalsIgnoreCase("kilograms"))
+            return w;
+         else
+            return w.multiply(LB2KG);
+         //return BigDecimal.valueOf(Double.parseDouble(weight));
+      }
       return null;
    }
 
