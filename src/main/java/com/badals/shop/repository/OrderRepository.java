@@ -20,7 +20,7 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
    Optional<Order> findOrderByReferenceAndConfirmationKey(String reference, String confirmationKey);
    List<Order> findOrdersByCustomerOrderByCreatedDateDesc(Customer customer);
-   List<Order> findAllByOrderStateInOrderByCreatedDateDesc(OrderState[] orderStates, Pageable page);
+   List<Order> findAllByOrderStateInOrderByCreatedDateDesc(List<OrderState> orderStates, Pageable page);
    List<Order> findAllByOrderByCreatedDateDesc(Pageable page);
 
    @Query("from Order o left join o.customer left join fetch o.deliveryAddress where o.id = ?1")
