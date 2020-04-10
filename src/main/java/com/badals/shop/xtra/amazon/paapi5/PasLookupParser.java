@@ -44,7 +44,7 @@ public class PasLookupParser {
                 .url(i.getUrl())
                 .image(i.getImage())
                 .brand(i.getBrand())
-                .weight(PasUtility.calculateWeight(i.getParsedWeight(), getOverride(overrides, OverrideType.WEIGHT)))
+                .weight(PasUtility.calculateWeight(i.getParsedWeightInKG(), getOverride(overrides, OverrideType.WEIGHT)))
                 .title(i.getTitle())
                 .upc(i.getUpc())
                 .tenantId(11L)

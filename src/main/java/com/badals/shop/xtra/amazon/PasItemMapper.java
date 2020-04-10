@@ -31,6 +31,7 @@ public interface PasItemMapper {
    @Mapping(source = "itemInfo.title.displayValue", target = "title")
 
    @Mapping(source = "itemInfo.productInfo.itemDimensions.weight.displayValue", target = "itemWeight")
+   @Mapping(source = "itemInfo.productInfo.itemDimensions.weight.unit", target = "itemWeightUnit")
    @Mapping(source = "itemInfo.manufactureInfo.model.displayValue", target="model")
    @Mapping(source = "itemInfo.features.displayValues", target="features")
    @Mapping(source = "itemInfo.productInfo.releaseDate.displayValue", target="releaseDate")
