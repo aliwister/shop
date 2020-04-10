@@ -131,7 +131,7 @@ public class OrderService {
     }
 
     public List<OrderDTO> getOrders(List<OrderState> orderState, Integer limit, String searchText) {
-        return orderRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(0,100)).stream()
+        return orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of(0,limit)).stream()
                 .map(orderMapper::toDto)
                 .collect(Collectors.toCollection(LinkedList::new));
     }

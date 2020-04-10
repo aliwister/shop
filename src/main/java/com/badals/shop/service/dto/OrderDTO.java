@@ -60,6 +60,8 @@ public class OrderDTO implements Serializable {
 
     private String paymentMethod;
 
+    private List<PaymentDTO> payments;
+    private BigDecimal balance;
 
     @Override
     public boolean equals(Object o) {
