@@ -1,3 +1,7 @@
+
+logstash -f C:\work\_merchant-data\logstash_import_csv.config
+
+
 # shop
 mvnw package -Pprod -DskipTests
 heroku deploy:jar target/shop-0.0.1-SNAPSHOT.jar --app face-shop-api

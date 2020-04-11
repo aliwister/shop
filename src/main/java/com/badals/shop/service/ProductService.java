@@ -10,17 +10,20 @@ import com.badals.shop.domain.pojo.ProductI18;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
+import com.badals.shop.repository.search.ProductSearchRepository;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.service.pojo.AddProductDTO;
+import com.badals.shop.service.pojo.AddProductElasticDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,6 +38,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import java.util.zip.CRC32;
 
 /**
@@ -54,7 +58,9 @@ public class ProductService {
     private final AlgoliaProductMapper algoliaProductMapper;
     private final AddProductMapper addProductMapper;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository) {
+    private final ProductSearchRepository productSearchRepository;
+
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.algoliaProductMapper = algoliaProductMapper;
@@ -63,6 +69,14 @@ public class ProductService {
         this.messageSource = messageSource;
         this.addProductMapper = addProductMapper;
         this.productLangRepository = productLangRepository;
+        this.productSearchRepository = productSearchRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<AddProductDTO> search(String query) {
+        log.debug("Request to search ShipmentItems for query {}", query);
+        return StreamSupport
+                .stream(productSearchRepository.search(queryStringQuery(query)).spliterator(), false).collect(Collectors.toList());
     }
 
     /**
@@ -217,10 +231,12 @@ public class ProductService {
        return response;
    }
 
-   public MerchantProductResponse getForMerchant(Long merchantId, Integer limit) {
-       List<Product> products = productRepository.listForMerchantsAll(merchantId, PageRequest.of(0,20));
+   public MerchantProductResponse getForTenant(Long tenantId, Integer limit, Integer offset) {
+       Integer total = productRepository.countForTenant(tenantId);
+       List<Product> products = productRepository.listForTenantAll(tenantId, PageRequest.of((int) offset/limit,limit));
        MerchantProductResponse response = new MerchantProductResponse();
-       response.setTotal(products.size());
+       response.setTotal(total);
+       response.setHasMore((limit+offset) < total);
        response.setItems(products.stream().map(addProductMapper::toDto).collect(Collectors.toList()));
        return response;
    }
@@ -291,6 +307,15 @@ public class ProductService {
         product = productRepository.save(product);
         return  addProductMapper.toDto(product);
     }
+
+    public void addToElastic(Long id, String sku, String name, String name_ar, List<String> shops) {
+        productSearchRepository.index(new AddProductDTO(id,
+                sku,
+                name,
+                name_ar,
+                shops));
+    }
+
 
 //    public List<ProductDTO> listForMerchantsAll(Long merchantId) {
 //        return productRepository.listForMerchantsAll(merchantId).stream().map(productMapper::toDto).collect(Collectors.toList());

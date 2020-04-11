@@ -39,8 +39,8 @@ public class MerchantQuery extends ShopQuery implements GraphQLQueryResolver {
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public MerchantProductResponse merchantProducts(String text, String type, Integer offset, Integer limit, String lang) throws IllegalAccessException {
        String t =  TenantContext.getCurrentTenant();
-       log.info("Tenant: " + t);
-       return productService.getForMerchant(TenantContext.getCurrentTenantId(),limit);
+       log.info("Tenant: "+ t+ " TenantId: "+ TenantContext.getCurrentTenantId()+ " Merchant "+ TenantContext.getCurrentMerchant()+ " MerchantId "+ TenantContext.getCurrentMerchantId());
+       return productService.getForTenant(TenantContext.getCurrentTenantId(),limit, offset);
     }
 
 }

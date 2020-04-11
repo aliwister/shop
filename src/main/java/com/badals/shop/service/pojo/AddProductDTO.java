@@ -7,12 +7,26 @@ import com.badals.shop.service.MerchantService;
 import com.badals.shop.service.dto.MerchantStockDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
 import lombok.Data;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "add-product")
 public class AddProductDTO {
+   public AddProductDTO() {
+   }
+
+   public AddProductDTO(Long id, String sku, String name, String name_ar, List<String> shops) {
+      this.id = id;
+      this.sku = sku;
+      this.name = name;
+      this.name_ar = name_ar;
+      this.gallery = shops;
+   }
+
    Long id;
    String sku;
    String upc;
@@ -35,10 +49,16 @@ public class AddProductDTO {
    Integer availability;
    BigDecimal salePrice;
    BigDecimal quantity;
-   List<Gallery> gallery;
+
+   List<String> gallery;
+
    Integer discountInPercent;
-   List<MerchantStockDTO> merchantStock;
-   List<ProductLangDTO> productLangs;
+
+   List<String> shops;
+
    List<Long> shopIds;
+
    String browseNode;
+   String variationType;
+
 }
