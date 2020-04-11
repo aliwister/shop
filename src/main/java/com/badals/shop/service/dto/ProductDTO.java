@@ -14,6 +14,7 @@ import com.badals.shop.domain.enumeration.ProductType;
 import com.badals.shop.domain.pojo.*;
 import com.badals.shop.service.pojo.Meta;
 import lombok.Data;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.Product} entity.
@@ -59,11 +60,13 @@ public class ProductDTO implements Serializable {
     private String url;
 
     @NotNull
+    @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
     private String title;
 
     private String description;
 
     private Set<CategoryDTO> categories;
+
 
     private String brand;
 
