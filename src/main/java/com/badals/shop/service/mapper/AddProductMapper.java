@@ -44,10 +44,12 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         List<String> gallery = new ArrayList<String>();
         //}
         //target.getGallery().add(0, source.getImage());
-        for(Gallery g: source.getGallery()) {
-            gallery.add(g.getUrl());
+        if(source.getGallery() != null) {
+            for (Gallery g : source.getGallery()) {
+                gallery.add(g.getUrl());
+            }
+            target.setGallery(gallery);
         }
-        target.setGallery(gallery);
 
         // Process sale price and discount percentage
         MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
