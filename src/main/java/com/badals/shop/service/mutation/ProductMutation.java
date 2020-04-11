@@ -34,6 +34,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Component
@@ -104,7 +105,10 @@ public class ProductMutation implements GraphQLMutationResolver {
         return null;
     }
 
-
+    public Message addToElastic( Long id, String  sku, String  name, String  name_ar, List<String> shops) {
+        productService.addToElastic(id, sku, name, name_ar, shops);
+        return new Message("success");
+    }
 
 }
 

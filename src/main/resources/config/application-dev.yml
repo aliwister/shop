@@ -58,7 +58,18 @@ spring:
       hibernate.cache.use_second_level_cache: false
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
-      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  data:
+    jest:
+      uri: https://maple-610226350.eu-west-1.bonsaisearch.net:443
+      password: 9oy2txuym0
+      username: 5g8qzii3g6
+  # see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-nosql.html#boot-features-connecting-to-elasticsearch-jest
+  elasticsearch:
+    rest:
+      uris: https://maple-610226350.eu-west-1.bonsaisearch.net:443
+      username: 5g8qzii3g6
+      password: 9oy2txuym0
+  # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
