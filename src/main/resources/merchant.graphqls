@@ -30,6 +30,7 @@ type MerchantProduct {
       quantity: BigDecimal
       discountInPercent: Int
       shopIds: [Long]
+      gallery: [String]
 }
 
 type MerchantProductResponse {
@@ -62,8 +63,6 @@ input AddProductInput {
       availability: Int
       salePrice: BigDecimal
       quantity: BigDecimal
-      merchantStock: [MerchantStockInput]
-      productLangs: [ProductI18nInput]
 }
 
 extend type Query {
