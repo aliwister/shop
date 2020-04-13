@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,7 +103,8 @@ public class PasItemNode implements Serializable {
       if(weight != null) {
          BigDecimal w = new BigDecimal(weight);
          if(getItemWeightUnit().equalsIgnoreCase("kilograms"))
-            return w.divide(LB2KG);
+
+            return w.divide(LB2KG,  4, RoundingMode.HALF_EVEN);
          else
             return w;
          //return BigDecimal.valueOf(Double.parseDouble(weight));
