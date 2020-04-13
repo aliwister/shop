@@ -13,7 +13,7 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "payment")
-public class Payment extends SimpleAuditable implements Serializable {
+public class Payment extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

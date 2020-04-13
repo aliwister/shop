@@ -43,5 +43,10 @@ public class MerchantQuery extends ShopQuery implements GraphQLQueryResolver {
        return productService.getForTenant(TenantContext.getCurrentTenantId(),limit, offset);
     }
 
+    public MerchantProductResponse merchantImportProducts(String text, String type, Integer offset, Integer limit, String lang) throws IllegalAccessException {
+       String t =  TenantContext.getCurrentTenant();
+       log.info("Tenant: "+ t+ " TenantId: "+ TenantContext.getCurrentTenantId()+ " Merchant "+ TenantContext.getCurrentMerchant()+ " MerchantId "+ TenantContext.getCurrentMerchantId());
+       return productService.searchForTenant(t, text, limit, offset);
+    }
 }
 

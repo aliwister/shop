@@ -5,6 +5,7 @@ import com.badals.shop.domain.*;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
+
 import org.mapstruct.*;
 
 import java.math.BigDecimal;

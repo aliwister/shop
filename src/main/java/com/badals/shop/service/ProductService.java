@@ -16,11 +16,13 @@ import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.service.pojo.AddProductDTO;
-import com.badals.shop.service.pojo.AddProductElasticDTO;
+
+import com.badals.shop.service.util.S3Util;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
@@ -33,8 +35,25 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -260,6 +279,7 @@ public class ProductService {
         Product product = null;
         if(dto.getId() == null) {
             product = addProductMapper.toEntity(dto);
+
             product.setSku(currentMerchant + "-" + dto.getSku());
             CRC32 checksum = new CRC32();
             checksum.update(dto.getSku().getBytes());
@@ -316,6 +336,54 @@ public class ProductService {
                 shops));
     }
 
+    public void importProducts(List<AddProductDTO> products, Long currentMerchantId, String currentMerchant, Long tenantId, List<Long> shopIds, String browseNode) {
+        for(AddProductDTO doc: products) {
+            Long id = doc.getId();
+            doc.setId(null);
+            String image = uploadToS3(doc.getImage(), currentMerchantId, currentMerchant, tenantId);
+            doc.setImage(image);
+            doc.setShopIds(shopIds);
+            doc.setBrowseNode(browseNode);
+            createMerchantProduct(doc, currentMerchantId, currentMerchant, tenantId );
+            doc.setId(id);
+            doc.setImported(true);
+            productSearchRepository.save(doc);
+        }
+    }
+
+    private String uploadToS3(String image, Long currentMerchantId, String currentMerchant, Long tenantId) {
+        String bucketName = "face-content";
+        String t = TenantContext.getCurrentTenant();
+        String m = TenantContext.getCurrentMerchant();
+        CRC32 checksum = new CRC32();
+        checksum.update(image.getBytes());
+
+        String objectKey = "_m/" + t + "/" + m + "/" + checksum.getValue()+image.substring(image.length()-4,image.length());
+
+
+        try {
+            //PutObjectRequest request = PutObjectRequest.builder().bucket(bucketName).key().contentType().build();
+            BufferedImage img = ImageIO.read(new URL(image));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(img,"png", outputStream);
+            PutObjectResponse response = S3Util.getClient().putObject(PutObjectRequest.builder().bucket(bucketName).key(objectKey).build(), RequestBody.fromBytes(outputStream.toByteArray()));
+            return "https://cdn.badals.com/"+ objectKey.substring(3);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    public MerchantProductResponse searchForTenant(String currentTenant, String text, Integer limit, Integer offset) {
+        List<AddProductDTO> result = search(currentTenant + " AND imported:false AND "+text);
+        MerchantProductResponse response = new MerchantProductResponse();
+        response.setTotal(12);
+        response.setHasMore((limit+offset) < 12);
+        response.setItems(result);
+        return response;
+    }
 
 //    public List<ProductDTO> listForMerchantsAll(Long merchantId) {
 //        return productRepository.listForMerchantsAll(merchantId).stream().map(productMapper::toDto).collect(Collectors.toList());

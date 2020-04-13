@@ -1,10 +1,12 @@
 package com.badals.shop.config;
 
+import com.badals.shop.aop.logging.CookieFilter;
 import com.badals.shop.security.*;
 import com.badals.shop.security.jwt.*;
 
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -31,10 +33,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final CorsFilter corsFilter;
     private final SecurityProblemSupport problemSupport;
 
-    public SecurityConfiguration(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport) {
+    private final CookieFilter cookieFilter;
+
+    public SecurityConfiguration(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport, CookieFilter cookieFilter) {
         this.tokenProvider = tokenProvider;
         this.corsFilter = corsFilter;
         this.problemSupport = problemSupport;
+        this.cookieFilter = cookieFilter;
     }
 
     @Bean
@@ -57,6 +62,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .csrf()
             .disable()
             .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(cookieFilter, CorsFilter.class)
             .exceptionHandling()
             .authenticationEntryPoint(problemSupport)
             .accessDeniedHandler(problemSupport)

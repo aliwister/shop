@@ -60,5 +60,6 @@ public class AddProductDTO {
 
    String browseNode;
    String variationType;
-
+   Boolean imported;
+   String tenant;
 }
