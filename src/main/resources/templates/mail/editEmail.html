@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title th:text="#{email.cancel.title(${order.reference})}">Badals.com Order Cancellation Notice</title>
+        <title th:text="#{email.edit.title(${order.reference})}">Badals.com Order Modification Notice</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
     </head>
@@ -9,17 +9,17 @@
         <p th:text="#{email.order.greeting(${user.firstname})}">
             Dear
         </p>
-        <p th:text="#{email.cancel.intro(${order.reference})}">
-            I'm sorry to inform you that your  order # {0} was cancelled.
+        <p th:text="#{email.edit.intro(${order.reference})}">
+Your order has been modified
         </p>
         <br/>
-        <p th:text="#{email.cancel.details}">>
-            The reason for cancellation was:
+        <p th:text="#{email.edit.details}">>
+            The reason for the change was:
         </p>
         <br/>
         <p th:text="${reason}">>
         </p>
-        <p th:text="#{email.cancel.guarantee}">>
+        <p th:text="#{email.edit.guarantee}">>
 Please rest assured that that your payment will be refunded to you in full.
         </p>
 
