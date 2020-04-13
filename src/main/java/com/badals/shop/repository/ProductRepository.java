@@ -19,7 +19,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-   String LATEST = "LATEST";
+
 
    @Query("from Product u where u.sku = ?1")
     Optional<Product> findBySkuJoinCategories(String asin);
@@ -42,7 +42,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findOneBySku(String sku);
 
-    @Cacheable(cacheNames = LATEST)
     List<Product> findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(List<VariationType> types, Pageable pageable);
 
     @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.categories where u.tenantId = ?1")

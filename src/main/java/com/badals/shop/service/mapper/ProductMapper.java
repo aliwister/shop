@@ -37,7 +37,6 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     @Mapping(target = "categories", ignore = true)
     ProductDTO toDto(Product product);
 
-
     @Named("mapWithoutCategories")
     @Mapping(source = "parent.id", target = "parent")
     //@Mapping(source = "price", target = "price", qualifiedByName = "doubleToString")
