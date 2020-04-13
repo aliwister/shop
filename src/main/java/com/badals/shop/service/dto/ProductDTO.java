@@ -14,6 +14,7 @@ import com.badals.shop.domain.enumeration.ProductType;
 import com.badals.shop.domain.pojo.*;
 import com.badals.shop.service.pojo.Meta;
 import lombok.Data;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 /**
@@ -21,6 +22,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
  */
 
 @Data
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class ProductDTO implements Serializable {
 
     private Long id;
