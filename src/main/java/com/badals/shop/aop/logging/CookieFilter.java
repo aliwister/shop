@@ -22,7 +22,7 @@ public class CookieFilter implements Filter {
 
       HttpServletRequest req = (HttpServletRequest) request;
       Cookie[] cookies = req.getCookies();
-      log.info("---------------------COOOOOOOOOOKIIIIIIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEE");
+      //log.info("---------------------COOOOOOOOOOKIIIIIIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEE");
       if (cookies != null) {
          for (Cookie ck : cookies) {
            /* if ("nameOfMyCookie".equals(ck.getName())) {
@@ -31,7 +31,7 @@ public class CookieFilter implements Filter {
                // set an object in the current request
                request.setAttribute("myCoolObject", myObject)
             }*/
-            log.info(ck.getName() + " " + ck.getValue());
+            //log.info(ck.getName() + " " + ck.getValue());
          }
       }
       HttpServletResponse res = (HttpServletResponse) response;

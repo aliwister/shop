@@ -193,13 +193,13 @@ extend type Mutation {
     sendPaymentSms(id: ID, mobile: String): Message
     discountOrder(id: ID): Order
     setOrderState(id: ID, state: OrderState): Order
-    cancelOrder(id: ID): Order
+    cancelOrder(id: ID, reason: String): Order
     addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
     sendOrderLevelEmail(id:ID, template:String): Message
     sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
 
     createCart(cart: CheckoutCartInput): CheckoutCart
-    editOrder(id: ID, orderItems: [OrderItemInput]): Order
+    editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
     #cancelOrder(id: ID): Order
     #refundPayment(id: ID, amount: BigDecimal): Payment
 

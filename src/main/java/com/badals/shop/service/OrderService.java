@@ -276,4 +276,15 @@ public class OrderService {
         CustomerDTO customer = dto.getCustomer();
         mailService.sendVoltageMail(customer, dto);
     }
+
+    public OrderDTO cancelOrder(Long id, String reason) {
+        Order order = orderRepository.getOne(id);
+
+        order.setOrderState(OrderState.CANCELLED);
+        order.setTotal(BigDecimal.ZERO);
+        order = orderRepository.save(order);
+        OrderDTO dto = orderMapper.toDto(order);
+        mailService.sendCancelMail(dto.getCustomer(), dto, reason);
+        return dto;
+    }
 }
