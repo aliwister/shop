@@ -36,10 +36,15 @@ public class OrderMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public OrderDTO editOrder(Long id, List<OrderItemDTO> orderItems) {
+    public OrderDTO editOrder(Long id, List<OrderItemDTO> orderItems, String reason) {
         OrderDTO order = orderService.editOrderItems(id, orderItems);
         return order;
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public OrderDTO cancelOrder(Long id, String reason){
+        OrderDTO order = orderService.cancelOrder(id, reason);
+        return order;
+    }
 }
 

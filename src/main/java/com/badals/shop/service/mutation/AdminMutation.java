@@ -124,10 +124,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         return orderService.setStatus(id, state);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public OrderDTO cancelOrder(Long id){
-        return null;
-    }
+
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message sendOrderLevelEmail(Long id, String template) {
