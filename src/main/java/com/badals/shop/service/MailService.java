@@ -38,6 +38,7 @@ public class MailService {
     private final Logger log = LoggerFactory.getLogger(MailService.class);
 
     private static final String USER = "user";
+    private static final String REASON = "reason";
     private static final String PRICINGREQUESTS = "pricingrequests";
     private static final String ORDER = "order";
     private static final String ITEMS = "items";
@@ -124,6 +125,20 @@ public class MailService {
     }
 
     @Async
+    public void sendEmailFromTemplate(CustomerDTO user, OrderDTO order, String reason, String templateName, String titleKey) {
+        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable(USER, user);
+        context.setVariable(ORDER, order);
+        context.setVariable(REASON, reason);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        String content = templateEngine.process(templateName, context);
+        final String[] params = new String[]{order.getReference()};
+        String subject = messageSource.getMessage(titleKey, params, locale);
+        sendEmail(user.getEmail(), subject, content, false, true);
+    }
+
+    @Async
     public void sendEmailFromTemplate(CustomerDTO user, PaymentDTO payment, String templateName, String titleKey) {
         Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
         Context context = new Context(locale);
@@ -176,5 +191,13 @@ public class MailService {
     public void sendVoltageMail(CustomerDTO user, OrderDTO order) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, order,"mail/voltageEmail", "email.voltage.title");
+    }
+    @Async
+    public void sendCancelMail(CustomerDTO user, OrderDTO order, String reason) {
+        sendEmailFromTemplate(user, order, reason,"mail/cancelEmail", "email.cancel.title");
+    }
+    @Async
+    public void sendEditMail(CustomerDTO user, OrderDTO order, String reason) {
+        sendEmailFromTemplate(user, order, reason,"mail/editEmail", "email.voltage.title");
     }
 }
