@@ -13,6 +13,7 @@ import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
+
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
@@ -33,6 +34,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Component
@@ -70,6 +72,13 @@ public class MerchantMutation implements GraphQLMutationResolver {
         //return productService.createMerchantProduct(dto, 11L, "Mayaseen", 11L);
     }
 
+
+    public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
+        String t =  TenantContext.getCurrentTenant();
+        productService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
+        return new Message("success");
+    }
+
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {
         String bucketName = "face-content";
@@ -92,6 +101,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
         }
         return new PresignedUrl("","","");
     }
+
 
     public static void main(String args[]) {
 

@@ -1,5 +1,6 @@
 package com.badals.shop.config;
 
+import com.badals.shop.aop.logging.CookieFilter;
 import io.github.jhipster.config.JHipsterProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,5 +78,8 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         }
         return new CorsFilter(source);
     }
-
+    @Bean
+    public CookieFilter cookieFilter() {
+        return new CookieFilter();
+    }
 }

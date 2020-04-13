@@ -34,6 +34,7 @@ public class CacheConfiguration {
         return cm -> {
             createCache(cm, com.badals.shop.repository.UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, com.badals.shop.repository.UserRepository.USERS_BY_EMAIL_CACHE);
+            createCache(cm, com.badals.shop.repository.ProductRepository.LATEST);
             // jhipster-needle-ehcache-add-entry
         };
     }
