@@ -14,6 +14,7 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
 
+import com.badals.shop.service.util.S3Util;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
@@ -81,7 +82,6 @@ public class MerchantMutation implements GraphQLMutationResolver {
 
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {
-        String bucketName = "face-content";
         String t =  TenantContext.getCurrentTenant();
         String m = TenantContext.getCurrentMerchant();
         String objectKey = "_m/" + t + "/" + m + "/" + filename;
@@ -92,7 +92,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
 
             PresignedPutObjectRequest presignedRequest =
                     presigner.presignPutObject(z -> z.signatureDuration(Duration.ofMinutes(10))
-                            .putObjectRequest(por -> por.bucket(bucketName).key(objectKey).contentType(contentType)));
+                            .putObjectRequest(por -> por.bucket(S3Util.getBucketName()).key(objectKey).contentType(contentType)));
             // Upload content to the bucket by using this URL
             URL url = presignedRequest.url();
             return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+t + "/" + m + "/" + filename, "200");

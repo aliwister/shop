@@ -31,4 +31,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
    @Query("select o from Order o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress where o.id = ?1 and oi.id in ?2")
    Optional<Order> getOrderWithSomeOrderItems(Long orderId, ArrayList<Long> orderItems);
+
+   Optional<Order> findByReference(String ref);
 }
