@@ -25,23 +25,22 @@ import com.badals.shop.xtra.amazon.PricingException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
+
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -240,8 +239,8 @@ public class ProductService {
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
 
     }
-
-   // @Cacheable(value="latest-products")
+    public static final String LATEST = "LATEST";
+   @Cacheable(cacheNames = LATEST)
    public ProductResponse getLatest(Integer limit) {
        List<Product> products = productRepository.findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(Arrays.asList(new VariationType[]{VariationType.SIMPLE}), PageRequest.of(0,20));
        ProductResponse response = new ProductResponse();
