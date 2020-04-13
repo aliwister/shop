@@ -215,6 +215,12 @@ public class OrderService {
         return orderMapper.toDto(order);
     }
 
+    public OrderDTO setStatus(String id, OrderState state) {
+        Order order = orderRepository.findByReference(id).get();
+        order.setOrderState(state);
+        return orderMapper.toDto(orderRepository.save(order));
+    }
+
     public OrderDTO setStatus(Long id, OrderState state) {
         Order order = orderRepository.getOne(id);
         List<Order> versions = new ArrayList<>();
