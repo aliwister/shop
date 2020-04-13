@@ -352,7 +352,6 @@ public class ProductService {
     }
 
     private String uploadToS3(String image, Long currentMerchantId, String currentMerchant, Long tenantId) {
-        String bucketName = "face-content";
         String t = TenantContext.getCurrentTenant();
         String m = TenantContext.getCurrentMerchant();
         CRC32 checksum = new CRC32();
@@ -366,7 +365,7 @@ public class ProductService {
             BufferedImage img = ImageIO.read(new URL(image));
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(img,"png", outputStream);
-            PutObjectResponse response = S3Util.getClient().putObject(PutObjectRequest.builder().bucket(bucketName).key(objectKey).build(), RequestBody.fromBytes(outputStream.toByteArray()));
+            PutObjectResponse response = S3Util.getClient().putObject(PutObjectRequest.builder().bucket(S3Util.getBucketName()).key(objectKey).build(), RequestBody.fromBytes(outputStream.toByteArray()));
             return "https://cdn.badals.com/"+ objectKey.substring(3);
         } catch (MalformedURLException e) {
             e.printStackTrace();
