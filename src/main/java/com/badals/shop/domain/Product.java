@@ -19,6 +19,7 @@ import com.badals.shop.xtra.IMerchantProduct;
 import com.badals.shop.xtra.IProductLang;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.SelectBeforeUpdate;
 import org.hibernate.annotations.Type;
@@ -29,6 +30,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  */
 @Entity
 @Table(name = "product")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @SelectBeforeUpdate(false)
 public class Product implements Serializable, IMerchantProduct {
 
