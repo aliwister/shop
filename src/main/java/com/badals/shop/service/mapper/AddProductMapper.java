@@ -26,6 +26,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     Product toEntity(AddProductDTO productDTO);
 
     @Mapping(target = "gallery", ignore = true)
+    @Mapping(target = "tenant", ignore = true)
     AddProductDTO toDto(Product product);
 
     @AfterMapping
