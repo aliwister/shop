@@ -78,8 +78,8 @@ spring:
   thymeleaf:
     cache: true
   redis:
-    host: redis-19246.c15.us-east-1-4.ec2.cloud.redislabs.com:19246
-    port: 18497
+    host: redis-19246.c15.us-east-1-4.ec2.cloud.redislabs.com
+    port: 19246
     password: IFpOoXYxfcQtZx2edgtgRSkmcMKHiRFA
 
 # ===================================================================
