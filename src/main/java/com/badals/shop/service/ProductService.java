@@ -327,6 +327,7 @@ public class ProductService {
         dto.setTenant(currentMerchant);
         dto.setSlug(product.getSlug());
         dto.setRef(product.getRef());
+        dto.setImported(true);
         productSearchRepository.save(dto);
         return  addProductMapper.toDto(product);
     }
@@ -387,14 +388,14 @@ public class ProductService {
         return response;
     }
 
-/*    public ProductResponse searchAll(String type) {
-        List<AddProductDTO> result = search(type + " AND imported:false AND "+type);
+    public ProductResponse searchAll(String type) {
+        List<AddProductDTO> result = search(type + " AND imported:true ");
         ProductResponse response = new ProductResponse();
         response.setTotal(12);
         //response.setHasMore((limit+offset) < 12);
-        response.setItems(result.stream().map(addProductMapper::toProductDTO).collect(Collectors.toList()));
+        response.setItems(result.stream().map(addProductMapper::toProductDto).collect(Collectors.toList()));
         return response;
-    }*/
+    }
 
 //    public List<ProductDTO> listForMerchantsAll(Long merchantId) {
 //        return productRepository.listForMerchantsAll(merchantId).stream().map(productMapper::toDto).collect(Collectors.toList());
