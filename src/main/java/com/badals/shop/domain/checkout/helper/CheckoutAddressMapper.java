@@ -11,4 +11,6 @@ import org.mapstruct.factory.Mappers;
 public interface CheckoutAddressMapper {
 
    AddressPojo addressToAddressPojo(Address address);
+
+   Address addressPojoToAddress(AddressPojo addressPojo);
 }
