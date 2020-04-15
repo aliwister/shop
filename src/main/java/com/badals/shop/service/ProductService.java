@@ -274,7 +274,7 @@ public class ProductService {
         return productRepository.findOneBySku(sku).get().getParent().getSku();
     }
 
-    public AddProductDTO createMerchantProduct(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId) {
+    public AddProductDTO createMerchantProduct(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant) {
         Product product = null;
         if(dto.getId() == null) {
             product = addProductMapper.toEntity(dto);
@@ -324,6 +324,9 @@ public class ProductService {
 
         //product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
         product = productRepository.save(product);
+        dto.setTenant(currentMerchant);
+        dto.setSlug(product.getSlug());
+        dto.setRef(product.getRef());
         productSearchRepository.save(dto);
         return  addProductMapper.toDto(product);
     }
@@ -336,15 +339,15 @@ public class ProductService {
                 shops));
     }
 
-    public void importProducts(List<AddProductDTO> products, Long currentMerchantId, String currentMerchant, Long tenantId, List<Long> shopIds, String browseNode) {
+    public void importProducts(List<AddProductDTO> products, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant, List<Long> shopIds, String browseNode) {
         for(AddProductDTO doc: products) {
             Long id = doc.getId();
             doc.setId(null);
             String image = uploadToS3(doc.getImage(), currentMerchantId, currentMerchant, tenantId);
             doc.setImage(image);
-            doc.setShopIds(shopIds);
+            //doc.setShopIds(shopIds);
             doc.setBrowseNode(browseNode);
-            createMerchantProduct(doc, currentMerchantId, currentMerchant, tenantId );
+            createMerchantProduct(doc, currentMerchantId, currentMerchant, tenantId, currentTenant );
             doc.setId(id);
             doc.setImported(true);
             productSearchRepository.save(doc);

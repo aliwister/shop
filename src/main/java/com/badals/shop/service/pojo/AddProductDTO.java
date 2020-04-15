@@ -30,7 +30,7 @@ public class AddProductDTO {
    Long id;
    String sku;
    String upc;
-   String ref;
+   Long ref;
    String slug;
    BigDecimal price;
    String image;
@@ -62,4 +62,6 @@ public class AddProductDTO {
    String variationType;
    Boolean imported;
    String tenant;
+   String merchant;
+
 }
