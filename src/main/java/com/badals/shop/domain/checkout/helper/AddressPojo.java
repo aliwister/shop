@@ -7,6 +7,7 @@ import java.io.Serializable;
 @Data
 public class AddressPojo implements Serializable {
     Long id;
+    String alias;
     String firstName;
     String lastName;
     String line1;
@@ -16,4 +17,5 @@ public class AddressPojo implements Serializable {
     String country;
     String postalCode;
     String mobile;
+    Boolean save;
 }

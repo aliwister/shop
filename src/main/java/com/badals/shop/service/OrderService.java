@@ -1,9 +1,12 @@
 package com.badals.shop.service;
 
+import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
-import com.badals.shop.domain.OrderItem;
+import com.badals.shop.domain.checkout.helper.AddressPojo;
+import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.repository.OrderRepository;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
@@ -48,8 +51,10 @@ public class OrderService {
     private final MessageSource messageSource;
     private final MailService mailService;
     private final AuditReader auditReader;
+    private final CheckoutAddressMapper checkoutAddressMapper;
+    private final AddressRepository addressRepository;
 
-    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader) {
+    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -57,6 +62,8 @@ public class OrderService {
         this.messageSource = messageSource;
         this.mailService = mailService;
         this.auditReader = auditReader;
+        this.checkoutAddressMapper = checkoutAddressMapper;
+        this.addressRepository = addressRepository;
     }
 
     /**
@@ -117,6 +124,21 @@ public class OrderService {
         }
         Customer customer = customerService.findByEmail(order.getEmail());
         order.setCustomer(customer);
+
+        AddressPojo addressPojo = order.getDeliveryAddressPojo();
+
+        if (addressPojo != null && addressPojo.getSave()) {
+            Address address = checkoutAddressMapper.addressPojoToAddress(addressPojo);
+            address.setCustomer(customer);
+            address.setActive("1");
+            address.setDeleted("0");
+            address.setIdCountry(164L);
+            address = addressRepository.save(address);
+            order.setDeliveryAddressPojo(null);
+            order.setDeliveryAddress(address);
+
+        }
+
         order.setConfirmationKey(order.getConfirmationKey()+order.getId());
         order = orderRepository.save(order);
         sendConfirmationEmail(order.getId());
