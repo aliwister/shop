@@ -30,6 +30,11 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(target = "tenant", ignore = true)
     AddProductDTO toDto(Product product);
 
+    @Mapping(target="hours", source = "availability")
+    @Mapping(target = "gallery", ignore = true)
+    @Mapping(target = "features", ignore = true)
+    ProductDTO toProductDto(AddProductDTO product);
+
     @AfterMapping
     default void afterMapping(@MappingTarget Product target, AddProductDTO source) {
         if(source.getGallery() != null) {
@@ -39,6 +44,27 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
             }
             target.setGallery(gallery);
         }
+    }
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget ProductDTO target, AddProductDTO source) {
+        ArrayList<Gallery> gallery = new ArrayList<Gallery>();
+        if (source.getGallery() != null)
+            for (String g : source.getGallery()) {
+                gallery.add(new Gallery(g));
+            }
+
+        gallery.add(0, new Gallery(source.getImage()));
+        target.setGallery(gallery);
+
+        //int hours = stock.getAvailability();
+        target.setAvailability(ProductMapper.processAvailability(target.getHours(), null).get("en"));
+
+        if(source.getFeatures() != null)
+            target.setFeatures(Arrays.asList(source.getFeatures().split(";")));
+
+        target.setDescription(source.getDescription());
+        target.setBrowseNode(source.getBrowseNode());
     }
 
     @AfterMapping
@@ -106,4 +132,5 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         purchase.setId(id);
         return purchase;
     }
+
 }
