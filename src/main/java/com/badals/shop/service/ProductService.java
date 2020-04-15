@@ -324,6 +324,7 @@ public class ProductService {
 
         //product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
         product = productRepository.save(product);
+        productSearchRepository.save(dto);
         return  addProductMapper.toDto(product);
     }
 
@@ -382,6 +383,15 @@ public class ProductService {
         response.setItems(result);
         return response;
     }
+
+/*    public ProductResponse searchAll(String type) {
+        List<AddProductDTO> result = search(type + " AND imported:false AND "+type);
+        ProductResponse response = new ProductResponse();
+        response.setTotal(12);
+        //response.setHasMore((limit+offset) < 12);
+        response.setItems(result.stream().map(addProductMapper::toProductDTO).collect(Collectors.toList()));
+        return response;
+    }*/
 
 //    public List<ProductDTO> listForMerchantsAll(Long merchantId) {
 //        return productRepository.listForMerchantsAll(merchantId).stream().map(productMapper::toDto).collect(Collectors.toList());

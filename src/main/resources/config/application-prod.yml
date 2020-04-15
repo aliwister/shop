@@ -58,15 +58,15 @@ spring:
 
   data:
     jest:
-      uri: https://maple-610226350.eu-west-1.bonsaisearch.net:443
-      password: 9oy2txuym0
-      username: 5g8qzii3g6
+      uri: https://d68af11bb6364c90b56a8215597289b1.eu-central-1.aws.cloud.es.io:9243
+      username: elastic
+      password: U4s3g1aeygWkZbbeK8urU7KM
   # see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-nosql.html#boot-features-connecting-to-elasticsearch-jest
   elasticsearch:
     rest:
-      uris: https://maple-610226350.eu-west-1.bonsaisearch.net:443
-      username: 5g8qzii3g6
-      password: 9oy2txuym0
+      uris: https://d68af11bb6364c90b56a8215597289b1.eu-central-1.aws.cloud.es.io:9243
+      username: elastic
+      password: U4s3g1aeygWkZbbeK8urU7KM
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     contexts: prod
