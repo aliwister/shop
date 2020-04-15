@@ -69,14 +69,14 @@ public class MerchantMutation implements GraphQLMutationResolver {
     public AddProductDTO createMerchantProduct(AddProductDTO dto){
         String t =  TenantContext.getCurrentTenant();
         log.info("Tenant: " + t);
-        return productService.createMerchantProduct(dto, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
+        return productService.createMerchantProduct(dto, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(), TenantContext.getCurrentTenant());
         //return productService.createMerchantProduct(dto, 11L, "Mayaseen", 11L);
     }
 
 
     public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
         String t =  TenantContext.getCurrentTenant();
-        productService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
+        productService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(),TenantContext.getCurrentTenant(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
         return new Message("success");
     }
 
