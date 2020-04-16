@@ -6,12 +6,12 @@ import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.MerchantProductResponse;
-import com.badals.shop.domain.pojo.ProductI18;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
@@ -22,13 +22,10 @@ import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
@@ -45,14 +42,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -77,8 +69,9 @@ public class ProductService {
     private final AddProductMapper addProductMapper;
 
     private final ProductSearchRepository productSearchRepository;
+    private final TenantService tenantService;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository) {
+    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService) {
         this.productRepository = productRepository;
         this.productMapper = productMapper;
         this.algoliaProductMapper = algoliaProductMapper;
@@ -88,6 +81,7 @@ public class ProductService {
         this.addProductMapper = addProductMapper;
         this.productLangRepository = productLangRepository;
         this.productSearchRepository = productSearchRepository;
+        this.tenantService = tenantService;
     }
 
     @Transactional(readOnly = true)
@@ -275,6 +269,18 @@ public class ProductService {
     }
 
     public AddProductDTO createMerchantProduct(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant) {
+
+        int discount = 100 * (int)((dto.getPrice().doubleValue() - dto.getSalePrice().doubleValue())/dto.getPrice().doubleValue());
+        dto.setDiscountInPercent(discount);
+        dto.setTenant(currentTenant);
+        dto.setMerchant(currentMerchant);
+        dto.setImported(false);
+        dto.setIndexed(false);
+        productSearchRepository.save(dto);
+        return dto;
+    }
+
+    public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant) {
         Product product = null;
         if(dto.getId() == null) {
             product = addProductMapper.toEntity(dto);
@@ -341,12 +347,18 @@ public class ProductService {
     }
 
     public void importProducts(List<AddProductDTO> products, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant, List<Long> shopIds, String browseNode) {
-        for(AddProductDTO doc: products) {
+       TenantDTO tenantObj = tenantService.findOne(tenantId).get();
+
+       for(AddProductDTO doc: products) {
             Long id = doc.getId();
             doc.setId(null);
-            String image = uploadToS3(doc.getImage(), currentMerchantId, currentMerchant, tenantId);
-            doc.setImage(image);
-            //doc.setShopIds(shopIds);
+            if (doc.getImage() != null && !doc.getImage().contains("cdn.badals")) {
+                String image = uploadToS3(doc.getImage(), currentMerchantId, currentMerchant, tenantId);
+                doc.setImage(image);
+            }
+            if(!doc.getSku().startsWith(tenantObj.getSkuPrefix()))
+                doc.setSku(tenantObj.getSkuPrefix()+doc.getSku());
+            doc.setShopIds(shopIds);
             doc.setBrowseNode(browseNode);
             createMerchantProduct(doc, currentMerchantId, currentMerchant, tenantId, currentTenant );
             doc.setId(id);
@@ -379,8 +391,8 @@ public class ProductService {
         return image;
     }
 
-    public MerchantProductResponse searchForTenant(String currentTenant, String text, Integer limit, Integer offset) {
-        List<AddProductDTO> result = search(currentTenant + " AND imported:false AND "+text);
+    public MerchantProductResponse searchForTenant(String currentTenant, String text, Integer limit, Integer offset, Boolean imported) {
+        List<AddProductDTO> result = search("tenant:"+currentTenant + " AND imported:" + imported.toString() + ((text != null)?" AND "+text:""));
         MerchantProductResponse response = new MerchantProductResponse();
         response.setTotal(12);
         response.setHasMore((limit+offset) < 12);

@@ -3,6 +3,8 @@ package com.badals.shop.domain;
 import javax.persistence.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +25,84 @@ public class Tenant implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "max_products")
+    private Long maxProducts;
+
+    @Column(name = "plan_name")
+    private String planName;
+
+    @Column(name = "discount_rate")
+    private Integer discountRate;
+
+    @Column(name = "active")
+    private Boolean active;
+
+    @Column(name = "monthly_fee")
+    private BigDecimal monthlyFee;
+
+    @Column(name = "sku_prefix")
+    private String skuPrefix;
+
+    @Column(name = "contract_start_date")
+    private LocalDate contractStartDate;
+
+
+    public Long getMaxProducts() {
+        return maxProducts;
+    }
+
+    public void setMaxProducts(Long maxProducts) {
+        this.maxProducts = maxProducts;
+    }
+
+    public String getPlanName() {
+        return planName;
+    }
+
+    public void setPlanName(String planName) {
+        this.planName = planName;
+    }
+
+    public Integer getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(Integer discountRate) {
+        this.discountRate = discountRate;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public BigDecimal getMonthlyFee() {
+        return monthlyFee;
+    }
+
+    public void setMonthlyFee(BigDecimal monthlyFee) {
+        this.monthlyFee = monthlyFee;
+    }
+
+    public String getSkuPrefix() {
+        return skuPrefix;
+    }
+
+    public void setSkuPrefix(String skuPrefix) {
+        this.skuPrefix = skuPrefix;
+    }
+
+    public LocalDate getContractStartDate() {
+        return contractStartDate;
+    }
+
+    public void setContractStartDate(LocalDate contractStartDate) {
+        this.contractStartDate = contractStartDate;
+    }
 
     @ManyToMany
     @JoinTable(name = "tenant_merchant",
