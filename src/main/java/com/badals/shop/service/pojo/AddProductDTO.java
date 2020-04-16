@@ -61,6 +61,7 @@ public class AddProductDTO {
    String browseNode;
    String variationType;
    Boolean imported;
+   Boolean indexed;
    String tenant;
    String merchant;
 

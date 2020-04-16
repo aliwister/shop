@@ -37,16 +37,17 @@ public class MerchantQuery extends ShopQuery implements GraphQLQueryResolver {
    }
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
-    public MerchantProductResponse merchantProducts(String text, String type, Integer offset, Integer limit, String lang) throws IllegalAccessException {
+    public MerchantProductResponse merchantProducts(String text, String type, Integer offset, Integer limit, String lang, Boolean imported) throws IllegalAccessException {
        String t =  TenantContext.getCurrentTenant();
        log.info("Tenant: "+ t+ " TenantId: "+ TenantContext.getCurrentTenantId()+ " Merchant "+ TenantContext.getCurrentMerchant()+ " MerchantId "+ TenantContext.getCurrentMerchantId());
-       return productService.getForTenant(TenantContext.getCurrentTenantId(),limit, offset);
+       //return productService.getForTenant(TenantContext.getCurrentTenantId(),limit, offset);
+       return productService.searchForTenant(t, text, limit, offset, imported);
     }
 
-    public MerchantProductResponse merchantImportProducts(String text, String type, Integer offset, Integer limit, String lang) throws IllegalAccessException {
+/*    public MerchantProductResponse merchantProductsCatalog(String text, String type, Integer offset, Integer limit, String lang) throws IllegalAccessException {
        String t =  TenantContext.getCurrentTenant();
        log.info("Tenant: "+ t+ " TenantId: "+ TenantContext.getCurrentTenantId()+ " Merchant "+ TenantContext.getCurrentMerchant()+ " MerchantId "+ TenantContext.getCurrentMerchantId());
        return productService.searchForTenant(t, text, limit, offset);
-    }
+    }*/
 }
 
