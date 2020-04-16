@@ -273,4 +273,12 @@ public class CartService {
         checkoutCart = checkoutCartRepository.save(checkoutCart);
         return checkoutCart;
     }
+
+    public void closeCart(String secureKey) {
+        Cart cart = cartRepository.findBySecureKey(secureKey).orElse(null);
+        if(cart == null)
+            return;
+        cart.setCartState(CartState.CLOSED);
+        cartRepository.save(cart);
+    }
 }
