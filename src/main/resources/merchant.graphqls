@@ -74,19 +74,13 @@ extend type Query {
             offset: Int = 0
             limit: Int = 10
             lang: Int = 1
+            imported: Boolean = true
     ): MerchantProductResponse
-    pendingMerchantProducts(merchantId: Long) : [Product]
-    merchantImportProducts(
-            text: String = ""
-            type: String = ""
-            offset: Int = 0
-            limit: Int = 10
-            lang: Int = 1
-    ): MerchantProductResponse
+
 }
 
 extend type Mutation {
-    createMerchantProduct(product: AddProductInput) : MerchantProduct
+    createMerchantProduct(product: AddProductInput) : Message
     approveProduct(id: ID): Product
     getImageUploadUrl(filename: String, contentType: String): PresignedUrl
     importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
