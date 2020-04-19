@@ -45,11 +45,11 @@ public class Pas4LookupParser {
       p.setPrice(null);
 
       CRC32 checksum = new CRC32();
-      checksum.update(i.getAsin().getBytes());
+      checksum.update(i.getId().getBytes());
       long ref = checksum.getValue();
       p.ref(ref).slug(String.valueOf(ref))
               .active(true)
-              .sku(i.getAsin())
+              .sku(i.getId())
               .url(i.getUrl())
               //.setImageUrl(i.getLargeImage().getURL())
               .image(i.getImage())

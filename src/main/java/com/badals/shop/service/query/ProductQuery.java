@@ -65,6 +65,8 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
             return productService.getLatest(10);
          case "MAYASEEN":
             return productService.searchAll(type);
+         case "capitol-stores":
+            return productService.searchAll(type);
       }
        return productService.findAllByCategory(slug, offset, limit);
     }

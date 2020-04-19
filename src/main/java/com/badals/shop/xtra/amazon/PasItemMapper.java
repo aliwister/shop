@@ -22,7 +22,7 @@ public interface PasItemMapper {
    PasItemMapper INSTANCE = Mappers.getMapper(PasItemMapper.class);
 
 
-   @Mapping(source = "ASIN", target = "asin")
+   @Mapping(source = "ASIN", target = "id")
    @Mapping(source = "parentASIN", target = "parentAsin")
    @Mapping(source = "itemInfo.byLineInfo.brand.displayValue", target = "brand")
    @Mapping(source = "itemInfo.byLineInfo.manufacturer.displayValue", target = "manufacturer")
