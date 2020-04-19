@@ -109,6 +109,8 @@ public class PurchaseService {
             //throw InvalidPurchaseException("Product doesn't exist");
         }
         purchase.getPurchaseItems().clear();
+
+
         for(PurchaseItemDTO i : items) {
             PurchaseItem pi = purchaseItemMapper.toEntity(i);
             pi.setPurchase(purchase);
