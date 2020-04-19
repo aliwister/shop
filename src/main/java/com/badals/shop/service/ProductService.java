@@ -22,6 +22,7 @@ import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
+import org.imgscalr.Scalr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,6 +49,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import java.util.zip.CRC32;
@@ -360,7 +363,7 @@ public class ProductService {
                 doc.setSku(tenantObj.getSkuPrefix()+doc.getSku());
             doc.setShopIds(shopIds);
             doc.setBrowseNode(browseNode);
-            createMerchantProduct(doc, currentMerchantId, currentMerchant, tenantId, currentTenant );
+            importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant );
             doc.setId(id);
             doc.setImported(true);
             productSearchRepository.save(doc);
@@ -379,6 +382,9 @@ public class ProductService {
         try {
             //PutObjectRequest request = PutObjectRequest.builder().bucket(bucketName).key().contentType().build();
             BufferedImage img = ImageIO.read(new URL(image));
+            if(img.getHeight() > 250 || img.getWidth() > 250)
+                img = resizeAndCrop(img, 200, 200);
+
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(img,"png", outputStream);
             PutObjectResponse response = S3Util.getClient().putObject(PutObjectRequest.builder().bucket(S3Util.getBucketName()).key(objectKey).build(), RequestBody.fromBytes(outputStream.toByteArray()));
@@ -407,6 +413,55 @@ public class ProductService {
         //response.setHasMore((limit+offset) < 12);
         response.setItems(result.stream().map(addProductMapper::toProductDto).collect(Collectors.toList()));
         return response;
+    }
+
+    public BufferedImage resizeAndCrop(BufferedImage bufferedImage, Integer width, Integer height) {
+
+        Scalr.Mode mode = (double) width / (double) height >= (double) bufferedImage.getWidth() / (double) bufferedImage.getHeight() ? Scalr.Mode.FIT_TO_WIDTH
+                : Scalr.Mode.FIT_TO_HEIGHT;
+
+        bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.ULTRA_QUALITY, mode, width, height);
+
+        int x = 0;
+        int y = 0;
+
+        if (mode == Scalr.Mode.FIT_TO_WIDTH) {
+            y = (bufferedImage.getHeight() - height) / 2;
+        } else if (mode == Scalr.Mode.FIT_TO_HEIGHT) {
+            x = (bufferedImage.getWidth() - width) / 2;
+        }
+
+        bufferedImage = Scalr.crop(bufferedImage, x, y, width, height);
+
+        return bufferedImage;
+    }
+
+    public static Dimension getScaledDimension(Dimension imgSize, Dimension boundary) {
+
+        int original_width = imgSize.width;
+        int original_height = imgSize.height;
+        int bound_width = boundary.width;
+        int bound_height = boundary.height;
+        int new_width = original_width;
+        int new_height = original_height;
+
+        // first check if we need to scale width
+        if (original_width > bound_width) {
+            //scale width to fit
+            new_width = bound_width;
+            //scale height to maintain aspect ratio
+            new_height = (new_width * original_height) / original_width;
+        }
+
+        // then check if we need to scale even with the new height
+        if (new_height > bound_height) {
+            //scale height to fit instead
+            new_height = bound_height;
+            //scale width to maintain aspect ratio
+            new_width = (new_height * original_width) / original_height;
+        }
+
+        return new Dimension(new_width, new_height);
     }
 
 //    public List<ProductDTO> listForMerchantsAll(Long merchantId) {

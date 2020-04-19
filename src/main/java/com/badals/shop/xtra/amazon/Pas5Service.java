@@ -1,9 +1,6 @@
 package com.badals.shop.xtra.amazon;
 
-import com.amazon.paapi5.v1.GetItemsResponse;
-import com.amazon.paapi5.v1.GetVariationsResponse;
-import com.amazon.paapi5.v1.Item;
-import com.amazon.paapi5.v1.VariationsResult;
+import com.amazon.paapi5.v1.*;
 import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
@@ -15,7 +12,7 @@ import com.badals.shop.repository.CategoryRepository;
 import com.badals.shop.repository.MerchantRepository;
 import com.badals.shop.repository.ProductOverrideRepository;
 import com.badals.shop.repository.ProductRepository;
-import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.repository.search.PasItemNodeSearchRepository;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.xtra.IProductService;
 import com.badals.shop.xtra.amazon.mws.MwsItemNode;
@@ -25,11 +22,11 @@ import com.badals.shop.xtra.amazon.paapi5.PasLookup;
 import com.badals.shop.xtra.amazon.paapi5.PasLookupParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,8 +43,9 @@ public class Pas5Service implements IProductService {
     private final RedisPasRepository redisPasRepository;
     private final ProductMapper productMapper;
     private final PasItemMapper pasItemMapper;
+    private final PasItemNodeSearchRepository pasItemNodeSearchRepository;
 
-    public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper) {
+    public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper, PasItemNodeSearchRepository pasItemNodeSearchRepository) {
         this.productRepo = productRepo;
         this.categoryRepository = categoryRepository;
         this.merchantRepository = merchantRepository;
@@ -57,6 +55,7 @@ public class Pas5Service implements IProductService {
         this.redisPasRepository = redisPasRepository;
         this.productMapper = productMapper;
         this.pasItemMapper = pasItemMapper;
+        this.pasItemNodeSearchRepository = pasItemNodeSearchRepository;
     }
 
     public Boolean existsBySku(String sku) {
@@ -84,12 +83,16 @@ public class Pas5Service implements IProductService {
     public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild) throws NoOfferException {
 
         Product product = productRepo.findBySkuJoinChildren(asin).orElse(null);
+        //PasItemNode current = pasItemNodeSearchRepository.findById(asin);
         if (product == null) {
             product = new Product();
             isRebuild = true;
         }
         else {
             isParent = product.getVariationType().equals(VariationType.PARENT);
+            if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
+                return product;
+
         }
         if(isParent) isRebuild = true;
         //if (product != null) // && product.getUpdated())
@@ -99,20 +102,28 @@ public class Pas5Service implements IProductService {
         Map<String, Item> doc;
 
         // Read from redis cache
-        if (isRedis && redisPasRepository.getHashOperations().hasKey("pas", asin)) {
+/*        if (isRedis && redisPasRepository.getHashOperations().hasKey("pas", asin)) {
             try {
                 item = (PasItemNode) redisPasRepository.getHashOperations().get("pas", asin);
             }
             catch (Exception e) {
                 redisPasRepository.getHashOperations().delete("pas", asin);
             }
-        }
+        }*/
+        //if
 
         List<String> list = new ArrayList();
         list.add(asin);
 
         if (item == null) {
             response = pasLookup.lookup(list);
+            if(response.getErrors() != null && response.getErrors().size() > 0 ) {
+                ErrorData error = response.getErrors().get(0);
+                if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
+                    mwsLookup.lookup(asin);
+                    return null;
+                }
+            }
             doc = parse_response(response.getItemsResult().getItems());
             item = pasItemMapper.itemToPasItemNode(doc.get(asin));
             redisPasRepository.getHashOperations().put("pas", asin, item);
@@ -133,7 +144,7 @@ public class Pas5Service implements IProductService {
             product.setParentId(findBySku(item.getParentAsin()).getRef());
         }
 
-        List<ProductOverride> overrides = findOverrides(item.getAsin(), item.getParentAsin());
+        List<ProductOverride> overrides = findOverrides(item.getId(), item.getParentAsin());
         product = initProduct(product, item, isParent, overrides);
 
         if(isRebuild) {
@@ -151,7 +162,7 @@ public class Pas5Service implements IProductService {
                     if (variationsResult == null)
                         break;
                     for (PasItemNode childItem : variationsResult.getItems().stream().map(pasItemMapper::itemToPasItemNode).collect(Collectors.toList())) {
-                        String childAsin = childItem.getAsin();
+                        String childAsin = childItem.getId();
                         Product child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(new Product());
                         child = initProduct(child, childItem, false, overrides);
 
