@@ -87,7 +87,7 @@ public interface PasItemMapper {
 //         }
 //      }
       // Gallery
-      if(source.getImages().getVariants() != null) {
+      if(source.getImages()!= null && source.getImages().getVariants() != null) {
          for (ImageType set : source.getImages().getVariants()) {
             target.getGallery().add(set.getLarge().getURL());
          }
