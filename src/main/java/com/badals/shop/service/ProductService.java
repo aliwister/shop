@@ -7,6 +7,7 @@ import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.MerchantProductResponse;
 import com.badals.shop.domain.pojo.ProductResponse;
+import com.badals.shop.domain.pojo.Variation;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
@@ -285,19 +286,26 @@ public class ProductService {
 
     public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant, boolean isSaveES) {
         Product product = null;
+        CRC32 checksum = new CRC32();
         if(dto.getId() == null) {
             product = addProductMapper.toEntity(dto);
 
-            product.setSku(currentMerchant + "-" + dto.getSku());
-            CRC32 checksum = new CRC32();
+            product.setSku(dto.getSku());
             checksum.update(dto.getSku().getBytes());
             String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
             product.setRef(Long.valueOf(ref));
             product.setSlug(ref);
         }
-        else
+        else {
             product = productRepository.findById(dto.getId()).get();
-
+            if(dto.getRef() == null || dto.getRef().equals("")) {
+                String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
+                product.setRef(Long.valueOf(ref));
+                product.setSlug(ref);
+            }
+        }
+        if(product.getVariationType() == null)
+            product.setVariationType(VariationType.SIMPLE);
 
         product.setActive(false);
 
@@ -384,8 +392,8 @@ public class ProductService {
         try {
             //PutObjectRequest request = PutObjectRequest.builder().bucket(bucketName).key().contentType().build();
             BufferedImage img = ImageIO.read(new URL(image));
-            if(img.getHeight() > 250 || img.getWidth() > 250)
-                img = resizeAndCrop(img, 200, 200);
+            if(img.getHeight() > 350 || img.getWidth() > 350)
+                img = resizeAndCrop(img, 300, 300);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(img,"png", outputStream);
