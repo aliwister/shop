@@ -44,6 +44,17 @@ public class PurchaseItem implements Serializable {
     @Column(name = "comment")
     private String comment;
 
+    @Column(name = "product_id")
+    private Long productId;
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties("purchaseItems")

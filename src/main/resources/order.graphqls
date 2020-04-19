@@ -103,11 +103,13 @@ input PurchaseInput {
 }
 
 input PurchaseItemInput {
+    id: Long
     sequence: Int
     price: Float
     quantity: Float
     description: String
     orderItemId: Int
+    productId: Long
 }
 
 type Payment {
@@ -128,6 +130,7 @@ type PurchaseQueue {
     weight: BigDecimal
     url: String
     sku: String
+    productId: Long
     orderId: Long
 }
 
