@@ -44,7 +44,7 @@ public class Pas5Service implements IProductService {
     private final PasItemMapper pasItemMapper;
 
 
-    public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper, PasItemNodeSearchRepository pasItemNodeSearchRepository) {
+    public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper) {
         this.productRepo = productRepo;
         this.categoryRepository = categoryRepository;
         this.merchantRepository = merchantRepository;
