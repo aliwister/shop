@@ -283,7 +283,7 @@ public class ProductService {
         return dto;
     }
 
-    public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant) {
+    public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant, boolean isSaveES) {
         Product product = null;
         if(dto.getId() == null) {
             product = addProductMapper.toEntity(dto);
@@ -337,7 +337,9 @@ public class ProductService {
         dto.setSlug(product.getSlug());
         dto.setRef(product.getRef());
         dto.setImported(true);
-        productSearchRepository.save(dto);
+
+        if(isSaveES)
+            productSearchRepository.save(dto);
         return  addProductMapper.toDto(product);
     }
 
@@ -363,7 +365,7 @@ public class ProductService {
                 doc.setSku(tenantObj.getSkuPrefix()+doc.getSku());
             doc.setShopIds(shopIds);
             doc.setBrowseNode(browseNode);
-            importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant );
+            importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant, false);
             doc.setId(id);
             doc.setImported(true);
             productSearchRepository.save(doc);
