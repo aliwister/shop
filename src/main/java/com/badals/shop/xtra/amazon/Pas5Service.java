@@ -12,7 +12,6 @@ import com.badals.shop.repository.CategoryRepository;
 import com.badals.shop.repository.MerchantRepository;
 import com.badals.shop.repository.ProductOverrideRepository;
 import com.badals.shop.repository.ProductRepository;
-import com.badals.shop.repository.search.PasItemNodeSearchRepository;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.xtra.IProductService;
 import com.badals.shop.xtra.amazon.mws.MwsItemNode;
@@ -43,7 +42,7 @@ public class Pas5Service implements IProductService {
     private final RedisPasRepository redisPasRepository;
     private final ProductMapper productMapper;
     private final PasItemMapper pasItemMapper;
-    private final PasItemNodeSearchRepository pasItemNodeSearchRepository;
+
 
     public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper, PasItemNodeSearchRepository pasItemNodeSearchRepository) {
         this.productRepo = productRepo;
@@ -55,7 +54,6 @@ public class Pas5Service implements IProductService {
         this.redisPasRepository = redisPasRepository;
         this.productMapper = productMapper;
         this.pasItemMapper = pasItemMapper;
-        this.pasItemNodeSearchRepository = pasItemNodeSearchRepository;
     }
 
     public Boolean existsBySku(String sku) {
