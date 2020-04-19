@@ -24,8 +24,10 @@ class PasBrowseNode {
 }
 
 @Data
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "pas-item")
 public class PasItemNode implements Serializable {
-   String asin;
+
+   String id;
    String parentAsin;
    String url;
    String brand;
@@ -128,7 +130,7 @@ public class PasItemNode implements Serializable {
    @Override
    public String toString() {
       return "PasItemNode{" +
-              "asin='" + asin + '\'' +
+             // "asin='" + asin + '\'' +
               ", brand='" + brand + '\'' +
               ", ean='" + ean + '\'' +
               ", manufacturer='" + manufacturer + '\'' +

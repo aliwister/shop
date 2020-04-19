@@ -1,5 +1,7 @@
 package com.badals.shop.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -38,9 +40,43 @@ public class Payment extends Auditable implements Serializable {
     @Column(name = "transaction_id")
     private String transactionId;
 
+    @Column(name = "bank_account_number")
+    private String bankAccountNumber;
+
+    @Column(name = "bank_name")
+    private String bankName;
+
+    @Column(name = "bank_owner_name")
+    private String bankOwnerName;
+
+    @Column(name = "ref")
+    private Long ref;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @JoinColumn(name="ref", referencedColumnName = "id", insertable = false, updatable = false)
+    private Payment parent;
+
     @ManyToOne
     @JsonIgnoreProperties("orderPayments")
     private Order order;
+
+
+    public Long getRef() {
+        return ref;
+    }
+
+    public void setRef(Long ref) {
+        this.ref = ref;
+    }
+
+    public Payment getParent() {
+        return parent;
+    }
+
+    public void setParent(Payment parent) {
+        this.parent = parent;
+    }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -114,6 +150,30 @@ public class Payment extends Auditable implements Serializable {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public String getBankAccountNumber() {
+        return bankAccountNumber;
+    }
+
+    public void setBankAccountNumber(String bankAccountNumber) {
+        this.bankAccountNumber = bankAccountNumber;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getBankOwnerName() {
+        return bankOwnerName;
+    }
+
+    public void setBankOwnerName(String bankOwnerName) {
+        this.bankOwnerName = bankOwnerName;
     }
 
     public Order getOrder() {

@@ -18,7 +18,9 @@ package com.badals.shop.xtra.amazon.mws;
 
 import com.amazonservices.mws.products.*;
 import com.amazonservices.mws.products.model.*;
+import com.badals.shop.xtra.amazon.PasItemNode;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.util.List;
 
@@ -38,6 +40,49 @@ public class MwsLookup {
    private final String sellerId;
    private final String marketPlaceId;
    private final MarketplaceWebServiceProducts client;
+
+   public PasItemNode lookup(String asin) {
+       GetMatchingProductRequest request = new GetMatchingProductRequest();
+       request.setSellerId(sellerId);
+       request.setMarketplaceId(marketPlaceId);
+       ASINListType asinList = new ASINListType();;
+       asinList.withASIN(asin);
+
+       request.setASINList(asinList);
+
+       GetMatchingProductResponse response = invokeGetMatchingProduct(request);
+       Product x = response.getGetMatchingProductResult().get(0).getProduct();
+
+       if (x.isSetAttributeSets()) {
+           System.out.println("                    Attributes");
+           AttributeSetList attributeSetList = x.getAttributeSets();
+           for (Object obj : attributeSetList.getAny()) {
+               Node attribute = (Node) obj;
+               if(attribute.hasChildNodes()) {
+                   NodeList list = attribute.getChildNodes();
+                   for(int i=0; i < list.getLength(); i++) {
+                       System.out.println(list.item(i).getLocalName());
+                       System.out.println(list.item(i).getNodeValue());
+                       //System.out.println(list.item(i).get)
+                       if(list.item(i).hasChildNodes()) {
+                           NodeList clist = list.item(i).getChildNodes();
+                           for(int ii=0; ii < clist.getLength(); ii++) {
+                               System.out.println(clist.item(ii).getLocalName());
+                               System.out.println(clist.item(ii).getNodeValue());
+                           }
+                       }
+                   }
+               }
+               System.out.println(ProductsUtil.formatXml(attribute));
+               System.out.println(attribute.getLocalName());
+
+           }
+           System.out.println();
+       }
+
+       return null;
+   }
+
 
     public MwsItemNode fetch(String asin) {
         GetLowestOfferListingsForASINRequest request = new GetLowestOfferListingsForASINRequest();

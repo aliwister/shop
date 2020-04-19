@@ -125,7 +125,7 @@ public class Pas4Lookup {
                      if(isSimilarity)
                         item.getSimilarities().add(reader.getText());
                      else
-                        item.setAsin(reader.getText());
+                        item.setId(reader.getText());
                      break;
                   case "ParentASIN":
                      reader.next();
@@ -366,7 +366,7 @@ public class Pas4Lookup {
                case "ASIN":
                   reader.next();
                   if(reader.hasText())
-                     item.setAsin(reader.getText());
+                     item.setId(reader.getText());
                   break;
                case "Brand":
                   reader.next();
@@ -525,7 +525,7 @@ public class Pas4Lookup {
          }
       }
 
-      System.out.println(parent.getAsin());
+      System.out.println(parent.getId());
       parent.getChildren().forEach(
               x -> System.out.println(x)
       );

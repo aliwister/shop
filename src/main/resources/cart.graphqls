@@ -14,7 +14,7 @@ type Address {
     line1: String
     line2: String
     city: String
-
+    phone: String
 }
 type Cart {
     id: ID!,

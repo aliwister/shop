@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="#{email.edit.title(${order.reference})}">Badals.com Order Modification Notice</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
+    </head>
+    <body>
+        <p th:text="#{email.order.greeting(${user.firstname})}">
+            Dear
+        </p>
+        <p th:text="#{email.edit.intro(${order.reference})}">
+Your order has been modified
+        </p>
+        <br/>
+        <p th:text="#{email.edit.approve.details}">>
+Thank you for your approval on the order changes.
+
+        </p>
+        <br/>
+        <p th:text="#{email.order.details}">>
+            Your order is as follows:
+
+        </p>
+        <table>
+            <th></th><th>Item Name</th><th>Quantity</th><th>Price</th>
+            <tr th:each="o: ${items}">
+                <td><img th:src="${o.image}" style="max-width: 70px"/></td>
+                <td th:text="${o.productName}" />
+                <td th:text="${o.quantity}" />
+                <td th:text="${o.price}" />
+            </tr>
+        </table>
+        <p th:text="#{email.order.total(${order.currency},${order.total})}">>
+            Total is {0} {1}
+        </p>
+
+        <div th:switch="${order.balance}">
+            <div th:case="0">There is no additional amount to pay! </div>
+            <div th:case="&lt;0">
+                <p th:text="#{email.edit.guarantee}">>
+                    Please rest assured that that your balance will be refunded to you in full.
+                </p>
+                <div th:switch="${order.paymentMethod}">
+                    <p th:case="'checkoutcom'"><span th:text="#{email.refund.payment.auto}">Your refund will automatically go back to the same card used for payment in 7-10 business days</span></p>
+                    <p th:case="'bankwire'"><span th:text="#{email.refund.payment.transfer}">To get your refund, please provide:</span></p>
+                    <ul>
+                        <li th:text="#{email.refund.name}">Name in English</li>
+                        <li th:text="#{email.refund.bank.account}">Bank Account # (NOT Card number)</li>
+                        <li th:text="#{email.refund.bank.name}">Bank Name</li>
+                    </ul>
+                    <p th:case="'bankwire'"><span th:text="#{email.refund.bank.timeline}">Please note Bank Muscat refunds take 5-7 business days. Other banks may take up to 15 business days.</span></p>
+
+                </div>
+            </div>
+            <div th:case="&gt;0">
+                Please use the following link to make a balance payment:
+                <a th:href="order.paymentLink">Pay with Badals.com checkout</a>
+            </div>
+        </div>
+        <p>
+            <span th:text="#{email.order.thanks}">Regards, </span>
+            <br/>
+            <em th:text="#{email.signature}">Badals.com.</em>
+        </p>
+    </body>
+</html>
