@@ -13,4 +13,5 @@ public interface PurchaseQueue {
    String getUrl();
    String getSku();
    Long getOrderId();
+   Long getProductId();
 }
