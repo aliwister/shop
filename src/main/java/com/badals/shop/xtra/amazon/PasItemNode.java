@@ -99,16 +99,20 @@ public class PasItemNode implements Serializable {
          children = new ArrayList<PasItemNode>();
    }
    private static final BigDecimal LB2KG = BigDecimal.valueOf(0.453592);
+   private static final BigDecimal LB2G = BigDecimal.valueOf(200);
+
+
    public BigDecimal getParsedWeight() {
       String weight = (this.packageWeight== null)?this.getItemWeight():this.getPackageWeight();
 
       if(weight != null) {
          BigDecimal w = new BigDecimal(weight);
          if(getItemWeightUnit().equalsIgnoreCase("kilograms"))
-
             return w.divide(LB2KG,  4, RoundingMode.HALF_EVEN);
-         else
-            return w;
+         else if (getItemWeightUnit().equalsIgnoreCase("Grams"))
+            return w.divide(LB2G, 4, RoundingMode.HALF_EVEN);
+
+         return w;
          //return BigDecimal.valueOf(Double.parseDouble(weight));
       }
       return null;
