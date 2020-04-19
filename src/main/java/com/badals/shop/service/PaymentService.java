@@ -3,6 +3,7 @@ package com.badals.shop.service;
 import com.badals.shop.domain.Order;
 import com.badals.shop.domain.Payment;
 import com.badals.shop.repository.PaymentRepository;
+import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.PaymentDTO;
 import com.badals.shop.service.mapper.PaymentMapper;
 import org.slf4j.Logger;
@@ -94,5 +95,12 @@ public class PaymentService {
 
    public List<PaymentDTO> findForOrder(Long orderId) {
        return paymentRepository.findAllByOrderId(orderId).stream().map(paymentMapper::toDto).collect(Collectors.toList());
+   }
+
+   public PaymentDTO addRefund(Long orderId, BigDecimal amount, String authCode, String bankName, String bankAccountNumber, String bankOwnerName, Long ref, String paymentMethod) {
+      Payment p = new Payment();
+      p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod).authCode(authCode);
+      p = paymentRepository.save(p);
+      return paymentMapper.toDto(p);
    }
 }

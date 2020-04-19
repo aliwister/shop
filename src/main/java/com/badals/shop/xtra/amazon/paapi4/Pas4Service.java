@@ -88,7 +88,7 @@ public class Pas4Service implements IProductService {
             children = new HashSet<Product>();
          List<Variation> variations = new ArrayList<Variation>();
          for (PasItemNode childItem : item.getChildren()) {
-            String childAsin = childItem.getAsin();
+            String childAsin = childItem.getId();
             Product child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(new Product());
             child = initProduct(child, childItem, false);
             Pas4LookupParser.parseVariationAttributes(child, childItem);
