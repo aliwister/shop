@@ -50,7 +50,7 @@ public class MwsLookupParser {
          Integer iRating = 0;
          Integer ratingCount = offer.getRatingCount();
          try { iRating = Integer.parseInt(r.substring(0,2)); } catch (NumberFormatException e) {/*Swallow*/}
-         if((ratingCount < offerSize || iRating < 50) &&!offer.isPrime() ) continue;
+         //if((ratingCount < offerSize || iRating < 50) &&!offer.isPrime() ) continue;
          double ratingCountIndex = ratingCount/ 5.0;
          if(ratingCount > 10) ratingCountIndex = 1 + Math.log10(Math.min(ratingCount,1000));
          if(iRating < 70) iRating = 0;
