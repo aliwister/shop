@@ -114,6 +114,9 @@ public interface PasItemMapper {
         .map(PasBrowseNode::getDisplayName)
         .collect(Collectors.joining(" > "));
       target.setBrowseNode(browseNode);
+
+      if(target.getTitle() == null)
+         target.setTitle(target.getId());
       /*
       String n = "";
       String t = "";
