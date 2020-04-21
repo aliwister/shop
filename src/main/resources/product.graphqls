@@ -260,7 +260,7 @@ type PricingRequest {
 }
 
 extend type Query {
-    product(slug: String!): Product!
+    product(slug: String!, cookie: String = ""): Product!
     products(
         category: String
         text: String

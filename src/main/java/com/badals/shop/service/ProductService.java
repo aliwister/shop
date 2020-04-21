@@ -474,6 +474,12 @@ public class ProductService {
         return new Dimension(new_width, new_height);
     }
 
+/*
+    public <U> U log(Customer loginUser, String slug, cookie) {
+       productRepository.log(loginUser.getId(), slug, cookie);
+    }
+*/
+
 //    public List<ProductDTO> listForMerchantsAll(Long merchantId) {
 //        return productRepository.listForMerchantsAll(merchantId).stream().map(productMapper::toDto).collect(Collectors.toList());
 //    }
