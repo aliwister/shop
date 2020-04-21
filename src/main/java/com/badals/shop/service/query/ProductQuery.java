@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
@@ -43,8 +44,12 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.getAllProducts(count);
       //return null;
    }
-   public ProductDTO product (String slug)  throws ProductNotFoundException  {
+   public ProductDTO product (String slug, String cookie)  throws ProductNotFoundException  {
       ProductDTO dto = this.productService.getProductBySlug(slug);
+      Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+      //CompletableFuture.supplyAsync(() -> productService.log(loginUser, slug, cookie))
+
+
       return dto;
    }
 

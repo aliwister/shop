@@ -30,6 +30,7 @@ type OrderItem {
     lineTotal: BigDecimal
     productUrl: String
     productSku: String
+    productId: Long
 }
 
 type Order {
