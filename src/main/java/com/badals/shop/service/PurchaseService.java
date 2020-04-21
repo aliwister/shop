@@ -115,6 +115,7 @@ public class PurchaseService {
             PurchaseItem pi = purchaseItemMapper.toEntity(i);
             pi.setPurchase(purchase);
             purchase.getPurchaseItems().add(pi);
+
         }
 
         purchase = purchaseRepository.save(purchase);

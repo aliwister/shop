@@ -43,6 +43,7 @@ public class OrderItemDTO implements Serializable {
 
 private String productUrl;
 private String productSku;
+private String productId;
 
     @Override
     public boolean equals(Object o) {
