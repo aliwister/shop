@@ -41,6 +41,28 @@ public class MwsLookup {
    private final String marketPlaceId;
    private final MarketplaceWebServiceProducts client;
 
+   private void parseNode(PasItemNode pas, NodeList list, String prepend) {
+       for (int i = 0; i < list.getLength(); i++) {
+           System.out.println(list.item(i).getLocalName());
+           System.out.println(list.item(i).getFirstChild().getNodeValue());
+           String attrName = list.item(i).getLocalName();
+           String attrValue = list.item(i).getFirstChild().getNodeValue();
+           if(attrName.equals("ItemDimensions")) {
+               parseNode(pas, list.item(i).getChildNodes(), "Item");
+           }
+           else if(attrName.equals("PackageDimensions")) {
+               parseNode(pas, list.item(i).getChildNodes(), "Package");
+           }
+           else if(attrName.equals("SmallImage")) {
+               parseNode(pas, list.item(i).getChildNodes(), "SmallImage");
+           }
+           else if(attrName.equals("ItemDimensions")) {
+               parseNode(pas, list.item(i).getChildNodes(), "Item");
+           }
+           setValue(pas, prepend+attrName, attrValue);
+       }
+   }
+
    public PasItemNode lookup(String asin) {
        GetMatchingProductRequest request = new GetMatchingProductRequest();
        request.setSellerId(sellerId);
@@ -52,13 +74,19 @@ public class MwsLookup {
 
        GetMatchingProductResponse response = invokeGetMatchingProduct(request);
        Product x = response.getGetMatchingProductResult().get(0).getProduct();
+       PasItemNode pas = new PasItemNode();
+       pas.setId(asin);
 
        if (x.isSetAttributeSets()) {
            System.out.println("                    Attributes");
            AttributeSetList attributeSetList = x.getAttributeSets();
            for (Object obj : attributeSetList.getAny()) {
                Node attribute = (Node) obj;
-               if(attribute.hasChildNodes()) {
+               if (attribute.hasChildNodes()) {
+                   parseNode(pas, attribute.getChildNodes(), "");
+               }
+
+/*               if(attribute.hasChildNodes()) {
                    NodeList list = attribute.getChildNodes();
                    for(int i=0; i < list.getLength(); i++) {
                        System.out.println(list.item(i).getLocalName());
@@ -72,15 +100,68 @@ public class MwsLookup {
                            }
                        }
                    }
-               }
-               System.out.println(ProductsUtil.formatXml(attribute));
-               System.out.println(attribute.getLocalName());
+               }*/
+               //System.out.println(ProductsUtil.formatXml(attribute));
+               //System.out.println(attribute.getLocalName());
 
            }
-           System.out.println();
        }
 
-       return null;
+       return pas;
+   }
+
+   public void setValue(PasItemNode node, String attribute, String value) {
+       switch (attribute) {
+           case "Brand":
+               node.setBrand(value);
+               break;
+           case "Model":
+               node.setModel(value);
+               break;
+           case "PartNumber":
+               node.setPartNumber(value);
+               break;
+           case "ProductGroup":
+               node.setProductGroup(value);
+               break;
+           case "ProductTypeName":
+               node.setProductType(value);
+               break;
+           case "SmallImageURL":
+               System.out.println(value);
+               value = value.replace("http://ecx.images-amazon.com/", "https://m.media-amazon.com/").replace("._SL75_.jpg", ".jpg");
+               System.out.println(value);
+               node.setImage(value);
+               break;
+           case "Title":
+               node.setTitle(value);
+               break;
+           case "PackageWeight":
+               node.setPackageWeight(value);
+               break;
+           case "PackageHeight":
+               node.setPackageHeight(value);
+               break;
+           case "PackageLength":
+               node.setPackageLength(value);
+               break;
+           case "PackageWidth":
+               node.setPackageWidth(value);
+               break;
+           case "ItemWeight":
+               node.setItemWeight(value);
+               break;
+           case "ItemHeight":
+               node.setItemHeight(value);
+               break;
+           case "ItemLength":
+               node.setItemLength(value);
+               break;
+           case "ItemWidth":
+               node.setItemWidth(value);
+               break;
+
+       }
    }
 
 

@@ -95,6 +95,7 @@ public class PasLookupParser {
     }
 
     private static ProductOverride getOverride(List<ProductOverride> overrides, OverrideType type) {
+        if (overrides == null) return null;
         return overrides.stream().filter(x -> x.getType() == type).findFirst().orElse(null);
     }
 
