@@ -21,7 +21,7 @@ import java.util.Optional;
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
    List<Purchase> findAllByOrderByCreatedDateDesc(Pageable page);
 
-   @Query("from Purchase p left join fetch p.merchant left join fetch p.purchaseItems")
+   @Query("from Purchase p left join fetch p.merchant left join fetch p.purchaseItems order by p.id DESC")
    List<Purchase> findForPurchaseList(Pageable page);
 
    @Query("from Purchase p left join fetch p.purchaseItems i left join fetch i.orderItem where p.id = ?1")
