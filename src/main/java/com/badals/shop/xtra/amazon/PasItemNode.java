@@ -46,6 +46,15 @@ public class PasItemNode implements Serializable {
    String itemWeightUnit;
    String packageWeight;
 
+   String packageHeight;
+   String packageLength;
+   String packageWidth;
+
+   String itemHeight;
+   String itemLength;
+   String itemWidth;
+
+
    String productGroup;
    String productType;
    String partNumber;
@@ -107,6 +116,8 @@ public class PasItemNode implements Serializable {
 
       if(weight != null) {
          BigDecimal w = new BigDecimal(weight);
+         if(getItemWeightUnit() == null)
+            return w;
          if(getItemWeightUnit().equalsIgnoreCase("kilograms"))
             return w.divide(LB2KG,  4, RoundingMode.HALF_EVEN);
          else if (getItemWeightUnit().equalsIgnoreCase("Grams"))
@@ -159,4 +170,6 @@ public class PasItemNode implements Serializable {
               ", image='" + image + '\'' +
               '}';
    }
+
+
 }

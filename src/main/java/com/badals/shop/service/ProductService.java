@@ -23,6 +23,7 @@ import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
+import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import org.imgscalr.Scalr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,8 @@ public class ProductService {
     private final SearchIndex<AlgoliaProduct> index;
     private final Pas5Service pas5Service;
     private final MessageSource messageSource;
+
+
 
     private final ProductMapper productMapper;
     private final AlgoliaProductMapper algoliaProductMapper;
@@ -182,12 +185,12 @@ public class ProductService {
 
     public Attribute indexProduct(long id) {
         Product product = productRepository.getOne(id);
-        AlgoliaProduct algoliaProduct = algoliaProductMapper.producttoAlgoliaProduct(product);
+       // AlgoliaProduct algoliaProduct = algoliaProductMapper.producttoAlgoliaProduct(product);
 
         /*for(ProductLang i: productLangRepository.findAllByProductId( id ) ){
             algoliaProduct.getI18().put(i.getLang(), new ProductI18(i.getTitle(), "", ""));
         }*/
-        index.saveObject(algoliaProduct);
+       // index.saveObject(algoliaProduct);
         return new Attribute("success", "1");
     }
 
