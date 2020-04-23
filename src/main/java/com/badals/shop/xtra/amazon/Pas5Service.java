@@ -81,6 +81,10 @@ public class Pas5Service implements IProductService {
     public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild) throws NoOfferException {
 
         Product product = productRepo.findBySkuJoinChildren(asin).orElse(null);
+
+        if(true)
+            return mwsItemShortCircuit(product, asin, isParent, isRebuild);
+
         //PasItemNode current = pasItemNodeSearchRepository.findById(asin);
         if (product == null) {
             product = new Product();
@@ -93,6 +97,8 @@ public class Pas5Service implements IProductService {
 
         }
         if(isParent) isRebuild = true;
+
+
         //if (product != null) // && product.getUpdated())
         List<Product> mws = new ArrayList<>();
         GetItemsResponse response = null;
@@ -196,6 +202,19 @@ public class Pas5Service implements IProductService {
             p = priceMws(p, overrides);
         }
 
+        product = productRepo.save(product);
+        return product;
+    }
+
+    private Product mwsItemShortCircuit(Product product, String asin, boolean isParent, boolean isRebuild) throws NoOfferException {
+        if(product == null) {
+            PasItemNode item = mwsLookup.lookup(asin);
+            product = new Product();
+            initProduct(product, item, false, null);
+            product.setVariationType(VariationType.SIMPLE);
+        }
+        List<ProductOverride> overrides = findOverrides(asin, null);
+        product = priceMws(product, overrides);
         product = productRepo.save(product);
         return product;
     }
