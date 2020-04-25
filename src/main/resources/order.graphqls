@@ -31,6 +31,7 @@ type OrderItem {
     productUrl: String
     productSku: String
     productId: Long
+    purchaseItems: [PurchaseItem]
 }
 
 type Order {
@@ -182,7 +183,11 @@ input CheckoutCartInput {
     items: [LineItemInput]
     #tenantId: Long
 }
-
+type OrderResponse {
+  items: [Order!]!
+  total: Int!
+  hasMore: Boolean!
+}
 
 
 extend type Mutation {
@@ -212,8 +217,9 @@ extend type Query {
     #getOrders(): [Orders]
     orderConfirmation(ref: String, key: String): Order
     orders(limit: Int = 10): [Order]
-    ordersA(state: [OrderState], limit: Int, searchText: String): [Order]
+    ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     orderA(id: ID): Order
+
 
     purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
     purchase(id: ID): Purchase

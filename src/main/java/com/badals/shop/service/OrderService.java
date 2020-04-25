@@ -6,6 +6,8 @@ import com.badals.shop.domain.Order;
 import com.badals.shop.domain.checkout.helper.AddressPojo;
 import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.domain.pojo.OrderResponse;
+import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.repository.OrderRepository;
 import com.badals.shop.service.dto.CustomerDTO;
@@ -155,12 +157,18 @@ public class OrderService {
         return orderRepository.findOrdersByCustomerOrderByCreatedDateDesc(loginUser).stream()
                 .map(orderMapper::toDto)
                 .collect(Collectors.toCollection(LinkedList::new));
+
     }
 
-    public List<OrderDTO> getOrders(List<OrderState> orderState, Integer limit, String searchText) {
-        return orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of(0,limit)).stream()
-                .map(orderMapper::toDto)
-                .collect(Collectors.toCollection(LinkedList::new));
+    public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText) {
+        List<Order> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
+        OrderResponse response = new OrderResponse();
+        response.setTotal(orders.size());
+        response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
+        Integer total = orderRepository.countForState(orderState);
+        response.setHasMore((limit+offset) < total);
+        return response;
+
     }
 
     public void sendPaymnetMessage(Long id) {
