@@ -33,4 +33,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    Optional<Order> getOrderWithSomeOrderItems(Long orderId, ArrayList<Long> orderItems);
 
    Optional<Order> findByReference(String ref);
+
+   @Query("select count(u) from Order u where u.orderState in ?1")
+   Integer countForState(List<OrderState> orderState);
 }

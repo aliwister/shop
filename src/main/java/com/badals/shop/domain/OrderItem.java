@@ -8,6 +8,8 @@ import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A OrderItem.
@@ -67,6 +69,17 @@ public class OrderItem implements Serializable {
 
     @Column(name="line_total")
     private BigDecimal lineTotal;
+
+    @OneToMany(mappedBy = "orderItem")
+    private Set<PurchaseItem> purchaseItems = new HashSet<>();
+
+    public Set<PurchaseItem> getPurchaseItems() {
+        return purchaseItems;
+    }
+
+    public void setPurchaseItems(Set<PurchaseItem> purchaseItems) {
+        this.purchaseItems = purchaseItems;
+    }
 
     public Product getProduct() {
         return product;

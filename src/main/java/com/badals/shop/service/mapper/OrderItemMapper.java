@@ -8,7 +8,7 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link OrderItem} and its DTO {@link OrderItemDTO}.
  */
-@Mapper(componentModel = "spring", uses = {OrderMapper.class})
+@Mapper(componentModel = "spring", uses = {OrderMapper.class, PurchaseItemMapper.class})
 public interface OrderItemMapper extends EntityMapper<OrderItemDTO, OrderItem> {
 
     @Mapping(source = "order.id", target = "orderId")
