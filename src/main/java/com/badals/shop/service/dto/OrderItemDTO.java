@@ -5,7 +5,9 @@ import javax.persistence.Column;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.OrderItem} entity.
@@ -44,6 +46,10 @@ public class OrderItemDTO implements Serializable {
 private String productUrl;
 private String productSku;
 private String productId;
+
+private Set<PurchaseItemDTO> purchaseItems = new HashSet<>();
+
+
 
     @Override
     public boolean equals(Object o) {

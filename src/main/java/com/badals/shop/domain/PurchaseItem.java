@@ -61,6 +61,7 @@ public class PurchaseItem implements Serializable {
     private Purchase purchase;
 
     @ManyToOne
+    @JsonIgnoreProperties("purchaseItems")
     @JoinTable(name = "purchase_item_order_item",
                joinColumns = @JoinColumn(name = "purchase_item_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "order_item_id", referencedColumnName = "id"))
