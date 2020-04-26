@@ -194,7 +194,7 @@ public class ProductService {
         return new Attribute("success", "1");
     }
 
-    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException {
+    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException, NoOfferException, PricingException {
         Product product = productRepository.findBySlugJoinCategories(slug).get();
         if(product == null)
             throw new ProductNotFoundException("Invalid Product");
@@ -204,7 +204,10 @@ public class ProductService {
                 throw new ProductNotFoundException("Lonely Parent");
             product = product.getChildren().iterator().next();
         }
-
+        else if(product.getStub() != null && product.getStub()) {
+            pas5Service.lookup(product.getSku(),false, false, false);
+            return this.getProductBySku(product.getSku());
+        }
 
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
         //return productRepository.findBySlugJoinCategories(slug).map(productMapper::toDto).orElse(null);

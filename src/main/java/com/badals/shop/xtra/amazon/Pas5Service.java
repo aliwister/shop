@@ -5,7 +5,9 @@ import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.ProductOverride;
+import com.badals.shop.domain.enumeration.OverrideType;
 import com.badals.shop.domain.enumeration.VariationType;
+import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.Variation;
 import com.badals.shop.repository.CategoryRepository;
@@ -28,6 +30,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.CRC32;
 
 @Service
 public class Pas5Service implements IProductService {
@@ -207,16 +210,57 @@ public class Pas5Service implements IProductService {
     }
 
     private Product mwsItemShortCircuit(Product product, String asin, boolean isParent, boolean isRebuild) throws NoOfferException {
+        List<ProductOverride> overrides = findOverrides(asin, null);
         if(product == null) {
             PasItemNode item = mwsLookup.lookup(asin);
             product = new Product();
+            //List<ProductOverride> overrides = findOverrides(asin, null);
             initProduct(product, item, false, null);
-            product.setVariationType(VariationType.SIMPLE);
+            product.setVariationType(item.getVariationType());
+            /*if(item.getVariationType() == VariationType.CHILD) {
+                String parentAsin = item.getParentAsin();
+                Product parent = productRepo.findBySkuJoinChildren(asin).orElse(null);
+                if (parent == null) {
+                    PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
+                    final Product finalParent = new Product();
+                    finalParent.setVariationType(VariationType.PARENT);
+                    Set<Product> children = new HashSet<>();
+                    final List<Variation> variations = new ArrayList<>();
+                    initProduct(finalParent, parentItem, true, null);
+                    parentItem.getVariations().forEach((key, value) -> children.add(initStub(key, value, finalParent)));
+                    children.forEach((child) -> variations.add(new Variation(child.getRef(), child.getVariationAttributes())));
+                    finalParent.setChildren(children);
+                    finalParent.setVariations(variations);
+                    productRepo.save(finalParent);
+                }
+                else {
+                    parent.getChildren().add(product);
+                    product.setParent(parent);
+                    parent = productRepo.save(parent);
+                }
+            }*/
         }
-        List<ProductOverride> overrides = findOverrides(asin, null);
-        product = priceMws(product, overrides);
+
+        product.weight(PasUtility.calculateWeight(product.getWeight(), PasLookupParser.getOverride(overrides, OverrideType.WEIGHT)));
+
+
+        if(product.getWeight() != null)
+            product = priceMws(product, overrides);
+
         product = productRepo.save(product);
         return product;
+    }
+
+    private Product initStub(String key, List<Attribute> value, Product parent) {
+        Product stub = new Product();
+        stub.setVariationType(VariationType.CHILD);
+        CRC32 checksum = new CRC32();
+        checksum.update(key.getBytes());
+        long ref = checksum.getValue();
+        stub.slug(String.valueOf(ref)).ref(ref).tenantId(11L).active(true).sku(key).stub(true).outOfStock(false).title("stub");
+        stub.setVariationAttributes(value);
+        stub.setParent(parent);
+        return stub;
     }
 
     MerchantStock getMerchantStock(Product product) {

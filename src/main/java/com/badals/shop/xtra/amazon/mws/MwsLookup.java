@@ -18,10 +18,13 @@ package com.badals.shop.xtra.amazon.mws;
 
 import com.amazonservices.mws.products.*;
 import com.amazonservices.mws.products.model.*;
+import com.badals.shop.domain.enumeration.VariationType;
+import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.xtra.amazon.PasItemNode;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,8 +46,7 @@ public class MwsLookup {
 
    private void parseNode(PasItemNode pas, NodeList list, String prepend) {
        for (int i = 0; i < list.getLength(); i++) {
-           System.out.println(list.item(i).getLocalName());
-           System.out.println(list.item(i).getFirstChild().getNodeValue());
+
            String attrName = list.item(i).getLocalName();
            String attrValue = list.item(i).getFirstChild().getNodeValue();
            if(attrName.equals("ItemDimensions")) {
@@ -75,7 +77,41 @@ public class MwsLookup {
        GetMatchingProductResponse response = invokeGetMatchingProduct(request);
        Product x = response.getGetMatchingProductResult().get(0).getProduct();
        PasItemNode pas = new PasItemNode();
+       pas.setVariationType(VariationType.SIMPLE);
        pas.setId(asin);
+
+       if(x.isSetRelationships()) {
+            RelationshipList r = x.getRelationships();
+            for (Object obj : r.getAny()) {
+                Node attribute = (Node) obj;
+                System.out.println(attribute.getLocalName());
+                String type = attribute.getLocalName();
+                String relationSku = getAsin(attribute.getChildNodes());
+
+                if (type.equals("VariationParent")) {
+                    //return lookup(relationSku, false);
+                    pas.setVariationType(VariationType.CHILD);
+                    pas.setParentAsin(relationSku);
+                }
+                else if (type.equals("VariationChild")) {
+                    pas.setVariationType(VariationType.PARENT);
+                    System.out.println("Has Child:"+relationSku);
+                    if (attribute.hasChildNodes()) {
+                        NodeList list = attribute.getChildNodes();
+                        ArrayList<Attribute> varList = new ArrayList<>();
+                        for (int i = 0; i < list.getLength(); i++) {
+                            if(list.item(i).getLocalName().equals("Identifiers"))
+                                continue;
+                            pas.getVariationDimensions().add(list.item(i).getLocalName());
+                            varList.add(new Attribute(list.item(i).getLocalName(), list.item(i).getFirstChild().getNodeValue()));
+                            //System.out.println(list.item(i).getLocalName()+"="+list.item(i).getFirstChild().getNodeValue());
+                        }
+                        pas.getVariations().put(relationSku, varList);
+                    }
+                }
+
+            }
+       }
 
        if (x.isSetAttributeSets()) {
            System.out.println("                    Attributes");
@@ -110,7 +146,25 @@ public class MwsLookup {
        return pas;
    }
 
-   public void setValue(PasItemNode node, String attribute, String value) {
+    private String getAsin(NodeList list) {
+        for (int i = 0; i < list.getLength(); i++) {
+            if(list.item(i).getLocalName().equals("Identifiers")) {
+                NodeList childList = list.item(i).getChildNodes();
+                for (int ii = 0; ii < childList.getLength(); ii++) {
+                    if (childList.item(ii).getLocalName().equals("MarketplaceASIN")) {
+                        NodeList cchildList = childList.item(i).getChildNodes();
+                        for (int iii = 0; iii < cchildList.getLength(); iii++) {
+                            if (cchildList.item(iii).getLocalName().equals("ASIN"))
+                                return cchildList.item(iii).getFirstChild().getNodeValue();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void setValue(PasItemNode node, String attribute, String value) {
        switch (attribute) {
            case "Brand":
                node.setBrand(value);
