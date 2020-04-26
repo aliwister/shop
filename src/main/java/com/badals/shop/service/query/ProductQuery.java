@@ -14,6 +14,7 @@ import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
+import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,8 @@ import java.util.concurrent.CompletableFuture;
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final ProductService productService;
-
+   @Autowired
+   private MwsLookup mwsLookup;
    private final CategoryService categoryService;
    private static final Logger log = LoggerFactory.getLogger(ProductQuery.class);
 
@@ -44,7 +46,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.getAllProducts(count);
       //return null;
    }
-   public ProductDTO product (String slug, String cookie)  throws ProductNotFoundException  {
+   public ProductDTO product (String slug, String cookie) throws ProductNotFoundException, NoOfferException, PricingException {
       ProductDTO dto = this.productService.getProductBySlug(slug);
       Customer loginUser = userService.getUserWithAuthorities().orElse(null);
       //CompletableFuture.supplyAsync(() -> productService.log(loginUser, slug, cookie))
@@ -97,6 +99,11 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    }
 
    public List<ProductDTO> pendingMerchantProducts(Long merchantId) {
+      return null;
+   }
+
+   public ProductDTO mws(String asin) {
+      mwsLookup.lookup(asin);
       return null;
    }
 }

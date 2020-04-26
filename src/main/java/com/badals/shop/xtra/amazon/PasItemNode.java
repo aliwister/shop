@@ -2,6 +2,7 @@ package com.badals.shop.xtra.amazon;
 
 import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.ProductOverride;
+import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
 import lombok.Data;
@@ -10,6 +11,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @Data
@@ -82,7 +85,12 @@ public class PasItemNode implements Serializable {
    String ean;
    String isbn;
 
+   VariationType variationType;
+
    List<Attribute> variationAttributes = new ArrayList<>();
+   HashSet<String> variationDimensions = new HashSet<>();
+
+   HashMap<String, List<Attribute>> variations = new HashMap<String, List<Attribute>>();
 
    boolean superSaver = false;
    boolean prime = false;
