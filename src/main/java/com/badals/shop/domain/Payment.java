@@ -61,6 +61,23 @@ public class Payment extends Auditable implements Serializable {
     @JsonIgnoreProperties("orderPayments")
     private Order order;
 
+    public Payment bankAccountNumber(String bankAccountNumber) {
+        this.bankAccountNumber = bankAccountNumber;
+        return this;
+    }
+    public Payment bankName(String bankName) {
+        this.bankName = bankName;
+        return this;
+    }
+    public Payment bankOwnerName(String bankOwnerName) {
+        this.bankOwnerName = bankOwnerName;
+        return this;
+    }
+    public Payment ref(Long ref) {
+        this.ref = ref;
+        return this;
+    }
+
 
     public Long getRef() {
         return ref;

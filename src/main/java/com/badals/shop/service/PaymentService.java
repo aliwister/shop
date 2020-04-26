@@ -99,7 +99,7 @@ public class PaymentService {
 
    public PaymentDTO addRefund(Long orderId, BigDecimal amount, String authCode, String bankName, String bankAccountNumber, String bankOwnerName, Long ref, String paymentMethod) {
       Payment p = new Payment();
-      p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod).authCode(authCode);
+      p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod).authCode(authCode).bankAccountNumber(bankAccountNumber).bankName(bankName).bankOwnerName(bankOwnerName).ref(ref);
       p = paymentRepository.save(p);
       return paymentMapper.toDto(p);
    }
