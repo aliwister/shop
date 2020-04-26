@@ -128,6 +128,37 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
+    public Boolean getStub() {
+        return stub;
+    }
+
+    public void setStub(Boolean stub) {
+        this.stub = stub;
+    }
+
+    public Boolean getOutOfStock() {
+        return outOfStock;
+    }
+
+    public void setOutOfStock(Boolean outOfStock) {
+        this.outOfStock = outOfStock;
+    }
+
+    @Column(name = "stub", nullable = false)
+    private Boolean stub;
+
+    @Column(name = "out_of_stock", nullable = false)
+    private Boolean outOfStock;
+
+    public Product stub(boolean b) {
+        stub = b;
+        return this;
+    }
+    public Product outOfStock(boolean b) {
+        outOfStock = b;
+        return this;
+    }
+
     @Convert(converter = StringListConverter.class)
     @Column(name = "similar_products")
     private List<String> similarProducts;
@@ -700,4 +731,6 @@ public class Product implements Serializable, IMerchantProduct {
             ", volumeWeight=" + getVolumeWeight() +
             "}";
     }
+
+
 }
