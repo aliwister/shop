@@ -134,6 +134,7 @@ type PurchaseQueue {
     sku: String
     productId: Long
     orderId: Long
+    attributes: String
 }
 
 type LineItem {
