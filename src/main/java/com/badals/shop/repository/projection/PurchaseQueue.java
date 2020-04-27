@@ -1,6 +1,9 @@
 package com.badals.shop.repository.projection;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface PurchaseQueue {
    Long getId();
@@ -14,4 +17,7 @@ public interface PurchaseQueue {
    String getSku();
    Long getOrderId();
    Long getProductId();
+
+   //@Value("T(org.springframework.util.CollectionUtils).arrayToList(attributes.split(','))")
+   String getAttributes();
 }
