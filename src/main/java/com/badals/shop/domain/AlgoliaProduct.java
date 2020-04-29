@@ -42,6 +42,14 @@ public class AlgoliaProduct implements Serializable {
 
     private Map<String, BigDecimal> price;
     private String image;
+    private Long quantity;
+    private String tenant;
+    private String merchant;
+    private String unit;
+
+    private Integer discountInPercent;
+
+    private Long hours;
 
     //private LocalDate releaseDate;
 

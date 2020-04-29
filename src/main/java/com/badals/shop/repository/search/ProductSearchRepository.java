@@ -6,4 +6,5 @@ import com.badals.shop.service.pojo.AddProductDTO;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 public interface ProductSearchRepository extends ElasticsearchRepository<AddProductDTO, Long> {
+   AddProductDTO findBySlug(String slug);
 }
