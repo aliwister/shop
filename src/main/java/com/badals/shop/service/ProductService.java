@@ -390,9 +390,10 @@ public class ProductService {
             //importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant, false);
             doc.setId(id);
             doc.setImported(true);
+           doc.setMerchant(currentMerchant);
+           doc.setTenant(currentTenant);
             AlgoliaProduct algoliaProduct = algoliaProductMapper.addProductToAlgoliaProduct(doc);
-            algoliaProduct.setMerchant(currentMerchant);
-            algoliaProduct.setTenant(currentTenant);
+
             productSearchRepository.save(doc);
            index.saveObject(algoliaProduct);
 
