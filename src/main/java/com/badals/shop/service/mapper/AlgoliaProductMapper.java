@@ -111,7 +111,7 @@ public interface AlgoliaProductMapper {
 
         if(source.getSalePrice()!= null) {
             Map price = new HashMap<String, String>();
-            price.put("OMR", source.getPrice().setScale(2, RoundingMode.HALF_UP));
+            price.put("OMR", source.getSalePrice().setScale(2, RoundingMode.HALF_UP));
             target.setPrice(price);
         }
 
