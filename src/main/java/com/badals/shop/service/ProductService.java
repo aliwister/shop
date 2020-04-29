@@ -195,6 +195,14 @@ public class ProductService {
     }
 
     public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException, NoOfferException, PricingException {
+        char c = slug.charAt(0);
+        if (c >= 'A' && c <= 'Z') {
+            AddProductDTO addProductDTO = productSearchRepository.findBySlug(slug);
+            if(addProductDTO != null)
+                return addProductMapper.toProductDto(addProductDTO);
+        }
+
+
         Product product = productRepository.findBySlugJoinCategories(slug).get();
         if(product == null)
             throw new ProductNotFoundException("Invalid Product");
@@ -377,12 +385,17 @@ public class ProductService {
             }
             if(!doc.getSku().startsWith(tenantObj.getSkuPrefix()))
                 doc.setSku(tenantObj.getSkuPrefix()+doc.getSku());
-            doc.setShopIds(shopIds);
-            doc.setBrowseNode(browseNode);
-            importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant, false);
+            //doc.setShopIds(shopIds);
+            //doc.setBrowseNode(browseNode);
+            //importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant, false);
             doc.setId(id);
             doc.setImported(true);
+            AlgoliaProduct algoliaProduct = algoliaProductMapper.addProductToAlgoliaProduct(doc);
+            algoliaProduct.setMerchant(currentMerchant);
+            algoliaProduct.setTenant(currentTenant);
             productSearchRepository.save(doc);
+           index.saveObject(algoliaProduct);
+
         }
     }
 
@@ -392,7 +405,7 @@ public class ProductService {
         CRC32 checksum = new CRC32();
         checksum.update(image.getBytes());
 
-        String objectKey = "_m/" + t + "/" + m + "/" + checksum.getValue()+image.substring(image.length()-4,image.length());
+        String objectKey = "_m/" + m + "/" + checksum.getValue()+image.substring(image.length()-4,image.length());
 
 
         try {

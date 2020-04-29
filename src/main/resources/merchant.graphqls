@@ -22,7 +22,7 @@ type MerchantProduct {
       features_ar: String
       cost: BigDecimal
       weight: BigDecimal
-      #slug
+      slug: String
       type: String
       unit: String
       availability: Int
@@ -31,6 +31,8 @@ type MerchantProduct {
       discountInPercent: Int
       shopIds: [Long]
       gallery: [String]
+      browseNode: String
+      browseNode_ar: String
 }
 
 type MerchantProductResponse {
@@ -57,7 +59,8 @@ input AddProductInput {
       weight: BigDecimal
       shopIds: [Long]
       browseNode: String
-      #slug
+      browseNode_ar: String
+      slug: String
       type: String
       unit: String
       availability: Int
