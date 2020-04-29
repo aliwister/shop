@@ -9,6 +9,7 @@ import com.badals.shop.service.pojo.AddProductDTO;
 import org.mapstruct.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,8 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
 
         target.setDescription(source.getDescription());
         target.setBrowseNode(source.getBrowseNode());
+
+        target.setPrice(source.getSalePrice().setScale(2, RoundingMode.HALF_UP).toString());
     }
 
     @AfterMapping
