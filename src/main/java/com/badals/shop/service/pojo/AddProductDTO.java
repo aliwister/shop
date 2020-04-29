@@ -59,6 +59,7 @@ public class AddProductDTO {
    List<Long> shopIds;
 
    String browseNode;
+   String browseNode_ar;
    String variationType;
    Boolean imported;
    Boolean indexed;
