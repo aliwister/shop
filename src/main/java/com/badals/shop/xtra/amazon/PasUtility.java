@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 public class PasUtility {
    private static final double USD2OMR = .386;
    private static final double LB2KG = 0.453592;
-   private static final double OMRPERKG = 3.8;
+   private static final double OMRPERKG = 3.4;
 
    public static BigDecimal calculatePrice(BigDecimal cost, BigDecimal weight, double localShipping, double margin, double risk, double fixed, boolean isPrime, boolean isFulfilledByAmazon, String shippingCountry) throws PricingException {
       double dWeight = weight.doubleValue()*LB2KG;
@@ -45,7 +45,7 @@ public class PasUtility {
       //if($isDirect) 		$w_add = 0 ;
       //if(!isInsurance) 	$insurance = 0;
       double dPrice = (dCost + c_add + insurance  ) * USD2OMR + fixed + w_add;
-      dPrice = Math.round(dPrice*10.2)/10.0;
+      dPrice = Math.round(dPrice*9.9)/10.0;
 
       BigDecimal price = BigDecimal.valueOf(dPrice);
       return price;
