@@ -20,7 +20,10 @@ import com.amazonservices.mws.products.*;
 import com.amazonservices.mws.products.model.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.service.ProductService;
 import com.badals.shop.xtra.amazon.PasItemNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -43,6 +46,7 @@ public class MwsLookup {
    private final String sellerId;
    private final String marketPlaceId;
    private final MarketplaceWebServiceProducts client;
+    private final Logger log = LoggerFactory.getLogger(MwsLookup.class);
 
    private void parseNode(PasItemNode pas, NodeList list, String prepend) {
        for (int i = 0; i < list.getLength(); i++) {
@@ -84,7 +88,7 @@ public class MwsLookup {
             RelationshipList r = x.getRelationships();
             for (Object obj : r.getAny()) {
                 Node attribute = (Node) obj;
-                System.out.println(attribute.getLocalName());
+                log.debug(attribute.getLocalName());
                 String type = attribute.getLocalName();
                 String relationSku = getAsin(attribute.getChildNodes());
 
@@ -95,7 +99,7 @@ public class MwsLookup {
                 }
                 else if (type.equals("VariationChild")) {
                     pas.setVariationType(VariationType.PARENT);
-                    System.out.println("Has Child:"+relationSku);
+                    log.debug("Has Child:"+relationSku);
                     if (attribute.hasChildNodes()) {
                         NodeList list = attribute.getChildNodes();
                         ArrayList<Attribute> varList = new ArrayList<>();
@@ -104,7 +108,7 @@ public class MwsLookup {
                                 continue;
                             pas.getVariationDimensions().add(list.item(i).getLocalName());
                             varList.add(new Attribute(list.item(i).getLocalName(), list.item(i).getFirstChild().getNodeValue()));
-                            //System.out.println(list.item(i).getLocalName()+"="+list.item(i).getFirstChild().getNodeValue());
+                            //log.debug(list.item(i).getLocalName()+"="+list.item(i).getFirstChild().getNodeValue());
                         }
                         pas.getVariations().put(relationSku, varList);
                     }
@@ -114,7 +118,7 @@ public class MwsLookup {
        }
 
        if (x.isSetAttributeSets()) {
-           System.out.println("                    Attributes");
+           log.debug("                    Attributes");
            AttributeSetList attributeSetList = x.getAttributeSets();
            for (Object obj : attributeSetList.getAny()) {
                Node attribute = (Node) obj;
@@ -182,9 +186,9 @@ public class MwsLookup {
                node.setProductType(value);
                break;
            case "SmallImageURL":
-               System.out.println(value);
+               log.debug(value);
                value = value.replace("http://ecx.images-amazon.com/", "https://m.media-amazon.com/").replace("._SL75_.jpg", ".jpg");
-               System.out.println(value);
+               log.debug(value);
                node.setImage(value);
                break;
            case "Title":
@@ -238,11 +242,24 @@ public class MwsLookup {
         GetLowestOfferListingsForASINResponse response = invokeGetLowestOfferListingsForASIN(request);
 
         Product x = response.getGetLowestOfferListingsForASINResult().get(0).getProduct();
+
+        //if(x.getLowestOfferListings().getLowestOfferListing().size() == 0) {
+
+          //  return fetch2(asin);
+        //}
+
         for (LowestOfferListingType l: x.getLowestOfferListings().getLowestOfferListing()) {
             QualifiersType q = l.getQualifiers();
             node.addOffer(l.getPrice().getLandedPrice().getAmount(), q.getShipsDomestically().equals("True"), q.getFulfillmentChannel().equals("Amazon"), q.getSellerPositiveFeedbackRating(), l.getSellerFeedbackCount(), q.getShippingTime().getMax());
         }
+
+
         return node;
+    }
+
+    private MwsItemNode fetch2(String asin) {
+        //GetLowestPricedOffersForASINResult  request = new GetLowestOfferListingsForASINRequest();
+        return null;
     }
 
 
@@ -262,24 +279,24 @@ public class MwsLookup {
             GetLowestOfferListingsForASINResponse response = client.getLowestOfferListingsForASIN(request);
             ResponseHeaderMetadata rhmd = response.getResponseHeaderMetadata();
             // We recommend logging every the request id and timestamp of every call.
-            System.out.println("Response:");
-            System.out.println("RequestId: "+rhmd.getRequestId());
-            System.out.println("Timestamp: "+rhmd.getTimestamp());
+            log.debug("Response:");
+            log.debug("RequestId: "+rhmd.getRequestId());
+            log.debug("Timestamp: "+rhmd.getTimestamp());
             String responseXml = response.toXML();
-            System.out.println(responseXml);
+            log.debug(responseXml);
             return response;
         } catch (MarketplaceWebServiceProductsException ex) {
             // Exception properties are important for diagnostics.
-            System.out.println("Service Exception:");
+            log.debug("Service Exception:");
             ResponseHeaderMetadata rhmd = ex.getResponseHeaderMetadata();
             if(rhmd != null) {
-                System.out.println("RequestId: "+rhmd.getRequestId());
-                System.out.println("Timestamp: "+rhmd.getTimestamp());
+                log.debug("RequestId: "+rhmd.getRequestId());
+                log.debug("Timestamp: "+rhmd.getTimestamp());
             }
-            System.out.println("Message: "+ex.getMessage());
-            System.out.println("StatusCode: "+ex.getStatusCode());
-            System.out.println("ErrorCode: "+ex.getErrorCode());
-            System.out.println("ErrorType: "+ex.getErrorType());
+            log.debug("Message: "+ex.getMessage());
+            log.debug("StatusCode: "+ex.getStatusCode());
+            log.debug("ErrorCode: "+ex.getErrorCode());
+            log.debug("ErrorType: "+ex.getErrorType());
             throw ex;
         }
     }
@@ -297,24 +314,24 @@ public class MwsLookup {
           GetMatchingProductResponse response = client.getMatchingProduct(request);
           ResponseHeaderMetadata rhmd = response.getResponseHeaderMetadata();
           // We recommend logging every the request id and timestamp of every call.
-          System.out.println("Response:");
-          System.out.println("RequestId: "+rhmd.getRequestId());
-          System.out.println("Timestamp: "+rhmd.getTimestamp());
+          log.debug("Response:");
+          log.debug("RequestId: "+rhmd.getRequestId());
+          log.debug("Timestamp: "+rhmd.getTimestamp());
           String responseXml = response.toXML();
-          System.out.println(responseXml);
+          log.debug(responseXml);
           return response;
       } catch (MarketplaceWebServiceProductsException ex) {
           // Exception properties are important for diagnostics.
-          System.out.println("Service Exception:");
+          log.debug("Service Exception:");
           ResponseHeaderMetadata rhmd = ex.getResponseHeaderMetadata();
           if(rhmd != null) {
-              System.out.println("RequestId: "+rhmd.getRequestId());
-              System.out.println("Timestamp: "+rhmd.getTimestamp());
+              log.debug("RequestId: "+rhmd.getRequestId());
+              log.debug("Timestamp: "+rhmd.getTimestamp());
           }
-          System.out.println("Message: "+ex.getMessage());
-          System.out.println("StatusCode: "+ex.getStatusCode());
-          System.out.println("ErrorCode: "+ex.getErrorCode());
-          System.out.println("ErrorType: "+ex.getErrorType());
+          log.debug("Message: "+ex.getMessage());
+          log.debug("StatusCode: "+ex.getStatusCode());
+          log.debug("ErrorCode: "+ex.getErrorCode());
+          log.debug("ErrorType: "+ex.getErrorType());
           throw ex;
       }
   }

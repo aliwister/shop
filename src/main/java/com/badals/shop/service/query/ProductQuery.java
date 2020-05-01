@@ -15,6 +15,7 @@ import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.badals.shop.xtra.amazon.mws.MwsLookup;
+import com.badals.shop.xtra.ebay.EbayLookup;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,13 @@ import java.util.concurrent.CompletableFuture;
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final ProductService productService;
+
    @Autowired
    private MwsLookup mwsLookup;
+
+   @Autowired
+   private EbayLookup ebayLookup;
+
    private final CategoryService categoryService;
    private static final Logger log = LoggerFactory.getLogger(ProductQuery.class);
 
@@ -105,6 +111,10 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    public ProductDTO mws(String asin) {
       mwsLookup.lookup(asin);
       return null;
+   }
+
+   public ProductDTO ebay(String id) throws ProductNotFoundException, NoOfferException {
+      return productService.lookupEbay(id);
    }
 }
 

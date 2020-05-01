@@ -20,6 +20,9 @@ public class PricingRequestDTO implements Serializable {
     private String email;
     private String parent;
 
+    private int merchantId;
+    private String merchantName;
+
 
     @Override
     public boolean equals(Object o) {

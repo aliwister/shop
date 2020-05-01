@@ -262,26 +262,26 @@ public class Product implements Serializable, IMerchantProduct {
 
 
     @ManyToOne
-    @JoinColumn(name="tenant_id", insertable = false, updatable = false)
-    Tenant tenant;
+    @JoinColumn(name="merchant_id", insertable = false, updatable = false)
+    Merchant merchant;
 
-    @Column(name = "tenant_id")
-    private Long tenantId;
+    @Column(name = "merchant_id")
+    private Long merchantId;
 
-    public Tenant getTenant() {
-        return tenant;
+    public Merchant getMerchant() {
+        return merchant;
     }
 
-    public void setTenant(Tenant tenant) {
-        this.tenant = tenant;
+    public void setMerchant(Merchant merchant) {
+        this.merchant = merchant;
     }
 
-    public Long getTenantId() {
-        return tenantId;
+    public Long getMerchantId() {
+        return merchantId;
     }
 
-    public void setTenantId(Long tenantId) {
-        this.tenantId = tenantId;
+    public void setMerchantId(Long merchantId) {
+        this.merchantId = merchantId;
     }
 
     public Boolean getActive() {
@@ -311,8 +311,8 @@ public class Product implements Serializable, IMerchantProduct {
     }
 
     @Override
-    public Product tenantId(Long l) {
-        this.tenantId = l;
+    public Product merchantId(Long l) {
+        this.merchantId = l;
         return this;
     }
 
