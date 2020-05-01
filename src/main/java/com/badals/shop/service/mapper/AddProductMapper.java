@@ -2,6 +2,7 @@ package com.badals.shop.service.mapper;
 
 import com.badals.shop.aop.logging.TenantContext;
 import com.badals.shop.domain.*;
+import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
@@ -25,7 +26,6 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
     @Mapping(target = "title", source = "name")
-    @Mapping(target = "variationType", source="type")
     Product toEntity(AddProductDTO productDTO);
 
     @Mapping(target = "gallery", ignore = true)
@@ -36,6 +36,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "features", ignore = true)
     @Mapping(target = "title", source="name")
+    @Mapping(target = "type", ignore = true)
     ProductDTO toProductDto(AddProductDTO product);
 
     @AfterMapping
@@ -60,6 +61,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         target.getProductLangs().add(langEn.product(target));
 
         target.setActive(true);
+        target.setVariationType(VariationType.valueOf(source.getType()));
     }
 
     @AfterMapping
