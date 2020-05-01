@@ -82,10 +82,14 @@ public class AdminMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy) throws PricingException, NoOfferException, ProductNotFoundException {
+    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId) throws PricingException, NoOfferException, ProductNotFoundException {
         ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
         productOverrideService.saveOrUpdate(dto);
-        ProductDTO productDTO = productService.lookupPas(sku, true, false);
+        ProductDTO productDTO = null;
+        if(merchantId == 1L)
+            productDTO = productService.lookupPas(sku, true, false);
+        else if(merchantId == 2L)
+            productDTO = productService.lookupEbay(sku);
         return productDTO;
     }
 

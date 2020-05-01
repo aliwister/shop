@@ -257,7 +257,7 @@ public class Pas5Service implements IProductService {
         CRC32 checksum = new CRC32();
         checksum.update(key.getBytes());
         long ref = checksum.getValue();
-        stub.slug(String.valueOf(ref)).ref(ref).tenantId(11L).active(true).sku(key).stub(true).outOfStock(false).title("stub");
+        stub.slug(String.valueOf(ref)).ref(ref).merchantId(11L).active(true).sku(key).stub(true).outOfStock(false).title("stub");
         stub.setVariationAttributes(value);
         stub.setParent(parent);
         return stub;
@@ -305,7 +305,7 @@ public class Pas5Service implements IProductService {
     }
 
     Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
-        product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides);
+        product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides, 1L, "", "");
         if((product.getWeight() == null || product.getWeight().doubleValue() < .001) && !isParent) {
             BigDecimal weight = productRepo.lookupWeight(product.getSku());
             product.setWeight(weight);

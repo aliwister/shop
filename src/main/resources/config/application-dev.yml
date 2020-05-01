@@ -159,3 +159,6 @@ aws:
 
 badals:
   checkout-app: http://127.0.0.1:8081/checkout/start
+
+ebay:
+  app-id: BadalTra-5d42-45de-b09b-586ff14be57f

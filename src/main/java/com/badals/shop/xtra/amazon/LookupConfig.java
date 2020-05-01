@@ -6,6 +6,7 @@ import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import com.badals.shop.xtra.amazon.mws.MwsRequestHelper;
 import com.badals.shop.xtra.amazon.paapi4.Pas4Lookup;
 import com.badals.shop.xtra.amazon.paapi5.PasLookup;
+import com.badals.shop.xtra.ebay.EbayLookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,9 @@ public class LookupConfig {
 
    @Value("${mws.marketplaceid}")
    private String mwsMarketPlaceId;
+
+   @Value("${ebay.app-id}")
+   private String ebayAppId;
 
 
    @Bean
@@ -69,7 +73,11 @@ public class LookupConfig {
       return mwsLookup;
    }
 
-
+   @Bean
+   public EbayLookup ebayLookup() {
+      final EbayLookup ebayLookup = new EbayLookup(ebayAppId);
+      return ebayLookup;
+   }
 
 
 

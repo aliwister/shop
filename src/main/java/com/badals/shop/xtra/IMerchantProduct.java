@@ -52,5 +52,5 @@ public interface IMerchantProduct {
 
     List<String> getVariationDimensions();
 
-   IMerchantProduct tenantId(Long l);
+   IMerchantProduct merchantId(Long l);
 }
