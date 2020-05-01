@@ -27,7 +27,17 @@ public class PricingRequest extends Auditable implements Serializable {
 
     @Column(name = "email_sent", nullable = false)
     private Boolean emailSent;
-    
+
+    @ManyToOne
+    private Merchant merchant;
+
+    public Merchant getMerchant() {
+        return merchant;
+    }
+
+    public void setMerchant(Merchant merchant) {
+        this.merchant = merchant;
+    }
 
     public Boolean getEmailSent() {
         return emailSent;

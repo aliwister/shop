@@ -3,6 +3,8 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -31,6 +33,8 @@ public class CartItemDTO implements Serializable {
     private String title;
     private String slug;
     private String unit = "pcs";
+
+    //private List<String> variationAttributes = new ArrayList<String>();
 
     @Override
     public boolean equals(Object o) {

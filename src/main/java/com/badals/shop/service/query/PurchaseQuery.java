@@ -40,7 +40,7 @@ public class PurchaseQuery extends ShopQuery implements GraphQLQueryResolver {
         List<PurchaseDTO> orders = purchaseService.findForPurchaseList(orderState, limit, searchText);
         return orders;
     }
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<PurchaseQueue> purchaseQueue() {
         return purchaseService.getPurchaseQueue();
     }

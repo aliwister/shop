@@ -110,12 +110,10 @@ public class PurchaseService {
         }
         purchase.getPurchaseItems().clear();
 
-
         for(PurchaseItemDTO i : items) {
             PurchaseItem pi = purchaseItemMapper.toEntity(i);
             pi.setPurchase(purchase);
             purchase.getPurchaseItems().add(pi);
-
         }
 
         purchase = purchaseRepository.save(purchase);
