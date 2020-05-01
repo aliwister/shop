@@ -44,6 +44,7 @@ public class EbayService {
       PasItemNode item = ebayLookup.lookup(id);
       product = initProduct(product, item, false, overrides);
       product.setVariationType(item.getVariationType());
+      product.setUrl(item.getUrl());
       product = productRepo.save(product);
 
 
