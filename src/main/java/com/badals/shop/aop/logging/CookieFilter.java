@@ -23,6 +23,7 @@ public class CookieFilter implements Filter {
       HttpServletRequest req = (HttpServletRequest) request;
       Cookie[] cookies = req.getCookies();
       //log.info("---------------------COOOOOOOOOOKIIIIIIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEE");
+      //log.info(((HttpServletRequest) request).getRequestURI());
       if (cookies != null) {
          for (Cookie ck : cookies) {
            /* if ("nameOfMyCookie".equals(ck.getName())) {

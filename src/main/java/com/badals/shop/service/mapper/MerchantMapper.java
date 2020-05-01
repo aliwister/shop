@@ -11,8 +11,6 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {})
 public interface MerchantMapper extends EntityMapper<MerchantDTO, Merchant> {
 
-
-
     default Merchant fromId(Long id) {
         if (id == null) {
             return null;

@@ -47,8 +47,6 @@ public class CartItem implements Serializable {
     @Column(name = "product_id")
     private Long productId;
 
-
-
     @ManyToOne
     @JoinColumn(name="product_id", referencedColumnName = "ref", insertable = false, updatable = false)
     private Product product;

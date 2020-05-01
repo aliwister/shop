@@ -7,7 +7,6 @@ import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.MerchantProductResponse;
 import com.badals.shop.domain.pojo.ProductResponse;
-import com.badals.shop.domain.pojo.Variation;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
@@ -22,8 +21,9 @@ import com.badals.shop.service.util.S3Util;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
+import com.badals.shop.xtra.amazon.PasItemNode;
 import com.badals.shop.xtra.amazon.PricingException;
-import com.badals.shop.xtra.amazon.mws.MwsLookup;
+import com.badals.shop.xtra.ebay.EbayService;
 import org.imgscalr.Scalr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +67,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final SearchIndex<AlgoliaProduct> index;
     private final Pas5Service pas5Service;
+    private final EbayService ebayService;
     private final MessageSource messageSource;
 
 
@@ -78,8 +79,9 @@ public class ProductService {
     private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
 
-    public ProductService(ProductRepository productRepository, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService) {
+    public ProductService(ProductRepository productRepository, EbayService ebayService, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService) {
         this.productRepository = productRepository;
+        this.ebayService = ebayService;
         this.productMapper = productMapper;
         this.algoliaProductMapper = algoliaProductMapper;
         this.index = index;
@@ -298,10 +300,10 @@ public class ProductService {
         return dto;
     }
 
-    public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant, boolean isSaveES) {
-        Product product = null;
+    public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long merchantId, String currentTenant, boolean isSaveES) {
+        Product product = productRepository.findOneByRef(dto.getId()).orElse(new Product());
         CRC32 checksum = new CRC32();
-        if(dto.getId() == null) {
+/*        if(dto.getId() == null) {
             product = addProductMapper.toEntity(dto);
 
             product.setSku(dto.getSku());
@@ -317,15 +319,19 @@ public class ProductService {
                 product.setRef(Long.valueOf(ref));
                 product.setSlug(ref);
             }
-        }
+        }*/
+
         if(product.getVariationType() == null)
             product.setVariationType(VariationType.SIMPLE);
 
         product.setActive(false);
 
-
+        product.setRef(dto.getRef());
+        product.setSlug(dto.getSlug());
         product.setTitle(dto.getName());
-        product.setTenantId(tenantId);
+        product.setMerchantId(merchantId);
+
+
         product.getMerchantStock().clear();
         product.getProductLangs().clear();
         product.getCategories().clear();
@@ -355,10 +361,10 @@ public class ProductService {
 
         //product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
         product = productRepository.save(product);
-        dto.setTenant(currentMerchant);
-        dto.setSlug(product.getSlug());
-        dto.setRef(product.getRef());
-        dto.setImported(true);
+        //dto.setTenant(currentMerchant);
+        //dto.setSlug(product.getSlug());
+        //dto.setRef(product.getRef());
+        //dto.setImported(true);
 
         if(isSaveES)
             productSearchRepository.save(dto);
@@ -387,11 +393,11 @@ public class ProductService {
                 doc.setSku(tenantObj.getSkuPrefix()+doc.getSku());
             //doc.setShopIds(shopIds);
             //doc.setBrowseNode(browseNode);
-            //importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant, false);
+            importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant, false);
             doc.setId(id);
             doc.setImported(true);
-           doc.setMerchant(currentMerchant);
-           doc.setTenant(currentTenant);
+            doc.setMerchant(currentMerchant);
+            doc.setTenant(currentTenant);
             AlgoliaProduct algoliaProduct = algoliaProductMapper.addProductToAlgoliaProduct(doc);
 
             productSearchRepository.save(doc);
@@ -492,6 +498,24 @@ public class ProductService {
         }
 
         return new Dimension(new_width, new_height);
+    }
+
+    public ProductDTO lookupEbay(String id) throws NoOfferException, ProductNotFoundException {
+        Product node = ebayService.lookup(id, false);
+        return productMapper.toDto(node);
+    }
+
+    public boolean exists(Long productId) {
+        if (productRepository.findOneByRef(productId).isPresent())
+            return true;
+
+
+        if (productSearchRepository.existsById(productId)) {
+            productRepository.save(addProductMapper.toEntity(productSearchRepository.findById(productId).get()).active(true));
+            return true;
+        }
+
+        return false;
     }
 
 /*

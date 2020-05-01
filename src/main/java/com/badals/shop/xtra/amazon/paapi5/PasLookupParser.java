@@ -31,14 +31,14 @@ public class PasLookupParser {
 
     private static final Logger log = LoggerFactory.getLogger(PasLookupParser.class);
 
-    public static IMerchantProduct parseProduct(IMerchantProduct p, PasItemNode i, boolean isParent, List<ProductOverride> overrides) {
+    public static IMerchantProduct parseProduct(IMerchantProduct p, PasItemNode i, boolean isParent, List<ProductOverride> overrides, Long merchantId, String refPrepend, String slugPrepend) {
         //Reset price
         p.setPrice(null);
 
         CRC32 checksum = new CRC32();
         checksum.update(i.getId().getBytes());
         long ref = checksum.getValue();
-        p.ref(ref).slug(String.valueOf(ref))
+        p.ref(Long.parseLong(refPrepend+ref)).slug(String.valueOf(slugPrepend+ref))
                 .active(true)
                 .sku(i.getId())
                 .url(i.getUrl())
@@ -47,7 +47,7 @@ public class PasLookupParser {
                 .weight(PasUtility.calculateWeight(i.getParsedWeight(), getOverride(overrides, OverrideType.WEIGHT)))
                 .title(i.getTitle())
                 .upc(i.getUpc())
-                .tenantId(11L)
+                .merchantId(merchantId)
                 .gallery(i.gallerizeImages());
         //p.setTenantId()
         return p;

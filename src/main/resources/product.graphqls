@@ -132,6 +132,7 @@ type Product {
     hours: Int
     availability: String
     features: [String]
+    browseNode: String
 }
 
 type LocalizedValue {
@@ -257,6 +258,8 @@ type PricingRequest {
     ref: String
     email: String
     parent: String
+    merchantId: Int
+    merchantName: String
 }
 
 extend type Query {
@@ -278,6 +281,8 @@ extend type Query {
     getProductBySku(sku: String, isParent: Boolean = false):Product
     pricingRequests:[PricingRequest]
     parentOf(sku: String): String
+    mws(sku: String):Product
+    ebay(id: String):Product
 }
 
 extend type Mutation {
@@ -292,7 +297,7 @@ extend type Mutation {
             i18n: ProductI18nInput):ProductI18n,
     pasLookup(sku: String): Product
     addToPricingQ(sku: String):Message
-    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean): Product
+    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int): Product
     completePricingRequest(id: Long):Message
     completePricingRequestAndEmail(id: Long):Message
     addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message

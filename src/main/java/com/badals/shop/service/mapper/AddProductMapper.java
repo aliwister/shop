@@ -23,12 +23,13 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(target = "removeProductLang", ignore = true)
     @Mapping(target = "merchantStock", ignore = true)
     @Mapping(target = "gallery", ignore = true)
-    @Mapping(target = "tenant", ignore = true)
-    //@Mapping(target = "")
+    @Mapping(target = "merchant", ignore = true)
+    @Mapping(target = "title", source = "name")
+    @Mapping(target = "variationType", source="type")
     Product toEntity(AddProductDTO productDTO);
 
     @Mapping(target = "gallery", ignore = true)
-    @Mapping(target = "tenant", ignore = true)
+    @Mapping(target = "merchant", ignore = true)
     AddProductDTO toDto(Product product);
 
     @Mapping(target="hours", source = "availability")
@@ -46,6 +47,19 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
             }
             target.setGallery(gallery);
         }
+        ProductLang langAr = new ProductLang().lang("ar").description(source.getDescription_ar()).title(source.getName_ar()).brand(source.getBrand_ar()).browseNode(source.getBrowseNode());
+        if(source.getFeatures_ar() != null)
+            langAr.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
+
+
+        ProductLang langEn = new ProductLang().lang("en").description(source.getDescription()).title(source.getName()).brand(source.getBrand()).browseNode(source.getBrowseNode());
+        if(source.getFeatures() != null)
+            langEn.setFeatures(Arrays.asList(source.getFeatures().split(";")));
+
+        target.getProductLangs().add(langAr.product(target));
+        target.getProductLangs().add(langEn.product(target));
+
+        target.setActive(true);
     }
 
     @AfterMapping

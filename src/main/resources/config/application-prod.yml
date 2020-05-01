@@ -180,6 +180,8 @@ mws:
 badals:
   checkout-app: https://checkout.badals.com/checkout/start
 
+ebay:
+  app-id: BadalTra-5d42-45de-b09b-586ff14be57f
 
 graphiql:
   mapping: /graphiql

@@ -48,7 +48,7 @@ public class CartService {
     private final CheckoutAddressMapper checkoutAddressMapper;
 
     private final UserService userService;
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
     public static String createUIUD() {
         // Creating a random UUID (Universally unique identifier).
@@ -56,7 +56,7 @@ public class CartService {
         return uuid.toString();
     }
 
-    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, UserService userService, ProductRepository productRepository, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, UserService userService, ProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.cartMapper = cartMapper;
@@ -64,7 +64,7 @@ public class CartService {
         this.userService = userService;
         this.checkoutCartMapper = checkoutCartMapper;
         this.checkoutCartRepository = checkoutCartRepository;
-        this.productRepository = productRepository;
+        this.productService = productService;
         this.checkoutLineItemMapper = checkoutLineItemMapper;
         this.checkoutAddressMapper = checkoutAddressMapper;
     }
@@ -189,10 +189,10 @@ public class CartService {
                 existing.setQuantity(existing.getQuantity() + dto.getQuantity());
             else {
                 // Check product exists
-                Product p = productRepository.findOneByRef(dto.getProductId()).orElse(null);
-                if(p != null) {
+                //Product p = productRepository.findOneByRef(dto.getProductId()).orElse(null);
+                if(productService.exists(dto.getProductId())) {
                     CartItem newCartItem = cartItemMapper.toEntity(dto);
-                    newCartItem.setProduct(p);
+                    newCartItem.setProductId(dto.getProductId());
                     cart.addCartItem(newCartItem);
                 }
             }
@@ -240,7 +240,7 @@ public class CartService {
         cart.getCartItems().clear();;
         for(CartItemDTO dto : items) {
             Long ref = dto.getProductId();
-            if(ref != null && productRepository.findOneByRef(ref).orElse(null) != null) {
+            if(ref != null && productService.exists(ref)) {
                 CartItem item = cartItemMapper.toEntity(dto);
                 cart.addCartItem(item);
             }

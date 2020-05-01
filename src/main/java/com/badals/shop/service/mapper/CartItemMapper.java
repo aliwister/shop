@@ -1,9 +1,13 @@
 package com.badals.shop.service.mapper;
 
+import com.amazon.paapi5.v1.VariationAttribute;
 import com.badals.shop.domain.*;
 
 import com.badals.shop.service.dto.CartItemDTO;
+import com.badals.shop.service.dto.ProductDTO;
 import org.mapstruct.*;
+
+import java.util.stream.Collectors;
 
 /**
  * Mapper for the entity {@link CartItem} and its DTO {@link CartItemDTO}.
@@ -26,6 +30,13 @@ public interface CartItemMapper extends EntityMapper<CartItemDTO, CartItem> {
     //@Mapping(source = "productId", target = "product.ref")
     @Mapping(source = "productId", target = "productId")
     CartItem toEntity(CartItemDTO cartItemDTO);
+
+/*    @AfterMapping
+    default void afterMapping(@MappingTarget CartItemDTO target, CartItem source) {
+        if (source.getProduct() != null && source.getProduct().getVariationAttributes() != null)
+            target.setVariationAttributes(source.getProduct().getVariationAttributes().stream().map(v -> v.getValue()).collect(Collectors.toList()));
+    }*/
+
 
     default CartItem fromId(Long id) {
         if (id == null) {

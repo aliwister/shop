@@ -28,7 +28,7 @@ public interface AlgoliaProductMapper {
     @Mapping(target = "price", ignore = true)
     @Mapping(target = "hierarchicalCategories", ignore = true)
     @Mapping(target = "availability", ignore = true)
-    @Mapping(target = "tenant", ignore = true)
+    @Mapping(target = "merchant", ignore = true)
     AlgoliaProduct producttoAlgoliaProduct(Product product);
 
     @AfterMapping
