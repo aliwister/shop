@@ -385,7 +385,7 @@ public class ProductService {
        for(AddProductDTO doc: products) {
             Long id = doc.getId();
             doc.setId(null);
-            if (doc.getImage() != null && !doc.getImage().contains("cdn.badals")) {
+            if (doc.getImage() != null ) {
                 String image = uploadToS3(doc.getImage(), currentMerchantId, currentMerchant, tenantId);
                 doc.setImage(image);
             }
@@ -393,7 +393,7 @@ public class ProductService {
                 doc.setSku(tenantObj.getSkuPrefix()+doc.getSku());
             //doc.setShopIds(shopIds);
             //doc.setBrowseNode(browseNode);
-            importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant, false);
+            //importMerchantProducts(doc, currentMerchantId, currentMerchant, tenantId, currentTenant, false);
             doc.setId(id);
             doc.setImported(true);
             doc.setMerchant(currentMerchant);
