@@ -252,6 +252,7 @@ public class CartService {
         return this.createCheckoutWithCart(secureKey, items).getSecureKey();
     }
 
+    @Transactional
     public CheckoutCart createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
         //Cart cart = cartRepository.findBySecureKey(secureKey).orElse(new Cart()); //cartMapper.toEntity(cartDTO);
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
