@@ -78,7 +78,10 @@ public class PasUtility {
       }
 
       if(!item.getShippingCountry().equalsIgnoreCase("us"))
-         availability *= 1.2;
+         availability *= 1.8;
+
+      if(item.getShippingCountry().equalsIgnoreCase("cn"))
+         availability *= 1.4;
 
       return availability;
    }

@@ -500,7 +500,7 @@ public class ProductService {
         return new Dimension(new_width, new_height);
     }
 
-    public ProductDTO lookupEbay(String id) throws NoOfferException, ProductNotFoundException {
+    public ProductDTO lookupEbay(String id) throws NoOfferException, ProductNotFoundException, PricingException {
         Product node = ebayService.lookup(id, false);
         return productMapper.toDto(node);
     }
@@ -516,6 +516,15 @@ public class ProductService {
         }
 
         return false;
+    }
+
+    public ProductResponse findByType(String type) {
+        List<AddProductDTO> result = search(type + " AND imported:true");
+        ProductResponse response = new ProductResponse();
+        response.setTotal(6);
+        response.setHasMore(false);
+        response.setItems(result.stream().map(addProductMapper::toProductDto).collect(Collectors.toList()));
+        return response;
     }
 
 /*
