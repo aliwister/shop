@@ -5,6 +5,7 @@ import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.PasItemNode;
 
+import com.badals.shop.xtra.amazon.PricingException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,7 +39,7 @@ public class EbayLookup {
       lookupShippingUri = "http://open.api.ebay.com/shopping?callname=GetShippingCosts&version=975&siteid=0&responseencoding=JSON&appid="+APP_ID+"&ItemID=";
    }
 
-   public PasItemNode lookup(String id) throws ProductNotFoundException {
+   public PasItemNode lookup(String id) throws ProductNotFoundException, PricingException {
       EbayResponse response =  restTemplate.getForObject(lookupUri+id,EbayResponse.class);
       if(response != null && response.getItem() != null) {
          EbayItem item = response.getItem();
@@ -49,7 +50,8 @@ public class EbayLookup {
          node.setId(item.getItemID());
          node.setImage(item.getGallery().get(0));
          node.setCost(item.getPrice().getValue());
-         node.setPrime(item.getCountry().equals("US"));
+         node.setPrime(item.getCountry().equalsIgnoreCase("US"));
+         node.setShippingCountry(item.getCountry());
          node.setTitle(item.getTitle());
          node.setAvailabilityType("Now");
 
@@ -57,9 +59,16 @@ public class EbayLookup {
 
          //EbayResponse omShipping = restTemplate.getForObject(lookupShippingUri+id+"&DestinationCountryCode=OM",EbayResponse.class);
          EbayResponse usShipping = restTemplate.getForObject(lookupShippingUri+id+"&DestinationCountryCode=US&DestinationPostalCode=34249",EbayResponse.class);
+         EbayResponse omShipping = restTemplate.getForObject(lookupShippingUri+id+"&DestinationCountryCode=OM",EbayResponse.class);
 
-         node.setShippingCharges(usShipping.getShippingCost().getCost().getValue());
-         //node.setOmanShippingCharges(omShipping)
+         if(usShipping!= null && usShipping.getShippingCost() != null )
+            node.setShippingCharges(usShipping.getShippingCost().getCost().getValue());
+
+         if(omShipping!= null && omShipping.getShippingCost() != null )
+            node.setOmanShippingCharges(omShipping.getShippingCost().getCost().getValue());
+
+         if(node.getOmanShippingCharges() == null && node.getShippingCharges() == null)
+            throw new PricingException("Unable to support this item");
 
          return node;
       }

@@ -78,7 +78,7 @@ public class PasLookupParser {
             throw new NoOfferException("Non prime/free shipping item");
 
         double margin = 5, risk = 2, fixed = 1.1;
-        double localShipping = 0;
+        double localShipping = (item.getShippingCharges() != null)?item.getShippingCharges().doubleValue():0;
 
         BigDecimal price = PasUtility.calculatePrice(cost, weight, localShipping, margin, risk, fixed, item.isPrime(), item.isSuperSaver(), item.getShippingCountry());
         price = calculatePrice(price, getOverride(overrides, OverrideType.PRICE));
