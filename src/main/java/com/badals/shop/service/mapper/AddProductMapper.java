@@ -8,6 +8,7 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
 
 import org.mapstruct.*;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -77,7 +78,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         target.setGallery(gallery);
 
         //int hours = stock.getAvailability();
-        target.setAvailability(ProductMapper.processAvailability(target.getHours(), null).get("en"));
+        target.setAvailability(ProductMapper.processAvailability(target.getHours()).get("en"));
 
         if(source.getFeatures() != null)
             target.setFeatures(Arrays.asList(source.getFeatures().split(";")));
@@ -86,6 +87,15 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         target.setBrowseNode(source.getBrowseNode());
 
         target.setPrice(source.getSalePrice().setScale(2, RoundingMode.HALF_UP).toString());
+
+        if(LocaleContextHolder.getLocale().toString().equals("ar")) {
+            target.setTitle(source.getName_ar());
+            target.setBrowseNode(source.getBrowseNode_ar());
+            target.setDescription(source.getDescription_ar());
+            target.setBrand(source.getBrand_ar());
+            if(source.getFeatures_ar() != null)
+                target.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
+        }
     }
 
     @AfterMapping

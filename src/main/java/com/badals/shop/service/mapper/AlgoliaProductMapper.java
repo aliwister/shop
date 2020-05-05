@@ -60,7 +60,7 @@ public interface AlgoliaProductMapper {
 
         MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
         if(stock.getAvailability() != null) {
-            Map<String, String> map = ProductMapper.processAvailability(stock.getAvailability(), null);
+            Map<String, String> map = ProductMapper.processAvailability(stock.getAvailability());
             target.setAvailability(map.get("en"));
             target.setAvailability_ar(map.get("ar"));
         }
@@ -117,7 +117,7 @@ public interface AlgoliaProductMapper {
 
 
         if(source.getAvailability() != null) {
-            Map<String, String> map = ProductMapper.processAvailability(source.getAvailability(), null);
+            Map<String, String> map = ProductMapper.processAvailability(source.getAvailability());
             target.setAvailability(map.get("en"));
             target.setAvailability_ar(map.get("ar"));
         }
