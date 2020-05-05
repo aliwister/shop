@@ -1,9 +1,6 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.Merchant;
-import com.badals.shop.domain.Product;
-import com.badals.shop.domain.Purchase;
-import com.badals.shop.domain.PurchaseItem;
+import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.repository.PurchaseRepository;
 import com.badals.shop.repository.projection.PurchaseQueue;
@@ -21,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.transform.Source;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -115,12 +113,29 @@ public class PurchaseService {
             pi.setPurchase(purchase);
             purchase.getPurchaseItems().add(pi);
         }
-
+        purchase.setTotal(calculateTotal(purchase));
+        purchase.setSubtotal(calculateSubtotal(purchase));
         purchase = purchaseRepository.save(purchase);
         return purchaseMapper.toDto(purchase);
     }
 
     public List<PurchaseQueue> getPurchaseQueue() {
         return purchaseRepository.getPurchaseQueue();
+    }
+
+    public BigDecimal calculateSubtotal(Purchase order) {
+        BigDecimal sum = BigDecimal.valueOf(order.getPurchaseItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        return sum;
+    }
+
+    public BigDecimal calculateTotal(Purchase order) {
+        BigDecimal sum = BigDecimal.valueOf(order.getPurchaseItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        if(order.getDeliveryTotal() != null)
+            sum = sum.add(order.getDeliveryTotal());
+        if(order.getTaxesTotal() != null)
+            sum = sum.add(order.getTaxesTotal());
+        if(order.getDiscountTotal()!= null)
+            sum = sum.subtract(order.getDiscountTotal());
+        return sum;
     }
 }
