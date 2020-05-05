@@ -5,6 +5,7 @@ import com.badals.shop.domain.*;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.service.dto.ProductDTO;
 import org.mapstruct.*;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -100,7 +101,9 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
             @Todo
             Move to language files
              */
-            target.setAvailability(processAvailability(hours, null).get("en"));
+            //System.out.println("LOCALE:"+LocaleContextHolder.getLocale());
+            Map<String, String> a = processAvailability(hours);
+            target.setAvailability(a.get(LocaleContextHolder.getLocale().toString()));
         }
 
         ProductLang lang = source.getProductLangs().stream().findFirst().orElse(null);
@@ -111,7 +114,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
         }
     }
 
-    public static Map<String, String> processAvailability (int hours, String locale) {
+    public static Map<String, String> processAvailability (int hours) {
         //messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale());
         Map<String, String> availability = new HashMap<>();
         if(hours < 3) {
