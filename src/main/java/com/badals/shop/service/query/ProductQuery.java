@@ -81,7 +81,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
          case "capitol-stores":
             return productService.searchAll(type);
       }
-       return productService.findAllByCategory(slug, offset, limit);
+       return productService.findByType(type);//.findAllByCategory(slug, offset, limit);
     }
 
    public List<ProductDTO> relatedProducts(String type, String slug) {
@@ -113,7 +113,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return null;
    }
 
-   public ProductDTO ebay(String id) throws ProductNotFoundException, NoOfferException {
+   public ProductDTO ebay(String id) throws ProductNotFoundException, NoOfferException, PricingException {
       return productService.lookupEbay(id);
    }
 }
