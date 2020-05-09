@@ -20,4 +20,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     Optional<Cart> findBySecureKey(String secureKey);
 
     List<Cart> findByCustomerAndCartStateOrderByIdDesc(Customer user, CartState cartState);
+
+    @Query("from Cart c left join fetch c.customer cc left join fetch cc.addresses where id = ?1")
+    Cart getCartByCustomerJoinAddresses(Long id);
 }

@@ -7,9 +7,9 @@ import com.badals.shop.domain.checkout.helper.AddressPojo;
 import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.OrderResponse;
-import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.repository.OrderRepository;
+import com.badals.shop.repository.search.OrderSearchRepository;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
@@ -45,6 +45,7 @@ public class OrderService {
     private final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
+    private final OrderSearchRepository orderSearchRepository;
 
     private final OrderMapper orderMapper;
     private UserService userService;
@@ -57,8 +58,9 @@ public class OrderService {
     private final AddressRepository addressRepository;
     private final CartService cartService;
 
-    public OrderService(OrderRepository orderRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, CartService cartService) {
+    public OrderService(OrderRepository orderRepository, OrderSearchRepository orderSearchRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, CartService cartService) {
         this.orderRepository = orderRepository;
+        this.orderSearchRepository = orderSearchRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
         this.customerService = customerService;
@@ -79,8 +81,7 @@ public class OrderService {
     public OrderDTO save(OrderDTO orderDTO) {
         log.debug("Request to save Order : {}", orderDTO);
         Order order = orderMapper.toEntity(orderDTO);
-        order = orderRepository.save(order);
-        return orderMapper.toDto(order);
+        return save(order);
     }
 
     /**
@@ -147,9 +148,9 @@ public class OrderService {
         cartService.closeCart(secureKey);
 
         order.setConfirmationKey(order.getConfirmationKey()+order.getId());
-        order = orderRepository.save(order);
-        sendConfirmationEmail(order.getId());
-        return orderMapper.toDto(order);
+        OrderDTO dto = save(order);
+        sendConfirmationEmail(dto);
+        return dto;
     }
 
     public List<OrderDTO> getCustomerOrders() {
@@ -247,13 +248,13 @@ public class OrderService {
 
     public OrderDTO setOrderState(Long orderId, OrderState os) {
         Order order = orderRepository.save(orderRepository.getOne(orderId).orderState(os));
-        return orderMapper.toDto(order);
+        return save(order);
     }
 
     public OrderDTO setStatus(String id, OrderState state) {
         Order order = orderRepository.findByReference(id).get();
         order.setOrderState(state);
-        return orderMapper.toDto(orderRepository.save(order));
+        return save(order);
     }
 
     public OrderDTO setStatus(Long id, OrderState state) {
@@ -267,13 +268,13 @@ public class OrderService {
             versions.add(v);
         }
 
-        return orderMapper.toDto(orderRepository.save(order));
+        return save(order);
     }
 
-    public void sendConfirmationEmail(Long id) {
-        OrderDTO order = getOrderWithOrderItems(id).orElse(null);
-        CustomerDTO customer = order.getCustomer();
-        mailService.sendOrderCreationMail(customer, order);
+    public void sendConfirmationEmail(OrderDTO dto) {
+        //OrderDTO order = getOrderWithOrderItems(id).orElse(null);
+        //CustomerDTO customer = order.getCustomer();
+        mailService.sendOrderCreationMail(dto.getCustomer(), dto);
     }
 
    public OrderDTO editOrderItems(Long id, List<OrderItemDTO> orderItems) {
@@ -288,8 +289,7 @@ public class OrderService {
        }
        order.setSubtotal(calculateSubtotal(order));
        order.setTotal(calculateTotal(order));
-       order = orderRepository.save(order);
-       return orderMapper.toDto(order);
+       return save(order);
    }
     public BigDecimal calculateSubtotal(Order order) {
         BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
@@ -317,9 +317,21 @@ public class OrderService {
 
         order.setOrderState(OrderState.CANCELLED);
         order.setTotal(BigDecimal.ZERO);
-        order = orderRepository.save(order);
-        OrderDTO dto = orderMapper.toDto(order);
+        OrderDTO dto = save(order);
         mailService.sendCancelMail(dto.getCustomer(), dto, reason);
         return dto;
+    }
+
+    private OrderDTO save(Order order) {
+        order = orderRepository.save(order);
+        OrderDTO dto = orderMapper.toDto(order);
+        orderSearchRepository.save(dto);
+        return dto;
+    }
+
+    public void sendConfirmationEmail(Long id) {
+        Order order = orderRepository.getOne(id);
+        OrderDTO dto = orderMapper.toDto(order);
+        sendConfirmationEmail(dto);
     }
 }
