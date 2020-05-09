@@ -16,6 +16,7 @@ import java.util.Objects;
  * A DTO for the {@link com.badals.shop.domain.Order} entity.
  */
 @Data
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "order")
 public class OrderDTO implements Serializable {
 
     private Long id;

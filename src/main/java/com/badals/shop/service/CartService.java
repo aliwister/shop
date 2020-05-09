@@ -3,16 +3,12 @@ package com.badals.shop.service;
 import com.badals.shop.domain.Cart;
 import com.badals.shop.domain.CartItem;
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.Product;
 import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
 import com.badals.shop.domain.checkout.helper.CheckoutCartMapper;
 import com.badals.shop.domain.checkout.helper.CheckoutLineItemMapper;
-import com.badals.shop.repository.CartItemRepository;
-import com.badals.shop.repository.CheckoutCartRepository;
+import com.badals.shop.repository.*;
 import com.badals.shop.domain.enumeration.CartState;
-import com.badals.shop.repository.CartRepository;
-import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
@@ -38,6 +34,7 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final CustomerRepository customerRepository;
 
     private final CartMapper cartMapper;
     private final CartItemMapper cartItemMapper;
@@ -56,9 +53,10 @@ public class CartService {
         return uuid.toString();
     }
 
-    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, UserService userService, ProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, CustomerRepository customerRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, UserService userService, ProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
+        this.customerRepository = customerRepository;
         this.cartMapper = cartMapper;
         this.cartItemMapper = cartItemMapper;
         this.userService = userService;
@@ -252,7 +250,7 @@ public class CartService {
         return this.createCheckoutWithCart(secureKey, items).getSecureKey();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CheckoutCart createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
         //Cart cart = cartRepository.findBySecureKey(secureKey).orElse(new Cart()); //cartMapper.toEntity(cartDTO);
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
@@ -260,13 +258,14 @@ public class CartService {
 
         setItems(cart, items); //cartMapper.toDto(cart);
         cart = cartRepository.save(cart);
-
+        Customer customer = customerRepository.findByIdJoinAddresses(cart.getCustomer().getId()).get();
+        cart = cartRepository.getCartByCustomerJoinAddresses(cart.getId());
         List<CartItemInfo> cartItems = cartItemRepository.findCartItemsWithProductNative(cart.getId());
 
 
         CheckoutCart checkoutCart = checkoutCartRepository.findBySecureKey(cart.getSecureKey()).orElse(new CheckoutCart());
         checkoutCart.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
-        checkoutCart.setAddresses(cart.getCustomer().getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).collect(Collectors.toList()));
+        checkoutCart.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).collect(Collectors.toList()));
         checkoutCart.setSecureKey(cart.getSecureKey());
         checkoutCart.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
         checkoutCart.setEmail(cart.getCustomer().getEmail());
