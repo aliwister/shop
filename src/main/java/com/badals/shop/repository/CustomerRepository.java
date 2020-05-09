@@ -13,4 +13,7 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
    public Optional<Customer> findByEmail(String email);
+
+   @Query("from Customer c left join fetch c.addresses where c.id = ?1")
+   public Optional<Customer> findByIdJoinAddresses(Long id);
 }
