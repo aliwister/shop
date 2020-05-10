@@ -97,7 +97,7 @@ public class PurchaseService {
     }
 
     public List<PurchaseDTO> findForPurchaseList(List<OrderState> orderState, Integer limit, String searchText) {
-        return purchaseRepository.findForPurchaseList(PageRequest.of(0,limit)).stream().map(purchaseMapper::toDto).collect(Collectors.toList());
+        return purchaseRepository.findForPurchaseList(PageRequest.of(0,limit)).stream().map(purchaseMapper::toDtoList).collect(Collectors.toList());
     }
 
     public PurchaseDTO updatePurchase(PurchaseDTO dto, List<PurchaseItemDTO> items) {

@@ -24,6 +24,14 @@ public interface PurchaseMapper extends EntityMapper<PurchaseDTO, Purchase> {
     @Mapping(target = "removePurchaseItem", ignore = true)
     Purchase toEntity(PurchaseDTO purchaseDTO);
 
+    @Named(value = "list")
+    @Mapping(source = "deliveryAddress.id", target = "deliveryAddressId")
+    @Mapping(source = "invoiceAddress.id", target = "invoiceAddressId")
+    @Mapping(source = "merchant.id", target = "merchantId")
+    @Mapping(source = "merchant", target = "merchantObj")
+    @Mapping(target="purchaseItems", ignore = true)
+    PurchaseDTO toDtoList(Purchase purchase);
+
     default Purchase fromId(Long id) {
         if (id == null) {
             return null;
