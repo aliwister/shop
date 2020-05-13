@@ -197,8 +197,7 @@ public class CartService {
         }
 
         cart = cartRepository.save(cart);
-
-        //cartRepository.getOne(cart.getId())
+        cartRepository.refresh(cart);
         return cartMapper.toDto(cart);
     }
 
