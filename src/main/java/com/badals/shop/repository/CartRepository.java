@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface CartRepository extends JpaRepository<Cart, Long> {
+public interface CartRepository extends CustomRepository<Cart, Long> {
 
     Optional<Cart> findBySecureKey(String secureKey);
 
