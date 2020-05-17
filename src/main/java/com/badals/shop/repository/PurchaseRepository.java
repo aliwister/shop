@@ -24,7 +24,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
    @Query("from Purchase p left join fetch p.merchant order by p.id DESC")
    List<Purchase> findForPurchaseList(Pageable page);
 
-   @Query("from Purchase p left join fetch p.purchaseItems i left join fetch i.orderItem where p.id = ?1")
+   @Query("from Purchase p left join fetch p.purchaseItems i left join fetch i.orderItem where p.id = ?1 order by i.sequence")
    Optional<Purchase>  findForUpdate(Long id);
 
    @Query("from Purchase p left join fetch p.merchant left join fetch p.deliveryAddress left join fetch p.purchaseItems i left join fetch i.orderItem where p.id = ?1 order by i.sequence")
