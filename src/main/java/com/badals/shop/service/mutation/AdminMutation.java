@@ -87,7 +87,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         productOverrideService.saveOrUpdate(dto);
         ProductDTO productDTO = null;
         if(merchantId == 1L)
-            productDTO = productService.lookupForcePas(sku, true, false, true);
+            productDTO = productService.lookupForcePas(sku, false, false, true);
         if(merchantId == 0L)
             productDTO = productService.lookupPas(sku, true, false);
         else if(merchantId == 2L)
