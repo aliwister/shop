@@ -35,31 +35,21 @@ import java.util.List;
 //@Configuration
 public class PasLookup {
    private final Logger log = LoggerFactory.getLogger(PasLookup.class);
-   //@Autowired
-   public SignedRequestsHelper helper;
 
    @Autowired
    private LookupConfig lookupConfig;
 
    private DefaultApi api;
-   String partnerTag = "deseneoma-20";
+   private final String partnerTag;
 
-   public PasLookup() {
+   public PasLookup(String pasAccessKeyId, String pasSecretKey, String pasTag) {
       ApiClient client = new ApiClient();
-      client.setAwsAccessKey("AKIAJH3HSRU4OMRAU5NA");
-      // Please add your secret key here
-      client.setAwsSecretKey("yu6R/dsS4DD+Ws3zZcAkmLqoMx4Nhg4Utcm5DCEO");
-
-      // Enter your partner tag (store/tracking id)
-
+      client.setAwsAccessKey(pasAccessKeyId);
+      client.setAwsSecretKey(pasSecretKey);
       client.setHost("webservices.amazon.com");
       client.setRegion("us-east-1");
       this.api = new DefaultApi(client);
-   }
-
-   public PasLookup(SignedRequestsHelper helper) {
-      this();
-      this.helper = helper;
+      this.partnerTag = pasTag;
    }
 
    /*
