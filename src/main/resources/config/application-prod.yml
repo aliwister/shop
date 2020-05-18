@@ -167,9 +167,9 @@ jhipster:
 # application:
 # application:
 pas:
-  key: AKIAJH3HSRU4OMRAU5NA
-  tag: deseneoma-20
-  secret: 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
+  key: ***REMOVED***
+  tag: 4242020-20
+  secret: ***REMOVED***
 
 mws:
   key: ***REMOVED***

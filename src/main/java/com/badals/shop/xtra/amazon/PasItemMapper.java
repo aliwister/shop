@@ -117,6 +117,9 @@ public interface PasItemMapper {
 
       if(target.getTitle() == null)
          target.setTitle(target.getId());
+
+      // Link
+      target.setUrl("https://www.amazon.com/dp/"+source.getASIN());
       /*
       String n = "";
       String t = "";
