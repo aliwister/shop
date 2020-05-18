@@ -282,6 +282,7 @@ extend type Query {
     pricingRequests:[PricingRequest]
     parentOf(sku: String): String
     mws(sku: String):Product
+    pas(sku: String):Product
     ebay(id: String):Product
 }
 

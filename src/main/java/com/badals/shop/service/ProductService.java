@@ -215,7 +215,7 @@ public class ProductService {
             product = product.getChildren().iterator().next();
         }
         else if(product.getStub() != null && product.getStub()) {
-            pas5Service.lookup(product.getSku(),false, false, false);
+            pas5Service.lookup(product.getSku(),false, false, false, false);
             return this.getProductBySku(product.getSku());
         }
 
@@ -277,12 +277,17 @@ public class ProductService {
         return lookupPas(sku, false, isRedis, isRebuild);
     }
     public ProductDTO lookupPas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
-        Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild);
+        Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild, false);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             this.indexProduct(p.getId());
         return this.getProductBySku(sku);
     }
-
+    public ProductDTO lookupForcePas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
+        Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild, true);
+        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
+            this.indexProduct(p.getId());
+        return this.getProductBySku(sku);
+    }
 
     public String getParentOf(String sku) {
         return productRepository.findOneBySku(sku).get().getParent().getSku();

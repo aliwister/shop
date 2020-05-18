@@ -81,11 +81,11 @@ public class Pas5Service implements IProductService {
     }
 
     @Transactional
-    public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild) throws NoOfferException {
+    public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild, boolean forcePas) throws NoOfferException {
 
         Product product = productRepo.findBySkuJoinChildren(asin).orElse(null);
 
-        if(true)
+        if(!forcePas)
             return mwsItemShortCircuit(product, asin, isParent, isRebuild);
 
         //PasItemNode current = pasItemNodeSearchRepository.findById(asin);
@@ -146,14 +146,14 @@ public class Pas5Service implements IProductService {
 
         if (item.getParentAsin() != null && !item.getParentAsin().equals("asin")) {
             if(!existsBySku(item.getParentAsin()) || isRebuild)
-               return lookup(item.getParentAsin(), true, isRedis, isRebuild);
+               return lookup(item.getParentAsin(), true, isRedis, isRebuild, true);
             product.setVariationType(VariationType.CHILD);
             product.setParentId(findBySku(item.getParentAsin()).getRef());
         }
 
         List<ProductOverride> overrides = findOverrides(item.getId(), item.getParentAsin());
         product = initProduct(product, item, isParent, overrides);
-
+        product = productRepo.save(product);
         if(isRebuild) {
             GetVariationsResponse variationsResponse = pasLookup.variationLookup(asin, 1);
             if (variationsResponse != null && variationsResponse.getVariationsResult() != null) {
@@ -170,7 +170,7 @@ public class Pas5Service implements IProductService {
                         break;
                     for (PasItemNode childItem : variationsResult.getItems().stream().map(pasItemMapper::itemToPasItemNode).collect(Collectors.toList())) {
                         String childAsin = childItem.getId();
-                        Product child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(new Product());
+                        Product child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(findProduct(childAsin));
                         child = initProduct(child, childItem, false, overrides);
 
                         PasLookupParser.parseVariationAttributes(child, childItem);
@@ -207,6 +207,10 @@ public class Pas5Service implements IProductService {
 
         product = productRepo.save(product);
         return product;
+    }
+
+    private Product findProduct(String sku) {
+        return productRepo.findBySku(sku).orElse(new Product());
     }
 
     private Product mwsItemShortCircuit(Product product, String asin, boolean isParent, boolean isRebuild) throws NoOfferException {
