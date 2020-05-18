@@ -116,5 +116,9 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    public ProductDTO ebay(String id) throws ProductNotFoundException, NoOfferException, PricingException {
       return productService.lookupEbay(id);
    }
+
+   public ProductDTO pas(String sku) throws ProductNotFoundException, NoOfferException, PricingException {
+      return productService.lookupForcePas(sku, true,true, false);
+   }
 }
 

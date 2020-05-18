@@ -21,7 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
 
-   @Query("from Product u where u.sku = ?1")
+    @Query("from Product u where u.sku = ?1")
     Optional<Product> findBySkuJoinCategories(String asin);
 
     @Query("from Product u where u.slug = ?1")
@@ -49,4 +49,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("select count(u) from Product u where u.merchantId = ?1")
     Integer countForTenant(Long merchantId);
+
+    @Query("from Product u where u.sku = ?1")
+    Optional<Product> findBySku(String asin);
 }
