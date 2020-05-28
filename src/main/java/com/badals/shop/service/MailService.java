@@ -190,7 +190,7 @@ public class MailService {
     @Async
     public void sendVoltageMail(CustomerDTO user, OrderDTO order) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, order,"mail/voltageEmail", "email.voltage.title");
+        sendEmailFromTemplate(user, order,"mail/edit/voltageEmail", "email.voltage.title");
     }
     @Async
     public void sendCancelMail(CustomerDTO user, OrderDTO order, String reason) {
