@@ -122,6 +122,7 @@ public class PasItemNode implements Serializable {
    }
    private static final BigDecimal LB2KG = BigDecimal.valueOf(0.453592);
    private static final BigDecimal LB2G = BigDecimal.valueOf(200);
+   private static final BigDecimal LB2OUNCE = BigDecimal.valueOf(14);
 
 
    public BigDecimal getParsedWeight() {
@@ -135,6 +136,8 @@ public class PasItemNode implements Serializable {
             return w.divide(LB2KG,  4, RoundingMode.HALF_EVEN);
          else if (getItemWeightUnit().equalsIgnoreCase("Grams"))
             return w.divide(LB2G, 4, RoundingMode.HALF_EVEN);
+         else if (getItemWeightUnit().equalsIgnoreCase("ounces"))
+            return w.divide(LB2OUNCE, 4, RoundingMode.HALF_EVEN);
 
          return w;
          //return BigDecimal.valueOf(Double.parseDouble(weight));
