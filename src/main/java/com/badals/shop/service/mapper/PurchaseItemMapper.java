@@ -12,12 +12,10 @@ import org.mapstruct.*;
 public interface PurchaseItemMapper extends EntityMapper<PurchaseItemDTO, PurchaseItem> {
 
     @Mapping(source = "purchase.id", target = "purchaseId")
-    @Mapping(source = "orderItem.id", target = "orderItemId")
-    @Mapping(source = "orderItem.order.id", target = "orderId")
     PurchaseItemDTO toDto(PurchaseItem purchaseItem);
 
     @Mapping(source = "purchaseId", target = "purchase")
-    @Mapping(source = "orderItemId", target = "orderItem")
+/*    @Mapping(target = "orderItems", ignore = true)*/
     PurchaseItem toEntity(PurchaseItemDTO purchaseItemDTO);
 
     default PurchaseItem fromId(Long id) {
