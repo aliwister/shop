@@ -26,7 +26,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    @Query("from Order o left join o.customer left join fetch o.deliveryAddress where o.id = ?1")
    Optional<Order> findJoinCustomerJoinAddress(Long orderId);
 
-   @Query("select o from Order o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress left join fetch o.payments where o.id = ?1 or o.reference= ?2 order by oi.sequence")
+   @Query("select o from Order o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress left join fetch o.payments left join fetch oi.purchaseItem where o.id = ?1 or o.reference= ?2 order by oi.sequence")
    Optional<Order> findForOrderDetails(Long id, String ref);
 
    @Query("select o from Order o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress where o.id = ?1 and oi.id in ?2")

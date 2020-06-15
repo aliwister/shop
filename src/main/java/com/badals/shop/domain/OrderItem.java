@@ -43,7 +43,6 @@ public class OrderItem implements Serializable {
     private String shippingInstructions;
 
     @ManyToOne(optional = false)
-    @NotNull
     @JsonIgnoreProperties("orderItems")
     private Order order;
 
@@ -70,15 +69,22 @@ public class OrderItem implements Serializable {
     @Column(name="line_total")
     private BigDecimal lineTotal;
 
-    @OneToMany(mappedBy = "orderItem")
-    private Set<PurchaseItem> purchaseItems = new HashSet<>();
 
-    public Set<PurchaseItem> getPurchaseItems() {
-        return purchaseItems;
+
+    @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JsonIgnoreProperties("orderItems")
+    @JoinTable(name = "purchase_item_order_item",
+            joinColumns = @JoinColumn(name = "order_item_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "purchase_item_id", referencedColumnName = "id"))
+    private PurchaseItem purchaseItem;
+
+
+    public PurchaseItem getPurchaseItem() {
+        return purchaseItem;
     }
 
-    public void setPurchaseItems(Set<PurchaseItem> purchaseItems) {
-        this.purchaseItems = purchaseItems;
+    public void setPurchaseItem(PurchaseItem purchaseItem) {
+        this.purchaseItem = purchaseItem;
     }
 
     public Product getProduct() {
@@ -273,4 +279,8 @@ public class OrderItem implements Serializable {
     }
 
 
+    public OrderItem purchaseItem(PurchaseItem pi) {
+        this.purchaseItem = pi;
+        return this;
+    }
 }
