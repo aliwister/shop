@@ -49,7 +49,7 @@ public class OrderItemDTO implements Serializable {
     private String productSku;
     private String productId;
 
-
+    private String __typename;
 
 
     @Override

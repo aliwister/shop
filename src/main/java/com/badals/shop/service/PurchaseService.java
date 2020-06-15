@@ -3,6 +3,7 @@ package com.badals.shop.service;
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.repository.OrderItemRepository;
+import com.badals.shop.repository.PurchaseItemRepository;
 import com.badals.shop.repository.PurchaseRepository;
 import com.badals.shop.repository.projection.PurchaseQueue;
 import com.badals.shop.service.dto.OrderItemDTO;
@@ -31,14 +32,16 @@ public class PurchaseService {
     private final Logger log = LoggerFactory.getLogger(PurchaseService.class);
 
     private final PurchaseRepository purchaseRepository;
+    private final PurchaseItemRepository purchaseItemRepository;
     private final OrderItemRepository orderItemRepository;
 
     private final PurchaseMapper purchaseMapper;
     private final PurchaseItemMapper purchaseItemMapper;
     //private final PurchaseItemMapper purchaseItemMapper;
 
-    public PurchaseService(PurchaseRepository purchaseRepository, OrderItemRepository orderItemRepository, PurchaseMapper purchaseMapper, PurchaseItemMapper purchaseItemMapper) {
+    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository, OrderItemRepository orderItemRepository, PurchaseMapper purchaseMapper, PurchaseItemMapper purchaseItemMapper) {
         this.purchaseRepository = purchaseRepository;
+        this.purchaseItemRepository = purchaseItemRepository;
         this.orderItemRepository = orderItemRepository;
         this.purchaseMapper = purchaseMapper;
         this.purchaseItemMapper = purchaseItemMapper;
@@ -106,31 +109,37 @@ public class PurchaseService {
         //
         Purchase purchase = purchaseRepository.findForUpdate(dto.getId()).orElse(null);
         if(purchase != null) {
-            purchase.getPurchaseItems().forEach(x -> x.getOrderItems().forEach( o -> o.setPurchaseItem(null)));
-            purchaseRepository.save(purchase);
-            purchase = null;
+            purchase.getPurchaseItems().forEach(x -> x.getOrderItems().forEach( o -> orderItemRepository.save(o.purchaseItem(null))));
+            purchase.getPurchaseItems().clear();
+            purchase = purchaseRepository.save(purchase);
         }
-        purchase = purchaseMapper.toEntity(dto);
-        if(purchase != null) {
+
+
+        if(purchase == null) {
             //throw InvalidPurchaseException("Product doesn't exist");
+            purchase = purchaseMapper.toEntity(dto);
         }
 
+        purchase = purchaseRepository.save(purchase);
 
 
-        purchase.getPurchaseItems().clear();
 
+        int sequence = 1;
         for(PurchaseItemDTO i : items) {
             PurchaseItem pi = purchaseItemMapper.toEntity(i);
+            pi.setSequence(sequence++);
             pi.setPurchase(purchase);
-
-            purchase.getPurchaseItems().add(pi);
-            for(OrderItemDTO oi:  i.getOrderItems()) {
-                pi.addOrderItem(orderItemRepository.getOne(oi.getId()));
+            purchaseItemRepository.save(pi);
+            for (OrderItemDTO oi : i.getOrderItems()) {
+                OrderItem o = orderItemRepository.getOne(oi.getId()).purchaseItem(pi);
+                orderItemRepository.save(o);
             }
+
         }
         purchase.setTotal(calculateTotal(purchase));
         purchase.setSubtotal(calculateSubtotal(purchase));
-        purchase = purchaseRepository.save(purchase);
+
+
         return purchaseMapper.toDto(purchase);
     }
 
