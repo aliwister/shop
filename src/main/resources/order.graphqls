@@ -84,9 +84,11 @@ type PurchaseItem {
 
 input OrderItemInput {
     id: ID
+    orderId: Long
     sequence: Int
     quantity: Int
     price: BigDecimal
+    __typename: String
 }
 
 input PurchaseInput {
