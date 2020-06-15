@@ -60,19 +60,21 @@ public class PurchaseItem implements Serializable {
     @JsonIgnoreProperties("purchaseItems")
     private Purchase purchase;
 
-    @ManyToOne
-    @JsonIgnoreProperties("purchaseItems")
-    @JoinTable(name = "purchase_item_order_item",
-               joinColumns = @JoinColumn(name = "purchase_item_id", referencedColumnName = "id"),
-               inverseJoinColumns = @JoinColumn(name = "order_item_id", referencedColumnName = "id"))
-    private OrderItem orderItem;
 
-    public OrderItem getOrderItem() {
-        return orderItem;
+    @OneToMany(mappedBy = "purchaseItem")
+    private Set<OrderItem> orderItems = new HashSet<>();
+
+    public Set<OrderItem> getOrderItems() {
+        return orderItems;
     }
 
-    public void setOrderItem(OrderItem orderItem) {
-        this.orderItem = orderItem;
+    public void setOrderItems(Set<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setPurchaseItem(this);
     }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

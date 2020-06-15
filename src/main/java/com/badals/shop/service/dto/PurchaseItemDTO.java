@@ -33,11 +33,9 @@ public class PurchaseItemDTO implements Serializable {
 
     private Long purchaseId;
 
-    private Long orderItemId;
-
-    private Long orderId;
-
     private Long productId;
+
+    private Set<OrderItemDTO> orderItems = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

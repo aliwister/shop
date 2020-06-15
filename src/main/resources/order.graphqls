@@ -19,6 +19,7 @@ type Currency {
 
 type OrderItem {
     id: ID
+    orderId: Long
     sequence: Int
     productName: String
     quantity: Int
@@ -31,7 +32,7 @@ type OrderItem {
     productUrl: String
     productSku: String
     productId: Long
-    purchaseItems: [PurchaseItem]
+    po: Long
 }
 
 type Order {
@@ -78,8 +79,7 @@ type PurchaseItem {
     price: BigDecimal
     quantity: BigDecimal
     description: String
-    orderItemId: Long
-    orderId: Long
+    orderItems: [OrderItem]
 }
 
 input OrderItemInput {
@@ -110,7 +110,7 @@ input PurchaseItemInput {
     price: Float
     quantity: Float
     description: String
-    orderItemId: Int
+    orderItems: [OrderItemInput]
     productId: Long
 }
 
