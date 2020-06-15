@@ -42,12 +42,13 @@ public class OrderItemDTO implements Serializable {
 
 
     private Long orderId;
+    private Long purchaseItemId;
+    private Long po;
 
-private String productUrl;
-private String productSku;
-private String productId;
+    private String productUrl;
+    private String productSku;
+    private String productId;
 
-private Set<PurchaseItemDTO> purchaseItems = new HashSet<>();
 
 
 
