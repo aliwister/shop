@@ -125,6 +125,7 @@ public class PurchaseService {
 
 
         int sequence = 1;
+        double sum = 0;
         for(PurchaseItemDTO i : items) {
             PurchaseItem pi = purchaseItemMapper.toEntity(i);
             pi.setSequence(sequence++);
@@ -134,11 +135,13 @@ public class PurchaseService {
                 OrderItem o = orderItemRepository.getOne(oi.getId()).purchaseItem(pi);
                 orderItemRepository.save(o);
             }
-
+            sum += i.getQuantity().doubleValue() * i.getPrice().doubleValue();
         }
-        purchase.setTotal(calculateTotal(purchase));
-        purchase.setSubtotal(calculateSubtotal(purchase));
+        BigDecimal subtotal = BigDecimal.valueOf(sum);
+        purchase.setSubtotal(subtotal);
+        purchase.setTotal(calculateTotal(purchase,subtotal));
 
+        purchase = purchaseRepository.save(purchase);
 
         return purchaseMapper.toDto(purchase);
     }
@@ -152,14 +155,14 @@ public class PurchaseService {
         return sum;
     }
 
-    public BigDecimal calculateTotal(Purchase order) {
-        BigDecimal sum = BigDecimal.valueOf(order.getPurchaseItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
-        if(order.getDeliveryTotal() != null)
-            sum = sum.add(order.getDeliveryTotal());
+    public BigDecimal calculateTotal(Purchase order, BigDecimal subtotal) {
+        BigDecimal total = subtotal;
+         if(order.getDeliveryTotal() != null)
+            total = total.add(order.getDeliveryTotal());
         if(order.getTaxesTotal() != null)
-            sum = sum.add(order.getTaxesTotal());
+            total = total.add(order.getTaxesTotal());
         if(order.getDiscountTotal()!= null)
-            sum = sum.subtract(order.getDiscountTotal());
-        return sum;
+            total = total.subtract(order.getDiscountTotal());
+        return total;
     }
 }
