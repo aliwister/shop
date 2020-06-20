@@ -37,6 +37,8 @@ public class OrderDTO implements Serializable {
 
     private CartDTO cart;
 
+    private Long cartId;
+
     private AddressDTO deliveryAddress;
 
     private AddressDTO invoiceAddress;
