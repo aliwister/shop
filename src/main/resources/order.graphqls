@@ -42,7 +42,7 @@ type Order {
     invoiceDate: LocalDate,
     deliveryDate: LocalDate,
     customer: Customer!,
-    cart: Cart,
+    cartId: Long,
     currency: String,
     deliveryAddress: Address!,
     invoiceAddress: Address!
