@@ -2,6 +2,7 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.repository.MerchantRepository;
 import com.badals.shop.repository.OrderItemRepository;
 import com.badals.shop.repository.PurchaseItemRepository;
 import com.badals.shop.repository.PurchaseRepository;
@@ -9,6 +10,8 @@ import com.badals.shop.repository.projection.PurchaseQueue;
 import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.dto.PurchaseDTO;
 import com.badals.shop.service.dto.PurchaseItemDTO;
+import com.badals.shop.service.mapper.MerchantMapper;
+import com.badals.shop.service.mapper.OrderItemMapper;
 import com.badals.shop.service.mapper.PurchaseItemMapper;
 import com.badals.shop.service.mapper.PurchaseMapper;
 import org.slf4j.Logger;
@@ -34,17 +37,23 @@ public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
     private final PurchaseItemRepository purchaseItemRepository;
     private final OrderItemRepository orderItemRepository;
+    private final MerchantRepository merchantRepository;
+    private final MerchantMapper merchantMapper;
 
     private final PurchaseMapper purchaseMapper;
     private final PurchaseItemMapper purchaseItemMapper;
+    private final OrderItemMapper orderItemMapper;
     //private final PurchaseItemMapper purchaseItemMapper;
 
-    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository, OrderItemRepository orderItemRepository, PurchaseMapper purchaseMapper, PurchaseItemMapper purchaseItemMapper) {
+    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseItemRepository purchaseItemRepository, OrderItemRepository orderItemRepository, MerchantRepository merchantRepository, MerchantMapper merchantMapper, PurchaseMapper purchaseMapper, PurchaseItemMapper purchaseItemMapper, OrderItemMapper orderItemMapper) {
         this.purchaseRepository = purchaseRepository;
         this.purchaseItemRepository = purchaseItemRepository;
         this.orderItemRepository = orderItemRepository;
+        this.merchantRepository = merchantRepository;
+        this.merchantMapper = merchantMapper;
         this.purchaseMapper = purchaseMapper;
         this.purchaseItemMapper = purchaseItemMapper;
+        this.orderItemMapper = orderItemMapper;
     }
 
     /**
@@ -132,14 +141,29 @@ public class PurchaseService {
             pi.setPurchase(purchase);
             purchaseItemRepository.save(pi);
             for (OrderItemDTO oi : i.getOrderItems()) {
-                OrderItem o = orderItemRepository.getOne(oi.getId()).purchaseItem(pi);
-                orderItemRepository.save(o);
+                OrderItem o = orderItemRepository.getOne(oi.getId());
+                if (o.getQuantity().intValue() > pi.getQuantity().intValue()) {
+                    OrderItem oNew = orderItemMapper.toEntity(orderItemMapper.toDto(o));
+                    oNew.setQuantity(pi.getQuantity().intValue());
+                    o.setQuantity(o.getQuantity().intValue() - pi.getQuantity().intValue());
+                    oNew.setProduct(o.getProduct());
+                    oNew.setId(null);
+                    orderItemRepository.save(o);
+                    orderItemRepository.save(oNew);
+                    o = oNew;
+                }
+                orderItemRepository.save(o.purchaseItem(pi));
             }
             sum += i.getQuantity().doubleValue() * i.getPrice().doubleValue();
         }
         BigDecimal subtotal = BigDecimal.valueOf(sum);
         purchase.setSubtotal(subtotal);
         purchase.setTotal(calculateTotal(purchase,subtotal));
+        purchase.setDeliveryTotal(dto.getDeliveryTotal());
+        purchase.setDiscountTotal(dto.getDiscountTotal());
+        purchase.setTaxesTotal(dto.getTaxesTotal());
+        if(dto.getMerchantId() != null)
+            purchase.setMerchant(merchantRepository.getOne(dto.getMerchantId()));
 
         purchase = purchaseRepository.save(purchase);
 

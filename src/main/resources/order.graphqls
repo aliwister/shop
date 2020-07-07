@@ -80,6 +80,7 @@ type PurchaseItem {
     quantity: BigDecimal
     description: String
     orderItems: [OrderItem]
+    productId: Long
 }
 
 input OrderItemInput {
@@ -88,7 +89,6 @@ input OrderItemInput {
     sequence: Int
     quantity: Int
     price: BigDecimal
-    __typename: String
 }
 
 input PurchaseInput {
