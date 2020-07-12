@@ -62,10 +62,10 @@ public class DetrackController {
       //Integer shipmentId = Integer.parseInt(confirmation.get_do().split("-")[1]);
 
       if(confirmation.getStatus().equalsIgnoreCase("not delivered")) {
-         shipmentService.setStatus(shipmentId, ShipmentStatus.FAILED);
+         shipmentService.setStatus(shipmentId, ShipmentStatus.FAILED, confirmation.getReason());
          return;
       }
-      shipmentService.setStatus(shipmentId, ShipmentStatus.DELIVERED);
+      shipmentService.setStatus(shipmentId, ShipmentStatus.DELIVERED, "");
 
       String fileKey = "pod/"+confirmation.get_do()+".pdf";
       String imageKey = "pod/"+confirmation.get_do()+".jpg";
