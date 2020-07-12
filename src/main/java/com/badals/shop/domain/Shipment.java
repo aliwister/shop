@@ -9,6 +9,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -64,6 +66,22 @@ public class Shipment implements Serializable {
     @Column(name = "shipment_status")
     private ShipmentStatus shipmentStatus;
 
+    @OneToMany(mappedBy = "shipment", cascade=CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("eventDate")
+    private Set<ShipmentTracking> shipmentTrackings = new HashSet<>();
+
+    public Set<ShipmentTracking> getShipmentTrackings() {
+        return shipmentTrackings;
+    }
+
+    public void setShipmentTrackings(Set<ShipmentTracking> shipmentTrackings) {
+        this.shipmentTrackings = shipmentTrackings;
+    }
+    public Shipment addShipmentTracking(ShipmentTracking t) {
+        this.shipmentTrackings.add(t);
+        t.setShipment(this);
+        return this;
+    }
 
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

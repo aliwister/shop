@@ -1,6 +1,7 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Shipment;
+import com.badals.shop.domain.ShipmentTracking;
 import com.badals.shop.domain.enumeration.ShipmentStatus;
 import com.badals.shop.repository.ShipmentRepository;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 //import com.badals.admin.repository.search.ShipmentSearchRepository;
@@ -33,11 +35,23 @@ public class ShipmentService {
         return shipmentRepository.findById(id);
     }
 
-    public void setStatus(Long shipmentId, ShipmentStatus status) {
+    public void setStatus(Long shipmentId, ShipmentStatus status, String details) {
+        int id = 2001;
+        switch (status) {
+            case DELIVERED:
+               id =  3000;
+               break;
+            case FAILED:
+                id = 2001;
+                break;
+        }
+
         Shipment shipment = shipmentRepository.findById(shipmentId).get();
         shipment.setShipmentStatus(status);
+        shipment.addShipmentTracking(new ShipmentTracking().shipment(shipment).shipmentEventId(id).details(details).eventDate(LocalDateTime.now()));
         shipmentRepository.save(shipment);
     }
+
     /**
      * Search for the shipment corresponding to the query.
      *
