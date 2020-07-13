@@ -1,6 +1,7 @@
 package com.badals.shop.domain;
 
-import com.badals.admin.domain.enumeration.ShipmentStatus;
+
+import com.badals.shop.domain.enumeration.ShipmentStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
