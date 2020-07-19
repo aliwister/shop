@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * A ShipmentStatus.
  */
 @Entity
-@Table(name = "shipment_tracking")
+@Table(name = "shipment_tracking", catalog = "admin")
 public class ShipmentTracking extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
