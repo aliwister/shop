@@ -8,7 +8,7 @@ import java.io.Serializable;
  * A ShipmentEvent.
  */
 @Entity
-@Table(name = "shipment_event")
+@Table(name = "shipment_event", catalog = "admin")
 public class ShipmentEvent implements Serializable {
 
     private static final long serialVersionUID = 1L;
