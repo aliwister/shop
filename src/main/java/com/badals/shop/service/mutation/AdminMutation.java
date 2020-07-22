@@ -1,14 +1,11 @@
 package com.badals.shop.service.mutation;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.Order;
-import com.badals.shop.domain.Payment;
-import com.badals.shop.domain.ProductOverride;
 import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.domain.checkout.helper.Message;
+import com.badals.shop.domain.checkout.helper.PresignedUrl;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.enumeration.OverrideType;
-import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.repository.CheckoutCartRepository;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.*;
@@ -17,16 +14,12 @@ import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
-import org.hibernate.envers.AuditReader;
-import org.hibernate.envers.query.AuditQuery;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,11 +36,12 @@ public class AdminMutation implements GraphQLMutationResolver {
     private final MailService mailService;
     private final CustomerService customerService;
     private final ProductOverrideService productOverrideService;
+    private final AwsService awsService;
 
     private final MessageSource messageSource;
     private final CheckoutCartRepository checkoutCartRepository;
 
-    public AdminMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, CheckoutCartRepository checkoutCartRepository) {
+    public AdminMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, AwsService awsService, CheckoutCartRepository checkoutCartRepository) {
         this.productService = productService;
         this.pasService = pasService;
         this.productLangService = productLangService;
@@ -60,6 +54,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         this.purchaseService = purchaseService;
         this.paymentService = paymentService;
         this.mailService = mailService;
+        this.awsService = awsService;
         this.checkoutCartRepository = checkoutCartRepository;
     }
 
@@ -88,7 +83,9 @@ public class AdminMutation implements GraphQLMutationResolver {
         ProductDTO productDTO = null;
         if(merchantId == 1L)
             productDTO = productService.lookupForcePas(sku, false, false, true);
-        if(merchantId == 0L)
+        else if(merchantId == -1L)
+            productDTO = productService.lookupForcePas(sku, false, false, false);
+        else if(merchantId == 0L)
             productDTO = productService.lookupPas(sku, true, false);
         else if(merchantId == 2L)
             productDTO = productService.lookupEbay(sku);
@@ -175,5 +172,13 @@ public class AdminMutation implements GraphQLMutationResolver {
         cart = checkoutCartRepository.save(cart);
         return cart;
     }
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public PresignedUrl getUploadUrl(String filename, String contentType) {
+        String objectKey = filename;
+        URL url = awsService.presignUrl(objectKey, contentType);
+        return new PresignedUrl(url.toString(), "https://cdn.badals.com/" + filename, "200");
+    }
+
 }
 
