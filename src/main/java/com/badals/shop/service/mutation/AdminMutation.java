@@ -173,7 +173,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         return cart;
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PresignedUrl getUploadUrl(String filename, String contentType) {
         String objectKey = filename;
         URL url = awsService.presignUrl(objectKey, contentType);
