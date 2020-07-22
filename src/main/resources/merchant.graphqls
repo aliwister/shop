@@ -68,6 +68,7 @@ input AddProductInput {
       quantity: BigDecimal
       ref: String
       discountInPercent: Int
+      merchantId: Int
 }
 
 extend type Query {
@@ -86,5 +87,6 @@ extend type Mutation {
     createMerchantProduct(product: AddProductInput) : Message
     approveProduct(id: ID): Product
     getImageUploadUrl(filename: String, contentType: String): PresignedUrl
+    getUploadUrl(filename: String, contentType: String): PresignedUrl
     importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
 }
