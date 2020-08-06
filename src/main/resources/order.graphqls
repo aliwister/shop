@@ -225,6 +225,8 @@ extend type Query {
 
 
     purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
+    unshippedPurchases: [PurchaseQueue]
+
     purchase(id: ID): Purchase
     purchaseQueue: [PurchaseQueue]
     merchants: [Merchant]
