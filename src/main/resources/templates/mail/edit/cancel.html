@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title th:text="#{email.cancel.title(${order.reference})}">Badals.com Order Cancellation Notice</title>
+        <title th:text="#{email.edit.cancel.title(${order.reference})}">Badals.com Some items were canceled</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
     </head>
@@ -9,18 +9,18 @@
         <p th:text="#{email.order.greeting(${user.firstname})}">
             Dear
         </p>
-        <p th:text="#{email.cancel.intro(${order.reference})}">
-            I'm sorry to inform you that your  order # {0} was cancelled.
+        <p th:text="#{email.edit.cancel.intro(${order.reference})}">
+            I'm sorry to inform you that some items of your order # {0} have been cancelled.
         </p>
         <br/>
-        <p th:text="#{email.cancel.details}">>
+        <p th:text="#{email.edit.cancel.details}">>
             The reason for cancellation was:
         </p>
         <br/>
         <p th:text="${reason}">>
         </p>
         <p th:text="#{email.cancel.guarantee}">>
-Please rest assured that that your payment will be refunded to you in full.
+Please rest assured that that any payment you made be refunded to you in full for the canceled items.
         </p>
 
         <div th:switch="${order.balance}">
@@ -49,6 +49,21 @@ Please rest assured that that your payment will be refunded to you in full.
                     </div>
             </div>
         </div>
+        <div>
+            Your order is now as follows:
+
+            <table>
+                <th></th><th>Item Name</th><th>Quantity</th><th>Price</th>
+                <tr th:each="o: ${items}">
+                    <td><img th:src="${o.image}" style="max-width: 70px"/></td>
+                    <td th:text="${o.productName}" />
+                    <td th:text="${o.quantity}" />
+                    <td th:text="${o.price}" />
+                </tr>
+            </table>
+
+        </div>
+
         <p>
             <span th:text="#{email.order.thanks}">Regards, </span>
             <br/>
