@@ -3,6 +3,7 @@ package com.badals.shop.service;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
+import com.badals.shop.domain.OrderItem;
 import com.badals.shop.domain.checkout.helper.AddressPojo;
 import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
@@ -277,19 +278,28 @@ public class OrderService {
         mailService.sendOrderCreationMail(dto.getCustomer(), dto);
     }
 
-   public OrderDTO editOrderItems(Long id, List<OrderItemDTO> orderItems) {
+   public OrderDTO editOrderItems(Long id, List<OrderItemDTO> orderItems, String reason) {
        Order order = orderRepository.findForOrderDetails(id, String.valueOf(id)).get();
-
+       boolean isEditCancel = false;
        for(OrderItemDTO item : orderItems) {
-           order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
-                   .findFirst().get()
-                   .quantity(item.getQuantity())
+           OrderItem before = order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
+                   .findFirst().get();
+
+           if(item.getQuantity() < before.getQuantity())
+               isEditCancel = true;
+
+           before.quantity(item.getQuantity())
                    .price(item.getPrice())
                    .lineTotal(item.getPrice().doubleValue()*item.getQuantity());
        }
        order.setSubtotal(calculateSubtotal(order));
        order.setTotal(calculateTotal(order));
-       return save(order);
+       OrderDTO dto = save(order);
+       if(isEditCancel)
+            mailService.sendEditCancelMail(dto.getCustomer(), dto, reason);
+       else
+           mailService.sendEditMail(dto.getCustomer(), dto, reason);
+       return dto;
    }
     public BigDecimal calculateSubtotal(Order order) {
         BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());

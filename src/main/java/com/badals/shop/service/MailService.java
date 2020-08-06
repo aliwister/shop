@@ -130,6 +130,7 @@ public class MailService {
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(ORDER, order);
+        context.setVariable(ITEMS, order.getOrderItems());
         context.setVariable(REASON, reason);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
         String content = templateEngine.process(templateName, context);
@@ -197,7 +198,11 @@ public class MailService {
         sendEmailFromTemplate(user, order, reason,"mail/cancelEmail", "email.cancel.title");
     }
     @Async
+    public void sendEditCancelMail(CustomerDTO user, OrderDTO order, String reason) {
+        sendEmailFromTemplate(user, order, reason,"mail/edit/cancel", "email.edit.cancel.title");
+    }
+    @Async
     public void sendEditMail(CustomerDTO user, OrderDTO order, String reason) {
-        sendEmailFromTemplate(user, order, reason,"mail/editEmail", "email.voltage.title");
+        sendEmailFromTemplate(user, order, reason,"mail/edit/general", "email.edit.title");
     }
 }
