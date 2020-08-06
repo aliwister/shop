@@ -147,6 +147,7 @@ public class PurchaseService {
                     oNew.setQuantity(pi.getQuantity().intValue());
                     o.setQuantity(o.getQuantity().intValue() - pi.getQuantity().intValue());
                     oNew.setProduct(o.getProduct());
+                    oNew.setSku(o.getSku());
                     oNew.setId(null);
                     orderItemRepository.save(o);
                     orderItemRepository.save(oNew);
@@ -188,5 +189,9 @@ public class PurchaseService {
         if(order.getDiscountTotal()!= null)
             total = total.subtract(order.getDiscountTotal());
         return total;
+    }
+
+    public List<PurchaseQueue> findUnshippedPurchases() {
+        return purchaseRepository.findUnshipped();
     }
 }

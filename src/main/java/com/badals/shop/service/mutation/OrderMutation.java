@@ -42,7 +42,7 @@ public class OrderMutation implements GraphQLMutationResolver {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO editOrder(Long id, List<OrderItemDTO> orderItems, String reason) {
-        OrderDTO order = orderService.editOrderItems(id, orderItems);
+        OrderDTO order = orderService.editOrderItems(id, orderItems, reason);
         return order;
     }
 
