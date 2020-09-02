@@ -407,6 +407,7 @@ public class Pas5Service implements IProductService {
         Product product = p;
         try {
             product = setMerchantStock(p, MwsLookupParser.parseStock(getMerchantStock(p),n, p.getWeight(), overrides), BigDecimal.valueOf(99L));
+            product.inStock(true);
         } catch (PricingException e) {
             product.setPrice((BigDecimal) null);
             //e.printStackTrace();
