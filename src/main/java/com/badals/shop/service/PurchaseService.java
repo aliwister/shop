@@ -7,6 +7,7 @@ import com.badals.shop.repository.OrderItemRepository;
 import com.badals.shop.repository.PurchaseItemRepository;
 import com.badals.shop.repository.PurchaseRepository;
 import com.badals.shop.repository.projection.PurchaseQueue;
+import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.dto.PurchaseDTO;
 import com.badals.shop.service.dto.PurchaseItemDTO;
@@ -193,5 +194,27 @@ public class PurchaseService {
 
     public List<PurchaseQueue> findUnshippedPurchases() {
         return purchaseRepository.findUnshipped();
+    }
+
+    public PurchaseDTO setStatus(Long id, OrderState state) {
+        Purchase order = purchaseRepository.getOne(id);
+        order.setOrderState(state);
+        order = purchaseRepository.save(order);
+        return purchaseMapper.toDto(order);
+    }
+
+    public PurchaseDTO close(Long id, String comment) {
+        Purchase order = purchaseRepository.getOne(id);
+        order.setOrderState(OrderState.CLOSED);
+        order = purchaseRepository.save(order);
+        return purchaseMapper.toDto(order);
+    }
+
+    public PurchaseDTO cancel(Long id, String comment) {
+        Purchase order = purchaseRepository.getOne(id);
+        order.setOrderState(OrderState.CANCELLED);
+        order.setTotal(BigDecimal.ZERO);
+        order = purchaseRepository.save(order);
+        return purchaseMapper.toDto(order);
     }
 }

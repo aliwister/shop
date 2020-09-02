@@ -322,7 +322,7 @@ public class OrderService {
         mailService.sendVoltageMail(customer, dto);
     }
 
-    public OrderDTO cancelOrder(Long id, String reason) {
+    public OrderDTO cancel(Long id, String reason) {
         Order order = orderRepository.getOne(id);
 
         order.setOrderState(OrderState.CANCELLED);
@@ -343,5 +343,12 @@ public class OrderService {
         Order order = orderRepository.getOne(id);
         OrderDTO dto = orderMapper.toDto(order);
         sendConfirmationEmail(dto);
+    }
+
+    public OrderDTO close(Long id, String reason) {
+        Order order = orderRepository.getOne(id);
+        order.setOrderState(OrderState.CLOSED);
+        OrderDTO dto = save(order);
+        return dto;
     }
 }

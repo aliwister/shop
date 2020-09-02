@@ -10,6 +10,7 @@ enum OrderState {
     DELIVERED
     SHIPPED
     CANCELLED
+    CLOSED
 }
 
 type Currency {
@@ -204,7 +205,11 @@ extend type Mutation {
     sendPaymentSms(id: ID, mobile: String): Message
     discountOrder(id: ID): Order
     setOrderState(id: ID, state: OrderState): Order
+    setPurchaseState(id: ID, state: OrderState): Purchase
     cancelOrder(id: ID, reason: String): Order
+    closeOrder(id: ID, reason: String): Order
+    cancelPurchase(id: ID, reason: String): Purchase
+    closePurchase(id: ID, reason: String): Purchase
     addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
     sendOrderLevelEmail(id:ID, template:String): Message
     sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
