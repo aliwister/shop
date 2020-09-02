@@ -118,7 +118,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    }
 
    public ProductDTO pas(String sku) throws ProductNotFoundException, NoOfferException, PricingException {
-      return productService.lookupForcePas(sku, true,true, false);
+      return productService.lookupForcePas(sku, false,false, true);
    }
 }
 

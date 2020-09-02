@@ -77,9 +77,11 @@ public class AdminMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId) throws PricingException, NoOfferException, ProductNotFoundException {
+    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly) throws PricingException, NoOfferException, ProductNotFoundException {
         ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
         productOverrideService.saveOrUpdate(dto);
+        if(submitOnly)
+            return null;
         ProductDTO productDTO = null;
         if(merchantId == 1L)
             productDTO = productService.lookupForcePas(sku, false, false, true);
@@ -125,6 +127,12 @@ public class AdminMutation implements GraphQLMutationResolver {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO setOrderState(Long id, OrderState state){
         return orderService.setStatus(id, state);
+    }
+
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public PurchaseDTO setPurchaseState(Long id, OrderState state){
+        return purchaseService.setStatus(id, state);
     }
 
 
