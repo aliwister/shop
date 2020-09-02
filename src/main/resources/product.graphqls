@@ -133,6 +133,7 @@ type Product {
     availability: String
     features: [String]
     browseNode: String
+    inStock: Boolean
 }
 
 type LocalizedValue {
@@ -298,7 +299,7 @@ extend type Mutation {
             i18n: ProductI18nInput):ProductI18n,
     pasLookup(sku: String): Product
     addToPricingQ(sku: String):Message
-    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int): Product
+    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int): Product
     completePricingRequest(id: Long):Message
     completePricingRequestAndEmail(id: Long):Message
     addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message

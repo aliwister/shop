@@ -63,8 +63,6 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "parent_id")
     private Long parentId;
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="parent_id", referencedColumnName = "ref", insertable = false, updatable = false)
     private Product parent;
@@ -72,8 +70,6 @@ public class Product implements Serializable, IMerchantProduct {
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "parent_id",referencedColumnName = "ref")
     private Set<Product> children;
-
-
 
     @ManyToMany
     @JoinTable(
@@ -136,26 +132,30 @@ public class Product implements Serializable, IMerchantProduct {
         this.stub = stub;
     }
 
-    public Boolean getOutOfStock() {
-        return outOfStock;
-    }
 
-    public void setOutOfStock(Boolean outOfStock) {
-        this.outOfStock = outOfStock;
-    }
 
     @Column(name = "stub", nullable = false)
     private Boolean stub;
 
-    @Column(name = "out_of_stock", nullable = false)
-    private Boolean outOfStock;
+    public Boolean getInStock() {
+        return inStock;
+    }
+
+    public void setInStock(Boolean inStock) {
+        this.inStock = inStock;
+    }
+
+    @Column(name = "in_stock", nullable = false)
+    private Boolean inStock;
+
+
 
     public Product stub(boolean b) {
         stub = b;
         return this;
     }
-    public Product outOfStock(boolean b) {
-        outOfStock = b;
+    public Product inStock(boolean b) {
+        inStock = b;
         return this;
     }
 
@@ -688,6 +688,11 @@ public class Product implements Serializable, IMerchantProduct {
         this.children = children;
     }
 
+    public void addChild(Product child) {
+        this.children.add(child);
+        child.setParentId(this.ref);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -707,30 +712,10 @@ public class Product implements Serializable, IMerchantProduct {
     @Override
     public String toString() {
         return "Product{" +
-            "id=" + getId() +
-            ", ref=" + getRef() +
-            ", parent=" + getParent() +
-            ", sku='" + getSku() + "'" +
-            ", upc=" + getUpc() +
-            ", price=" + getPrice() +
-            ", image='" + getImage() + "'" +
-            ", images='" + getGallery() + "'" +
-            ", releaseDate='" + getReleaseDate() + "'" +
-            ", active='" + isActive() + "'" +
-            ", similarProducts='" + getSimilarProducts() + "'" +
-            ", url='" + getUrl() + "'" +
-            ", title='" + getTitle() + "'" +
-            ", brand='" + getBrand() + "'" +
-            ", group='" + getGroup() + "'" +
-           // ", updated='" + getUpdated() + "'" +
-            //", created='" + getCreated() + "'" +
-            ", condition='" + getCondition() + "'" +
-            ", isUsed='" + isIsUsed() + "'" +
-            ", availableForOrder='" + isAvailableForOrder() + "'" +
-            ", weight=" + getWeight() +
-            ", volumeWeight=" + getVolumeWeight() +
-            "}";
+                "id=" + id +
+                ", ref=" + ref +
+                ", slug='" + slug + '\'' +
+                ", parentId=" + parentId +
+                '}';
     }
-
-
 }

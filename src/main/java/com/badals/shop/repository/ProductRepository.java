@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 /**
@@ -52,4 +53,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("from Product u where u.sku = ?1")
     Optional<Product> findBySku(String asin);
+
+    @Query("from Product u where u.sku in ?1")
+    List<Product> findAllBySku(Set<String> keySet);
+
+    @Modifying(flushAutomatically = true)
+    @Query("update Product u set u.parentId = ?1 where u.sku in ?2")
+    void updateParentAllBySku(Long parentId, Set<String> keySet);
 }

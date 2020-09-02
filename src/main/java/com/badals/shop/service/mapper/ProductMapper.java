@@ -1,16 +1,19 @@
 package com.badals.shop.service.mapper;
 
+import com.amazon.paapi5.v1.VariationAttribute;
 import com.badals.shop.domain.*;
 
+import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
+import com.badals.shop.domain.pojo.Variation;
+import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.service.dto.ProductDTO;
 import org.mapstruct.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.badals.shop.service.util.AccessUtil.opt;
 
@@ -70,7 +73,26 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     default void beforeMapping(@MappingTarget ProductDTO target, Product source) {
         if (source.getParent() != null) {
             target.setVariations(source.getParent().getVariations());
-            target.setVariationOptions(source.getParent().getVariationOptions());
+            List<String> dimensions = source.getVariationAttributes().stream().map(x -> x.getName()).collect(Collectors.toList());
+            List<VariationOption> variationOptions = new ArrayList<>();
+            for(String dim: dimensions) {
+                VariationOption o = new VariationOption();
+                o.setLabel(dim);
+                o.setName(dim);
+                o.setValues(new ArrayList<>());
+                variationOptions.add(o);
+                //List<String> values = source.getParent().getVariations().stream().filter(x -> (x.getVariationAttributes().stream().filter(y -> y.getName().toLowerCase().startsWith(dim.toLowerCase())).findFirst().get())
+            }
+            // Generate variation list on the fly
+
+            for (Variation v : source.getParent().getVariations()) {
+                for(Attribute attribute: v.getVariationAttributes()) {
+                    variationOptions.stream().filter(y -> attribute.getName().toLowerCase().startsWith(y.getName().toLowerCase())).findFirst().get().getValues().add(attribute.getValue());
+                }
+
+            }
+            variationOptions.forEach(o -> o.setValues(new ArrayList<>(new HashSet<>(o.getValues()))));
+            target.setVariationOptions(variationOptions);
         }
         else {
             target.setVariations(source.getVariations());
