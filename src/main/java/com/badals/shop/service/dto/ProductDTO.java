@@ -25,6 +25,8 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class ProductDTO implements Serializable {
 
+   private Boolean inStock;
+
     private Long id;
 
     private Long ref;
