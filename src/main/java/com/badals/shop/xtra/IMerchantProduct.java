@@ -36,9 +36,10 @@ public interface IMerchantProduct {
     IMerchantProduct gallery(List<Gallery> images);
 
     IMerchantProduct weight(BigDecimal weight);
+
     IMerchantProduct volumeWeight(BigDecimal volumeWeight);
 
-
+    IMerchantProduct inStock(Boolean inStock);
 
     void setPrice(Price price);
 

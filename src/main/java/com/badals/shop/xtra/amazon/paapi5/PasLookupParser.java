@@ -48,7 +48,8 @@ public class PasLookupParser {
                 .title(i.getTitle())
                 .upc(i.getUpc())
                 .merchantId(merchantId)
-                .gallery(i.gallerizeImages());
+                .gallery(i.gallerizeImages())
+                .inStock(true);
         //p.setTenantId()
         return p;
     }

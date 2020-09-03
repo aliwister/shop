@@ -154,7 +154,9 @@ public class Product implements Serializable, IMerchantProduct {
         stub = b;
         return this;
     }
-    public Product inStock(boolean b) {
+
+    @Override
+    public Product inStock(Boolean b) {
         inStock = b;
         return this;
     }
