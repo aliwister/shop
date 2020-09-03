@@ -315,6 +315,10 @@ public class Pas5Service implements IProductService {
                     productRepo.save(parent);
                 }
             }
+            else {
+                // Assume no parent will be queried directly
+                product.setVariationType(VariationType.SIMPLE);
+            }
         }
         else {
             //TODO: Check expired
