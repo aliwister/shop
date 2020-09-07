@@ -1,0 +1,32 @@
+type Payment {
+    id: ID
+    paymentMethod: String
+    orderId: Long
+    amount: BigDecimal
+    authCode: String
+    transactionId: String
+}
+
+input PaymentInput {
+    id: ID
+    paymentMethod: String
+    orderId: Long
+    amount: BigDecimal
+    authCode: String
+}
+
+type PaymentResponse {
+  items: [Payment!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
+extend type Mutation {
+    setSettlementDate(payment: [PaymentInput], date: Date): Message
+    setProcessDate(payment: PaymentInput, date: Date): Message
+}
+
+extend type Query {
+    payments(state: [OrderState], offset: Int, limit: Int, searchText: String): PaymentResponse
+    payment(id: ID): Payment
+}

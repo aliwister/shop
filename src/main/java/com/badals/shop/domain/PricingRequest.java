@@ -1,9 +1,12 @@
 package com.badals.shop.domain;
 
+import org.springframework.data.annotation.CreatedDate;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * A PricingRequest.

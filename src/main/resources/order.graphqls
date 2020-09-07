@@ -117,13 +117,7 @@ input PurchaseItemInput {
     productId: Long
 }
 
-type Payment {
-    id: ID
-    paymentMethod: String
-    orderId: Long
-    amount: BigDecimal
-    authCode: String
-}
+
 
 type PurchaseQueue {
     id: ID
