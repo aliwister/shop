@@ -66,4 +66,6 @@ public class AddProductDTO {
    String tenant;
    String merchant;
 
+   Long merchantId;
+
 }

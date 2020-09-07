@@ -64,6 +64,10 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
 
         target.setActive(true);
         target.setVariationType(VariationType.valueOf(source.getType()));
+
+        target.getMerchantStock().clear();
+        target.getMerchantStock().add(new MerchantStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(source.getCost()).allow_backorder(false)
+                .price(source.getSalePrice()).discount(source.getDiscountInPercent()).product(target).merchantId(source.getMerchantId()));
     }
 
     @AfterMapping
@@ -89,6 +93,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         target.setPrice(source.getSalePrice().setScale(2, RoundingMode.HALF_UP).toString());
 
         if(LocaleContextHolder.getLocale().toString().equals("ar")) {
+            ///target.setLang("ar");
             target.setTitle(source.getName_ar());
             target.setBrowseNode(source.getBrowseNode_ar());
             target.setDescription(source.getDescription_ar());

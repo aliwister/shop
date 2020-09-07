@@ -6,6 +6,7 @@ import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.MerchantProductResponse;
+import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
@@ -47,6 +48,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -215,6 +217,9 @@ public class ProductService {
             product = product.getChildren().iterator().next();
         }
         else if(product.getStub() != null && product.getStub()) {
+            //product.setStub(false);
+            //product.setPrice(new Price(BigDecimal.TEN,"OMR"));
+            //productRepository.save(product);
             pas5Service.lookup(product.getSku(),false, false, false, false);
             return this.getProductBySku(product.getSku());
         }
@@ -276,12 +281,14 @@ public class ProductService {
     public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         return lookupPas(sku, false, isRedis, isRebuild);
     }
+
     public ProductDTO lookupPas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild, false);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             this.indexProduct(p.getId());
         return this.getProductBySku(sku);
     }
+
     public ProductDTO lookupForcePas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild, true);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
@@ -295,8 +302,10 @@ public class ProductService {
 
     public AddProductDTO createMerchantProduct(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant) {
 
-        int discount = 100 * (int)((dto.getPrice().doubleValue() - dto.getSalePrice().doubleValue())/dto.getPrice().doubleValue());
-        dto.setDiscountInPercent(discount);
+        if (dto.getSalePrice() != null) {
+            int discount = 100 * (int) ((dto.getPrice().doubleValue() - dto.getSalePrice().doubleValue()) / dto.getPrice().doubleValue());
+            dto.setDiscountInPercent(discount);
+        }
         dto.setTenant(currentTenant);
         dto.setMerchant(currentMerchant);
         dto.setImported(false);
@@ -304,6 +313,10 @@ public class ProductService {
         productSearchRepository.save(dto);
         return dto;
     }
+
+/*    public AddProductDTO createStubProduct(AddProductDTO dto) {
+
+    }*/
 
     public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long merchantId, String currentTenant, boolean isSaveES) {
         Product product = productRepository.findOneByRef(dto.getId()).orElse(new Product());
@@ -375,6 +388,91 @@ public class ProductService {
             productSearchRepository.save(dto);
         return  addProductMapper.toDto(product);
     }
+
+
+
+    public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {
+        Product product = productRepository.findOneByRef(dto.getId()).orElse(new Product());
+        CRC32 checksum = new CRC32();
+        if(dto.getVariationType() == null)
+            dto.setType("SIMPLE");
+
+        if(dto.getId() == null) {
+            product = addProductMapper.toEntity(dto);
+
+            product.setSku(dto.getSku());
+            checksum.update(dto.getSku().getBytes());
+            String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
+            product.setRef(Long.valueOf(ref));
+            product.setSlug(ref);
+        }
+        else {
+            product = productRepository.findById(dto.getId()).get();
+            if(dto.getRef() == null || dto.getRef().equals("")) {
+                String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
+                product.setRef(Long.valueOf(ref));
+                product.setSlug(ref);
+            }
+        }
+
+
+
+        product.setActive(true);
+        product.setStub(false);
+        product.setInStock(true);
+        product.setCurrency("OMR");
+
+
+/*        product.setRef(dto.getRef());
+        product.setSlug(dto.getSlug());*/
+        product.setTitle(dto.getName());
+        product.setMerchantId(currentMerchantId);
+
+
+        product.getMerchantStock().clear();
+        product.getProductLangs().clear();
+        product.getCategories().clear();
+
+/*
+        for(Long id: dto.getShopIds()) {
+            product.getCategories().add(new Category(id));
+        }
+*/
+
+        //product.getProductLangs().add(new ProductLang().title("Fuck").product(product).lang("ar"));
+        int discount = 0;
+
+/*        if(dto.getSalePrice() != null)
+            discount = 100 * (int)((dto.getPrice().doubleValue() - dto.getSalePrice().doubleValue())/dto.getPrice().doubleValue());*/
+
+        product.getMerchantStock().add(new MerchantStock().quantity(dto.getQuantity()).availability(dto.getAvailability()).cost(dto.getCost()).allow_backorder(false)
+                .price(dto.getSalePrice()).discount(discount).product(product).merchantId(currentMerchantId));
+
+        ProductLang langAr = new ProductLang().lang("ar").description(dto.getDescription_ar()).title(dto.getName_ar()).brand(dto.getBrand_ar()).browseNode(dto.getBrowseNode());
+        if(dto.getFeatures_ar() != null)
+            langAr.setFeatures(Arrays.asList(dto.getFeatures_ar().split(";")));
+
+
+        ProductLang langEn = new ProductLang().lang("en").description(dto.getDescription()).title(dto.getName()).brand(dto.getBrand()).browseNode(dto.getBrowseNode());
+        if(dto.getFeatures() != null)
+            langEn.setFeatures(Arrays.asList(dto.getFeatures().split(";")));
+
+        product.getProductLangs().add(langAr.product(product));
+        product.getProductLangs().add(langEn.product(product));
+
+        //product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
+        product = productRepository.save(product);
+        //dto.setTenant(currentMerchant);
+        //dto.setSlug(product.getSlug());
+        //dto.setRef(product.getRef());
+        //dto.setImported(true);
+
+        if(isSaveES)
+            productSearchRepository.save(dto);
+        return  addProductMapper.toDto(product);
+    }
+
+
 
     public void addToElastic(Long id, String sku, String name, String name_ar, List<String> shops) {
         productSearchRepository.index(new AddProductDTO(id,

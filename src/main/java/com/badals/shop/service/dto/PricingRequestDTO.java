@@ -3,6 +3,7 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -15,6 +16,8 @@ public class PricingRequestDTO implements Serializable {
 
     @NotNull
     private String sku;
+
+    private Date createdDate;
 
     private String ref;
     private String email;
