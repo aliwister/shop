@@ -65,6 +65,12 @@ public class MerchantMutation implements GraphQLMutationResolver {
     }
 
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {
+        return productService.createProduct(dto, isSaveES, currentMerchantId);
+    }
+
+
     public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
         String t =  TenantContext.getCurrentTenant();
         productService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(),TenantContext.getCurrentTenant(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
@@ -75,9 +81,9 @@ public class MerchantMutation implements GraphQLMutationResolver {
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {
         String t =  TenantContext.getCurrentTenant();
         String m = TenantContext.getCurrentMerchant();
-        String objectKey = "_m/" + t + "/" + m + "/" + filename;
+        String objectKey = "_m/" + m + "/" + filename;
         URL url = awsService.presignUrl(objectKey, contentType);
-        return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+t + "/" + m + "/" + filename, "200");
+        return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+ m + "/" + filename, "200");
 /*        try {
             S3Presigner presigner = S3Presigner.builder().region(region).build();
 
@@ -94,6 +100,26 @@ public class MerchantMutation implements GraphQLMutationResolver {
         return adminMutation.getUploadUrl(objectKey, contentType);*/
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public PresignedUrl getAdminImageUploadUrl(String filename, String merchant, String contentType) {
+        String objectKey = "_m/" + merchant + "/" + filename;
+        URL url = awsService.presignUrl(objectKey, contentType);
+        return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+ merchant + "/" + filename, "200");
+/*        try {
+            S3Presigner presigner = S3Presigner.builder().region(region).build();
+
+            PresignedPutObjectRequest presignedRequest =
+                    presigner.presignPutObject(z -> z.signatureDuration(Duration.ofMinutes(10))
+                            .putObjectRequest(por -> por.bucket(S3Util.getBucketName()).key(objectKey).contentType(contentType)));
+            // Upload content to the bucket by using this URL
+            URL url = presignedRequest.url();
+            return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+t + "/" + m + "/" + filename, "200");
+        } catch (S3Exception  e) {
+            e.getStackTrace();
+        }
+        return new PresignedUrl("","","");*
+        return adminMutation.getUploadUrl(objectKey, contentType);*/
+    }
 
     public static void main(String args[]) {
 
