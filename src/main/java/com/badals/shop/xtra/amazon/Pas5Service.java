@@ -82,7 +82,7 @@ public class Pas5Service implements IProductService {
     }
 
     @Transactional
-    public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild, boolean forcePas) throws NoOfferException {
+    public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild, boolean forcePas) throws NoOfferException, PricingException {
 
         Product product = productRepo.findBySkuJoinChildren(asin).orElse(null);
 
@@ -263,7 +263,7 @@ public class Pas5Service implements IProductService {
     }
 
 
-    private Product mwsItemShortCircuit(Product product, String asin, boolean isParent, boolean isRebuild) throws NoOfferException {
+    private Product mwsItemShortCircuit(Product product, String asin, boolean isParent, boolean isRebuild) throws NoOfferException, PricingException {
 
         List<ProductOverride> overrides = findOverrides(asin, null);
         //Product finalParent = null;
@@ -275,17 +275,36 @@ public class Pas5Service implements IProductService {
         List<String> list = new ArrayList();
         list.add(asin);
         Map<String, Item> doc;
+        boolean isPasLookup = false;
+        boolean isMwsLookup = false;
+
         if (item == null) {
-            response = pasLookup.lookup(list);
-            if(response.getErrors() != null && response.getErrors().size() > 0 ) {
-                ErrorData error = response.getErrors().get(0);
-                if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
-                    mwsLookup.lookup(asin);
-                    return null;
+            if(overrides != null && overrides.size() > 0) {
+                isPasLookup = true;
+            }
+            if(!isPasLookup) {
+                try {
+                    item = mwsLookup.lookup(asin);
+                } catch (Exception e) {
+                    isPasLookup = true;
+                    isMwsLookup = false;
                 }
             }
-            doc = parse_response(response.getItemsResult().getItems());
-            item = pasItemMapper.itemToPasItemNode(doc.get(asin));
+            if(isPasLookup) {
+                response = pasLookup.lookup(list);
+                if (response.getErrors() != null && response.getErrors().size() > 0) {
+                    ErrorData error = response.getErrors().get(0);
+                    if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
+                        if(isMwsLookup)
+                            item = mwsLookup.lookup(asin);
+                        else
+                            throw new PricingException("Unable to price this item!");
+                    }
+                } else {
+                    doc = parse_response(response.getItemsResult().getItems());
+                    item = pasItemMapper.itemToPasItemNode(doc.get(asin));
+                }
+            }
             //redisPasRepository.getHashOperations().put("pas", asin, item);
         }
 
