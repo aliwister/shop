@@ -43,12 +43,13 @@ Thank you for your approval on the order changes.
                 </p>
                 <div th:switch="${order.paymentMethod}">
                     <p th:case="'checkoutcom'"><span th:text="#{email.refund.payment.auto}">Your refund will automatically go back to the same card used for payment in 7-10 business days</span></p>
-                    <p th:case="'bankwire'"><span th:text="#{email.refund.payment.transfer}">To get your refund, please provide:</span></p>
+                    <p th:case="'bankwire'"><span th:text="#{email.refund.payment.transfer}">To get your refund, please provide:</span>
                     <ul>
                         <li th:text="#{email.refund.name}">Name in English</li>
                         <li th:text="#{email.refund.bank.account}">Bank Account # (NOT Card number)</li>
                         <li th:text="#{email.refund.bank.name}">Bank Name</li>
                     </ul>
+                    </p>
                     <p th:case="'bankwire'"><span th:text="#{email.refund.bank.timeline}">Please note Bank Muscat refunds take 5-7 business days. Other banks may take up to 15 business days.</span></p>
 
                 </div>
