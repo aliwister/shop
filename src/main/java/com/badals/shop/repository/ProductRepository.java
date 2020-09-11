@@ -43,6 +43,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findOneBySku(String sku);
 
+    Optional<Product> findOneBySkuAndMerchantId(String sku, Long merchantId);
+
     List<Product> findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(List<VariationType> types, Pageable pageable);
 
     @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.categories where u.merchantId = ?1")
