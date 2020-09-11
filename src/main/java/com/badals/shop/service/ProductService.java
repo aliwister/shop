@@ -297,7 +297,7 @@ public class ProductService {
     }
 
     public String getParentOf(String sku) {
-        return productRepository.findOneBySku(sku).get().getParent().getSku();
+        return productRepository.findOneBySkuAndMerchantId(sku, 1L).get().getParent().getSku();
     }
 
     public AddProductDTO createMerchantProduct(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant) {

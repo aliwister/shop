@@ -65,7 +65,7 @@ public class Pas5Service implements IProductService {
     }
 
     public Product findBySku(String sku) {
-        return productRepo.findOneBySku(sku).get();
+        return productRepo.findOneBySkuAndMerchantId(sku, 1L).get();
     }
 
     private List<ProductOverride> findOverrides(String asin, String parent) {
@@ -262,6 +262,23 @@ public class Pas5Service implements IProductService {
         return product;
     }
 
+    private PasItemNode callPas(String asin) throws PricingException {
+        GetItemsResponse response = null;
+        List<String> list = new ArrayList();
+        list.add(asin);
+        Map<String, Item> doc;
+        response = pasLookup.lookup(list);
+
+        //ErrorData error = response.getErrors().get(0);
+        //if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
+
+        if (response.getErrors() != null && response.getErrors().size() > 0) {
+            throw new PricingException("Unable to price this item!");
+        }
+
+        doc = parse_response(response.getItemsResult().getItems());
+        return pasItemMapper.itemToPasItemNode(doc.get(asin));
+    }
 
     private Product mwsItemShortCircuit(Product product, String asin, boolean isParent, boolean isRebuild) throws NoOfferException, PricingException {
 
@@ -271,45 +288,35 @@ public class Pas5Service implements IProductService {
         //if(product == null || product.getStub()) {
             //item = mwsLookup.lookup(asin);
         //}
-        GetItemsResponse response = null;
-        List<String> list = new ArrayList();
-        list.add(asin);
-        Map<String, Item> doc;
+
+
         boolean isPasLookup = false;
         boolean isMwsLookup = false;
 
-        if (item == null) {
-            if(overrides != null && overrides.size() > 0) {
-                isPasLookup = true;
-            }
-            if(!isPasLookup) {
-                try {
-                    item = mwsLookup.lookup(asin);
-                } catch (Exception e) {
-                    isPasLookup = true;
-                    isMwsLookup = false;
-                }
-            }
-            if(isPasLookup) {
-                response = pasLookup.lookup(list);
-                if (response.getErrors() != null && response.getErrors().size() > 0) {
-                    ErrorData error = response.getErrors().get(0);
-                    if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
-                        if(isMwsLookup)
-                            item = mwsLookup.lookup(asin);
-                        else
-                            throw new PricingException("Unable to price this item!");
-                    }
-                } else {
-                    doc = parse_response(response.getItemsResult().getItems());
-                    item = pasItemMapper.itemToPasItemNode(doc.get(asin));
-                }
-            }
-            //redisPasRepository.getHashOperations().put("pas", asin, item);
+        if(overrides != null && overrides.size() > 0) {
+            isPasLookup = true;
         }
+        if(!isPasLookup) {
+            try {
+                item = mwsLookup.lookup(asin);
+            } catch (Exception e) {
+                isPasLookup = true;
+                isMwsLookup = false;
+            }
+        }
+        if(isPasLookup) {
+            try {
+                callPas(asin);
+            }
+            catch (PricingException e) {
+                if (isMwsLookup)
+                    item = mwsLookup.lookup(asin);
+                else
+                    throw e;
+            }
+        }
+            //redisPasRepository.getHashOperations().put("pas", asin, item);
 
-
-        //if (item.getParentAsin() != null && !item.getParentAsin().equals("asin")) {
         // Not Exists
         if(product == null) {
             // Create Product
@@ -378,9 +385,20 @@ public class Pas5Service implements IProductService {
         }
         Product updated = productRepo.findBySkuJoinChildren(asin).orElse(product);
         updated.weight(PasUtility.calculateWeight(product.getWeight(), PasLookupParser.getOverride(overrides, OverrideType.WEIGHT)));
-        if(updated.getWeight() != null)
+        if(updated.getWeight() != null) {
             updated = priceMws(updated, overrides);
-
+            if(updated.getPrice() == null) {
+                if(!isPasLookup) {
+                    try {
+                        item = callPas(asin);
+                    } catch (Exception e) {
+                        //swallow
+                    }
+                }
+                if (item != null)
+                    updated = pricePas(updated, item, overrides);
+            }
+        }
         updated = productRepo.save(updated);
         return updated;
     }
@@ -394,7 +412,7 @@ public class Pas5Service implements IProductService {
             CRC32 checksum = new CRC32();
             checksum.update(key.getBytes());
             long ref = checksum.getValue();
-            child.slug(String.valueOf(ref)).ref(ref).merchantId(11L).active(true).sku(key).stub(true).inStock(true).title("stub");
+            child.slug(String.valueOf(ref)).ref(ref).merchantId(1L).active(true).sku(key).stub(true).inStock(true).title("stub");
             child.setVariationAttributes(value);
             child.setParent(parent);
         }
@@ -437,6 +455,23 @@ public class Pas5Service implements IProductService {
         } catch (NoOfferException e) {
             //product = setMerchantStock(p, getMerchantStock(p),BigDecimal.ZERO);
             product.inStock(false);
+        }
+        return product;
+    }
+
+    Product pricePas(Product p, PasItemNode item, List<ProductOverride> overrides) throws NoOfferException {
+
+        if (p.getWeight() == null || p.getWeight().doubleValue() < .01) return p;
+        MwsItemNode n = mwsLookup.fetch(p.getSku());
+        Product product = p;
+
+        MerchantStock stock = this.getMerchantStock(product);
+        try {
+            product = setMerchantStock(product, PasLookupParser.parseStock(product, stock, item, overrides),BigDecimal.valueOf(99L));
+        } catch (PricingException e) {
+            //e.printStackTrace();//@Todo set stock quantity to 0
+        } catch (NoOfferException e) {
+            //e.printStackTrace();
         }
         return product;
     }
