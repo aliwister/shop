@@ -36,4 +36,12 @@ public class PaymentDTO implements Serializable {
 
     private String orderReference;
 
+    private String account;
+
+    private String bankAccountNumber;
+    private String         bankName;
+    private String bankOwnerName;
+
+    private Date processedDate;
+    private Date settlementDate;
 }
