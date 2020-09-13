@@ -306,7 +306,7 @@ public class Pas5Service implements IProductService {
         }
         if(isPasLookup) {
             try {
-                callPas(asin);
+                item = callPas(asin);
             }
             catch (PricingException e) {
                 if (isMwsLookup)
