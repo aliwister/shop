@@ -1,33 +1,43 @@
 package com.badals.shop.service.query;
 
 
-import com.badals.shop.domain.Payment;
-import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.PaymentResponse;
-import com.badals.shop.service.PricingRequestService;
-import com.badals.shop.service.ProductService;
+import com.badals.shop.service.PaymentService;
 import com.badals.shop.service.dto.PaymentDTO;
-import com.badals.shop.service.dto.PricingRequestDTO;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 @Component
 public class AccountingQuery extends ShopQuery implements GraphQLQueryResolver {
 
-/*    @PreAuthorize("hasRole('ROLE_ACCOUNTANT')")
-    public List<PaymentDTO> payments(Integer limit) {
-        return null;
-    }*/
-    @PreAuthorize("hasRole('ROLE_ACCOUNTANT')")
-    public PaymentResponse payments(List<OrderState> state, Integer offset, Integer limit, String searchText){
-        return null;
+    private final PaymentService paymentService;
+
+    public AccountingQuery(PaymentService paymentService) {
+        this.paymentService = paymentService;
     }
-    @PreAuthorize("hasRole('ROLE_ACCOUNTANT')")
-    public PaymentDTO payment(Long id) {
+
+    /*    @PreAuthorize("hasRole('ROLE_ACCOUNTANT')")
+        public List<PaymentDTO> payments(Integer limit) {
+            return null;
+        }*/
+    //@PreAuthorize("hasRole('ROLE_ACCOUNTANT')")
+    //payments(paymentMethods: [String], offset: Int, limit: Int, searchText: String, dateFrom: Date, dateTo: Date, customerId: id, accountCode: String): PaymentResponse
+    public PaymentResponse transactions(List<String> paymentMethods, Integer offset, Integer limit, String searchText, Date from, Date to, Long customerId, String accountCode){
+        return paymentService.findForTable(paymentMethods,
+                offset,
+                limit,
+                searchText,
+                from,
+                to,
+                customerId,
+                accountCode);
+    }
+    @PreAuthorize("hasRole('ROLE_FINANCE')")
+    public PaymentDTO transaction(Long id) {
         return null;
     }
 }
