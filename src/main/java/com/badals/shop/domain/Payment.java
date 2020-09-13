@@ -9,6 +9,7 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Date;
 
 /**
  * A OrderPayment.
@@ -22,6 +23,17 @@ public class Payment extends Auditable implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String account;
+
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
 
     @NotNull
     @Column(name = "payment_method", nullable = false)
@@ -60,6 +72,28 @@ public class Payment extends Auditable implements Serializable {
     @ManyToOne
     @JsonIgnoreProperties("orderPayments")
     private Order order;
+
+    @Column(name = "processed_date")
+    private Date processedDate;
+
+    @Column(name = "settlement_date")
+    private Date settlementDate;
+
+    public Date getSettlementDate() {
+        return settlementDate;
+    }
+
+    public void setSettlementDate(Date settlementDate) {
+        this.settlementDate = settlementDate;
+    }
+
+    public Date getProcessedDate() {
+        return processedDate;
+    }
+
+    public void setProcessedDate(Date processedDate) {
+        this.processedDate = processedDate;
+    }
 
     public Payment bankAccountNumber(String bankAccountNumber) {
         this.bankAccountNumber = bankAccountNumber;

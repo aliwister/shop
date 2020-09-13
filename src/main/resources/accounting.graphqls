@@ -5,6 +5,15 @@ type Payment {
     amount: BigDecimal
     authCode: String
     transactionId: String
+    cardNumber: String
+    createdDate: String
+    orderReference: String
+    account: String
+    bankAccountNumber: String
+    bankName: String
+    bankOwnerName: String
+    settlementDate: String
+    processedDate: String
 }
 
 input PaymentInput {
@@ -22,11 +31,12 @@ type PaymentResponse {
 }
 
 extend type Mutation {
-    setSettlementDate(payment: [PaymentInput], date: Date): Message
-    setProcessDate(payment: PaymentInput, date: Date): Message
+    setSettlementDate(paymentIds: [Long], date: Date): Message
+    setProcessedDate(paymentId: ID, date: Date): Message
+    setAccountingCode(paymentId: ID, code: String): Message
 }
 
 extend type Query {
-    payments(state: [OrderState], offset: Int, limit: Int, searchText: String): PaymentResponse
-    payment(id: ID): Payment
+    transactions(paymentMethods: [String], offset: Int, limit: Int, searchText: String, from: Date, to: Date, customerId: Long, accountCode: String): PaymentResponse
+    transaction(id: ID): Payment
 }

@@ -2,6 +2,8 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.Order;
 import com.badals.shop.domain.Payment;
+import com.badals.shop.domain.pojo.OrderResponse;
+import com.badals.shop.domain.pojo.PaymentResponse;
 import com.badals.shop.repository.PaymentRepository;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.PaymentDTO;
@@ -9,13 +11,13 @@ import com.badals.shop.service.mapper.PaymentMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -102,5 +104,27 @@ public class PaymentService {
       p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod).authCode(authCode).bankAccountNumber(bankAccountNumber).bankName(bankName).bankOwnerName(bankOwnerName).ref(ref);
       p = paymentRepository.save(p);
       return paymentMapper.toDto(p);
+   }
+
+   public PaymentResponse findForTable(List<String> paymentMethods, Integer offset, Integer limit, String searchText, Date from, Date to, Long customerId, String accountCode) {
+      Page<Payment> payments = paymentRepository.findForTable(paymentMethods, from, to, customerId, accountCode, PageRequest.of((int) offset/limit,limit));
+      PaymentResponse response = new PaymentResponse();
+      response.setItems(payments.getContent().stream().map(paymentMapper::toDto).collect(Collectors.toList()));
+      Long total = payments.getTotalElements();
+      response.setTotal(total.intValue());
+      response.setHasMore((limit+offset) < total);
+      return response;
+   }
+
+   public void setSettlementDate(ArrayList<Long> payments, Date date) {
+       paymentRepository.setSettlementDate(payments, date);
+   }
+
+   public void setProcessedDate(Long paymentId, Date date) {
+       paymentRepository.setProcessedDate(paymentId, date);
+   }
+
+   public void setAccountingCode(Long paymentId, String code) {
+       paymentRepository.setAccountingCode(paymentId, code);
    }
 }

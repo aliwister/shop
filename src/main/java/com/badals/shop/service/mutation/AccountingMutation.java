@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,15 +40,22 @@ public class AccountingMutation implements GraphQLMutationResolver {
         this.paymentService = paymentService;
     }
 
-    @PreAuthorize("hasRole('ROLE_ACCOUNTANT')")
-    public Message setSettlementDate(List<PaymentDTO> payment, Date date) {
-        return null;
+    @PreAuthorize("hasRole('ROLE_FINANCE')")
+    public Message setSettlementDate(ArrayList<Long> paymentIds, Date date) {
+        paymentService.setSettlementDate(paymentIds, date);
+        return new Message("Success");
     }
 
-    @PreAuthorize("hasRole('ROLE_ACCOUNTANT')")
-    public Message setProcessDate(PaymentDTO payment, Date date) {
-        return null;
+    @PreAuthorize("hasRole('ROLE_FINANCE')")
+    public Message setProcessedDate(Long paymentId, Date date) {
+        paymentService.setProcessedDate(paymentId, date);
+        return new Message("Success");
+    }
+
+    @PreAuthorize("hasRole('ROLE_FINANCE')")
+    public Message setAccountingCode(Long paymentId, String code) {
+        paymentService.setAccountingCode(paymentId, code);
+        return new Message("Success");
     }
 
 }
-
