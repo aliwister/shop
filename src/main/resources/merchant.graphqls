@@ -92,4 +92,5 @@ extend type Mutation {
     importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
     createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long) : MerchantProduct
     getAdminImageUploadUrl(filename: String, merchant: String, contentType: String): PresignedUrl
+    getAdminFile(filename: String, contentType: String): PresignedUrl
 }
