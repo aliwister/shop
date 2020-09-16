@@ -82,7 +82,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
         String t =  TenantContext.getCurrentTenant();
         String m = TenantContext.getCurrentMerchant();
         String objectKey = "_m/" + m + "/" + filename;
-        URL url = awsService.presignUrl(objectKey, contentType);
+        URL url = awsService.presignPutUrl(objectKey, contentType);
         return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+ m + "/" + filename, "200");
 /*        try {
             S3Presigner presigner = S3Presigner.builder().region(region).build();
@@ -99,11 +99,17 @@ public class MerchantMutation implements GraphQLMutationResolver {
         return new PresignedUrl("","","");*
         return adminMutation.getUploadUrl(objectKey, contentType);*/
     }
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    public PresignedUrl getAdminFile(String filename, String contentType) {
+        String objectKey = filename;
+        URL url = awsService.presignGetUrl(objectKey, contentType);
+        return new PresignedUrl(url.toString(), "https://cdn.badals.com/" + filename, "200");
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PresignedUrl getAdminImageUploadUrl(String filename, String merchant, String contentType) {
         String objectKey = "_m/" + merchant + "/" + filename;
-        URL url = awsService.presignUrl(objectKey, contentType);
+        URL url = awsService.presignPutUrl(objectKey, contentType);
         return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+ merchant + "/" + filename, "200");
 /*        try {
             S3Presigner presigner = S3Presigner.builder().region(region).build();
