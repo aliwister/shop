@@ -37,6 +37,6 @@ extend type Mutation {
 }
 
 extend type Query {
-    transactions(paymentMethods: [String], offset: Int, limit: Int, searchText: String, from: Date, to: Date, customerId: Long, accountCode: String): PaymentResponse
+    transactions(paymentMethods: [String], offset: Int, limit: Int, maxAmount: String, from: Date, to: Date, customerId: Long, accountCode: String): PaymentResponse
     transaction(id: ID): Payment
 }

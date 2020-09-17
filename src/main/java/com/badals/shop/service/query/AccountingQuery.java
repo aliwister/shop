@@ -26,11 +26,11 @@ public class AccountingQuery extends ShopQuery implements GraphQLQueryResolver {
         }*/
     //@PreAuthorize("hasRole('ROLE_ACCOUNTANT')")
     //payments(paymentMethods: [String], offset: Int, limit: Int, searchText: String, dateFrom: Date, dateTo: Date, customerId: id, accountCode: String): PaymentResponse
-    public PaymentResponse transactions(List<String> paymentMethods, Integer offset, Integer limit, String searchText, Date from, Date to, Long customerId, String accountCode){
+    public PaymentResponse transactions(List<String> paymentMethods, Integer offset, Integer limit, String maxAmount, Date from, Date to, Long customerId, String accountCode){
         return paymentService.findForTable(paymentMethods,
                 offset,
                 limit,
-                searchText,
+                maxAmount,
                 from,
                 to,
                 customerId,
