@@ -106,8 +106,8 @@ public class PaymentService {
       return paymentMapper.toDto(p);
    }
 
-   public PaymentResponse findForTable(List<String> paymentMethods, Integer offset, Integer limit, String searchText, Date from, Date to, Long customerId, String accountCode) {
-      Page<Payment> payments = paymentRepository.findForTable(paymentMethods, from, to, customerId, accountCode, PageRequest.of((int) offset/limit,limit));
+   public PaymentResponse findForTable(List<String> paymentMethods, Integer offset, Integer limit, String maxAmount, Date from, Date to, Long customerId, String accountCode) {
+      Page<Payment> payments = paymentRepository.findForTable(paymentMethods, from, to, customerId, accountCode, maxAmount, PageRequest.of((int) offset/limit,limit));
       PaymentResponse response = new PaymentResponse();
       response.setItems(payments.getContent().stream().map(paymentMapper::toDto).collect(Collectors.toList()));
       Long total = payments.getTotalElements();

@@ -22,8 +22,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
    @Query("from Payment p where p.order.id = ?1")
    List<Payment> findAllByOrderId(Long orderId);
 
-   @Query("from Payment p where p.paymentMethod in (?1) and (?2 is null or p.settlementDate >= ?2) and (?3 is null or p.settlementDate <= ?3) order by p.id DESC")
-   Page<Payment> findForTable(List<String> paymentMethods, Date from, Date to, Long customerId, String accountCode, PageRequest of);
+   @Query("from Payment p where p.paymentMethod in (?1) and (?2 is null or p.settlementDate >= ?2) and (?3 is null or p.settlementDate <= ?3) and (?4 is null or p.order is null or p.order.customer.id = ?4 ) and (?5 is null or p.account = ?5 ) and (?6 is null or p.amount < ?6 ) order by p.id DESC")
+   Page<Payment> findForTable(List<String> paymentMethods, Date from, Date to, Long customerId, String accountCode, String maxAmount , PageRequest of);
 
    @Modifying @Query("update Payment p set p.settlementDate = ?2 where p.id in ?1")
    void setSettlementDate(ArrayList<Long> ids, Date date);
