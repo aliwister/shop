@@ -120,11 +120,11 @@ public class PaymentService {
        paymentRepository.setSettlementDate(payments, date);
    }
 
-   public void setProcessedDate(Long paymentId, Date date) {
-       paymentRepository.setProcessedDate(paymentId, date);
+   public void setProcessedDate(ArrayList<Long> payments, Date date) {
+       paymentRepository.setProcessedDate(payments, date);
    }
 
-   public void setAccountingCode(Long paymentId, String code) {
-       paymentRepository.setAccountingCode(paymentId, code);
+   public void setAccountingCode(ArrayList<Long> payments, String code) {
+       paymentRepository.setAccountingCode(payments, code);
    }
 }

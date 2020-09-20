@@ -2,6 +2,8 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.domain.pojo.OrderResponse;
+import com.badals.shop.domain.pojo.PurchaseResponse;
 import com.badals.shop.repository.MerchantRepository;
 import com.badals.shop.repository.OrderItemRepository;
 import com.badals.shop.repository.PurchaseItemRepository;
@@ -18,6 +20,7 @@ import com.badals.shop.service.mapper.PurchaseMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,8 +114,13 @@ public class PurchaseService {
         return purchaseRepository.findForPurchaseDetails(id).map(purchaseMapper::toDto);
     }
 
-    public List<PurchaseDTO> findForPurchaseList(List<OrderState> orderState, Integer limit, String searchText) {
-        return purchaseRepository.findForPurchaseList(PageRequest.of(0,limit)).stream().map(purchaseMapper::toDtoList).collect(Collectors.toList());
+    public PurchaseResponse findForPurchaseList(List<OrderState> orderState, Integer offset, Integer limit, String searchText) {
+        Page<Purchase> orders = purchaseRepository.findForPurchaseList(/*orderState, */PageRequest.of((int) offset/limit,limit));
+        PurchaseResponse response = new PurchaseResponse();
+        response.setTotal(orders.getNumber());
+        response.setItems(orders.getContent().stream().map(purchaseMapper::toDto).collect(Collectors.toList()));
+        response.setHasMore(orders.hasNext());
+        return response;
     }
 
     public PurchaseDTO updatePurchase(PurchaseDTO dto, List<PurchaseItemDTO> items) {
