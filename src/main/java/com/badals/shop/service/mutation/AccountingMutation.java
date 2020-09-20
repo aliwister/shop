@@ -47,14 +47,14 @@ public class AccountingMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_FINANCE')")
-    public Message setProcessedDate(Long paymentId, Date date) {
-        paymentService.setProcessedDate(paymentId, date);
+    public Message setProcessedDate(ArrayList<Long> paymentIds, Date date) {
+        paymentService.setProcessedDate(paymentIds, date);
         return new Message("Success");
     }
 
     @PreAuthorize("hasRole('ROLE_FINANCE')")
-    public Message setAccountingCode(Long paymentId, String code) {
-        paymentService.setAccountingCode(paymentId, code);
+    public Message setAccountingCode(ArrayList<Long> paymentIds, String code) {
+        paymentService.setAccountingCode(paymentIds, code);
         return new Message("Success");
     }
 

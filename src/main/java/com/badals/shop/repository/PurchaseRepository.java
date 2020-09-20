@@ -5,6 +5,7 @@ import com.badals.shop.domain.Purchase;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.repository.projection.PurchaseQueue;
 import com.badals.shop.service.dto.PurchaseDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
@@ -20,10 +21,10 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
-   List<Purchase> findAllByOrderByCreatedDateDesc(Pageable page);
+   Page<Purchase> findAllByOrderByCreatedDateDesc(Pageable page);
 
-   @Query("from Purchase p left join fetch p.merchant order by p.id DESC")
-   List<Purchase> findForPurchaseList(Pageable page);
+   @Query("select p from Purchase p left join p.merchant order by p.id DESC")
+   Page<Purchase> findForPurchaseList(Pageable page);
 
    @Query("from Purchase p left join fetch p.purchaseItems i left join fetch i.orderItems where p.id = ?1 order by i.sequence")
    Optional<Purchase>  findForUpdate(Long id);

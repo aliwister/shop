@@ -28,10 +28,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
    @Modifying @Query("update Payment p set p.settlementDate = ?2 where p.id in ?1")
    void setSettlementDate(ArrayList<Long> ids, Date date);
 
-   @Modifying @Query("update Payment p set p.processedDate = ?2 where p.id = ?1")
-   void setProcessedDate(Long paymentId, Date date);
+   @Modifying @Query("update Payment p set p.processedDate = ?2 where p.id in ?1")
+   void setProcessedDate(ArrayList<Long> ids, Date date);
 
-   @Modifying @Query("update Payment p set p.account = ?2 where p.id = ?1")
-   void setAccountingCode(Long paymentId, String account);
+   @Modifying @Query("update Payment p set p.account = ?2 where p.id in ?1")
+   void setAccountingCode(ArrayList<Long> ids, String account);
 
 }
