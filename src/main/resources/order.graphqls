@@ -187,6 +187,12 @@ type OrderResponse {
   hasMore: Boolean!
 }
 
+type PurchaseResponse {
+  items: [Purchase!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
 
 extend type Mutation {
     createOrder(id: Int): Order
@@ -223,7 +229,7 @@ extend type Query {
     orderA(id: ID): Order
 
 
-    purchases(state: [OrderState], limit: Int, searchText: String): [Purchase]
+    purchases(state: [OrderState], offset: Int, limit: Int, searchText: String): PurchaseResponse
     unshippedPurchases: [PurchaseQueue]
 
     purchase(id: ID): Purchase

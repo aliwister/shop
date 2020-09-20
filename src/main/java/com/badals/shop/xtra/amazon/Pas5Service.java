@@ -292,6 +292,15 @@ public class Pas5Service implements IProductService {
 
         boolean isPasLookup = false;
         boolean isMwsLookup = false;
+        boolean isReset = true;
+
+        if(product != null && product.getMerchantId() == 11L) {
+
+            isReset = true;
+        }
+
+        if(product != null && product.getWeight() != null)
+            isPasLookup = true;
 
         if(overrides != null && overrides.size() > 0) {
             isPasLookup = true;
@@ -328,6 +337,11 @@ public class Pas5Service implements IProductService {
                 String parentAsin = item.getParentAsin();
                 overrides = findOverrides(asin, parentAsin);
                 Product parent = productRepo.findBySkuJoinChildren(parentAsin).orElse(null);
+
+                if(isReset) {
+                    parent.setMerchantId(1L);
+                }
+
                 // Parent exists?
                 if(parent == null) {
                     PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
@@ -348,7 +362,8 @@ public class Pas5Service implements IProductService {
         }
         else {
             //TODO: Check expired
-
+            if(isReset)
+                product = createProduct(product, item);
             // Is Child?
             if(item.getParentAsin() != null && !item.getParentAsin().equals("asin")) {
                 overrides = findOverrides(asin, item.getParentAsin());
@@ -357,6 +372,8 @@ public class Pas5Service implements IProductService {
                     PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
                     String parentAsin = item.getParentAsin();
                     parent = productRepo.findBySkuJoinChildren(parentAsin).orElse(null);
+
+
 /*                    if(parent == null) {*/
                     parent = createProduct(new Product(), parentItem);
                     //TODO: Find all children and assign to it (must exclude them from stub creation)
@@ -373,12 +390,18 @@ public class Pas5Service implements IProductService {
                 else {
                     parent = product.getParent(); //productRepo.findBySkuJoinChildren(item.getParentAsin()).orElse(null);
                 }
-                if(product.getStub()) {
+                if(product.getStub() != null && product.getStub() || isReset) {
                     Product child = parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().get();
                     child = createProduct(child, item);
                     child.setVariationType(VariationType.CHILD);
                     parent.addChild(child);
+                    parent.setMerchantId(1L);
+/*                    if(isReset) {
+                        PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
+                        createStubs(parent, parentItem);
+                    }*/
                 }
+
                 productRepo.save(parent);
             }
 
@@ -415,11 +438,13 @@ public class Pas5Service implements IProductService {
             child.slug(String.valueOf(ref)).ref(ref).merchantId(1L).active(true).sku(key).stub(true).inStock(true).title("stub");
             child.setVariationAttributes(value);
             child.setParent(parent);
+            child.setMerchantId(1L);
         }
         else {
             child.setVariationType(VariationType.CHILD);
             child.setVariationAttributes(value);
             child.setParentId(parent.getRef());
+            child.setMerchantId(1L);
         }
         return child;
     }
