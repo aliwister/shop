@@ -3,6 +3,7 @@ package com.badals.shop.service.query;
 
 import com.badals.shop.domain.Merchant;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.domain.pojo.PurchaseResponse;
 import com.badals.shop.repository.projection.PurchaseQueue;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.MerchantDTO;
@@ -36,8 +37,8 @@ public class PurchaseQuery extends ShopQuery implements GraphQLQueryResolver {
         return o;
     }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<PurchaseDTO> purchases(List<OrderState> orderState, Integer limit, String searchText) throws OrderNotFoundException {
-        List<PurchaseDTO> orders = purchaseService.findForPurchaseList(orderState, limit, searchText);
+    public PurchaseResponse purchases(List<OrderState> orderState, Integer offset, Integer limit, String searchText) throws OrderNotFoundException {
+        PurchaseResponse orders = purchaseService.findForPurchaseList(orderState, offset, limit, searchText);
         return orders;
     }
    // @PreAuthorize("hasRole('ROLE_ADMIN')")

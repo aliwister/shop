@@ -32,8 +32,8 @@ type PaymentResponse {
 
 extend type Mutation {
     setSettlementDate(paymentIds: [Long], date: Date): Message
-    setProcessedDate(paymentId: ID, date: Date): Message
-    setAccountingCode(paymentId: ID, code: String): Message
+    setProcessedDate(paymentIds: [Long], date: Date): Message
+    setAccountingCode(paymentIds: [Long], code: String): Message
 }
 
 extend type Query {
