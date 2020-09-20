@@ -338,10 +338,6 @@ public class Pas5Service implements IProductService {
                 overrides = findOverrides(asin, parentAsin);
                 Product parent = productRepo.findBySkuJoinChildren(parentAsin).orElse(null);
 
-                if(isReset) {
-                    parent.setMerchantId(1L);
-                }
-
                 // Parent exists?
                 if(parent == null) {
                     PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
