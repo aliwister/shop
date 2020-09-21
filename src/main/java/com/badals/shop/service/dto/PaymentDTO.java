@@ -44,4 +44,7 @@ public class PaymentDTO implements Serializable {
 
     private Date processedDate;
     private Date settlementDate;
+
+    private String customer;
+    private String cartId;
 }

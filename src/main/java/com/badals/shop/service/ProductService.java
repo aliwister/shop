@@ -6,12 +6,12 @@ import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.MerchantProductResponse;
-import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.dto.SpeedDialDTO;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
@@ -22,7 +22,6 @@ import com.badals.shop.service.util.S3Util;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
-import com.badals.shop.xtra.amazon.PasItemNode;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.badals.shop.xtra.ebay.EbayService;
 import org.imgscalr.Scalr;
@@ -48,9 +47,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -80,8 +79,9 @@ public class ProductService {
 
     private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
+    private final SpeedDialService speedDialService;
 
-    public ProductService(ProductRepository productRepository, EbayService ebayService, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService) {
+    public ProductService(ProductRepository productRepository, EbayService ebayService, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService, SpeedDialService speedDialService) {
         this.productRepository = productRepository;
         this.ebayService = ebayService;
         this.productMapper = productMapper;
@@ -93,6 +93,7 @@ public class ProductService {
         this.productLangRepository = productLangRepository;
         this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
+        this.speedDialService = speedDialService;
     }
 
     @Transactional(readOnly = true)
@@ -258,6 +259,11 @@ public class ProductService {
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
 
     }
+    public ProductDTO getProductByDial(String dial) throws ProductNotFoundException, PricingException {
+        Long ref = speedDialService.findRefByDial(dial);
+        return productRepository.findBySlugJoinCategories(String.valueOf(ref)).map(productMapper::toDto).orElse(null);
+    }
+
     public static final String LATEST = "LATEST";
    @Cacheable(cacheNames = LATEST)
    public ProductResponse getLatest(Integer limit) {
@@ -466,6 +472,11 @@ public class ProductService {
         //dto.setSlug(product.getSlug());
         //dto.setRef(product.getRef());
         //dto.setImported(true);
+
+
+        if(dto.getDial() != null) {
+            speedDialService.save(new SpeedDialDTO().dial(dto.getDial()).ref(product.getRef()).expires(Instant.now()));
+        }
 
         if(isSaveES)
             productSearchRepository.save(dto);
