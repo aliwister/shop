@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,11 +38,12 @@ public class AdminMutation implements GraphQLMutationResolver {
     private final CustomerService customerService;
     private final ProductOverrideService productOverrideService;
     private final AwsService awsService;
+    private final SpeedDialService speedDialService;
 
     private final MessageSource messageSource;
     private final CheckoutCartRepository checkoutCartRepository;
 
-    public AdminMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, AwsService awsService, CheckoutCartRepository checkoutCartRepository) {
+    public AdminMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, AwsService awsService, SpeedDialService speedDialService, CheckoutCartRepository checkoutCartRepository) {
         this.productService = productService;
         this.pasService = pasService;
         this.productLangService = productLangService;
@@ -55,6 +57,7 @@ public class AdminMutation implements GraphQLMutationResolver {
         this.paymentService = paymentService;
         this.mailService = mailService;
         this.awsService = awsService;
+        this.speedDialService = speedDialService;
         this.checkoutCartRepository = checkoutCartRepository;
     }
 
@@ -77,9 +80,13 @@ public class AdminMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly) throws PricingException, NoOfferException, ProductNotFoundException {
-        ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
-        productOverrideService.saveOrUpdate(dto);
+    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws PricingException, NoOfferException, ProductNotFoundException {
+        if(override != null && !override.trim().isEmpty()) {
+            ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
+            productOverrideService.saveOrUpdate(dto);
+        }
+
+
         if(submitOnly)
             return null;
         ProductDTO productDTO = null;
@@ -91,6 +98,13 @@ public class AdminMutation implements GraphQLMutationResolver {
             productDTO = productService.lookupPas(sku, true, false);
         else if(merchantId == 2L)
             productDTO = productService.lookupEbay(sku);
+
+
+        if(dial != null && !dial.trim().isEmpty()) {
+            speedDialService.save(new SpeedDialDTO().dial(dial).ref(productDTO.getRef()).expires(Instant.now()));
+        }
+
+
         return productDTO;
     }
 

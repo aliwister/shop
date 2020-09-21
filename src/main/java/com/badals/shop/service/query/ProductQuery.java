@@ -104,6 +104,11 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.lookupPas(sku, true, false);
    }
 
+   public ProductDTO getProductByDial(final String dial) throws ProductNotFoundException, PricingException, NoOfferException {
+      log.info("getProductByDial: ("+dial+")");
+      return productService.getProductByDial(dial);
+   }
+
    public List<ProductDTO> pendingMerchantProducts(Long merchantId) {
       return null;
    }
@@ -121,4 +126,3 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.lookupForcePas(sku, false,false, true);
    }
 }
-
