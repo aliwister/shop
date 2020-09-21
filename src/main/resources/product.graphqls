@@ -196,7 +196,7 @@ input ProductInput {
     #releaseDate: LocalDate,
     #active: Boolean,
     #similarProducts: [Int],
-    #url: String,
+    url: String,
     name: String,
     brand: String,
     group: String,
@@ -252,6 +252,7 @@ input ProductOverrideInput {
     override: String
     active: Boolean
     lazy: Boolean
+    dial: String
 }
 type PricingRequest {
     id: ID
@@ -281,6 +282,7 @@ extend type Query {
 
     productAdmin(id: ID):Product
     getProductBySku(sku: String, isParent: Boolean = false):Product
+    getProductByDial(dial: String):Product
     pricingRequests:[PricingRequest]
     parentOf(sku: String): String
     mws(sku: String):Product
@@ -296,8 +298,10 @@ extend type Mutation {
             i18n: ProductI18nInput):ProductI18n,
     pasLookup(sku: String): Product
     addToPricingQ(sku: String):Message
-    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int): Product
+    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int, dial: String): Product
     completePricingRequest(id: Long):Message
     completePricingRequestAndEmail(id: Long):Message
     addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
 }
+
+

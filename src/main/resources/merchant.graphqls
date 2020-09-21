@@ -33,6 +33,7 @@ type MerchantProduct {
       gallery: [String]
       browseNode: String
       browseNode_ar: String
+
 }
 
 type MerchantProductResponse {
@@ -69,6 +70,8 @@ input AddProductInput {
       ref: String
       discountInPercent: Int
       merchantId: Int
+            url: String
+            dial: String
 }
 
 extend type Query {
