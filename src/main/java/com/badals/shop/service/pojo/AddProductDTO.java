@@ -68,4 +68,6 @@ public class AddProductDTO {
 
    Long merchantId;
 
+   String url;
+   String dial;
 }

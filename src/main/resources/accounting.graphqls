@@ -12,8 +12,10 @@ type Payment {
     bankAccountNumber: String
     bankName: String
     bankOwnerName: String
-    settlementDate: String
-    processedDate: String
+    settlementDate: Date
+    processedDate: Date
+    customer: String
+    cartId: String
 }
 
 input PaymentInput {
