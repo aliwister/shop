@@ -19,6 +19,7 @@ import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.service.pojo.AddProductDTO;
 
 import com.badals.shop.service.util.S3Util;
+import com.badals.shop.service.util.ValidationUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
@@ -466,6 +467,12 @@ public class ProductService {
         product.getProductLangs().add(langAr.product(product));
         product.getProductLangs().add(langEn.product(product));
 
+        if(dto.getUrl() != null && ValidationUtil.isValidURL(dto.getUrl())) {
+            product.setUrl(dto.getUrl());
+        }
+        else
+            product.setUrl(null);
+
         //product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
         product = productRepository.save(product);
         //dto.setTenant(currentMerchant);
@@ -474,7 +481,7 @@ public class ProductService {
         //dto.setImported(true);
 
 
-        if(dto.getDial() != null) {
+        if(dto.getDial() != null && dto.getDial().startsWith("*")) {
             speedDialService.save(new SpeedDialDTO().dial(dto.getDial()).ref(product.getRef()).expires(Instant.now()));
         }
 
