@@ -1,18 +1,16 @@
 package com.badals.shop.service.query;
 
-import com.badals.shop.domain.Customer;
-import com.badals.shop.service.ProductService;
-import com.badals.shop.service.UserService;
-import com.badals.shop.service.dto.AddressDTO;
+import com.badals.shop.service.CartService;
+import com.badals.shop.service.dto.CartDTO;
+import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.dto.CustomerDTO;
-import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.service.mapper.CustomerMapper;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Locale;
 
 /*
 query {
@@ -44,28 +42,18 @@ query {
  */
 
 @Component
-public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
+public class CartQuery extends ShopQuery implements GraphQLQueryResolver {
 
-    @Autowired
-    private ProductService productService;
+    private final CartService cartService;
 
-    @Autowired
-    private CustomerMapper customerMapper;
-
-    @Autowired
-    private UserService userService;
-
-    public List<AddressDTO> getAddresses(final int id) {
-return null;
-    }
-
-    public List<CustomerDTO> customers() {
-        return null;
+    public CartQuery(CartService cartService) {
+        this.cartService = cartService;
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    public CustomerDTO me() {
-        return  userService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
+    public CartDTO getCart(final String secureKey, final List<CartItemDTO> items) {
+        Locale l = LocaleContextHolder.getLocale();
+        return this.cartService.updateCart(secureKey, items, true);
     }
 }
 
