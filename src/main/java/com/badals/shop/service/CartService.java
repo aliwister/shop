@@ -153,7 +153,7 @@ public class CartService {
         if (cart == null || cart.getCartState() == CartState.UNCLAIMED) {
             cart = this.getCartByCustomer(loginUser);
             if (isMerge)
-                return this.mergeCart(cart, items, true);
+                return this.mergeCart(cart, items, false);
             else
                 return this.mergeCart(cart, items, false);
         }
@@ -172,7 +172,7 @@ public class CartService {
         //if (cart.getCartState() == CartState.CLOSED) {
         cart = this.getCartByCustomer(loginUser);
         if (isMerge)
-            return this.mergeCart(cart, items, true);
+            return this.mergeCart(cart, items, false);
         else
             return this.mergeCart(cart, items, false);
         //}
@@ -180,6 +180,7 @@ public class CartService {
 
     private CartDTO mergeCart(Cart cart, List<CartItemDTO> items, Boolean isMerge) {
         List<CartItem> cartItems = cart.getCartItems();
+        isMerge = false;
 
         if(items != null) {
             for (CartItemDTO dto : items) {
