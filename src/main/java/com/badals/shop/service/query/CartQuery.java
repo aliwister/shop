@@ -53,7 +53,7 @@ public class CartQuery extends ShopQuery implements GraphQLQueryResolver {
     //@PreAuthorize("hasRole('ROLE_USER')")
     public CartDTO getCart(final String secureKey, final List<CartItemDTO> items) {
         Locale l = LocaleContextHolder.getLocale();
-        return this.cartService.updateCart(secureKey, items, true);
+        return this.cartService.updateCart(secureKey, items, false);
     }
 }
 
