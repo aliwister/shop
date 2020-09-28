@@ -161,7 +161,7 @@ public class CartService {
         //Not reachable
         if (cart.getCartState() == CartState.CLAIMED) {
             if( loginUser.getId() == cart.getCustomer().getId() )
-                return this.save(cart, items);
+                return this.mergeCart(cart, items, false);
 
             cart = this.getCartByCustomer(loginUser);
         /*    if (isMerge)*/
