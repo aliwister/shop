@@ -56,7 +56,7 @@ public class CartMutation implements GraphQLMutationResolver {
     @Autowired
     private LocaleResolver locale;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("hasRole('ROLE_USER')")
     public CartDTO updateCart(final String secureKey, final List<CartItemDTO> items) {
         Locale l = LocaleContextHolder.getLocale();
         return this.cartService.updateCart(secureKey, items, true);
