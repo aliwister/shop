@@ -31,6 +31,13 @@ public interface CartItemMapper extends EntityMapper<CartItemDTO, CartItem> {
     @Mapping(source = "productId", target = "productId")
     CartItem toEntity(CartItemDTO cartItemDTO);
 
+    @AfterMapping
+    default void afterMapping(@MappingTarget CartItem target, CartItemDTO source) {
+        if (target.getQuantity() == null) {
+            target.setQuantity(1);
+        }
+    }
+
 /*    @AfterMapping
     default void afterMapping(@MappingTarget CartItemDTO target, CartItem source) {
         if (source.getProduct() != null && source.getProduct().getVariationAttributes() != null)

@@ -82,6 +82,11 @@ type CheckoutSession {
     redirectUrl: String,
     secureKey: String
 }
+
+extend type Query {
+    getCart(secureKey: String, items: [CartItemInput]): Cart
+}
+
 extend type Mutation {
     updateCart(secureKey: String, items: [CartItemInput]): Cart
     setCart(secureKey: String, items: [CartItemInput]): Cart
