@@ -146,16 +146,16 @@ public class CartService {
                 cart = new Cart();
                 cart.setSecureKey(createUIUD());
             }
-            return this.save(cart, items);
+            return this.mergeCart(cart, items, false);
         }
 
         //logged in user - always
         if (cart == null || cart.getCartState() == CartState.UNCLAIMED) {
             cart = this.getCartByCustomer(loginUser);
             if (isMerge)
-                return this.mergeCart(cart, items);
+                return this.mergeCart(cart, items, true);
             else
-                return this.save(cart, items);
+                return this.mergeCart(cart, items, false);
         }
 
         //Not reachable
@@ -164,40 +164,51 @@ public class CartService {
                 return this.save(cart, items);
 
             cart = this.getCartByCustomer(loginUser);
-            if (isMerge)
-                return this.mergeCart(cart, items);
-            else
-                return this.save(cart, items);
+        /*    if (isMerge)*/
+                return this.mergeCart(cart, items, false);
+            /*else
+                return this.save(cart, items);*/
         }
         //if (cart.getCartState() == CartState.CLOSED) {
         cart = this.getCartByCustomer(loginUser);
         if (isMerge)
-            return this.mergeCart(cart, items);
+            return this.mergeCart(cart, items, true);
         else
-            return this.save(cart, items);
+            return this.mergeCart(cart, items, false);
         //}
     }
 
-    private CartDTO mergeCart(Cart cart, List<CartItemDTO> items) {
+    private CartDTO mergeCart(Cart cart, List<CartItemDTO> items, Boolean isMerge) {
         List<CartItem> cartItems = cart.getCartItems();
 
-        for(CartItemDTO dto : items) {
-            CartItem existing = cartItems.stream().filter(x -> x.getProductId().equals(dto.getProductId())).findAny().orElse(null);
-            if(existing != null)
-                existing.setQuantity(existing.getQuantity() + dto.getQuantity());
-            else {
-                // Check product exists
-                //Product p = productRepository.findOneByRef(dto.getProductId()).orElse(null);
-                if(productService.exists(dto.getProductId())) {
-                    CartItem newCartItem = cartItemMapper.toEntity(dto);
-                    newCartItem.setProductId(dto.getProductId());
-                    cart.addCartItem(newCartItem);
+        if(items != null) {
+            for (CartItemDTO dto : items) {
+                CartItem existing = cartItems.stream().filter(x -> x.getProductId().equals(dto.getProductId())).findAny().orElse(null);
+                if (existing != null) {
+                    if(isMerge)
+                        existing.setQuantity(existing.getQuantity() + dto.getQuantity());
+                    else
+                        existing.setQuantity(dto.getQuantity());
+
+                    if(existing.getQuantity() < 1) {
+                        cartItems.remove(existing);
+                    }
+                }
+                else {
+                    // Check product exists
+                    //Product p = productRepository.findOneByRef(dto.getProductId()).orElse(null);
+                    if (productService.exists(dto.getProductId())) {
+                        CartItem newCartItem = cartItemMapper.toEntity(dto);
+                        newCartItem.setProductId(dto.getProductId());
+                        cart.addCartItem(newCartItem);
+
+                    }
                 }
             }
-        }
 
-        cart = cartRepository.save(cart);
-        cartRepository.refresh(cart);
+            cart = cartRepository.saveAndFlush(cart);
+            cartRepository.refresh(cart);
+        }
         return cartMapper.toDto(cart);
     }
 
@@ -216,7 +227,8 @@ public class CartService {
 
     private CartDTO save(Cart cart, List<CartItemDTO> items) {
         this.setItems(cart, items);
-        cart = cartRepository.save(cart);
+        cart = cartRepository.saveAndFlush(cart);
+        cartRepository.refresh(cart);
         return cartMapper.toDto(cart);
     }
 
@@ -255,8 +267,8 @@ public class CartService {
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
         Cart cart = this.getCartByCustomer(loginUser);
 
-        setItems(cart, items); //cartMapper.toDto(cart);
-        cart = cartRepository.save(cart);
+/*        setItems(cart, items); //cartMapper.toDto(cart);
+        cart = cartRepository.save(cart);*/
         Customer customer = customerRepository.findByIdJoinAddresses(cart.getCustomer().getId()).get();
         cart = cartRepository.getCartByCustomerJoinAddresses(cart.getId());
         List<CartItemInfo> cartItems = cartItemRepository.findCartItemsWithProductNative(cart.getId());
