@@ -504,6 +504,11 @@ public class Pas5Service implements IProductService {
     }
 
     Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
+        if(product.getWeight() != null) {
+            if(overrides == null)
+                overrides = new ArrayList<ProductOverride>();
+            overrides.add(new ProductOverride().override(product.getWeight().toString()).type(OverrideType.WEIGHT).active(true).lazy(false));
+        }
         product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides, 1L, "", "");
         if((product.getWeight() == null || product.getWeight().doubleValue() < .001) && !isParent) {
             BigDecimal weight = productRepo.lookupWeight(product.getSku());
@@ -526,8 +531,10 @@ public class Pas5Service implements IProductService {
             product = setMerchantStock(product, PasLookupParser.parseStock(product, stock, item, overrides),BigDecimal.valueOf(99L));
         } catch (PricingException e) {
             //e.printStackTrace();//@Todo set stock quantity to 0
+            System.out.println(e.getMessage());
         } catch (NoOfferException e) {
             //e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         product.setStub(false);
         return product;
