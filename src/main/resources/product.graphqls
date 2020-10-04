@@ -265,6 +265,11 @@ type PricingRequest {
     createdDate: String
 }
 
+input Hashtag {
+    en: String
+    ar: String
+}
+
 extend type Query {
     product(slug: String!, cookie: String = ""): Product!
     products(
@@ -302,6 +307,9 @@ extend type Mutation {
     completePricingRequest(id: Long):Message
     completePricingRequestAndEmail(id: Long):Message
     addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
+    createHash(hashtag: Hashtag): Message
+    setHashtags(hashtags: [String]): Product
+    setDial(dial: String): Product
 }
 
 

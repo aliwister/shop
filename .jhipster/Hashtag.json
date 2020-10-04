@@ -1,0 +1,23 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "en",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "ar",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20201004104610",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceClass",
+    "entityTableName": "hashtag",
+    "databaseType": "sql",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}

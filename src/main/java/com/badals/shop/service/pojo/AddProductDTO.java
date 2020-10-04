@@ -70,4 +70,7 @@ public class AddProductDTO {
 
    String url;
    String dial;
+
+   Boolean inStock;
+   List<String> hashTags;
 }

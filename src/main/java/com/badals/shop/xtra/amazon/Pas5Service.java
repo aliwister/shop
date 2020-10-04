@@ -406,7 +406,7 @@ public class Pas5Service implements IProductService {
         updated.weight(PasUtility.calculateWeight(product.getWeight(), PasLookupParser.getOverride(overrides, OverrideType.WEIGHT)));
         if(updated.getWeight() != null) {
             updated = priceMws(updated, overrides);
-            if(updated.getPrice() == null) {
+            if(updated.getPrice() == null  || !updated.getInStock() ) {
                 if(!isPasLookup) {
                     try {
                         item = callPas(asin);
@@ -483,16 +483,19 @@ public class Pas5Service implements IProductService {
     Product pricePas(Product p, PasItemNode item, List<ProductOverride> overrides) throws NoOfferException {
 
         if (p.getWeight() == null || p.getWeight().doubleValue() < .01) return p;
-        MwsItemNode n = mwsLookup.fetch(p.getSku());
+        //MwsItemNode n = mwsLookup.fetch(p.getSku());
         Product product = p;
 
         MerchantStock stock = this.getMerchantStock(product);
         try {
             product = setMerchantStock(product, PasLookupParser.parseStock(product, stock, item, overrides),BigDecimal.valueOf(99L));
+            product.inStock(true);
         } catch (PricingException e) {
+            product.setPrice((BigDecimal) null);
             //e.printStackTrace();//@Todo set stock quantity to 0
         } catch (NoOfferException e) {
             //e.printStackTrace();
+            product.inStock(false);
         }
         return product;
     }
@@ -504,12 +507,11 @@ public class Pas5Service implements IProductService {
     }
 
     Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
-        if(product.getWeight() != null) {
-            if(overrides == null)
-                overrides = new ArrayList<ProductOverride>();
-            overrides.add(new ProductOverride().override(product.getWeight().toString()).type(OverrideType.WEIGHT).active(true).lazy(false));
-        }
+        BigDecimal currentWeight = product.getWeight();
         product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides, 1L, "", "");
+
+        if(product.getWeight() == null)
+            product.setWeight(currentWeight);
         if((product.getWeight() == null || product.getWeight().doubleValue() < .001) && !isParent) {
             BigDecimal weight = productRepo.lookupWeight(product.getSku());
             product.setWeight(weight);
