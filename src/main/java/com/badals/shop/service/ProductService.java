@@ -256,7 +256,8 @@ public class ProductService {
 
         //if(product.getPrice() == null)
         //    throw new PricingException("Invalid price");
-
+        //if(isSaveES)
+        productSearchRepository.save(addProductMapper.toDto(product));
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
 
     }
