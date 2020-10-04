@@ -105,6 +105,8 @@ public class ProductDTO implements Serializable {
    private String availability;
    private int hours;
 
+   List<String> hashTags;
+
     // Variations
     List<String> variationDimensions;
     List<VariationOption> variationOptions;

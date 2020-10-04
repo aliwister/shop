@@ -165,6 +165,18 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "similar_products")
     private List<String> similarProducts;
 
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "hash_tags")
+    private List<String> hashTags;
+
+    public List<String> getHashTags() {
+        return hashTags;
+    }
+
+    public void setHashTags(List<String> hashTags) {
+        this.hashTags = hashTags;
+    }
+
     @Column(name = "url")
     private String url;
 
