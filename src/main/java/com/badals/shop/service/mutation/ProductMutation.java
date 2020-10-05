@@ -99,7 +99,7 @@ public class ProductMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Message createHash(HashtagDTO hash){
+    public Message createHashtag(HashtagDTO hash){
         hashtagService.save(hash);
         return new Message("Done");
     }
