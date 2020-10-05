@@ -72,5 +72,5 @@ public class AddProductDTO {
    String dial;
 
    Boolean inStock;
-   List<String> hashTags;
+   List<String> hashtags;
 }

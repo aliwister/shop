@@ -28,10 +28,12 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(target = "merchant", ignore = true)
     @Mapping(target = "title", source = "name")
     @Mapping(target = "price", source = "salePrice")
+    @Mapping(target = "dial", ignore = true)
     Product toEntity(AddProductDTO productDTO);
 
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
+    @Mapping(source="dial.dial", target="dial")
     AddProductDTO toDto(Product product);
 
     @Mapping(target="hours", source = "availability")

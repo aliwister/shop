@@ -1,49 +1,46 @@
 package com.badals.shop.service.query;
 
-import com.algolia.search.SearchIndex;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.Hashtag;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.service.CategoryService;
+import com.badals.shop.service.HashtagService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.CategoryDTO;
+import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 
 import com.badals.shop.xtra.amazon.NoOfferException;
-import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import com.badals.shop.xtra.ebay.EbayLookup;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Component
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final ProductService productService;
-
-   @Autowired
-   private MwsLookup mwsLookup;
-
-   @Autowired
-   private EbayLookup ebayLookup;
+   private final HashtagService hashtagService;
+   //private final MwsLookup mwsLookup;
+   private final EbayLookup ebayLookup;
 
    private final CategoryService categoryService;
    private static final Logger log = LoggerFactory.getLogger(ProductQuery.class);
 
    private final UserService userService;
 
-   public ProductQuery(ProductService productService, CategoryService categoryService, UserService userService) {
+   public ProductQuery(ProductService productService, HashtagService hashtagService, EbayLookup ebayLookup, CategoryService categoryService, UserService userService) {
       this.productService = productService;
+      this.hashtagService = hashtagService;
+      this.ebayLookup = ebayLookup;
       this.categoryService = categoryService;
       this.userService = userService;
    }
@@ -114,7 +111,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    }
 
    public ProductDTO mws(String asin) {
-      mwsLookup.lookup(asin);
+      //mwsLookup.lookup(asin);
       return null;
    }
 
@@ -124,5 +121,9 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    public ProductDTO pas(String sku) throws ProductNotFoundException, NoOfferException, PricingException {
       return productService.lookupForcePas(sku, false,false, true);
+   }
+
+   public List<HashtagDTO> hashtags() {
+      return hashtagService.findAll();
    }
 }
