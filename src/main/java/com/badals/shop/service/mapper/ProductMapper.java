@@ -28,6 +28,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     @Mapping(target = "removeProductLang", ignore = true)
     @Mapping(target = "merchantStock", ignore = true)
     @Mapping(source = "parent", target = "parentId")
+    @Mapping(target = "dial", ignore = true)
     Product toEntity(ProductDTO productDTO);
 
     @Mapping(source = "parent.id", target = "parent")
@@ -39,6 +40,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     @Mapping(target = "variationOptions", ignore = true)
     @Mapping(source = "ref", target = "id")
     @Mapping(target = "categories", ignore = true)
+    @Mapping(source="dial.dial", target="dial")
     ProductDTO toDto(Product product);
 
     @Named("mapWithoutCategories")
@@ -53,6 +55,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     @Mapping(target = "variations", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "variationOptions", ignore = true)
+    @Mapping(target = "dial", ignore = true)
     ProductDTO toDtoWOCategories(Product product);
 
     default Product fromId(Long id) {
