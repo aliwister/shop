@@ -1,10 +1,13 @@
 package com.badals.shop.service.dto;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.Hashtag} entity.
  */
+@Data
 public class HashtagDTO implements Serializable {
 
     private Long id;
@@ -13,30 +16,9 @@ public class HashtagDTO implements Serializable {
 
     private String ar;
 
+    private String icon;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEn() {
-        return en;
-    }
-
-    public void setEn(String en) {
-        this.en = en;
-    }
-
-    public String getAr() {
-        return ar;
-    }
-
-    public void setAr(String ar) {
-        this.ar = ar;
-    }
+    private Integer order;
 
     @Override
     public boolean equals(Object o) {

@@ -134,6 +134,8 @@ type Product {
     features: [String]
     browseNode: String
     inStock: Boolean
+    hashtags: [String]
+    dial: String
 }
 
 type LocalizedValue {
@@ -265,9 +267,18 @@ type PricingRequest {
     createdDate: String
 }
 
-input Hashtag {
+type Hashtag {
     en: String
     ar: String
+    icon: String
+    order: Int
+}
+
+input HashtagInput {
+    en: String
+    ar: String
+    icon: String
+    order: Int
 }
 
 extend type Query {
@@ -293,6 +304,7 @@ extend type Query {
     mws(sku: String):Product
     pas(sku: String):Product
     ebay(id: String):Product
+    hashtags: [Hashtag]
 }
 
 extend type Mutation {
@@ -307,9 +319,7 @@ extend type Mutation {
     completePricingRequest(id: Long):Message
     completePricingRequestAndEmail(id: Long):Message
     addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
-    createHash(hashtag: Hashtag): Message
+    createHashtag(hashtag: HashtagInput): Message
     setHashtags(hashtags: [String]): Product
     setDial(dial: String): Product
 }
-
-

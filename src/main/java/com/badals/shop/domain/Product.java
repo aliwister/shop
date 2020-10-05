@@ -100,6 +100,18 @@ public class Product implements Serializable, IMerchantProduct {
     }
 
 
+    public SpeedDial getDial() {
+        return dial;
+    }
+
+    public void setDial(SpeedDial dial) {
+        this.dial = dial;
+    }
+
+    @ManyToOne(optional=true)
+    private SpeedDial dial;
+
+
     @NotNull
     @Column(name = "sku", nullable = false, unique = true)
     private String sku;
@@ -166,15 +178,15 @@ public class Product implements Serializable, IMerchantProduct {
     private List<String> similarProducts;
 
     @Convert(converter = StringListConverter.class)
-    @Column(name = "hash_tags")
-    private List<String> hashTags;
+    @Column(name = "hashtags")
+    private List<String> hashtags;
 
-    public List<String> getHashTags() {
-        return hashTags;
+    public List<String> getHashtags() {
+        return hashtags;
     }
 
-    public void setHashTags(List<String> hashTags) {
-        this.hashTags = hashTags;
+    public void setHashtags(List<String> hashtags) {
+        this.hashtags = hashtags;
     }
 
     @Column(name = "url")

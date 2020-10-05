@@ -23,6 +23,26 @@ public class Hashtag implements Serializable {
     @Column(name = "ar")
     private String ar;
 
+    private String icon;
+
+    private Integer order;
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public Integer getOrder() {
+        return order;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
+    }
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -38,6 +58,14 @@ public class Hashtag implements Serializable {
 
     public Hashtag en(String en) {
         this.en = en;
+        return this;
+    }
+    public Hashtag icon(String icon) {
+        this.icon = icon;
+        return this;
+    }
+    public Hashtag order(Integer order) {
+        this.order = order;
         return this;
     }
 
