@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "hashtag")
-public class Hashtag implements Serializable {
+public class Hashtag extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,7 @@ public class Hashtag implements Serializable {
 
     private String icon;
 
-    private Integer order;
+    private Integer position;
 
     public String getIcon() {
         return icon;
@@ -35,12 +35,12 @@ public class Hashtag implements Serializable {
         this.icon = icon;
     }
 
-    public Integer getOrder() {
-        return order;
+    public Integer getPosition() {
+        return position;
     }
 
-    public void setOrder(Integer order) {
-        this.order = order;
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
@@ -64,8 +64,8 @@ public class Hashtag implements Serializable {
         this.icon = icon;
         return this;
     }
-    public Hashtag order(Integer order) {
-        this.order = order;
+    public Hashtag position(Integer position) {
+        this.position = position;
         return this;
     }
 

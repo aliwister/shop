@@ -266,8 +266,8 @@ public class ProductService {
         return productRepository.findBySlugJoinCategories(String.valueOf(ref)).map(productMapper::toDto).orElse(null);
     }
 
-    public static final String LATEST = "LATEST";
-   @Cacheable(cacheNames = LATEST)
+    //public static final String LATEST = "LATEST";
+   //@Cacheable(cacheNames = LATEST)
    public ProductResponse getLatest(Integer limit) {
        List<Product> products = productRepository.findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(Arrays.asList(new VariationType[]{VariationType.SIMPLE}), PageRequest.of(0,20));
        ProductResponse response = new ProductResponse();
@@ -647,6 +647,25 @@ public class ProductService {
         response.setHasMore(false);
         response.setItems(result.stream().map(addProductMapper::toProductDto).collect(Collectors.toList()));
         return response;
+    }
+
+    public ProductResponse findByHashtag(String hashtag) {
+        List<AddProductDTO> result = search(hashtag );
+        ProductResponse response = new ProductResponse();
+        response.setTotal(6);
+        response.setHasMore(false);
+        response.setItems(result.stream().map(addProductMapper::toProductDto).collect(Collectors.toList()));
+        return response;
+    }
+
+    public void setHashtags(List<String> hashs, Long ref) throws ProductNotFoundException {
+        Product p = productRepository.findOneByRef(ref).orElse(null);
+        if (p == null)
+            throw new ProductNotFoundException("No product found for ref "+ref);
+
+        p.setHashtags(hashs);
+        productRepository.save(p);
+        productSearchRepository.save(addProductMapper.toDto(p));
     }
 
 /*
