@@ -40,7 +40,8 @@ public class Product implements Serializable, IMerchantProduct {
     private Long id;
 
     @NaturalId
-    private Long ref;
+    @Column(name = "ref")
+    public Long ref;
 
     private String slug;
 
@@ -108,8 +109,10 @@ public class Product implements Serializable, IMerchantProduct {
         this.dial = dial;
     }
 
-    @ManyToOne(optional=true)
-    private SpeedDial dial;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="ref", referencedColumnName = "ref", insertable = false, updatable = false)
+    //@Transient
+    private SpeedDial dial = null;
 
 
     @NotNull

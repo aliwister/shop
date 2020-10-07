@@ -230,6 +230,13 @@ type ProductResponse {
   hasMore: Boolean!
 }
 
+type HashtagResponse {
+  items: [Hashtag!]!
+  total: Int!
+  hasMore: Boolean!
+
+}
+
 enum OverrideType {
     COST
     WEIGHT
@@ -268,17 +275,20 @@ type PricingRequest {
 }
 
 type Hashtag {
+id: ID
     en: String
     ar: String
     icon: String
-    order: Int
+    position: Int
+    products: ProductResponse
 }
 
 input HashtagInput {
+id: ID
     en: String
     ar: String
     icon: String
-    order: Int
+    position: Int
 }
 
 extend type Query {
@@ -304,7 +314,10 @@ extend type Query {
     mws(sku: String):Product
     pas(sku: String):Product
     ebay(id: String):Product
-    hashtags: [Hashtag]
+    hashtags(        offset: Int = 0
+                     limit: Int = 10): HashtagResponse
+    hashtagsWithProducts(        offset: Int = 0
+                     limit: Int = 10): HashtagResponse
 }
 
 extend type Mutation {
@@ -320,6 +333,6 @@ extend type Mutation {
     completePricingRequestAndEmail(id: Long):Message
     addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
     createHashtag(hashtag: HashtagInput): Message
-    setHashtags(hashtags: [String]): Product
-    setDial(dial: String): Product
+    setHashtags(hashtags: [String], ref: Long): Message
+    setDial(dial: String, ref: Long): Message
 }

@@ -1,4 +1,5 @@
 package com.badals.shop.service.dto;
+import com.badals.shop.domain.pojo.ProductResponse;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,7 +19,9 @@ public class HashtagDTO implements Serializable {
 
     private String icon;
 
-    private Integer order;
+    private Integer position;
+
+    private ProductResponse products;
 
     @Override
     public boolean equals(Object o) {

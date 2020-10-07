@@ -11,11 +11,11 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {ProductMapper.class})
 public interface SpeedDialMapper extends EntityMapper<SpeedDialDTO, SpeedDial> {
 
-    @Mapping(source = "product.id", target = "productId")
-    @Mapping(source = "product.ref", target = "productRef")
+/*    @Mapping(source = "product.id", target = "productId")
+    @Mapping(source = "product.ref", target = "productRef")*/
     SpeedDialDTO toDto(SpeedDial speedDial);
 
-    @Mapping(source = "productId", target = "product")
+/*    @Mapping(source = "productId", target = "product")*/
     SpeedDial toEntity(SpeedDialDTO speedDialDTO);
 
     default SpeedDial fromId(Long id) {
