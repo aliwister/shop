@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -91,4 +92,12 @@ public class SpeedDialService {
         }
         return ret.getRef();
     }
+
+   public void addDial(String dial, Long ref) {
+       SpeedDial d = speedDialRepository.findByDial(dial).orElse(new SpeedDial());
+       d.setRef(ref);
+       d.setDial(dial);
+       d.setExpires(Instant.now());
+       speedDialRepository.save(d);
+   }
 }

@@ -2,6 +2,7 @@ package com.badals.shop.service.query;
 
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Hashtag;
+import com.badals.shop.domain.pojo.HashtagResponse;
 import com.badals.shop.domain.pojo.ProductResponse;
 import com.badals.shop.service.CategoryService;
 import com.badals.shop.service.HashtagService;
@@ -123,7 +124,11 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.lookupForcePas(sku, false,false, true);
    }
 
-   public List<HashtagDTO> hashtags() {
-      return hashtagService.findAll();
+   public HashtagResponse hashtags(Integer offset,Integer limit ) {
+      return hashtagService.findForList(offset, limit);
+   }
+
+   public HashtagResponse hashtagsWithProducts(Integer offset,Integer limit ) {
+      return hashtagService.findForListWithProducts(offset, limit);
    }
 }

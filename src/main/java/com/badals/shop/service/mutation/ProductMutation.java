@@ -30,6 +30,8 @@ public class ProductMutation implements GraphQLMutationResolver {
 
     private final HashtagService hashtagService;
 
+    private final SpeedDialService speedDialService;
+
     private final ProductLangService productLangService;
 
     private final PricingRequestService pricingRequestService;
@@ -39,10 +41,11 @@ public class ProductMutation implements GraphQLMutationResolver {
     private final UserService userService;
 
 
-    public ProductMutation(ProductService productService, Pas5Service pasService, HashtagService hashtagService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
+    public ProductMutation(ProductService productService, Pas5Service pasService, HashtagService hashtagService, SpeedDialService speedDialService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
         this.productService = productService;
         this.pasService = pasService;
         this.hashtagService = hashtagService;
+        this.speedDialService = speedDialService;
         this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
@@ -98,20 +101,22 @@ public class ProductMutation implements GraphQLMutationResolver {
         return new Message("success");
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message createHashtag(HashtagDTO hash){
         hashtagService.save(hash);
         return new Message("Done");
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO setHashtags(List<String> hashs) {
-        return null;
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Message setHashtags(List<String> hashs, Long ref) throws ProductNotFoundException {
+        productService.setHashtags(hashs, ref);
+        return new Message("Done");
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO setDial(String dial){
-        return null;
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Message setDial(String dial, Long ref){
+        speedDialService.addDial(dial, ref);
+        return new Message("Done");
     }
 }
 

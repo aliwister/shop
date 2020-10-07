@@ -1,12 +1,16 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Hashtag;
+import com.badals.shop.domain.pojo.HashtagResponse;
 import com.badals.shop.repository.HashtagRepository;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.mapper.HashtagMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,10 +30,13 @@ public class HashtagService {
 
     private final HashtagRepository hashtagRepository;
 
+    private final ProductService productService;
+
     private final HashtagMapper hashtagMapper;
 
-    public HashtagService(HashtagRepository hashtagRepository, HashtagMapper hashtagMapper) {
+    public HashtagService(HashtagRepository hashtagRepository, ProductService productService, HashtagMapper hashtagMapper) {
         this.hashtagRepository = hashtagRepository;
+        this.productService = productService;
         this.hashtagMapper = hashtagMapper;
     }
 
@@ -81,5 +88,30 @@ public class HashtagService {
     public void delete(Long id) {
         log.debug("Request to delete Hashtag : {}", id);
         hashtagRepository.deleteById(id);
+    }
+
+    public HashtagResponse findForList(Integer offset,Integer limit ) {
+        Page<Hashtag> orders = hashtagRepository.findForList(/*orderState, */PageRequest.of((int) offset/limit,limit));
+        HashtagResponse response = new HashtagResponse();
+        response.setTotal(orders.getNumber());
+        response.setItems(orders.getContent().stream().map(hashtagMapper::toDto).collect(Collectors.toList()));
+        response.setHasMore(orders.hasNext());
+        return response;
+
+    }
+    public static final String LATEST = "LATEST";
+    @Cacheable(cacheNames = LATEST)
+    public HashtagResponse findForListWithProducts(Integer offset, Integer limit) {
+        Page<Hashtag> orders = hashtagRepository.findForList(/*orderState, */PageRequest.of((int) offset/limit,limit));
+        HashtagResponse response = new HashtagResponse();
+        response.setTotal(orders.getNumber());
+        response.setItems(orders.getContent().stream().map(hashtagMapper::toDto).collect(Collectors.toList()));
+        response.setHasMore(orders.hasNext());
+
+        response.getItems().forEach(x ->{
+            x.setProducts(productService.findByHashtag(x.getEn()));
+        });
+
+        return response;
     }
 }
