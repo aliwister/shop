@@ -32,9 +32,9 @@ public class SpeedDial implements Serializable {
     @Column(name = "expires", nullable = false)
     private Instant expires;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="ref", referencedColumnName = "ref", insertable = false, updatable = false)
-    private Product product;
+/*    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="ref", referencedColumnName = "ref")
+    private Product product;*/
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -84,7 +84,7 @@ public class SpeedDial implements Serializable {
         this.expires = expires;
     }
 
-    public Product getProduct() {
+/*    public Product getProduct() {
         return product;
     }
 
@@ -95,7 +95,7 @@ public class SpeedDial implements Serializable {
 
     public void setProduct(Product product) {
         this.product = product;
-    }
+    }*/
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
