@@ -70,7 +70,7 @@ public class Product implements Serializable, IMerchantProduct {
 
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "parent_id",referencedColumnName = "ref")
-    private Set<Product> children;
+    private Set<Product> children = new HashSet<>();;
 
     @ManyToMany
     @JoinTable(
