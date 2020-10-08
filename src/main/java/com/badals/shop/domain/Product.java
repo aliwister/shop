@@ -109,9 +109,9 @@ public class Product implements Serializable, IMerchantProduct {
         this.dial = dial;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="ref", referencedColumnName = "ref", insertable = false, updatable = false)
-    //@Transient
+/*    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="ref", referencedColumnName = "ref", insertable = false, updatable = false)*/
+    @Transient
     private SpeedDial dial = null;
 
 
