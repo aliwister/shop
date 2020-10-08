@@ -40,7 +40,7 @@ public class EbayService {
    @Transactional
    public Product lookup(String id, boolean isParent) throws NoOfferException, ProductNotFoundException, PricingException {
       List<ProductOverride> overrides = findOverrides(id, null);
-      Product product = productRepo.findBySkuJoinChildren(id).orElse(new Product());
+      Product product = productRepo.findBySkuJoinChildren(id, 2L).orElse(new Product());
       PasItemNode item = ebayLookup.lookup(id);
       product = initProduct(product, item, false, overrides);
       product.setVariationType(item.getVariationType());

@@ -84,7 +84,7 @@ public class Pas5Service implements IProductService {
     @Transactional
     public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild, boolean forcePas) throws NoOfferException, PricingException {
 
-        Product product = productRepo.findBySkuJoinChildren(asin).orElse(null);
+        Product product = productRepo.findBySkuJoinChildren(asin, 1L).orElse(null);
 
         if(!forcePas)
             return mwsItemShortCircuit(product, asin, isParent, isRebuild);
@@ -219,26 +219,43 @@ public class Pas5Service implements IProductService {
         //productRepo.updateParentAllBySku(finalParent.getRef(), parentItem.getVariations().keySet());
         List<Product> existingChildren = productRepo.findAllBySku(parentItem.getVariations().keySet());
     }
+
+    void skip() {};
+
     @Transactional
-    Product createStubs(final Product finalParent, PasItemNode parentItem ) {
+    Product createStubs(Product parent, PasItemNode parentItem ) {
         //final Product finalParent = new Product();
         //finalParent.setVariationType(VariationType.PARENT);
-        Set<Product> children = new HashSet<>();
+
         List<VariationOption> options = new ArrayList<>();
         final List<Variation> variations = new ArrayList<>();
-        initProduct(finalParent, parentItem, true, null);
+        initProduct(parent, parentItem, true, null);
 
 
         //Set<String> skus = parentItem.getVariations().keySet();
 
-        List<Product> existingChildren = productRepo.findAllBySku(parentItem.getVariations().keySet());
+        //List<Product> existingChildren =
+        productRepo.updateParentAllBySku(parent.getRef(), parentItem.getVariations().keySet());
+        parent = productRepo.findBySkuJoinChildren(parent.getSku(), 1L).orElse(parent);
 
-        parentItem.getVariations().forEach((key, value) -> children.add(initStub(key, value, finalParent, existingChildren)));
+        Set<Product> children = parent.getChildren();
 
+        for(String sku: parentItem.getVariations().keySet()) {
+            List<Attribute> value = parentItem.getVariations().get(sku);
+            Product child = children.stream().filter(x -> x.getSku().equals(sku)).findFirst().orElse(initStub(sku, value, parent));
+            child.setVariationType(VariationType.CHILD);
+            child.setVariationAttributes(value);
+            child.setParentId(parent.getRef());
+            child.setParent(parent);
+            //child.setParentId(finalParent);
 
+            child.setMerchantId(1L);
+            if(child.getId() ==  null)
+                children.add(child);
+        }
         children.forEach((child) -> variations.add(new Variation(child.getRef(), child.getVariationAttributes())));
-        finalParent.setChildren(children);
-        finalParent.setVariations(variations);
+        //finalParent.setChildren(children);
+        parent.setVariations(variations);
         int i = 0;
         for (String option : parentItem.getVariationDimensions()) {
             Set<String> values = new HashSet<>();
@@ -251,7 +268,7 @@ public class Pas5Service implements IProductService {
 
 
 
-        return finalParent;
+        return parent;
     }
 
     private Product createProduct(Product product, PasItemNode item) {
@@ -336,7 +353,7 @@ public class Pas5Service implements IProductService {
             if(item.getParentAsin() != null && !item.getParentAsin().equals("asin")) {
                 String parentAsin = item.getParentAsin();
                 overrides = findOverrides(asin, parentAsin);
-                Product parent = productRepo.findBySkuJoinChildren(parentAsin).orElse(null);
+                Product parent = productRepo.findBySkuJoinChildren(parentAsin, 1L).orElse(null);
 
                 // Parent exists?
                 if(parent == null) {
@@ -344,7 +361,7 @@ public class Pas5Service implements IProductService {
                     parent = createProduct(new Product(), parentItem);
 
                     //TODO: Find all children and assign to it (must exclude them from stub creation)
-                    createStubs(parent, parentItem);
+                    parent = createStubs(parent, parentItem);
                     Product child = parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().get();
                     child = createProduct(child, item);
                     parent.addChild(child);
@@ -367,13 +384,13 @@ public class Pas5Service implements IProductService {
                 if(product.getParent() == null) { // Unlikely case
                     PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
                     String parentAsin = item.getParentAsin();
-                    parent = productRepo.findBySkuJoinChildren(parentAsin).orElse(null);
+                    parent = productRepo.findBySkuJoinChildren(parentAsin, 1L).orElse(null);
 
 
 /*                    if(parent == null) {*/
                     parent = createProduct(new Product(), parentItem);
                     //TODO: Find all children and assign to it (must exclude them from stub creation)
-                    createStubs(parent, parentItem);
+                    parent = createStubs(parent, parentItem);
                     productRepo.save(parent);
                         //productRepo.flush();
 /*                    }
@@ -402,7 +419,7 @@ public class Pas5Service implements IProductService {
             }
 
         }
-        Product updated = productRepo.findBySkuJoinChildren(asin).orElse(product);
+        Product updated = productRepo.findBySkuJoinChildren(asin, 1L).orElse(product);
         updated.weight(PasUtility.calculateWeight(product.getWeight(), PasLookupParser.getOverride(overrides, OverrideType.WEIGHT)));
         if(updated.getWeight() != null) {
             updated = priceMws(updated, overrides);
@@ -422,11 +439,9 @@ public class Pas5Service implements IProductService {
         return updated;
     }
 
-    private Product initStub(String key, List<Attribute> value, Product parent, List<Product> existingChildren) {
-        Product child = existingChildren.stream().filter(x -> x.getSku().equals(key)).findFirst().orElse(null);
+    private Product initStub(String key, List<Attribute> value, Product parent) {
 
-        if(child == null) {
-            child = new Product();
+            Product child = new Product();
             child.setVariationType(VariationType.CHILD);
             CRC32 checksum = new CRC32();
             checksum.update(key.getBytes());
@@ -435,14 +450,7 @@ public class Pas5Service implements IProductService {
             child.setVariationAttributes(value);
             child.setParent(parent);
             child.setMerchantId(1L);
-        }
-        else {
-            child.setVariationType(VariationType.CHILD);
-            child.setVariationAttributes(value);
-            child.setParentId(parent.getRef());
-            child.setMerchantId(1L);
-        }
-        return child;
+            return child;
     }
 
     MerchantStock getMerchantStock(Product product) {
