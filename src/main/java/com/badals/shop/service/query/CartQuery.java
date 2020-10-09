@@ -1,12 +1,13 @@
 package com.badals.shop.service.query;
 
+import com.badals.shop.domain.Reward;
 import com.badals.shop.service.CartService;
+import com.badals.shop.service.RewardService;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
-import com.badals.shop.service.dto.CustomerDTO;
+import com.badals.shop.service.dto.RewardDTO;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -45,15 +46,21 @@ query {
 public class CartQuery extends ShopQuery implements GraphQLQueryResolver {
 
     private final CartService cartService;
+    private final RewardService rewardService;
 
-    public CartQuery(CartService cartService) {
+    public CartQuery(CartService cartService, RewardService rewardService) {
         this.cartService = cartService;
+        this.rewardService = rewardService;
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
     public CartDTO getCart(final String secureKey, final List<CartItemDTO> items) {
         Locale l = LocaleContextHolder.getLocale();
         return this.cartService.updateCart(secureKey, items, false);
+    }
+
+    public List<RewardDTO> rewards() {
+        return rewardService.findAll();
     }
 }
 

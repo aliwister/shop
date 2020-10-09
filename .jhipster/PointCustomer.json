@@ -1,0 +1,49 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [
+        {
+            "relationshipName": "customer",
+            "otherEntityName": "customer",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "id"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "totalPoints",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "spentPoints",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "referralCode",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "spentMoney",
+            "fieldType": "Double"
+        },
+        {
+            "fieldName": "active",
+            "fieldType": "Boolean",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "date_add",
+            "fieldType": "LocalDate"
+        }
+    ],
+    "changelogDate": "20201009200912",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceClass",
+    "entityTableName": "point_customer",
+    "databaseType": "sql",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}

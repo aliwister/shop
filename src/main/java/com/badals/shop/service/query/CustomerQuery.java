@@ -1,14 +1,11 @@
 package com.badals.shop.service.query;
 
-import com.badals.shop.domain.Customer;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.AddressDTO;
 import com.badals.shop.service.dto.CustomerDTO;
-import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.CustomerMapper;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -46,14 +43,17 @@ query {
 @Component
 public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private CustomerMapper customerMapper;
+    private final CustomerMapper customerMapper;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public CustomerQuery(ProductService productService, CustomerMapper customerMapper, UserService userService) {
+        this.productService = productService;
+        this.customerMapper = customerMapper;
+        this.userService = userService;
+    }
 
     public List<AddressDTO> getAddresses(final int id) {
 return null;
@@ -66,6 +66,11 @@ return null;
     @PreAuthorize("hasRole('ROLE_USER')")
     public CustomerDTO me() {
         return  userService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
+    }
+
+    @PreAuthorize("hasRole('ROLE_NONE')")
+    public CustomerDTO meTest(Long id) {
+        return userService.getUserWithAuthorities(id).map(customerMapper::toDto).orElse(null);
     }
 }
 

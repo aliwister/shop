@@ -318,6 +318,8 @@ extend type Query {
                      limit: Int = 10): HashtagResponse
     hashtagsWithProducts(        offset: Int = 0
                      limit: Int = 10): HashtagResponse
+
+    relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
 }
 
 extend type Mutation {

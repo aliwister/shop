@@ -1,0 +1,64 @@
+{
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "relationships": [
+        {
+            "relationshipName": "product",
+            "otherEntityName": "product",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "ref",
+            "otherEntityRelationshipName": "reward"
+        },
+        {
+            "relationshipName": "rewardLang",
+            "otherEntityName": "rewardLang",
+            "relationshipType": "one-to-many",
+            "otherEntityRelationshipName": "reward"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "rewardType",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "points",
+            "fieldType": "Long",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "radius",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "minimumCartAmount",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "discountValue",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "discountValidDays",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "discountReductionType",
+            "fieldType": "DiscountReductionType",
+            "fieldValues": "AMOUNT,PERCENT",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "changelogDate": "20201009131242",
+    "dto": "mapstruct",
+    "searchEngine": false,
+    "service": "serviceClass",
+    "entityTableName": "reward",
+    "databaseType": "sql",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no"
+}
