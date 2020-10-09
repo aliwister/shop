@@ -27,6 +27,8 @@ public class Customer implements Serializable {
     @Column(name = "id_customer")
     private Long id;
 
+
+
     @Column(name = "company")
     private String company;
 
@@ -69,6 +71,18 @@ public class Customer implements Serializable {
 
     @Column
     private String mobile;
+
+    @OneToOne(optional = true)
+    @JoinColumn(name="id_customer", referencedColumnName = "customer_id")
+    PointCustomer pointCustomer;
+
+    public PointCustomer getPointCustomer() {
+        return pointCustomer;
+    }
+
+    public void setPointCustomer(PointCustomer pointCustomer) {
+        this.pointCustomer = pointCustomer;
+    }
 
     public String getMobile() {
         return mobile;
