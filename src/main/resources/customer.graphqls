@@ -4,6 +4,8 @@ type Customer {
     lastname: String
     email: String
     mobile: String
+    totalPoints: Long
+    spentPoints: Long
 }
 
 type Address {
@@ -39,5 +41,6 @@ extend type Query {
     getAddresses(customerId: Int): [Address]
     #getAddress(addressId: Int): Address
     me: Customer
+    meTest(id: Long): Customer
     customers: [Customer]
 }

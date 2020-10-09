@@ -38,6 +38,9 @@ public class CustomerDTO implements Serializable {
     private Integer active;
     private String mobile;
 
+    private Long totalPoints;
+    private Long spentPoints;
+
 
     @Override
     public boolean equals(Object o) {

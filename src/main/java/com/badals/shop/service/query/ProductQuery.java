@@ -86,6 +86,10 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.findRelated(slug);
    }
 
+   public HashtagResponse relatedTo(Long ref, List<String> hashtags, String title) {
+      return hashtagService.findRelatedTo(ref, hashtags, title);
+   }
+
    public List<CategoryDTO> categories(String type) {
       return categoryService.findAll();
    }
