@@ -2,6 +2,7 @@ package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.*;
 
+import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CustomerDTO;
 import org.mapstruct.*;
 
@@ -11,7 +12,9 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {})
 public interface CustomerMapper extends EntityMapper<CustomerDTO, Customer> {
 
-
+    @Mapping(source = "pointCustomer.totalPoints", target = "totalPoints")
+    @Mapping(source = "pointCustomer.spentPoints", target = "spentPoints")
+    CustomerDTO toDto(Customer customer);
 
     default Customer fromId(Long id) {
         if (id == null) {

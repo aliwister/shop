@@ -8,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 /**
  * Spring Data  repository for the Hashtag entity.
@@ -18,4 +20,6 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 
    @Query("select p from Hashtag p order by p.position ASC")
    Page<Hashtag> findForList(Pageable page);
+
+   List<Hashtag> findByEnIn(List<String> a);
 }
