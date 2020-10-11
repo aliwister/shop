@@ -235,6 +235,9 @@ public class Pas5Service implements IProductService {
         //Set<String> skus = parentItem.getVariations().keySet();
 
         //List<Product> existingChildren =
+        if(parent.getId() == null)
+            productRepo.saveAndFlush(parent);
+
         productRepo.updateParentAllBySku(parent.getRef(), parentItem.getVariations().keySet());
         parent = productRepo.findBySkuJoinChildren(parent.getSku(), 1L).orElse(parent);
 
