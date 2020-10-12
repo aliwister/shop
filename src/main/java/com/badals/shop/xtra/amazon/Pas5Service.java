@@ -235,6 +235,7 @@ public class Pas5Service implements IProductService {
         //Set<String> skus = parentItem.getVariations().keySet();
 
         //List<Product> existingChildren =
+        parent.setVariationType(VariationType.PARENT);
         if(parent.getId() == null)
             productRepo.saveAndFlush(parent);
 
@@ -361,7 +362,7 @@ public class Pas5Service implements IProductService {
                 // Parent exists?
                 if(parent == null) {
                     PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
-                    parent = createProduct(new Product(), parentItem);
+                    parent = productRepo.findOneBySkuAndMerchantId(item.getParentAsin(),1L).orElse(createProduct(new Product(), parentItem));
 
                     //TODO: Find all children and assign to it (must exclude them from stub creation)
                     parent = createStubs(parent, parentItem);
@@ -387,11 +388,11 @@ public class Pas5Service implements IProductService {
                 if(product.getParent() == null) { // Unlikely case
                     PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
                     String parentAsin = item.getParentAsin();
-                    parent = productRepo.findBySkuJoinChildren(parentAsin, 1L).orElse(null);
+                    parent = productRepo.findBySkuJoinChildren(parentAsin, 1L).orElse(createProduct(new Product(), parentItem));
 
 
 /*                    if(parent == null) {*/
-                    parent = createProduct(new Product(), parentItem);
+                    //parent = createProduct(new Product(), parentItem);
                     //TODO: Find all children and assign to it (must exclude them from stub creation)
                     parent = createStubs(parent, parentItem);
                     productRepo.save(parent);
