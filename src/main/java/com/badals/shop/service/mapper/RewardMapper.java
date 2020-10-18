@@ -4,6 +4,7 @@ import com.badals.shop.domain.*;
 import com.badals.shop.service.dto.RewardDTO;
 
 import org.mapstruct.*;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * Mapper for the entity {@link Reward} and its DTO {@link RewardDTO}.
@@ -22,7 +23,8 @@ public interface RewardMapper extends EntityMapper<RewardDTO, Reward> {
 
     @AfterMapping
     default void afterMapping(@MappingTarget RewardDTO target, Reward source) {
-        RewardLang lang = source.getRewardLangs().stream().findFirst().orElse(null);
+        RewardLang lang = source.getRewardLangs().stream().filter(e -> e.getLang().equals(LocaleContextHolder.getLocale().toString())).findFirst().orElse(source.getRewardLangs().stream().findFirst().orElse(null));
+
         if(lang != null) {
             target.setName(lang.getName());
             target.setDescription(lang.getDescription());

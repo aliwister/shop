@@ -90,7 +90,7 @@ type Reward {
     minimumCartAmount: Long
     discountValue: Long
     discountValidDays: Long
-
+    points: Long
 }
 
 extend type Query {

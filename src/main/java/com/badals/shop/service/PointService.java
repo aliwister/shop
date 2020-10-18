@@ -85,43 +85,5 @@ public class PointService {
         paymentRepository.deleteById(id);
     }
 
-   public PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod, String authCode) {
-        Payment p = new Payment();
-        p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod).authCode(authCode);
-        p = paymentRepository.save(p);
-        return paymentMapper.toDto(p);
-   }
 
-   public List<PaymentDTO> findForOrder(Long orderId) {
-       return paymentRepository.findAllByOrderId(orderId).stream().map(paymentMapper::toDto).collect(Collectors.toList());
-   }
-
-   public PaymentDTO addRefund(Long orderId, BigDecimal amount, String authCode, String bankName, String bankAccountNumber, String bankOwnerName, Long ref, String paymentMethod) {
-      Payment p = new Payment();
-      p.amount(amount).order(new Order(orderId)).paymentMethod(paymentMethod).authCode(authCode).bankAccountNumber(bankAccountNumber).bankName(bankName).bankOwnerName(bankOwnerName).ref(ref);
-      p = paymentRepository.save(p);
-      return paymentMapper.toDto(p);
-   }
-
-   public PaymentResponse findForTable(List<String> paymentMethods, Integer offset, Integer limit, String searchText, Date from, Date to, Long customerId, String accountCode) {
-      Page<Payment> payments = paymentRepository.findForTable(paymentMethods, from, to, customerId, accountCode, searchText, PageRequest.of((int) offset/limit,limit));
-      PaymentResponse response = new PaymentResponse();
-      response.setItems(payments.getContent().stream().map(paymentMapper::toDto).collect(Collectors.toList()));
-      Long total = payments.getTotalElements();
-      response.setTotal(total.intValue());
-      response.setHasMore((limit+offset) < total);
-      return response;
-   }
-
-   public void setSettlementDate(ArrayList<Long> payments, Date date) {
-       paymentRepository.setSettlementDate(payments, date);
-   }
-
-   public void setProcessedDate(ArrayList<Long> payments, Date date) {
-       paymentRepository.setProcessedDate(payments, date);
-   }
-
-   public void setAccountingCode(ArrayList<Long> payments, String code) {
-       paymentRepository.setAccountingCode(payments, code);
-   }
 }
