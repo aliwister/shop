@@ -58,8 +58,6 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         else
             target.setVariationType(VariationType.valueOf(source.getType()));
 
-        if(target.getStub()) return;
-
         ProductLang langAr = new ProductLang().lang("ar").description(source.getDescription_ar()).title(source.getName_ar()).brand(source.getBrand_ar()).browseNode(source.getBrowseNode());
         if(source.getFeatures_ar() != null)
             langAr.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
