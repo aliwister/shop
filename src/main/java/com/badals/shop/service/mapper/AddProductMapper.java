@@ -52,24 +52,29 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
             }
             target.setGallery(gallery);
         }
+
+        if(source.getType() == null)
+            target.setVariationType(VariationType.SIMPLE);
+        else
+            target.setVariationType(VariationType.valueOf(source.getType()));
+
+        if(target.getStub()) return;
+
         ProductLang langAr = new ProductLang().lang("ar").description(source.getDescription_ar()).title(source.getName_ar()).brand(source.getBrand_ar()).browseNode(source.getBrowseNode());
         if(source.getFeatures_ar() != null)
             langAr.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
 
-
         ProductLang langEn = new ProductLang().lang("en").description(source.getDescription()).title(source.getName()).brand(source.getBrand()).browseNode(source.getBrowseNode());
         if(source.getFeatures() != null)
             langEn.setFeatures(Arrays.asList(source.getFeatures().split(";")));
-
         target.getProductLangs().add(langAr.product(target));
         target.getProductLangs().add(langEn.product(target));
 
         target.setActive(true);
-        target.setVariationType(VariationType.valueOf(source.getType()));
-
         target.getMerchantStock().clear();
         target.getMerchantStock().add(new MerchantStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(source.getCost()).allow_backorder(false)
                 .price(source.getSalePrice()).discount(source.getDiscountInPercent()).product(target).merchantId(source.getMerchantId()));
+
     }
 
     @AfterMapping
