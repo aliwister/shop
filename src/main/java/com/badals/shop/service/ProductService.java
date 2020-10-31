@@ -508,13 +508,14 @@ public class ProductService {
     }
     public AddProductDTO createStub(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) throws Exception {
 
-        Product product = null;
+        Optional<Product> productOptional = null;
         if(dto.getId() != null)
-            product = productRepository.findOneByRef(dto.getId()).get();
+            productOptional = productRepository.findOneByRef(dto.getId());
         else
-            product = productRepository.findOneBySkuAndMerchantId(dto.getSku(), dto.getMerchantId()).get();
+            productOptional = productRepository.findOneBySkuAndMerchantId(dto.getSku(), dto.getMerchantId());
 
-        if(product == null) {
+        Product product = null;
+        if(!productOptional.isPresent()) {
             CRC32 checksum = new CRC32();
             product = addProductMapper.toEntity(dto);
 
@@ -524,6 +525,8 @@ public class ProductService {
             product.setRef(Long.valueOf(ref));
             product.setSlug(ref);
         }
+        else
+            product = productOptional.get();
 
         if(!product.getStub())
             throw new Exception("Can't create a stub product from a product that already exists");
