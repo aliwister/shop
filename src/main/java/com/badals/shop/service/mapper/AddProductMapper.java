@@ -92,7 +92,8 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         target.setDescription(source.getDescription());
         target.setBrowseNode(source.getBrowseNode());
 
-        target.setPrice(source.getSalePrice().setScale(2, RoundingMode.HALF_UP).toString());
+        if (source.getSalePrice() != null)
+            target.setPrice(source.getSalePrice().setScale(2, RoundingMode.HALF_UP).toString());
 
         if(LocaleContextHolder.getLocale().toString().equals("ar")) {
             ///target.setLang("ar");

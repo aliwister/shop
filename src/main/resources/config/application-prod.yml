@@ -167,8 +167,16 @@ jhipster:
 # application:
 pas:
   key: ***REMOVED***
-  tag: 4242020-20
   secret: ***REMOVED***
+  us:
+    tag: 4242020-20
+    host: webservices.amazon.com
+    region: us-east-1
+  uk:
+    tag: exercisebikeu-21
+    host: webservices.amazon.co.uk
+    region: eu-west-1
+
 
 mws:
   key: ***REMOVED***
