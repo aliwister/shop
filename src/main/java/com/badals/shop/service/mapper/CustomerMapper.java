@@ -9,12 +9,18 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Customer} and its DTO {@link CustomerDTO}.
  */
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring", uses = {AddressMapper.class})
 public interface CustomerMapper extends EntityMapper<CustomerDTO, Customer> {
+    @Named("mapWithoutAddresses")
+    @Mapping(source = "pointCustomer.totalPoints", target = "totalPoints")
+    @Mapping(source = "pointCustomer.spentPoints", target = "spentPoints")
+    CustomerDTO toDtoWitAddresses(Customer customer);
 
     @Mapping(source = "pointCustomer.totalPoints", target = "totalPoints")
     @Mapping(source = "pointCustomer.spentPoints", target = "spentPoints")
+    @Mapping(target = "addresses", ignore = true)
     CustomerDTO toDto(Customer customer);
+
 
     default Customer fromId(Long id) {
         if (id == null) {

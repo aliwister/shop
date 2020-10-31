@@ -27,6 +27,7 @@ public class AddressDTO implements Serializable {
 
     private String active;
 
+    private String alias;
 
     private Long customerId;
 

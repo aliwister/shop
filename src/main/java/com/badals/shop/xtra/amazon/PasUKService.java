@@ -35,28 +35,26 @@ import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
 @Service
-public class Pas5Service implements IProductService {
+public class PasUKService implements IProductService {
 
-    private final Logger log = LoggerFactory.getLogger(Pas5Service.class);
+    private final Logger log = LoggerFactory.getLogger(PasUKService.class);
     private final ProductRepository productRepo;
-    private final CategoryRepository categoryRepository;
     private final MerchantRepository merchantRepository;
     private final ProductOverrideRepository productOverrideRepository;
+
+
     private final PasLookup pasLookup;
-    private final MwsLookup mwsLookup;
-    private final RedisPasRepository redisPasRepository;
+
     private final ProductMapper productMapper;
     private final PasItemMapper pasItemMapper;
 
 
-    public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, @Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper) {
+    public PasUKService(ProductRepository productRepo, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, @Qualifier("uk") PasLookup pasLookup, ProductMapper productMapper, PasItemMapper pasItemMapper) {
         this.productRepo = productRepo;
-        this.categoryRepository = categoryRepository;
         this.merchantRepository = merchantRepository;
         this.productOverrideRepository = productOverrideRepository;
         this.pasLookup = pasLookup;
-        this.mwsLookup = mwsLookup;
-        this.redisPasRepository = redisPasRepository;
+
         this.productMapper = productMapper;
         this.pasItemMapper = pasItemMapper;
     }
@@ -87,10 +85,6 @@ public class Pas5Service implements IProductService {
 
         Product product = productRepo.findBySkuJoinChildren(asin, 1L).orElse(null);
 
-        if(!forcePas)
-            return mwsItemShortCircuit(product, asin, isParent, isRebuild);
-
-        //PasItemNode current = pasItemNodeSearchRepository.findById(asin);
         if (product == null) {
             product = new Product();
             isRebuild = true;
@@ -103,23 +97,10 @@ public class Pas5Service implements IProductService {
         }
         if(isParent) isRebuild = true;
 
-
-        //if (product != null) // && product.getUpdated())
         List<Product> mws = new ArrayList<>();
         GetItemsResponse response = null;
         PasItemNode item = null;
         Map<String, Item> doc;
-
-        // Read from redis cache
-/*        if (isRedis && redisPasRepository.getHashOperations().hasKey("pas", asin)) {
-            try {
-                item = (PasItemNode) redisPasRepository.getHashOperations().get("pas", asin);
-            }
-            catch (Exception e) {
-                redisPasRepository.getHashOperations().delete("pas", asin);
-            }
-        }*/
-        //if
 
         List<String> list = new ArrayList();
         list.add(asin);
@@ -128,10 +109,6 @@ public class Pas5Service implements IProductService {
             response = pasLookup.lookup(list);
             if(response.getErrors() != null && response.getErrors().size() > 0 ) {
                 ErrorData error = response.getErrors().get(0);
-                if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
-                    mwsLookup.lookup(asin);
-                    return null;
-                }
             }
             doc = parse_response(response.getItemsResult().getItems());
             item = pasItemMapper.itemToPasItemNode(doc.get(asin));
@@ -203,10 +180,6 @@ public class Pas5Service implements IProductService {
         if(!isParent && product.getPrice() == null)
             mws.add(product);
 
-        for(Product p: mws) {
-            p = priceMws(p, overrides);
-        }
-
         product = productRepo.save(product);
         return product;
     }
@@ -221,60 +194,6 @@ public class Pas5Service implements IProductService {
         List<Product> existingChildren = productRepo.findAllBySku(parentItem.getVariations().keySet());
     }
 
-    void skip() {};
-
-    @Transactional
-    Product createStubs(Product parent, PasItemNode parentItem ) {
-        //final Product finalParent = new Product();
-        //finalParent.setVariationType(VariationType.PARENT);
-
-        List<VariationOption> options = new ArrayList<>();
-        final List<Variation> variations = new ArrayList<>();
-        initProduct(parent, parentItem, true, null);
-
-
-        //Set<String> skus = parentItem.getVariations().keySet();
-
-        //List<Product> existingChildren =
-        parent.setVariationType(VariationType.PARENT);
-        if(parent.getId() == null)
-            productRepo.saveAndFlush(parent);
-
-        productRepo.updateParentAllBySku(parent.getRef(), parentItem.getVariations().keySet());
-        parent = productRepo.findBySkuJoinChildren(parent.getSku(), 1L).orElse(parent);
-
-        Set<Product> children = parent.getChildren();
-
-        for(String sku: parentItem.getVariations().keySet()) {
-            List<Attribute> value = parentItem.getVariations().get(sku);
-            Product child = children.stream().filter(x -> x.getSku().equals(sku)).findFirst().orElse(initStub(sku, value, parent));
-            child.setVariationType(VariationType.CHILD);
-            child.setVariationAttributes(value);
-            child.setParentId(parent.getRef());
-            child.setParent(parent);
-            //child.setParentId(finalParent);
-
-            child.setMerchantId(1L);
-            if(child.getId() ==  null)
-                children.add(child);
-        }
-        children.forEach((child) -> variations.add(new Variation(child.getRef(), child.getVariationAttributes())));
-        //finalParent.setChildren(children);
-        parent.setVariations(variations);
-        int i = 0;
-        for (String option : parentItem.getVariationDimensions()) {
-            Set<String> values = new HashSet<>();
-            for(Product p : children) {
-                values.add(p.getVariationAttributes().get(i).getValue());
-            }
-            options.add(new VariationOption(option,null,new ArrayList<String>(values)));
-            i++;
-        }
-
-
-
-        return parent;
-    }
 
     private Product createProduct(Product product, PasItemNode item) {
         product = initProduct(product, item, false, null);
@@ -302,162 +221,6 @@ public class Pas5Service implements IProductService {
         return pasItemMapper.itemToPasItemNode(doc.get(asin));
     }
 
-    private Product mwsItemShortCircuit(Product product, String asin, boolean isParent, boolean isRebuild) throws NoOfferException, PricingException {
-
-        List<ProductOverride> overrides = findOverrides(asin, null);
-        //Product finalParent = null;
-        PasItemNode item = null;
-        //if(product == null || product.getStub()) {
-            //item = mwsLookup.lookup(asin);
-        //}
-
-
-        boolean isPasLookup = false;
-        boolean isMwsLookup = false;
-        boolean isReset = true;
-
-        if(product != null && product.getMerchantId() == 11L) {
-
-            isReset = true;
-        }
-
-        if(product != null && product.getWeight() != null)
-            isPasLookup = true;
-
-        if(overrides != null && overrides.size() > 0) {
-            isPasLookup = true;
-        }
-        if(!isPasLookup) {
-            try {
-                item = mwsLookup.lookup(asin);
-            } catch (Exception e) {
-                isPasLookup = true;
-                isMwsLookup = false;
-            }
-        }
-        if(isPasLookup) {
-            try {
-                item = callPas(asin);
-            }
-            catch (PricingException e) {
-                if (isMwsLookup)
-                    item = mwsLookup.lookup(asin);
-                else
-                    throw e;
-            }
-        }
-            //redisPasRepository.getHashOperations().put("pas", asin, item);
-
-        // Not Exists
-        if(product == null) {
-            // Create Product
-            product = createProduct(new Product(), item);
-
-            // Is Child?
-            //if(item.getVariationType() == VariationType.CHILD) {
-            if(item.getParentAsin() != null && !item.getParentAsin().equals("asin")) {
-                String parentAsin = item.getParentAsin();
-                overrides = findOverrides(asin, parentAsin);
-                Product parent = productRepo.findBySkuJoinChildren(parentAsin, 1L).orElse(null);
-
-                // Parent exists?
-                if(parent == null) {
-                    PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
-                    parent = productRepo.findOneBySkuAndMerchantId(item.getParentAsin(),1L).orElse(createProduct(new Product(), parentItem));
-
-                    //TODO: Find all children and assign to it (must exclude them from stub creation)
-                    parent = createStubs(parent, parentItem);
-                    Product child = parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().get();
-                    child = createProduct(child, item);
-                    parent.addChild(child);
-                    productRepo.save(parent);
-                }
-            }
-            else {
-                // Assume no parent will be queried directly
-                product.setVariationType(VariationType.SIMPLE);
-            }
-        }
-        else {
-            //TODO: Check expired
-            if(isReset)
-                product = createProduct(product, item);
-            // Is Child?
-            if(item.getParentAsin() != null && !item.getParentAsin().equals("asin")) {
-                overrides = findOverrides(asin, item.getParentAsin());
-                Product parent = null;
-                if(product.getParent() == null) { // Unlikely case
-                    PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
-                    String parentAsin = item.getParentAsin();
-                    parent = productRepo.findBySkuJoinChildren(parentAsin, 1L).orElse(createProduct(new Product(), parentItem));
-
-
-/*                    if(parent == null) {*/
-                    //parent = createProduct(new Product(), parentItem);
-                    //TODO: Find all children and assign to it (must exclude them from stub creation)
-                    parent = createStubs(parent, parentItem);
-                    productRepo.save(parent);
-                        //productRepo.flush();
-/*                    }
-                    else {
-                        reassignChildren(parent, parentItem);
-                        productRepo.save(parent);
-                    }*/
-
-                }
-                else {
-                    parent = product.getParent(); //productRepo.findBySkuJoinChildren(item.getParentAsin()).orElse(null);
-                }
-                if(product.getStub() != null && product.getStub() || isReset) {
-                    Product child = parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().get();
-                    child = createProduct(child, item);
-                    child.setVariationType(VariationType.CHILD);
-                    parent.addChild(child);
-                    parent.setMerchantId(1L);
-/*                    if(isReset) {
-                        PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
-                        createStubs(parent, parentItem);
-                    }*/
-                }
-
-                productRepo.save(parent);
-            }
-
-        }
-        Product updated = productRepo.findBySkuJoinChildren(asin, 1L).orElse(product);
-        updated.weight(PasUtility.calculateWeight(product.getWeight(), PasLookupParser.getOverride(overrides, OverrideType.WEIGHT)));
-        if(updated.getWeight() != null) {
-            updated = priceMws(updated, overrides);
-            if(updated.getPrice() == null  || !updated.getInStock() ) {
-                if(!isPasLookup) {
-                    try {
-                        item = callPas(asin);
-                    } catch (Exception e) {
-                        //swallow
-                    }
-                }
-                if (item != null)
-                    updated = pricePas(updated, item, overrides);
-            }
-        }
-        updated = productRepo.save(updated);
-        return updated;
-    }
-
-    private Product initStub(String key, List<Attribute> value, Product parent) {
-
-            Product child = new Product();
-            child.setVariationType(VariationType.CHILD);
-            CRC32 checksum = new CRC32();
-            checksum.update(key.getBytes());
-            long ref = checksum.getValue();
-            child.slug(String.valueOf(ref)).ref(ref).merchantId(1L).active(true).sku(key).stub(true).inStock(true).title("stub");
-            child.setVariationAttributes(value);
-            child.setParent(parent);
-            child.setMerchantId(1L);
-            return child;
-    }
-
     MerchantStock getMerchantStock(Product product) {
         if(product.getMerchantStock() == null)
             return new MerchantStock();
@@ -472,24 +235,6 @@ public class Pas5Service implements IProductService {
         }
         product.setPrice(new Price(stock.getPrice(), "OMR"));
 
-        return product;
-    }
-
-    Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
-
-        if (p.getWeight() == null || p.getWeight().doubleValue() < .01) return p;
-        MwsItemNode n = mwsLookup.fetch(p.getSku());
-        Product product = p;
-        try {
-            product = setMerchantStock(p, MwsLookupParser.parseStock(getMerchantStock(p),n, p.getWeight(), overrides), BigDecimal.valueOf(99L));
-            product.inStock(true);
-        } catch (PricingException e) {
-            product.setPrice((BigDecimal) null);
-            //e.printStackTrace();
-        } catch (NoOfferException e) {
-            //product = setMerchantStock(p, getMerchantStock(p),BigDecimal.ZERO);
-            product.inStock(false);
-        }
         return product;
     }
 

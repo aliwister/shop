@@ -23,6 +23,7 @@ import com.badals.shop.service.util.ValidationUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
+import com.badals.shop.xtra.amazon.PasUKService;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.badals.shop.xtra.ebay.EbayService;
 import org.imgscalr.Scalr;
@@ -31,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 
 import org.springframework.data.domain.PageRequest;
@@ -69,6 +69,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final SearchIndex<AlgoliaProduct> index;
     private final Pas5Service pas5Service;
+    private final PasUKService pasUKService;
     private final EbayService ebayService;
     private final MessageSource messageSource;
 
@@ -82,8 +83,9 @@ public class ProductService {
     private final TenantService tenantService;
     private final SpeedDialService speedDialService;
 
-    public ProductService(ProductRepository productRepository, EbayService ebayService, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService, SpeedDialService speedDialService) {
+    public ProductService(ProductRepository productRepository, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService, SpeedDialService speedDialService) {
         this.productRepository = productRepository;
+        this.pasUKService = pasUKService;
         this.ebayService = ebayService;
         this.productMapper = productMapper;
         this.algoliaProductMapper = algoliaProductMapper;
@@ -102,6 +104,13 @@ public class ProductService {
         log.debug("Request to search ShipmentItems for query {}", query);
         return StreamSupport
                 .stream(productSearchRepository.search(queryStringQuery(query)).spliterator(), false).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<AddProductDTO> searchPageable(String query, Integer page, Integer pageSize) {
+        log.debug("Request to search ShipmentItems for query {}", query);
+        return StreamSupport
+                .stream(productSearchRepository.search(queryStringQuery(query), PageRequest.of(page, pageSize)).spliterator(), false).collect(Collectors.toList());
     }
 
     /**
@@ -216,7 +225,7 @@ public class ProductService {
         if(product.getVariationType().equals(VariationType.PARENT)) {
             if(product.getChildren().size() <1)
                 throw new ProductNotFoundException("Lonely Parent");
-            product = product.getChildren().iterator().next();
+            product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
         }
         else if(product.getStub() != null && product.getStub()) {
             //product.setStub(false);
@@ -299,6 +308,13 @@ public class ProductService {
 
     public ProductDTO lookupForcePas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild, true);
+        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
+            this.indexProduct(p.getId());
+        return this.getProductBySku(sku);
+    }
+
+    public ProductDTO lookupForcePasUk(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
+        Product p = this.pasUKService.lookup(sku, isParent, isRedis, isRebuild, true);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             this.indexProduct(p.getId());
         return this.getProductBySku(sku);
@@ -490,6 +506,98 @@ public class ProductService {
             productSearchRepository.save(dto);
         return  addProductMapper.toDto(product);
     }
+    public AddProductDTO createStub(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) throws Exception {
+
+        Product product = null;
+        if(dto.getId() != null)
+            product = productRepository.findOneByRef(dto.getId()).get();
+        else
+            product = productRepository.findOneBySkuAndMerchantId(dto.getSku(), dto.getMerchantId()).get();
+
+        if(product == null) {
+            CRC32 checksum = new CRC32();
+            product = addProductMapper.toEntity(dto);
+
+            product.setSku(dto.getSku());
+            checksum.update(dto.getSku().getBytes());
+            String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
+            product.setRef(Long.valueOf(ref));
+            product.setSlug(ref);
+        }
+
+        if(!product.getStub())
+            throw new Exception("Can't create a stub product from a product that already exists");
+
+
+        if(dto.getVariationType() == null)
+            dto.setType("SIMPLE");
+
+        product.setActive(false);
+        product.setInStock(false);
+        product.setCurrency("OMR");
+
+
+/*        product.setRef(dto.getRef());
+        product.setSlug(dto.getSlug());*/
+        product.setTitle(dto.getName());
+        product.setMerchantId(currentMerchantId);
+
+
+        product.getMerchantStock().clear();
+        product.getProductLangs().clear();
+        product.getCategories().clear();
+
+/*
+        for(Long id: dto.getShopIds()) {
+            product.getCategories().add(new Category(id));
+        }
+*/
+
+        //product.getProductLangs().add(new ProductLang().title("Fuck").product(product).lang("ar"));
+        int discount = 0;
+
+/*        if(dto.getSalePrice() != null)
+            discount = 100 * (int)((dto.getPrice().doubleValue() - dto.getSalePrice().doubleValue())/dto.getPrice().doubleValue());*/
+
+/*        product.getMerchantStock().add(new MerchantStock().quantity(dto.getQuantity()).availability(dto.getAvailability()).cost(dto.getCost()).allow_backorder(false)
+                .price(dto.getSalePrice()).discount(discount).product(product).merchantId(currentMerchantId));
+
+        ProductLang langAr = new ProductLang().lang("ar").description(dto.getDescription_ar()).title(dto.getName_ar()).brand(dto.getBrand_ar()).browseNode(dto.getBrowseNode());
+        if(dto.getFeatures_ar() != null)
+            langAr.setFeatures(Arrays.asList(dto.getFeatures_ar().split(";")));
+
+
+        ProductLang langEn = new ProductLang().lang("en").description(dto.getDescription()).title(dto.getName()).brand(dto.getBrand()).browseNode(dto.getBrowseNode());
+        if(dto.getFeatures() != null)
+            langEn.setFeatures(Arrays.asList(dto.getFeatures().split(";")));
+
+        product.getProductLangs().add(langAr.product(product));
+        product.getProductLangs().add(langEn.product(product));*/
+
+        if(dto.getUrl() != null && ValidationUtil.isValidURL(dto.getUrl())) {
+            product.setUrl(dto.getUrl());
+        }
+        else
+            product.setUrl(null);
+
+        //product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
+        product = productRepository.save(product);
+        //dto.setTenant(currentMerchant);
+        //dto.setSlug(product.getSlug());
+        //dto.setRef(product.getRef());
+        //dto.setImported(true);
+
+/*
+
+        if(dto.getDial() != null && dto.getDial().startsWith("*")) {
+            speedDialService.save(new SpeedDialDTO().dial(dto.getDial()).ref(product.getRef()).expires(Instant.now()));
+        }
+*/
+
+        if(isSaveES)
+            productSearchRepository.save(dto);
+        return  addProductMapper.toDto(product);
+    }
 
 
 
@@ -653,6 +761,15 @@ public class ProductService {
         List<AddProductDTO> result = search(hashtag );
         ProductResponse response = new ProductResponse();
         response.setTotal(6);
+        response.setHasMore(false);
+        response.setItems(result.stream().map(addProductMapper::toProductDto).collect(Collectors.toList()));
+        return response;
+    }
+
+    public ProductResponse findByKeyword(String keyword) {
+        List<AddProductDTO> result = searchPageable(keyword, 1, 10 );
+        ProductResponse response = new ProductResponse();
+        response.setTotal(result.size());
         response.setHasMore(false);
         response.setItems(result.stream().map(addProductMapper::toProductDto).collect(Collectors.toList()));
         return response;

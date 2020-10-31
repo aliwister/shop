@@ -42,14 +42,14 @@ public class PasLookup {
    private DefaultApi api;
    private final String partnerTag;
 
-   public PasLookup(String pasAccessKeyId, String pasSecretKey, String pasTag) {
+   public PasLookup(String pasAccessKeyId, String pasSecretKey, String tag, String host, String region) {
       ApiClient client = new ApiClient();
       client.setAwsAccessKey(pasAccessKeyId);
       client.setAwsSecretKey(pasSecretKey);
-      client.setHost("webservices.amazon.com");
-      client.setRegion("us-east-1");
+      client.setHost(host);
+      client.setRegion(region);
       this.api = new DefaultApi(client);
-      this.partnerTag = pasTag;
+      this.partnerTag = tag;
    }
 
    /*

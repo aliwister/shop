@@ -20,12 +20,10 @@ import java.util.Set;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-
-
     @Query("from Product u where u.sku = ?1")
     Optional<Product> findBySkuJoinCategories(String asin);
 
-    @Query("from Product u where u.slug = ?1")
+    @Query("from Product u where u.slug = ?1 and u.active = true")
     Optional<Product> findBySlugJoinCategories(String slug);
 
     @Query("select u.products from Category u where u.slug = ?1")
@@ -44,6 +42,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findOneBySku(String sku);
 
     Optional<Product> findOneBySkuAndMerchantId(String sku, Long merchantId);
+
+    List<Product> findBySkuInAndMerchantId(Set<String> skus, Long merchantId);
 
     List<Product> findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(List<VariationType> types, Pageable pageable);
 

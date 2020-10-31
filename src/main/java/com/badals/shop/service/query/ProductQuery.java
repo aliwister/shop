@@ -65,6 +65,11 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
         return productService.getProductAdmin(id).get();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ProductResponse findByKeyword(String keyword) {
+        return productService.findByKeyword(keyword);
+    }
+
     public ProductDTO getProductAny(final int id) {
         //return new Product();
         return productService.getProduct(id).get();
@@ -126,6 +131,10 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    public ProductDTO pas(String sku) throws ProductNotFoundException, NoOfferException, PricingException {
       return productService.lookupForcePas(sku, false,false, true);
+   }
+
+   public ProductDTO pasUk(String sku) throws ProductNotFoundException, NoOfferException, PricingException {
+      return productService.lookupForcePasUk(sku, false,false, true);
    }
 
    public HashtagResponse hashtags(Integer offset,Integer limit ) {

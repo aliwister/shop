@@ -69,7 +69,10 @@ public class MerchantMutation implements GraphQLMutationResolver {
     public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {
         return productService.createProduct(dto, isSaveES, currentMerchantId);
     }
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public AddProductDTO createStub(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) throws Exception {
+        return productService.createStub(dto, isSaveES, currentMerchantId);
+    }
 
     public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
         String t =  TenantContext.getCurrentTenant();

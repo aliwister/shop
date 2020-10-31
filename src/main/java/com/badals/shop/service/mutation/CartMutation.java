@@ -1,6 +1,7 @@
 package com.badals.shop.service.mutation;
 
 import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.repository.CheckoutCartRepository;
 import com.badals.shop.service.CartService;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
@@ -47,14 +48,22 @@ mutation {
 
 @Component
 public class CartMutation implements GraphQLMutationResolver {
-    @Autowired
-    private CartService cartService;
+
+    private final  CartService cartService;
+
+    private final CheckoutCartRepository checkoutCartRepository;
+
 
     @Value("${badals.checkout-app}")
     String checkoutAppUrl;
 
     @Autowired
     private LocaleResolver locale;
+
+    public CartMutation(CartService cartService, CheckoutCartRepository checkoutCartRepository) {
+        this.cartService = cartService;
+        this.checkoutCartRepository = checkoutCartRepository;
+    }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
     public CartDTO updateCart(final String secureKey, final List<CartItemDTO> items) {
@@ -76,6 +85,20 @@ public class CartMutation implements GraphQLMutationResolver {
     @PreAuthorize("hasRole('ROLE_USER')")
     public CheckoutCart createCheckoutSessionWithCart(final String secureKey, final List<CartItemDTO> items) {
         CheckoutCart cart = cartService.createCheckoutWithCart(secureKey, items);
+        return cart;
+    }
+
+/*    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public CheckoutCart createCart(CheckoutCart cart) {
+        cart = cartService.createCustomCart(cart);
+        //cart = checkoutCartRepository.save(cart);
+        return cart;
+    }*/
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public CheckoutCart createCart(CheckoutCart cart) {
+        cart.setSecureKey(CartService.createUIUD());
+        cart = checkoutCartRepository.save(cart);
         return cart;
     }
 }
