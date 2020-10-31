@@ -524,6 +524,7 @@ public class ProductService {
             String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
             product.setRef(Long.valueOf(ref));
             product.setSlug(ref);
+            product.setStub(true);
         }
         else
             product = productOptional.get();
