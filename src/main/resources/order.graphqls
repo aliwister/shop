@@ -158,7 +158,7 @@ type CheckoutCart {
     #tenantId: Long
 }
 input LineItemInput {
-    productId: Int
+    productId: Long
     sku: String
     image: String
     name: String
@@ -168,6 +168,19 @@ input LineItemInput {
     subTotal: Float
     url: String
 }
+
+input AddressPojo {
+    id: ID
+    line1: String
+    line2: String
+    firstName: String
+    lastName: String
+    mobile: String
+    city: String
+    alias: String
+    country: String
+}
+
 input CheckoutCartInput {
     id: ID
     ref: String
@@ -175,7 +188,7 @@ input CheckoutCartInput {
     phone: String
     email: String
     secureKey: String
-    #addresses: [Address]
+    addresses: [AddressPojo]
     carrier: String
     currency: String
     items: [LineItemInput]

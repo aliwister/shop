@@ -293,4 +293,8 @@ public class CartService {
         cart.setCartState(CartState.CLOSED);
         cartRepository.save(cart);
     }
+
+   public CheckoutCart createCustomCart(CheckoutCart cart) {
+        return cart;
+   }
 }

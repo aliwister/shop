@@ -189,13 +189,6 @@ public class AdminMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public CheckoutCart createCart(CheckoutCart cart) {
-        cart.setSecureKey(CartService.createUIUD());
-        cart = checkoutCartRepository.save(cart);
-        return cart;
-    }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PresignedUrl getUploadUrl(String filename, String contentType) {
         String objectKey = filename;
         URL url = awsService.presignPutUrl(objectKey, contentType);

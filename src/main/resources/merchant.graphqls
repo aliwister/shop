@@ -70,8 +70,8 @@ input AddProductInput {
       ref: String
       discountInPercent: Int
       merchantId: Int
-            url: String
-            dial: String
+      url: String
+      dial: String
 }
 
 extend type Query {
@@ -91,9 +91,9 @@ extend type Mutation {
     approveProduct(id: ID): Product
     getImageUploadUrl(filename: String, contentType: String): PresignedUrl
     getUploadUrl(filename: String, contentType: String): PresignedUrl
-
     importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
     createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long) : MerchantProduct
+    createStub(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long) : MerchantProduct
     getAdminImageUploadUrl(filename: String, merchant: String, contentType: String): PresignedUrl
     getAdminFile(filename: String, contentType: String): PresignedUrl
 }

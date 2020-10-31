@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 //@Accessors(fluent = true)
 public class LineItem implements Serializable {
-    Integer productId;
+    Long productId;
     String sku;
     String unit;
     String ref;
@@ -21,4 +21,5 @@ public class LineItem implements Serializable {
     BigDecimal weight;
     Double subTotal;
     String url;
+    Integer availability;
 }

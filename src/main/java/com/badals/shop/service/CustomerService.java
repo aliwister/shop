@@ -59,7 +59,6 @@ public class CustomerService {
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
-
     /**
      * Get one customer by id.
      *
@@ -83,10 +82,11 @@ public class CustomerService {
         customerRepository.deleteById(id);
     }
 
-
     public Customer findByEmail(String email) {
         return customerRepository.findByEmail(email).orElse(null);
     }
 
-
+    public CustomerDTO findByMobileJoinAddresses(String mobile) {
+        return customerRepository.findByMobileJoinAddresses(mobile).map(customerMapper::toDtoWitAddresses).get();
+    }
 }

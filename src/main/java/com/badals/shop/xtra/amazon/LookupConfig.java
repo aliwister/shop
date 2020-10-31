@@ -22,8 +22,24 @@ public class LookupConfig {
    @Value("${pas.secret}")
    private String pasSecretKey;
 
-   @Value("${pas.tag}")
+   @Value("${pas.us.tag}")
    private String pasTag;
+
+   @Value("${pas.us.host}")
+   private String pasHost;
+
+   @Value("${pas.us.region}")
+   private String pasRegion;
+
+   @Value("${pas.uk.tag}")
+   private String pasUkTag;
+
+   @Value("${pas.uk.host}")
+   private String pasUkHost;
+
+   @Value("${pas.uk.region}")
+   private String pasUkRegion;
+
 
    @Value("${mws.key}")
    private String mwsAccessKeyId;
@@ -41,13 +57,23 @@ public class LookupConfig {
    private String ebayAppId;
 
 
-   @Bean
+   @Bean(name="us")
    public PasLookup pasLookup() throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException {
 
       System.out.println("======================================================"+pasAccessKeyId);
 
       final SignedRequestsHelper signedRequestsHelper = new SignedRequestsHelper(pasAccessKeyId, pasSecretKey);
-      final PasLookup pasLookup = new PasLookup(pasAccessKeyId, pasSecretKey, pasTag);
+      final PasLookup pasLookup = new PasLookup(pasAccessKeyId, pasSecretKey, pasTag, pasHost, pasRegion);
+      return pasLookup;
+   }
+
+   @Bean(name="uk")
+   public PasLookup pasUkLookup() throws InvalidKeyException, UnsupportedEncodingException, NoSuchAlgorithmException {
+
+      System.out.println("======================================================"+pasAccessKeyId);
+
+      final SignedRequestsHelper signedRequestsHelper = new SignedRequestsHelper(pasAccessKeyId, pasSecretKey);
+      final PasLookup pasLookup = new PasLookup(pasAccessKeyId, pasSecretKey, pasUkTag, pasUkHost, pasUkRegion);
       return pasLookup;
    }
 

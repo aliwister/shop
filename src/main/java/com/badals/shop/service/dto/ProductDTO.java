@@ -116,6 +116,8 @@ public class ProductDTO implements Serializable {
 
     List<MerchantStockDTO> merchantStock;
 
+    Long merchantId;
+
     String browseNode;
 
     List<String> features;

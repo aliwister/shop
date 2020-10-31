@@ -4,18 +4,7 @@ enum CartState {
     CLOSED
 }
 
-type Customer {
-    id: ID!
-}
 
-type Address {
-    firstName: String
-    lastName: String
-    line1: String
-    line2: String
-    city: String
-    phone: String
-}
 type Cart {
     id: ID!,
     secureKey: String,
@@ -53,7 +42,7 @@ input CartItemInput {
 }
 
 type CheckoutCartItem {
-    productId: Int
+    productId: Long
     sku: String
     image: String
     name: String
