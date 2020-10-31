@@ -313,6 +313,7 @@ extend type Query {
     parentOf(sku: String): String
     mws(sku: String):Product
     pas(sku: String):Product
+    pasUk(sku: String):Product
     ebay(id: String):Product
     hashtags(        offset: Int = 0
                      limit: Int = 10): HashtagResponse
@@ -320,10 +321,10 @@ extend type Query {
                      limit: Int = 10): HashtagResponse
 
     relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
+    findByKeyword(keyword: String): ProductResponse
 }
 
 extend type Mutation {
-
     createNewProduct(product: ProductInput):Product,
     indexProduct(id: Int): Attribute,
     addI18n(id: Int,

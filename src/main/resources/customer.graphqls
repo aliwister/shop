@@ -6,6 +6,7 @@ type Customer {
     mobile: String
     totalPoints: Long
     spentPoints: Long
+    addresses: [Address]
 }
 
 type Address {
@@ -16,6 +17,7 @@ type Address {
     line2: String
     city: String
     mobile: String
+    alias: String
 }
 
 type AddressInput {
@@ -39,6 +41,7 @@ extend type Mutation {
 
 extend type Query {
     getAddresses(customerId: Int): [Address]
+    customer(mobile: String): Customer
     #getAddress(addressId: Int): Address
     me: Customer
     meTest(id: Long): Customer
