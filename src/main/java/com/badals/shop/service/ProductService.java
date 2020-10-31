@@ -597,7 +597,7 @@ public class ProductService {
             speedDialService.save(new SpeedDialDTO().dial(dto.getDial()).ref(product.getRef()).expires(Instant.now()));
         }
 */
-
+        dto = addProductMapper.toDto(product);
         if(isSaveES)
             productSearchRepository.save(dto);
         return  addProductMapper.toDto(product);
@@ -771,7 +771,7 @@ public class ProductService {
     }
 
     public ProductResponse findByKeyword(String keyword) {
-        List<AddProductDTO> result = searchPageable(keyword, 1, 10 );
+        List<AddProductDTO> result = searchPageable(keyword, 0, 10 );
         ProductResponse response = new ProductResponse();
         response.setTotal(result.size());
         response.setHasMore(false);
