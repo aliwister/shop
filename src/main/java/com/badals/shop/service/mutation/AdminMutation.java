@@ -188,6 +188,13 @@ public class AdminMutation implements GraphQLMutationResolver {
         return payment;
     }
 
+    @PreAuthorize("hasRole('ROLE_SUPERADMIN')")
+    public OrderDTO addDiscount(Long orderId, BigDecimal amount) {
+        OrderDTO order = orderService.addDiscount(orderId, amount);
+        // Return
+        return order;
+    }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PresignedUrl getUploadUrl(String filename, String contentType) {
         String objectKey = filename;
