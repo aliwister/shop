@@ -248,13 +248,19 @@ public class OrderService {
    }
 
     public OrderDTO setOrderState(Long orderId, OrderState os) {
-        Order order = orderRepository.save(orderRepository.getOne(orderId).orderState(os));
+        Order order = orderRepository.getOne(orderId);
+        order.setOrderState(os);
+        if(!os.equals(OrderState.CANCELLED)) {
+            order.setSubtotal(calculateSubtotal(order));
+            order.setTotal(calculateTotal(order));
+        }
         return save(order);
     }
 
     public OrderDTO setStatus(String id, OrderState state) {
         Order order = orderRepository.findByReference(id).get();
         order.setOrderState(state);
+
         return save(order);
     }
 
@@ -301,6 +307,15 @@ public class OrderService {
            mailService.sendEditMail(dto.getCustomer(), dto, reason);
        return dto;
    }
+
+   public OrderDTO addDiscount(Long id, BigDecimal amount) {
+       Order order = orderRepository.getOne(id);
+       order.setDiscountsTotal(amount);
+       order.setSubtotal(calculateSubtotal(order));
+       order.setTotal(calculateTotal(order));
+       return save(order);
+   }
+
     public BigDecimal calculateSubtotal(Order order) {
         BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
         return sum;
