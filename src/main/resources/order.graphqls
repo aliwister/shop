@@ -167,6 +167,7 @@ input LineItemInput {
     cost: Float
     subTotal: Float
     url: String
+    ref: String
 }
 
 input AddressPojo {
@@ -232,6 +233,7 @@ extend type Mutation {
     #cancelOrder(id: ID): Order
     refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
 
+    addDiscount(id: ID, amount: BigDecimal): Order
 }
 
 extend type Query {
