@@ -1,11 +1,16 @@
 package com.badals.shop.service.dto;
 import com.badals.shop.domain.enumeration.OrderState;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
+import javax.persistence.Column;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,7 +21,6 @@ import java.util.Set;
 public class PurchaseDTO implements Serializable {
 
     private Long id;
-
 
     private String ref;
 
@@ -40,7 +44,6 @@ public class PurchaseDTO implements Serializable {
 
     private BigDecimal total;
 
-
     private Long deliveryAddressId;
 
     private String deliveryAddressId_address;
@@ -56,6 +59,14 @@ public class PurchaseDTO implements Serializable {
     private OrderState orderState;
 
     private Set<PurchaseItemDTO> purchaseItems;
+
+    private String createdBy;
+
+    private Date createdDate;
+
+    private String lastModifiedBy;
+
+    private Date lastModifiedDate;
 
     @Override
     public boolean equals(Object o) {
