@@ -175,6 +175,8 @@ public class PurchaseService {
         purchase.setDeliveryTotal(dto.getDeliveryTotal());
         purchase.setDiscountTotal(dto.getDiscountTotal());
         purchase.setTaxesTotal(dto.getTaxesTotal());
+        purchase.setRef(dto.getRef());
+        purchase.setCurrency(dto.getCurrency());
         if(dto.getMerchantId() != null)
             purchase.setMerchant(merchantRepository.getOne(dto.getMerchantId()));
 
