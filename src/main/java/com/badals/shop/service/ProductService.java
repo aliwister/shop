@@ -736,6 +736,7 @@ public class ProductService {
 
     public ProductDTO lookupEbay(String id) throws NoOfferException, ProductNotFoundException, PricingException {
         Product node = ebayService.lookup(id, false);
+        productSearchRepository.save(addProductMapper.toDto(node));
         return productMapper.toDto(node);
     }
 
