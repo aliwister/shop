@@ -266,10 +266,11 @@ public class ProductService {
         //if(product.getPrice() == null)
         //    throw new PricingException("Invalid price");
         //if(isSaveES)
-        productSearchRepository.save(addProductMapper.toDto(product));
+        saveToElastic(product);
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
 
     }
+
     public ProductDTO getProductByDial(String dial) throws ProductNotFoundException, PricingException {
         Long ref = speedDialService.findRefByDial(dial);
         return productRepository.findBySlugJoinCategories(String.valueOf(ref)).map(productMapper::toDto).orElse(null);
@@ -334,7 +335,7 @@ public class ProductService {
         dto.setMerchant(currentMerchant);
         dto.setImported(false);
         dto.setIndexed(false);
-        productSearchRepository.save(dto);
+        saveToElastic(dto);
         return dto;
     }
 
@@ -343,7 +344,7 @@ public class ProductService {
     }*/
 
     public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long merchantId, String currentTenant, boolean isSaveES) {
-        Product product = productRepository.findOneByRef(dto.getId()).orElse(new Product());
+        Product product = productRepository.findById(dto.getId()).orElse(new Product());
         CRC32 checksum = new CRC32();
 /*        if(dto.getId() == null) {
             product = addProductMapper.toEntity(dto);
@@ -409,14 +410,14 @@ public class ProductService {
         //dto.setImported(true);
 
         if(isSaveES)
-            productSearchRepository.save(dto);
+            saveToElastic(dto);
         return  addProductMapper.toDto(product);
     }
 
 
 
     public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {
-        Product product = productRepository.findOneByRef(dto.getId()).orElse(new Product());
+        Product product = productRepository.findById(dto.getId()).orElse(new Product());
         CRC32 checksum = new CRC32();
         if(dto.getVariationType() == null)
             dto.setType("SIMPLE");
@@ -431,7 +432,7 @@ public class ProductService {
             product.setSlug(ref);
         }
         else {
-            product = productRepository.findById(dto.getId()).get();
+            product = productRepository.findOneByRef(dto.getId()).get();
             if(dto.getRef() == null || dto.getRef().equals("")) {
                 String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
                 product.setRef(Long.valueOf(ref));
@@ -503,14 +504,14 @@ public class ProductService {
         }
 
         if(isSaveES)
-            productSearchRepository.save(dto);
+            saveToElastic(dto);
         return  addProductMapper.toDto(product);
     }
     public AddProductDTO createStub(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) throws Exception {
 
         Optional<Product> productOptional = null;
         if(dto.getId() != null)
-            productOptional = productRepository.findOneByRef(dto.getId());
+            productOptional = productRepository.findById(dto.getId());
         else
             productOptional = productRepository.findOneBySkuAndMerchantId(dto.getSku(), dto.getMerchantId());
 
@@ -599,7 +600,7 @@ public class ProductService {
 */
         dto = addProductMapper.toDto(product);
         if(isSaveES)
-            productSearchRepository.save(dto);
+            saveToElastic(dto);
         return  addProductMapper.toDto(product);
     }
 
@@ -634,7 +635,7 @@ public class ProductService {
             doc.setTenant(currentTenant);
             AlgoliaProduct algoliaProduct = algoliaProductMapper.addProductToAlgoliaProduct(doc);
 
-            productSearchRepository.save(doc);
+            saveToElastic(doc);
            index.saveObject(algoliaProduct);
 
         }
@@ -736,7 +737,8 @@ public class ProductService {
 
     public ProductDTO lookupEbay(String id) throws NoOfferException, ProductNotFoundException, PricingException {
         Product node = ebayService.lookup(id, false);
-        productSearchRepository.save(addProductMapper.toDto(node));
+        //productSearchRepository.save(addProductMapper.toDto(node));
+        saveToElastic(node);
         return productMapper.toDto(node);
     }
 
@@ -787,8 +789,19 @@ public class ProductService {
 
         p.setHashtags(hashs);
         productRepository.save(p);
-        productSearchRepository.save(addProductMapper.toDto(p));
+        //productSearchRepository.save(addProductMapper.toDto(p));
+        saveToElastic(p);
     }
+
+    private void saveToElastic(Product product) {
+        AddProductDTO dto = addProductMapper.toDto(product);
+        saveToElastic(dto);
+    }
+    private void saveToElastic(AddProductDTO dto) {
+        dto.setId(dto.getRef());
+        productSearchRepository.save(dto);
+    }
+
 
 /*
     public <U> U log(Customer loginUser, String slug, cookie) {
