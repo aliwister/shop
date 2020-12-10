@@ -98,6 +98,17 @@ public class Order implements Serializable {
    @Column(name="discounts_total")
    private BigDecimal discountsTotal;
 
+   @Column(name="coupon_name")
+   private String couponName;
+
+   public String getCouponName() {
+      return couponName;
+   }
+
+   public void setCouponName(String couponName) {
+      this.couponName = couponName;
+   }
+
    @CreatedDate
    @Column(name = "created_date")
    private Date createdDate;

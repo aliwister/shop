@@ -51,6 +51,7 @@ type Order {
     total: BigDecimal
     deliveryTotal: BigDecimal
     discountsTotal: BigDecimal
+    couponName: String
     subtotal: BigDecimal
     carrier: String
     paymentMethod: String
@@ -238,7 +239,7 @@ extend type Mutation {
     #cancelOrder(id: ID): Order
     refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
 
-    addDiscount(id: ID, amount: BigDecimal): Message
+    addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
 }
 
 extend type Query {
