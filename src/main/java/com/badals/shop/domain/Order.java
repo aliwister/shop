@@ -98,6 +98,7 @@ public class Order implements Serializable {
    @Column(name="discounts_total")
    private BigDecimal discountsTotal;
 
+   @NotAudited
    @Column(name="coupon_name")
    private String couponName;
 
