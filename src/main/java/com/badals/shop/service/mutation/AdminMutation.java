@@ -188,9 +188,9 @@ public class AdminMutation implements GraphQLMutationResolver {
         return payment;
     }
 
-    @PreAuthorize("hasRole('ROLE_SUPERADMIN')")
-    public Message addDiscount(Long orderId, BigDecimal amount) {
-        OrderDTO order = orderService.addDiscount(orderId, amount);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Message addDiscount(Long orderId, BigDecimal amount, String couponName) {
+        OrderDTO order = orderService.addDiscount(orderId, amount, couponName);
         // Return
         return new Message("Discount Added successfully");
     }
