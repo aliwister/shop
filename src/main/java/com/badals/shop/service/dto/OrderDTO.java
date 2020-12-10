@@ -54,6 +54,8 @@ public class OrderDTO implements Serializable {
 
     private BigDecimal discountsTotal;
 
+    private String couponName;
+
 
     private Date createdDate;
 

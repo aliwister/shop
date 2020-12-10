@@ -308,9 +308,10 @@ public class OrderService {
        return dto;
    }
 
-   public OrderDTO addDiscount(Long id, BigDecimal amount) {
+   public OrderDTO addDiscount(Long id, BigDecimal amount, String couponName) {
        Order order = orderRepository.getOne(id);
        order.setDiscountsTotal(amount);
+       order.setCouponName(couponName);
        order.setSubtotal(calculateSubtotal(order));
        order.setTotal(calculateTotal(order));
        return save(order);
