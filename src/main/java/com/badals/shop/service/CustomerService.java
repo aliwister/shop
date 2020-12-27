@@ -83,7 +83,7 @@ public class CustomerService {
     }
 
     public Customer findByEmail(String email) {
-        return customerRepository.findByEmail(email).orElse(null);
+        return customerRepository.findByEmailIgnoreCase(email).orElse(null);
     }
 
     public CustomerDTO findByMobileJoinAddresses(String mobile) {
