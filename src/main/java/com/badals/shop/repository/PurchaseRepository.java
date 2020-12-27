@@ -32,7 +32,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
    @Query("from Purchase p left join fetch p.merchant left join fetch p.deliveryAddress left join fetch p.purchaseItems i left join fetch i.orderItems where p.id = ?1 order by i.sequence")
    Optional<Purchase> findForPurchaseDetails(Long id);
 
-   @Query(value="Select id, product_name as productName, outstanding as quantity, image, weight, price, url, sku, cost, order_id as orderId, product_id as productId, attributes from purchase_queue", nativeQuery=true)
+   @Query(value="Select id, product_name as productName, outstanding as quantity, image, weight, price, url, sku, cost, order_id as orderId, product_id as productId, attributes, merchantId from purchase_queue", nativeQuery=true)
    List<PurchaseQueue> getPurchaseQueue();
 
    @Query(value="SELECT pit.description as productName, pit.quantity - ifnull(SUM(si.quantity),0) as quantity, pp.image, pp.weight, pp.price, pp.url, pp.sku FROM shop.purchase_item pit  " +
