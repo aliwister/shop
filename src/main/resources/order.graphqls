@@ -33,6 +33,7 @@ type OrderItem {
     productUrl: String
     productSku: String
     productId: Long
+    productMerchantId: Long
     po: Long
 }
 
@@ -138,6 +139,7 @@ type PurchaseQueue {
     productId: Long
     orderId: Long
     attributes: String
+    merchantId: Long
 }
 
 type LineItem {

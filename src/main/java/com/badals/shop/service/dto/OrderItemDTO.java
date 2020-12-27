@@ -48,6 +48,7 @@ public class OrderItemDTO implements Serializable {
     private String productUrl;
     private String productSku;
     private String productId;
+    private Long productMerchantId;
 
     private String __typename;
 

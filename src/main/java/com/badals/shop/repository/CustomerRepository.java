@@ -13,7 +13,9 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
-   public Optional<Customer> findByEmail(String email);
+
+
+   public Optional<Customer> findByEmailIgnoreCase(String email);
 
    @Query("from Customer c join fetch c.addresses where c.mobile = ?1")
    public Optional<Customer> findByMobileJoinAddresses(String mobile);
