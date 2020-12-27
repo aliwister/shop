@@ -17,6 +17,7 @@ public interface PurchaseQueue {
    String getSku();
    Long getOrderId();
    Long getProductId();
+   Long getMerchantId();
 
    //@Value("T(org.springframework.util.CollectionUtils).arrayToList(attributes.split(','))")
    String getAttributes();
