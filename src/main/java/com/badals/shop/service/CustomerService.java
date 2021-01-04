@@ -87,6 +87,10 @@ public class CustomerService {
     }
 
     public CustomerDTO findByMobileJoinAddresses(String mobile) {
-        return customerRepository.findByMobileJoinAddresses(mobile).map(customerMapper::toDtoWitAddresses).get();
+        List<Customer> customerList = customerRepository.findByMobileJoinAddresses(mobile);
+        if(customerList.size() > 0)
+            return customerMapper.toDtoWitAddresses(customerRepository.findByMobileJoinAddresses(mobile).get(0));
+
+        return null;
     }
 }
