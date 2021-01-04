@@ -277,7 +277,8 @@ public class CartService {
 
         CheckoutCart checkoutCart = checkoutCartRepository.findBySecureKey(cart.getSecureKey()).orElse(new CheckoutCart());
         checkoutCart.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
-        checkoutCart.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).collect(Collectors.toList()));
+        if (customer.getAddresses() != null && customer.getAddresses().size() > 0)
+            checkoutCart.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).collect(Collectors.toList()));
         checkoutCart.setSecureKey(cart.getSecureKey());
         checkoutCart.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
         checkoutCart.setEmail(cart.getCustomer().getEmail());
