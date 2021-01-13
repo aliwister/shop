@@ -1,14 +1,20 @@
 package com.badals.shop.domain;
 
 import com.badals.shop.domain.enumeration.OrderState;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.envers.Audited;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "action")
-public class Action extends Auditable implements Serializable {
+@EntityListeners(AuditingEntityListener.class)
+public class Action implements Serializable {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +26,30 @@ public class Action extends Auditable implements Serializable {
    private String objectId;
    private String state;
    private String comment;
+
+   @CreatedDate
+   @Column(name = "created_date")
+   private Date createdDate;
+
+   public Date getCreatedDate() {
+      return createdDate;
+   }
+
+   public void setCreatedDate(Date createdDate) {
+      this.createdDate = createdDate;
+   }
+
+   public String getCreatedBy() {
+      return createdBy;
+   }
+
+   public void setCreatedBy(String createdBy) {
+      this.createdBy = createdBy;
+   }
+
+   @Column(name = "created_by")
+   private String createdBy;
+
 
    public Long getId() {
       return id;
