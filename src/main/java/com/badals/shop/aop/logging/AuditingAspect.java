@@ -18,6 +18,7 @@ import org.springframework.ui.ExtendedModelMap;
 import org.springframework.web.bind.ServletRequestDataBinder;
 
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Aspect
 @Component
@@ -49,12 +50,11 @@ public class AuditingAspect {
     private void addAction(ProceedingJoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         String methodName = joinPoint.getSignature().getName();
-        User principal = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String principal =  Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication().getName()).orElse(null);
         String className = joinPoint.getSignature().getDeclaringTypeName();
         Timestamp timestamp = new Timestamp(new java.util.Date().getTime());
         // only log those methods called by an end user
-        if(principal.getUsername() != null)
-            System.out.println(principal.getUsername());
+
 
         System.out.println(methodName);
         CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
@@ -63,6 +63,11 @@ public class AuditingAspect {
         Action action = new Action();
         action.setAction(methodName);
         action.setObject(getObject(className));
+
+        if(principal != null)
+            action.setCreatedBy(principal);
+
+
 
         String state = "";
         for(Object o : args) {
@@ -89,6 +94,9 @@ public class AuditingAspect {
     private String getObject(String className) {
         if(className.toLowerCase().endsWith("mutation"))
             return className.substring(33, className.length() - 8);
+
+        if(className.toLowerCase().endsWith("query"))
+            return "product";
 
         return "order";
     }
