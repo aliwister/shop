@@ -32,9 +32,21 @@ public class AuditingAspect {
     @Autowired
     ActionRepository actionRepository;
 
-    @Around("execution(* com.badals.shop.service.mutation.*.*(..))")
-    public Object beforeWebMethodExecution(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("execution(* com.badals.shop.service.query.ProductQuery.product(..)) ||" +
+            "execution(* com.badals.shop.service.query.ProductQuery.getProductBySku(..)) ||" +
+            "execution(* com.badals.shop.service.query.ProductQuery.getProductByDial(..))")
+    public Object beforeWebMethodExecution1(ProceedingJoinPoint joinPoint) throws Throwable {
+        addAction(joinPoint);
+        return joinPoint.proceed();
+    }
 
+    @Around("execution(* com.badals.shop.service.mutation.*.*(..))")
+    public Object beforeWebMethodExecution2(ProceedingJoinPoint joinPoint) throws Throwable {
+        addAction(joinPoint);
+        return joinPoint.proceed();
+    }
+
+    private void addAction(ProceedingJoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         String methodName = joinPoint.getSignature().getName();
         User principal = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -64,29 +76,19 @@ public class AuditingAspect {
                 action.setState(value);*/
             if (key.equalsIgnoreCase("comment"))
                 action.setComment(value);
-            if (key.toLowerCase().endsWith("id"))
+            if (key.toLowerCase().endsWith("id") || key.toLowerCase().endsWith("key") || key.toLowerCase().endsWith("slug") || key.toLowerCase().endsWith("sku") || key.toLowerCase().endsWith("dial") )
                 action.setObjectId(value);
             else
                 state += " "+key+ "="+value;
-
             i++;
         }
         action.setState(state);
         actionRepository.save(action);
-        return joinPoint.proceed();
     }
 
     private String getObject(String className) {
-        if(className.equalsIgnoreCase("AdminMutation"))
-            return "order";
-        if(className.equalsIgnoreCase("OrderMutation"))
-            return "order";
-        if(className.equalsIgnoreCase("PaymentMutation"))
-            return "payment";
-        if(className.equalsIgnoreCase("ShipmentMutation"))
-            return "shipment";
-        if(className.equalsIgnoreCase("PurchaseMutation"))
-            return "purchase";
+        if(className.toLowerCase().endsWith("mutation"))
+            return className.substring(33, className.length() - 8);
 
         return "order";
     }
