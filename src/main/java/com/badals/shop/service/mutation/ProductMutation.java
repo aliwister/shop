@@ -8,6 +8,7 @@ import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
 
+import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
@@ -60,6 +61,8 @@ public class ProductMutation implements GraphQLMutationResolver {
     public ProductDTO createNewProduct(final ProductDTO product) {
         return this.productService.createNewProduct(product);
     }
+
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Attribute indexProduct(final long id) {
         return this.productService.indexProduct(id);
