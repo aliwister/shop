@@ -259,4 +259,5 @@ extend type Query {
     purchaseQueue: [PurchaseQueue]
     merchants: [Merchant]
     payments(orderId: ID) : [Payment]
+    orderActions(orderId: ID) : [Action]
 }
