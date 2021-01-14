@@ -23,4 +23,13 @@ type Message {
     value: String
 }
 
-
+type Action {
+    : Long
+    : String
+    : String
+    : String
+    : String
+    : String
+    : Date
+    : String
+}
