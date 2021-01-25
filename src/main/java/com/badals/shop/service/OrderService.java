@@ -35,6 +35,9 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 /**
  * Service Implementation for managing {@link Order}.
@@ -163,10 +166,26 @@ public class OrderService {
     }
 
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText) {
+        if(searchText != null && searchText.trim().length() > 1)
+            return searchOrders(orderState, offset, limit, searchText);
+
         List<Order> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();
         response.setTotal(orders.size());
         response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
+        Integer total = orderRepository.countForState(orderState);
+        response.setHasMore((limit+offset) < total);
+        return response;
+
+    }
+
+    public OrderResponse searchOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText) {
+
+        OrderResponse response = new OrderResponse();
+        List<OrderDTO> orders = StreamSupport
+                .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit)).spliterator(), false).collect(Collectors.toList());
+        response.setItems(orders);
+        response.setTotal(orders.size());
         Integer total = orderRepository.countForState(orderState);
         response.setHasMore((limit+offset) < total);
         return response;
