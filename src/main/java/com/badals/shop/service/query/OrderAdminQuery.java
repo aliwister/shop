@@ -36,7 +36,7 @@ public class OrderAdminQuery extends ShopQuery implements GraphQLQueryResolver {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderResponse ordersA(List<OrderState> orderState, Integer offset, Integer limit, String searchText) throws OrderNotFoundException {
-        return  orderService.getOrders(orderState, offset, limit, null);
+        return  orderService.getOrders(orderState, offset, limit, searchText);
         //return orders;
     }
 
