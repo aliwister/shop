@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,13 +184,12 @@ public class OrderService {
 
         OrderResponse response = new OrderResponse();
         List<OrderDTO> orders = StreamSupport
-                .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit)).spliterator(), false).collect(Collectors.toList());
+                .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
         response.setItems(orders);
         response.setTotal(orders.size());
         Integer total = orderRepository.countForState(orderState);
         response.setHasMore((limit+offset) < total);
         return response;
-
     }
 
     public void sendPaymnetMessage(Long id) {
