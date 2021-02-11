@@ -1254,14 +1254,15 @@
     </profiles>
     <repositories>
         <repository>
+            <id>shop.local</id>
+            <name>shop-repo</name>
+            <url>https://mymavenrepo.com/repo/UuYg0PAIB91fqre5B1Q3/</url>
+        </repository>
+        <repository>
             <id>jcenter</id>
             <url>https://jcenter.bintray.com/</url>
         </repository>
-        <repository>
-            <id>shop.local</id>
-            <name>shop-repo</name>
-            <url>file:${project.basedir}/repo</url>
-        </repository>
+
     </repositories>
 
 </project>
