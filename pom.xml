@@ -431,17 +431,17 @@
             <version>1.18.10</version>
         </dependency>
         <dependency>
-            <groupId>local.badals</groupId>
+            <groupId>com.amazonservices</groupId>
             <artifactId>mws-client</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>local.badals</groupId>
+            <groupId>com.amazonservices</groupId>
             <artifactId>mws-products</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>local.badals</groupId>
+            <groupId>com.amazonservices</groupId>
             <artifactId>paapi5</artifactId>
             <version>1.0</version>
         </dependency>
