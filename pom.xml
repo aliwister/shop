@@ -431,17 +431,17 @@
             <version>1.18.10</version>
         </dependency>
         <dependency>
-            <groupId>com.amazonservices</groupId>
+            <groupId>local.badals</groupId>
             <artifactId>mws-client</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.amazonservices</groupId>
+            <groupId>local.badals</groupId>
             <artifactId>mws-products</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.amazonservices</groupId>
+            <groupId>local.badals</groupId>
             <artifactId>paapi5</artifactId>
             <version>1.0</version>
         </dependency>
@@ -1260,7 +1260,7 @@
         <repository>
             <id>shop.local</id>
             <name>shop-repo</name>
-            <url>file:${project.basedir}/maven-repository</url>
+            <url>file:${project.basedir}/repo</url>
         </repository>
     </repositories>
 
