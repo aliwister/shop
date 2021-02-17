@@ -7,6 +7,7 @@ import com.badals.shop.service.MerchantService;
 import com.badals.shop.service.dto.MerchantStockDTO;
 import com.badals.shop.service.dto.ProductLangDTO;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
