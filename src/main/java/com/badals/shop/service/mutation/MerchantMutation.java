@@ -11,6 +11,7 @@ import com.badals.shop.xtra.amazon.Pas5Service;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
+import java.io.File;
 import java.net.URL;
 import java.time.Duration;
 import java.util.List;
@@ -42,6 +44,9 @@ public class MerchantMutation implements GraphQLMutationResolver {
     private final MessageSource messageSource;
 
     private final UserService userService;
+
+    @Value("${badals.cdnUrl}")
+    private String cdnUrl;
 
 
     public MerchantMutation(ProductService productService, Pas5Service pasService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
@@ -86,7 +91,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
         String m = TenantContext.getCurrentMerchant();
         String objectKey = "_m/" + m + "/" + filename;
         URL url = awsService.presignPutUrl(objectKey, contentType);
-        return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+ m + "/" + filename, "200");
+        return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + filename, "200");
 /*        try {
             S3Presigner presigner = S3Presigner.builder().region(region).build();
 
@@ -106,14 +111,14 @@ public class MerchantMutation implements GraphQLMutationResolver {
     public PresignedUrl getAdminFile(String filename, String contentType) {
         String objectKey = filename;
         URL url = awsService.presignGetUrl(objectKey, contentType);
-        return new PresignedUrl(url.toString(), "https://cdn.badals.com/" + filename, "200");
+        return new PresignedUrl(url.toString(), cdnUrl + "/" + filename, "200");
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PresignedUrl getAdminImageUploadUrl(String filename, String merchant, String contentType) {
         String objectKey = "_m/" + merchant + "/" + filename;
         URL url = awsService.presignPutUrl(objectKey, contentType);
-        return new PresignedUrl(url.toString(), "https://cdn.badals.com/"+ merchant + "/" + filename, "200");
+        return new PresignedUrl(url.toString(), cdnUrl + "/" + merchant + "/" + filename, "200");
 /*        try {
             S3Presigner presigner = S3Presigner.builder().region(region).build();
 
