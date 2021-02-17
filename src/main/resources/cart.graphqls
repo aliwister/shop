@@ -4,26 +4,6 @@ enum CartState {
     CLOSED
 }
 
-type AddressPojo {
-    id: ID
-    firstName: String
-    lastName: String
-    line1: String
-    line2: String
-    city: String
-    mobile: String
-    alias: String
-}
-
-type AddressPojoInput {
-    line1: String
-    line2: String
-    name: String
-    landmark: String
-    city: String
-    country: String
-}
-
 type Cart {
     id: ID!,
     secureKey: String,
@@ -60,31 +40,6 @@ input CartItemInput {
     quantity: Int
 }
 
-type CheckoutCartItem {
-    productId: Long
-    sku: String
-    image: String
-    name: String
-    quantity: Float
-    price: Float
-    subTotal: Float
-}
-type CheckoutCart {
-    id: ID!
-    ref: String
-    name: String
-    phone: String
-    email: String
-    secureKey: String
-    deliveryAddress: AddressPojo
-    invoiceAddress: AddressPojo
-    addresses: [AddressPojo]
-    paymentMethods: [PaymentMethod]
-    carrier: String
-    currency: String
-    items: [CartItem]
-    tenantId: Long
-}
 
 type CheckoutSession {
     redirectUrl: String,
