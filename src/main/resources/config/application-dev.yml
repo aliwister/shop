@@ -60,15 +60,15 @@ spring:
       hibernate.generate_statistics: false
   data:
     jest:
-      uri: https://d68af11bb6364c90b56a8215597289b1.eu-central-1.aws.cloud.es.io:9243
-      username: elastic
-      password: U4s3g1aeygWkZbbeK8urU7KM
+      uri: https://search-face-elastic-f5y3tcdz6idtcrgutxug4y4il4.eu-central-1.es.amazonaws.com
+      username:
+      password:
   # see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-nosql.html#boot-features-connecting-to-elasticsearch-jest
   elasticsearch:
     rest:
-      uris: https://d68af11bb6364c90b56a8215597289b1.eu-central-1.aws.cloud.es.io:9243
-      username: elastic
-      password: U4s3g1aeygWkZbbeK8urU7KM
+      uris: https://search-face-elastic-f5y3tcdz6idtcrgutxug4y4il4.eu-central-1.es.amazonaws.com
+      username:
+      password:
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
@@ -166,6 +166,19 @@ aws:
 
 badals:
   checkout-app: http://127.0.0.1:8081/checkout/start
+  cdnUrl: https://d4gk56dg16f6k.cloudfront.net
 
 ebay:
   app-id: BadalTra-5d42-45de-b09b-586ff14be57f
+
+graphiql:
+  mapping: /graphiql
+  endpoint:
+    graphql: /graphql
+    subscriptions: /subscriptions
+  subscriptions:
+    timeout: 30
+    reconnect: false
+  static:
+    basePath: /
+  enabled: true

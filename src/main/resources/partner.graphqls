@@ -1,0 +1,111 @@
+input PriceInput {
+    amount: Float
+    currency: String
+}
+
+type Attribute {
+    name: String
+    value: String
+}
+
+type VariationOption {
+    label: String
+    name: String
+    values: [String]
+}
+
+input VariationOptionInput {
+    label: String
+    name: String
+    values: [String]
+}
+
+type Variation {
+    ref: ID!
+    variationAttributes: [Attribute]
+}
+
+type PartnerProduct {
+      id: ID
+      sku: String
+      upc: String
+      ref: String
+      slug: String
+      price: BigDecimal
+      image: String
+      cost: BigDecimal
+      weight: BigDecimal
+
+      slug: String
+      type: String
+      unit: String
+
+      availability: Int
+      salePrice: BigDecimal
+      quantity: BigDecimal
+      discountInPercent: Int
+      gallery: [String]
+}
+
+type MerchantProductResponse {
+        items: [MerchantProduct]
+        total: Int!
+        hasMore: Boolean!
+}
+
+input PartnerProductInput {
+      id: Long
+      sku: String
+      upc: String
+      image: String
+      cost: BigDecimal
+      weight: BigDecimal
+      slug: String
+      type: String
+      unit: String
+      availability: Int
+      salePrice: BigDecimal
+      quantity: BigDecimal
+      ref: String
+      discountInPercent: Int
+      #variations: [VariationProductInput]
+      #prices: [PriceInput]
+      #langs: [ProductDescriptionInput]
+}
+
+input VariationProductInput {
+      id: Long
+      sku: String
+      upc: String
+      image: String
+      cost: BigDecimal
+      weight: BigDecimal
+      slug: String
+      type: String
+      unit: String
+      availability: Int
+      salePrice: BigDecimal
+      quantity: BigDecimal
+      ref: String
+      discountInPercent: Int
+}
+
+
+extend type Query {
+    partnerProduct(id: ID): PartnerProduct
+}
+
+extend type Mutation {
+    createPartnerProduct(product: PartnerProductInput) : Message
+    getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
+
+    #addPrice(price: PriceInput) : Message
+    #addLangFields(desc: ProductDescriptionInput) : Message
+    #addVariation(variation: VariationProductInput) : Message
+
+    #removePrice(price: PriceInput) : Message
+    #removeLangFields(desc: ProductDescriptionInput) : Message
+    #removeVariation(variation: VariationProductInput) : Message
+
+    #approveProduct(id: ID): Message
+}

@@ -186,6 +186,7 @@ mws:
 
 badals:
   checkout-app: https://face-checkout-test.herokuapp.com/checkout/start
+  cdnUrl: https://d4gk56dg16f6k.cloudfront.net
 
 ebay:
   app-id: BadalTra-5d42-45de-b09b-586ff14be57f
