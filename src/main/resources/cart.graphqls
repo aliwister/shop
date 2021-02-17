@@ -4,6 +4,25 @@ enum CartState {
     CLOSED
 }
 
+type AddressPojo {
+    id: ID
+    firstName: String
+    lastName: String
+    line1: String
+    line2: String
+    city: String
+    mobile: String
+    alias: String
+}
+
+type AddressPojoInput {
+    line1: String
+    line2: String
+    name: String
+    landmark: String
+    city: String
+    country: String
+}
 
 type Cart {
     id: ID!,
@@ -57,9 +76,9 @@ type CheckoutCart {
     phone: String
     email: String
     secureKey: String
-    deliveryAddress: Address
-    invoiceAddress: Address
-    addresses: [Address]
+    deliveryAddress: AddressPojo
+    invoiceAddress: AddressPojo
+    addresses: [AddressPojo]
     paymentMethods: [PaymentMethod]
     carrier: String
     currency: String
