@@ -15,9 +15,12 @@ import com.badals.shop.service.dto.SpeedDialDTO;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
+import com.badals.shop.service.mapper.PartnerProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.service.pojo.AddProductDTO;
 
+import com.badals.shop.service.pojo.ChildProduct;
+import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.util.S3Util;
 import com.badals.shop.service.util.ValidationUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
@@ -79,6 +82,7 @@ public class ProductService {
     private final AlgoliaProductMapper algoliaProductMapper;
     private final AddProductMapper addProductMapper;
 
+
     private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
     private final SpeedDialService speedDialService;
@@ -93,6 +97,7 @@ public class ProductService {
         this.pas5Service = pas5Service;
         this.messageSource = messageSource;
         this.addProductMapper = addProductMapper;
+
         this.productLangRepository = productLangRepository;
         this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
@@ -338,83 +343,6 @@ public class ProductService {
         saveToElastic(dto);
         return dto;
     }
-
-/*    public AddProductDTO createStubProduct(AddProductDTO dto) {
-
-    }*/
-
-    public AddProductDTO importMerchantProducts(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long merchantId, String currentTenant, boolean isSaveES) {
-        Product product = productRepository.findById(dto.getId()).orElse(new Product());
-        CRC32 checksum = new CRC32();
-/*        if(dto.getId() == null) {
-            product = addProductMapper.toEntity(dto);
-
-            product.setSku(dto.getSku());
-            checksum.update(dto.getSku().getBytes());
-            String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
-            product.setRef(Long.valueOf(ref));
-            product.setSlug(ref);
-        }
-        else {
-            product = productRepository.findById(dto.getId()).get();
-            if(dto.getRef() == null || dto.getRef().equals("")) {
-                String ref = currentMerchantId.toString() + String.valueOf(checksum.getValue());
-                product.setRef(Long.valueOf(ref));
-                product.setSlug(ref);
-            }
-        }*/
-
-        if(product.getVariationType() == null)
-            product.setVariationType(VariationType.SIMPLE);
-
-        product.setActive(false);
-
-        product.setRef(dto.getRef());
-        product.setSlug(dto.getSlug());
-        product.setTitle(dto.getName());
-        product.setMerchantId(merchantId);
-
-
-        product.getMerchantStock().clear();
-        product.getProductLangs().clear();
-        product.getCategories().clear();
-
-        for(Long id: dto.getShopIds()) {
-            product.getCategories().add(new Category(id));
-        }
-
-        //product.getProductLangs().add(new ProductLang().title("Fuck").product(product).lang("ar"));
-        int discount = 100 * (int)((dto.getPrice().doubleValue() - dto.getSalePrice().doubleValue())/dto.getPrice().doubleValue());
-
-        product.getMerchantStock().add(new MerchantStock().quantity(dto.getQuantity()).availability(dto.getAvailability()).cost(dto.getCost()).allow_backorder(false)
-                .price(dto.getSalePrice()).discount(discount).product(product).merchantId(currentMerchantId));
-
-        ProductLang langAr = new ProductLang().lang("ar").description(dto.getDescription_ar()).title(dto.getName_ar()).brand(dto.getBrand_ar()).browseNode(dto.getBrowseNode());
-        if(dto.getFeatures_ar() != null)
-            langAr.setFeatures(Arrays.asList(dto.getFeatures_ar().split(";")));
-
-
-        ProductLang langEn = new ProductLang().lang("en").description(dto.getDescription()).title(dto.getName()).brand(dto.getBrand()).browseNode(dto.getBrowseNode());
-        if(dto.getFeatures() != null)
-            langEn.setFeatures(Arrays.asList(dto.getFeatures().split(";")));
-
-        product.getProductLangs().add(langAr.product(product));
-        product.getProductLangs().add(langEn.product(product));
-
-
-        //product.ref(ref).sku(sku).upc(upc).releaseDate(releaseDate);
-        product = productRepository.save(product);
-        //dto.setTenant(currentMerchant);
-        //dto.setSlug(product.getSlug());
-        //dto.setRef(product.getRef());
-        //dto.setImported(true);
-
-        if(isSaveES)
-            saveToElastic(dto);
-        return  addProductMapper.toDto(product);
-    }
-
-
 
     public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {
         Product product = productRepository.findById(dto.getId()).orElse(new Product());
@@ -797,12 +725,10 @@ public class ProductService {
         AddProductDTO dto = addProductMapper.toDto(product);
         saveToElastic(dto);
     }
-    private void saveToElastic(AddProductDTO dto) {
+    protected void saveToElastic(AddProductDTO dto) {
         dto.setId(dto.getRef());
         productSearchRepository.save(dto);
     }
-
-
 /*
     public <U> U log(Customer loginUser, String slug, cookie) {
        productRepository.log(loginUser.getId(), slug, cookie);

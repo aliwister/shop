@@ -1,0 +1,38 @@
+mutation createPartnerProduct {
+  createPartnerProduct(product: {
+      id: null,           # Auto generated
+
+      sku: "partner-1",
+      upc: "1234",
+      model: "model",
+
+      ref: null  ,    # Auto generated
+
+      slug: "slub"  ,   # Must be Unique
+      brand: "Brand"  ,  # The English value
+      name: "Product Name" ,   # The English value
+
+      image: "http://image1" ,   # Main image
+
+      price: "100",
+      cost: "99",
+      weight: "5",
+
+      variationType: "SIMPLE"  ,   # SIMPLE, CHILD, PARENT
+      unit: "pcs",
+
+      availability: 500  ,# In hours
+
+      salePrice: 55,
+      quantity: 10,
+
+      discountInPercent: 15,
+
+      gallery: ["https://img2","https://img3"],   # Ordered
+      children: [],
+      prices: [],
+      langs: [],
+      options: []}
+  ) {
+    value
+  }

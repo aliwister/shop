@@ -94,11 +94,6 @@ public class ProductMutation implements GraphQLMutationResolver {
         return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO approveProduct(Long id){
-        return null;
-    }
-
     public Message addToElastic( Long id, String  sku, String  name, String  name_ar, List<String> shops) {
         productService.addToElastic(id, sku, name, name_ar, shops);
         return new Message("success");
