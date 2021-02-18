@@ -71,13 +71,13 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new Message("Okay");
     }
 
-    public Message removePrice(Price price)  {
+    public Message removePrice(Long id, Price price)  {
         return null;
     }
-    public Message removeLang(String lang)  {
+    public Message removeLang(Long id, String lang)  {
         return null;
     }
-    public Message removeChild(Long id) {
+    public Message removeChild(Long id, Long childId) {
         return null;
     }
 
