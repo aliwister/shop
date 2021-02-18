@@ -94,8 +94,6 @@ public class ProductDTO implements Serializable {
 
     private BigDecimal volumeWeight;
 
-    private ProductType type = ProductType.CHILDREN_BOOKS;
-
     private String author = "Fatma Anwar";
 
     private String unit = "pcs";
