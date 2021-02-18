@@ -6,10 +6,10 @@ enum Condition {
   FAIR
 }
 
-enum ProductType {
-    CHILDREN_BOOKS
-    TEEN_BOOKS
-    ADULT_BOOKS
+enum VariationType {
+    SIMPLE
+    CHILD
+    PARENT
 }
 
 enum ProductGroup {
@@ -41,11 +41,6 @@ enum ProductGroup {
 #    USD
 #    EUR
 #}
-
-input PriceInput {
-    amount: Float
-    currency: String
-}
 
 type Attribute {
     name: String
@@ -123,7 +118,7 @@ type Product {
     discountInPercent: Float
     slug: String
     categories: [Category]
-    type: ProductType
+
     author: String
     unit: String
     description: String
@@ -293,10 +288,10 @@ id: ID
 
 extend type Query {
     product(slug: String!, cookie: String = ""): Product!
-    products(
-        category: String
-        text: String
-        type: String
+                        products(
+                            category: String
+                            text: String
+                            type: String
         offset: Int = 0
         limit: Int = 10
         lang: String

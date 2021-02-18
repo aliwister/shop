@@ -1,27 +1,35 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.aop.logging.TenantContext;
-import com.badals.shop.domain.*;
+import com.badals.shop.domain.Category;
+import com.badals.shop.domain.MerchantStock;
+import com.badals.shop.domain.Product;
+import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
-
-import org.mapstruct.*;
+import com.badals.shop.service.pojo.PartnerProduct;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
  */
-@Mapper(componentModel = "spring", uses = {ProductLangMapper.class, MerchantStockMapper.class})
-public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
+@Mapper(componentModel = "spring", uses = {ProductLangMapper.class, MerchantStockMapper.class, ProductLangMapper.class, ChildProductMapper.class})
+public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Product> {
 
-    @Mapping(target = "productLangs", ignore = true)
+    @Mapping(source="langs", target = "productLangs")
+    @Mapping(source="options", target = "variationOptions")
     @Mapping(target = "removeProductLang", ignore = true)
     @Mapping(target = "merchantStock", ignore = true)
     @Mapping(target = "gallery", ignore = true)
@@ -29,21 +37,17 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(target = "title", source = "name")
     @Mapping(target = "price", source = "salePrice")
     @Mapping(target = "dial", ignore = true)
-    Product toEntity(AddProductDTO productDTO);
+    Product toEntity(PartnerProduct productDTO);
 
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
     @Mapping(source="dial.dial", target="dial")
-    AddProductDTO toDto(Product product);
-
-    @Mapping(target="hours", source = "availability")
-    @Mapping(target = "gallery", ignore = true)
-    @Mapping(target = "features", ignore = true)
-    @Mapping(target = "title", source="name")
-    ProductDTO toProductDto(AddProductDTO product);
+    @Mapping(source="productLangs", target = "langs")
+    @Mapping(source="variationOptions", target = "options")
+    PartnerProduct toDto(Product product);
 
     @AfterMapping
-    default void afterMapping(@MappingTarget Product target, AddProductDTO source) {
+    default void afterMapping(@MappingTarget Product target, PartnerProduct source) {
         if(source.getGallery() != null) {
             List<Gallery> gallery = new ArrayList<Gallery>();
             for(String g: source.getGallery()) {
@@ -52,7 +56,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
             target.setGallery(gallery);
         }
 
-        if(source.getType() == null)
+/*        if(source.getType() == null)
             target.setVariationType(VariationType.SIMPLE);
         else
             target.setVariationType(VariationType.valueOf(source.getType()));
@@ -70,7 +74,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         target.setActive(true);
         target.getMerchantStock().clear();
         target.getMerchantStock().add(new MerchantStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(source.getCost()).allow_backorder(false)
-                .price(source.getSalePrice()).discount(source.getDiscountInPercent()).product(target).merchantId(source.getMerchantId()));
+                .price(source.getSalePrice()).discount(source.getDiscountInPercent()).product(target).merchantId(source.getMerchantId()));*/
 
     }
 
@@ -109,7 +113,7 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     }
 
     @AfterMapping
-    default void afterMapping(@MappingTarget AddProductDTO target, Product source) {
+    default void afterMapping(@MappingTarget PartnerProduct target, Product source) {
         //if (source.getGallery() == null) {
         List<String> gallery = new ArrayList<String>();
         //}
@@ -142,28 +146,6 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
              */
             target.setAvailability(hours);
         }
-
-        //ProductLang lang = source.getProductLangs().stream().findFirst().orElse(null);
-        target.setName(source.getTitle());
-        for(ProductLang lang : source.getProductLangs()) {
-            if(lang.getLang().equals("en")) {
-                if(lang.getFeatures() != null)
-                    target.setFeatures(String.join(";",lang.getFeatures()));
-                target.setName(lang.getTitle());
-                target.setDescription(lang.getDescription());
-                target.setBrand(lang.getBrand());
-            }
-            else if(lang.getLang().equals("ar")) {
-                if(lang.getFeatures() != null)
-                    target.setFeatures_ar(String.join(";",lang.getFeatures()));
-                target.setName_ar(lang.getTitle());
-                target.setDescription_ar(lang.getDescription());
-                target.setBrand_ar(lang.getBrand());
-            }
-        }
-        if(source.getCategories() != null)
-            target.setShopIds(source.getCategories().stream().map(Category::getId).collect(Collectors.toList()));
-
     }
 
     default Product fromId(Long id) {
