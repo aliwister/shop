@@ -39,6 +39,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.children c left join fetch c.productLangs left join fetch c.merchantStock where u.sku = ?1 and u.merchantId = ?2")
     Optional<Product> findBySkuJoinChildren(String asin, Long merchantId);
 
+    @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.children c left join fetch c.productLangs left join fetch c.merchantStock where u.id = ?1 and u.merchantId = ?2")
+    Optional<Product> findByIdJoinChildren(Long id, Long merchantId);
+
     Optional<Product> findOneBySku(String sku);
 
     Optional<Product> findOneBySkuAndMerchantId(String sku, Long merchantId);
