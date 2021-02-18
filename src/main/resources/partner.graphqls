@@ -1,5 +1,5 @@
 input PriceInput {
-    amount: Float
+    amount: BigDecimal
     currency: String
 }
 
@@ -17,7 +17,7 @@ type VariationOption {
 input VariationOptionInput {
     label: String
     name: String
-    values: [String]
+    values: [String] #Ordered
 }
 
 type Variation {
@@ -26,25 +26,40 @@ type Variation {
 }
 
 type PartnerProduct {
-      id: ID
+      id: ID           # Auto generated
+
       sku: String
       upc: String
-      ref: String
-      slug: String
+
+      ref: String      # Auto generated
+
+      slug: String     # Must be Unique
+      brand: String    # The English value
+      name: String    # The English value
+
+      image: String    # Main image
+
       price: BigDecimal
-      image: String
       cost: BigDecimal
       weight: BigDecimal
 
       slug: String
-      type: String
-      unit: String
+      variationType: String     # SIMPLE, CHILD, PARENT
+      unit: String     #
 
-      availability: Int
+      availability: Int  # In hours
+
+
       salePrice: BigDecimal
       quantity: BigDecimal
+
+
       discountInPercent: Int
-      gallery: [String]
+
+      options: [VariationOption]
+      langs: [ProductI18n]
+      gallery: [String]   # Ordered
+      children: [ChildProduct]
 }
 
 type MerchantProductResponse {
@@ -54,41 +69,89 @@ type MerchantProductResponse {
 }
 
 input PartnerProductInput {
-      id: Long
+      id: ID           # Auto generated
+
       sku: String
       upc: String
-      image: String
+      model: String
+
+      ref: String      # Auto generated
+
+      slug: String     # Must be Unique
+      brand: String    # The English value
+      name: String    # The English value
+
+      image: String    # Main image
+
+      price: BigDecimal
       cost: BigDecimal
       weight: BigDecimal
-      slug: String
-      type: String
+
+      variationType: String     # SIMPLE, CHILD, PARENT
       unit: String
-      availability: Int
+
+      availability: Int  # In hours
+
       salePrice: BigDecimal
       quantity: BigDecimal
-      ref: String
+
       discountInPercent: Int
-      #variations: [VariationProductInput]
-      #prices: [PriceInput]
-      #langs: [ProductDescriptionInput]
+
+      gallery: [String]   # Ordered
+      children: [ChildProductInput]
+      prices: [PriceInput]
+      langs: [ProductI18nInput]
+      options: [VariationOptionInput]
 }
 
-input VariationProductInput {
-      id: Long
-      sku: String
-      upc: String
-      image: String
+type ChildProduct {
+      id: ID
+      slug: String     # Must be Unique
+      brand: String    # The English value
+      name: String    # The English value
+
+      image: String    # Main image
+
+      price: BigDecimal
       cost: BigDecimal
       weight: BigDecimal
-      slug: String
-      type: String
-      unit: String
-      availability: Int
+
+      availability: Int  # In hours
+
       salePrice: BigDecimal
       quantity: BigDecimal
-      ref: String
       discountInPercent: Int
+
+      gallery: [String]   # Ordered
+      variationAttributes: [Attribute]
 }
+
+
+input ChildProductInput {
+      slug: String     # Must be Unique
+      brand: String    # The English value
+      name: String    # The English value
+
+      sku: String
+      upc: String
+      model: String
+
+      image: String    # Main image
+
+      price: BigDecimal
+      cost: BigDecimal
+      weight: BigDecimal
+
+      availability: Int  # In hours
+
+      salePrice: BigDecimal
+      quantity: BigDecimal
+      discountInPercent: Int
+
+      gallery: [String]   # Ordered
+      variationAttributes: [AttributeInput]
+}
+
 
 
 extend type Query {
@@ -99,13 +162,13 @@ extend type Mutation {
     createPartnerProduct(product: PartnerProductInput) : Message
     getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
 
-    #addPrice(price: PriceInput) : Message
-    #addLangFields(desc: ProductDescriptionInput) : Message
-    #addVariation(variation: VariationProductInput) : Message
+    savePrice(id: ID, price: PriceInput) : Message
+    saveLang(id: ID, desc: ProductI18nInput) : Message
+    saveChild(id: ID, child: ChildProductInput) : Message
 
-    #removePrice(price: PriceInput) : Message
-    #removeLangFields(desc: ProductDescriptionInput) : Message
-    #removeVariation(variation: VariationProductInput) : Message
+    removePrice(id: ID, currency: String) : Message
+    removeLang(id: ID, lang: String) : Message
+    removeChild(id: ID, id: ID) : Message
 
-    #approveProduct(id: ID): Message
+    approveProduct(id: ID): Message
 }
