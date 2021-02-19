@@ -8,12 +8,16 @@ import com.badals.shop.service.*;
 import com.badals.shop.service.dto.ProductLangDTO;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
+import com.badals.shop.service.util.ChecksumUtil;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
+
+import java.net.URL;
+import java.time.LocalDate;
 
 
 @Component
@@ -30,16 +34,19 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     private final UserService userService;
 
+    private final AwsService awsService;
+
     @Value("${badals.cdnUrl}")
     private String cdnUrl;
 
 
-    public PartnerMutation(PartnerService partnerService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
+    public PartnerMutation(PartnerService partnerService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
         this.partnerService = partnerService;
         this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.userService = userService;
+        this.awsService = awsService;
     }
 
     public Message createPartnerProduct(PartnerProduct product) {
@@ -55,7 +62,13 @@ public class PartnerMutation implements GraphQLMutationResolver {
     }
 
     public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType) {
-        return null; //PresignedUrl
+        String t =  "badals";//TenantContext.getCurrentTenant();
+        String m = "badals";//TenantContext.getCurrentMerchant();
+        String fileKey = ChecksumUtil.getChecksum(filename + LocalDate.now())+filename.substring(filename.length() - 4);
+        String objectKey = "_m/" + m + "/" + fileKey;
+
+        URL url = awsService.presignPutUrl(objectKey, contentType);
+        return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey, "200");
     }
 
     public Message savePrice(Long id, Price price)  {
