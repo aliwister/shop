@@ -4,10 +4,11 @@ import com.badals.shop.domain.Shipment;
 import com.badals.shop.domain.ShipmentDoc;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.enumeration.ShipmentStatus;
+import com.badals.shop.service.AwsService;
 import com.badals.shop.service.OrderService;
 import com.badals.shop.service.ShipmentDocService;
 import com.badals.shop.service.ShipmentService;
-import com.badals.shop.service.util.S3Util;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +35,13 @@ public class DetrackController {
    private final ShipmentService shipmentService;
    private final ShipmentDocService shipmentDocService;
    private final OrderService orderService;
+   private final AwsService awsService;
 
-   public DetrackController(ShipmentService shipmentService, ShipmentDocService shipmentDocService, OrderService orderService) {
+   public DetrackController(ShipmentService shipmentService, ShipmentDocService shipmentDocService, OrderService orderService, AwsService awsService) {
       this.shipmentService = shipmentService;
       this.shipmentDocService = shipmentDocService;
       this.orderService = orderService;
+      this.awsService = awsService;
    }
 
    @RequestMapping(method= RequestMethod.POST)
@@ -104,6 +107,6 @@ public class DetrackController {
       if (response.getStatusCode() != HttpStatus.OK) {
          //Log error
       }
-      S3Util.getClient().putObject(PutObjectRequest.builder().bucket(S3Util.getBucketName()).key(fileKey).build(), RequestBody.fromInputStream(new ByteArrayInputStream(response.getBody()), response.getBody().length));
+      awsService.getS3Client().putObject(PutObjectRequest.builder().bucket(awsService.getBucketName()).key(fileKey).build(), RequestBody.fromInputStream(new ByteArrayInputStream(response.getBody()), response.getBody().length));
    }
 }
