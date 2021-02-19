@@ -102,6 +102,7 @@ public class PartnerService {
         }
         product.getProductLangs().stream().forEach(x -> x.setProduct(product));
         product.setActive(false);
+        product.setMerchantId(currentMerchantId);
 
         product.setMerchantId(merchantId);
 

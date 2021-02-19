@@ -177,6 +177,8 @@ pas:
     host: webservices.amazon.co.uk
     region: eu-west-1
 
+aws:
+  s3bucket: face-content
 
 mws:
   key: AKIAIOAQ437ZZB7K4O2A

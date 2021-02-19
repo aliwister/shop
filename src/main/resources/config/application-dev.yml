@@ -161,8 +161,7 @@ mws:
   marketplaceid: ATVPDKIKX0DER
 
 aws:
-  accessKeyId: AKIAIG3DJ4KLYNPBH2EA
-  secretAccessKey: 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
+  s3bucket: face-content-test
 
 badals:
   checkout-app: http://127.0.0.1:8081/checkout/start
