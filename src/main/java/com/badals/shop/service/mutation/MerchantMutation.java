@@ -6,7 +6,7 @@ import com.badals.shop.domain.checkout.helper.PresignedUrl;
 import com.badals.shop.service.*;
 import com.badals.shop.service.pojo.AddProductDTO;
 
-import com.badals.shop.service.util.S3Util;
+import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.slf4j.Logger;
@@ -24,6 +24,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import java.io.File;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -89,9 +90,10 @@ public class MerchantMutation implements GraphQLMutationResolver {
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {
         String t =  TenantContext.getCurrentTenant();
         String m = TenantContext.getCurrentMerchant();
-        String objectKey = "_m/" + m + "/" + filename;
+        String fileKey = ChecksumUtil.getChecksum(filename + LocalDate.now());
+        String objectKey = "_m/" + m + "/" + fileKey;
         URL url = awsService.presignPutUrl(objectKey, contentType);
-        return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + filename, "200");
+        return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey, "200");
 /*        try {
             S3Presigner presigner = S3Presigner.builder().region(region).build();
 

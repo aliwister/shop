@@ -15,13 +15,9 @@ import com.badals.shop.service.dto.SpeedDialDTO;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
-import com.badals.shop.service.mapper.PartnerProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.service.pojo.AddProductDTO;
 
-import com.badals.shop.service.pojo.ChildProduct;
-import com.badals.shop.service.pojo.PartnerProduct;
-import com.badals.shop.service.util.S3Util;
 import com.badals.shop.service.util.ValidationUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
@@ -74,20 +70,18 @@ public class ProductService {
     private final Pas5Service pas5Service;
     private final PasUKService pasUKService;
     private final EbayService ebayService;
+    private final AwsService awsService;
     private final MessageSource messageSource;
-
-
 
     private final ProductMapper productMapper;
     private final AlgoliaProductMapper algoliaProductMapper;
     private final AddProductMapper addProductMapper;
 
-
     private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
     private final SpeedDialService speedDialService;
 
-    public ProductService(ProductRepository productRepository, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService, SpeedDialService speedDialService) {
+    public ProductService(ProductRepository productRepository, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service, AwsService awsService, MessageSource messageSource, AddProductMapper addProductMapper, ProductLangRepository productLangRepository, ProductSearchRepository productSearchRepository, TenantService tenantService, SpeedDialService speedDialService) {
         this.productRepository = productRepository;
         this.pasUKService = pasUKService;
         this.ebayService = ebayService;
@@ -95,6 +89,7 @@ public class ProductService {
         this.algoliaProductMapper = algoliaProductMapper;
         this.index = index;
         this.pas5Service = pas5Service;
+        this.awsService = awsService;
         this.messageSource = messageSource;
         this.addProductMapper = addProductMapper;
 
@@ -586,7 +581,7 @@ public class ProductService {
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ImageIO.write(img,"png", outputStream);
-            PutObjectResponse response = S3Util.getClient().putObject(PutObjectRequest.builder().bucket(S3Util.getBucketName()).key(objectKey).build(), RequestBody.fromBytes(outputStream.toByteArray()));
+            PutObjectResponse response = awsService.getS3Client().putObject(PutObjectRequest.builder().bucket(awsService.getBucketName()).key(objectKey).build(), RequestBody.fromBytes(outputStream.toByteArray()));
             return "https://cdn.badals.com/"+ objectKey.substring(3);
         } catch (MalformedURLException e) {
             e.printStackTrace();
