@@ -8,6 +8,7 @@ import com.badals.shop.service.*;
 import com.badals.shop.service.dto.ProductLangDTO;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
+import com.badals.shop.service.pojo.ProductEnvelope;
 import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
@@ -50,7 +51,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         this.awsService = awsService;
     }
 
-    public Message savePartnerProduct(PartnerProduct product) throws ProductNotFoundException {
+    public ProductEnvelope savePartnerProduct(PartnerProduct product) throws ProductNotFoundException {
         String t =  TenantContext.getCurrentTenant();
         log.info("Tenant: " + t);
         Long mId = 1L;//TenantContext.getCurrentMerchantId();
@@ -58,8 +59,9 @@ public class PartnerMutation implements GraphQLMutationResolver {
         String merchant = "Badals.com";//TenantContext.getCurrentMerchant();
         String tenant = TenantContext.getCurrentTenant();
 
-        partnerService.savePartnerProduct(product, mId, true);
-        return new Message("Okay");
+        PartnerProduct p = partnerService.savePartnerProduct(product, mId, true);
+
+        return new ProductEnvelope(p, "Success", 202);
     }
 
     public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType) {

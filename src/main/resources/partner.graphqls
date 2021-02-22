@@ -145,6 +145,9 @@ input PartnerProductInput {
 }
 
 input ChildProductInput {
+      id: ID
+      isDirty: Boolean     # For new product doesn't matter
+
       sku: String
       upc: String
 
@@ -158,10 +161,15 @@ input ChildProductInput {
       gallery: [String]   # Ordered
       image: String    # Main image
       variationAttributes: [AttributeInput]
-      isDirty: Boolean
+
       active: Boolean
 }
 
+type ProductEnvelope {
+    message: String
+    product: PartnerProduct
+    code: Int
+}
 
 
 extend type Query {
@@ -169,7 +177,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    savePartnerProduct(product: PartnerProductInput): Message
+    savePartnerProduct(product: PartnerProductInput): ProductEnvelope
     getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
 
     approveProduct(id: ID): Message

@@ -69,7 +69,7 @@ public class PartnerService {
         return partnerProductMapper.toDto(product);
     }
 
-    public AddProductDTO savePartnerProduct(PartnerProduct dto, Long currentMerchantId, boolean isSaveES) throws ProductNotFoundException {
+    public PartnerProduct savePartnerProduct(PartnerProduct dto, Long currentMerchantId, boolean isSaveES) throws ProductNotFoundException {
         Product update = partnerProductMapper.toEntity(dto);
         final Product master;
         boolean _new = dto.getId() == null;
@@ -117,7 +117,7 @@ public class PartnerService {
         AddProductDTO esDto = addProductMapper.toDto(master);
         if(isSaveES)
             productService.saveToElastic(esDto);
-        return  esDto;
+        return partnerProductMapper.toDto(master);
     }
 
     private void saveChildren(Product master, Product update, PartnerProduct dto, Long currentMerchantId, boolean _new) {
