@@ -709,6 +709,11 @@ public class Product implements Serializable, IMerchantProduct {
         this.parent = parent;
     }
 
+    public Product parent(Product master) {
+        this.parent = parent;
+        return this;
+    }
+
     public Set<Product> getChildren() {
         return children;
     }
@@ -718,6 +723,8 @@ public class Product implements Serializable, IMerchantProduct {
     }
 
     public void addChild(Product child) {
+        child.setVariationType(VariationType.CHILD);
+        child.setMerchantId(this.merchantId);
         this.children.add(child);
         child.setParentId(this.ref);
     }
@@ -747,4 +754,6 @@ public class Product implements Serializable, IMerchantProduct {
                 ", parentId=" + parentId +
                 '}';
     }
+
+
 }
