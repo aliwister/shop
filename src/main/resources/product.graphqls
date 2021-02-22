@@ -166,20 +166,6 @@ input AttributeInput {
     value: String
 }
 
-type ProductI18n {
-    title: String,
-    description: String,
-    model: String,
-    features: [String],
-}
-
-input ProductI18nInput {
-    title: String,
-    description: String,
-    model: String,
-    features: [String],
-    lang: String
-}
 
 
 input ProductInput {

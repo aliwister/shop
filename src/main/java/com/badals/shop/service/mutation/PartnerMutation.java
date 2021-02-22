@@ -9,6 +9,7 @@ import com.badals.shop.service.dto.ProductLangDTO;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.util.ChecksumUtil;
+import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         this.awsService = awsService;
     }
 
-    public Message createPartnerProduct(PartnerProduct product) {
+    public Message savePartnerProduct(PartnerProduct product) throws ProductNotFoundException {
         String t =  TenantContext.getCurrentTenant();
         log.info("Tenant: " + t);
         Long mId = 1L;//TenantContext.getCurrentMerchantId();
@@ -57,7 +58,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         String merchant = "Badals.com";//TenantContext.getCurrentMerchant();
         String tenant = TenantContext.getCurrentTenant();
 
-        partnerService.createPartnerProduct(product, mId, merchant, tId, tenant, true);
+        partnerService.savePartnerProduct(product, mId, true);
         return new Message("Okay");
     }
 
@@ -68,30 +69,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         String objectKey = "_m/" + m + "/" + fileKey;
 
         URL url = awsService.presignPutUrl(objectKey, contentType);
-        return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey, "200");
-    }
-
-    public Message savePrice(Long id, Price price)  {
-        partnerService.savePrice(id, price);
-        return new Message("Okay");
-    }
-    public Message saveLang(Long id, ProductLangDTO lang)  {
-        partnerService.saveLang(id, lang);
-        return new Message("Okay");
-    }
-    public Message saveChild(Long id, ChildProduct child) {
-        partnerService.saveChild(id, child);
-        return new Message("Okay");
-    }
-
-    public Message removePrice(Long id, Price price)  {
-        return null;
-    }
-    public Message removeLang(Long id, String lang)  {
-        return null;
-    }
-    public Message removeChild(Long id, Long childId) {
-        return null;
+        return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey,m+"/"+fileKey, "200");
     }
 
     public Message approveProduct(Long id) {

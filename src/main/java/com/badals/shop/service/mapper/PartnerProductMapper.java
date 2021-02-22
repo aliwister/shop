@@ -6,6 +6,7 @@ import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Gallery;
+import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -35,7 +36,8 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Produ
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
     @Mapping(target = "title", source = "name")
-    @Mapping(target = "price", source = "salePrice")
+    @Mapping(target = "price", source = "priceObj.amount")
+    @Mapping(target = "currency", source = "priceObj.currency")
     @Mapping(target = "dial", ignore = true)
     Product toEntity(PartnerProduct productDTO);
 
@@ -128,16 +130,16 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Produ
         // Process sale price and discount percentage
         MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
         if (stock != null) {
-            target.setSalePrice(stock.getPrice());
-            target.setPrice(stock.getPrice());
+            target.setSalePriceObj(new Price(stock.getPrice(), source.getCurrency()));
+            target.setPriceObj(new Price(source.getPrice(), source.getCurrency()));
             target.setDiscountInPercent(0);
-            target.setCost(stock.getCost());
+            target.setCostObj(new Price(stock.getCost(), source.getCurrency()));
             target.setQuantity(stock.getQuantity());
 
             if(stock.getDiscount() != null) {
                 int discount = stock.getDiscount();
                 target.setDiscountInPercent(discount);
-                target.setPrice(new BigDecimal((int)(10*stock.getPrice().doubleValue()/(1.0-discount*.01))/10.0 ));
+                //target.setPrice(new BigDecimal((int)(10*stock.getPrice().doubleValue()/(1.0-discount*.01))/10.0 ));
             }
             int hours = stock.getAvailability();
             /*
