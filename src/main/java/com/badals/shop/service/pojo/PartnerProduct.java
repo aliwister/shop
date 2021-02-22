@@ -23,7 +23,10 @@ public class PartnerProduct extends AddProductDTO {
 
 
    List<ChildProduct> children;
-   List<Price> prices;
+   public Price priceObj = new Price();
+   public Price salePriceObj = new Price();
+   public Price costObj= new Price();
+
    List<ProductLangDTO> langs;
    List<VariationOption> options;
 

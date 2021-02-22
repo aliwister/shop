@@ -1,6 +1,7 @@
 type PresignedUrl {
     uploadUrl: String
     imageUrl: String
+    saveUrl: String
     status: String
 }
 

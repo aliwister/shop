@@ -16,6 +16,7 @@ public class ProductLangDTO implements Serializable {
     private String description;
 
     private String model;
+    private String brand;
 
     private List<String> features;
 
