@@ -1,5 +1,6 @@
 package com.badals.shop.service.query;
 
+import com.badals.shop.domain.pojo.MerchantProductResponse;
 import com.badals.shop.service.CategoryService;
 import com.badals.shop.service.PartnerService;
 import com.badals.shop.service.ProductService;
@@ -33,6 +34,10 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
        return partnerService.getPartnerProduct(id, mId);
     }
 
+   public MerchantProductResponse partnerProducts(String search, Integer limit, Integer offset, Boolean active) {
+      Long mId = 1L;//TenantContext.getCurrentMerchantId();
+      return partnerService.findAllByMerchant(mId, search, limit, offset, active);
+   }
 
 }
 
