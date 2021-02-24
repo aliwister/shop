@@ -6,6 +6,7 @@ import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
+import com.badals.shop.domain.pojo.MerchantProductResponse;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
@@ -19,6 +20,8 @@ import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -239,5 +242,20 @@ public class PartnerService {
         }
         return stock.quantity(quantity).availability(availability).cost(costPriceObj.getAmount()).allow_backorder(false)
                 .price(price).discount(discount).product(master).merchantId(currentMerchantId);
+    }
+
+    public MerchantProductResponse findAllByMerchant(Long currentMerchantId, String text, Integer limit, Integer offset, Boolean active) {
+        //List<AddProductDTO> result = search("tenant:"+currentTenant + " AND imported:" + imported.toString() + ((text != null)?" AND "+text:""));
+        String like = "%";
+        if(text != null)
+            like = "%"+text+"%";
+
+        Integer total = productRepository.countForTenantActive(currentMerchantId, active, like, VariationType.getListTypes());
+        List<Product> result = productRepository.listForTenantActive(currentMerchantId, active, like, VariationType.getListTypes(), PageRequest.of((int) offset / limit, limit));
+        MerchantProductResponse response = new MerchantProductResponse();
+        response.setTotal(total);
+        response.setHasMore((limit + offset) < total);
+        response.setItems(result.stream().map(partnerProductMapper::toDto).collect(Collectors.toList()));
+        return response;
     }
 }
