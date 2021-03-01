@@ -19,7 +19,7 @@ public class VariationOption implements Serializable {
     public VariationOption() {
     }
 
-    public VariationOption(String label, String name, List<String> values) {
+    public VariationOption(String name, String label, List<String> values) {
         this.name = name;
         this.label = label;
         this.values = values;

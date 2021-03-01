@@ -246,7 +246,7 @@ public class PartnerService {
 
     public MerchantProductResponse findAllByMerchant(Long currentMerchantId, String text, Integer limit, Integer offset, Boolean active) {
         //List<AddProductDTO> result = search("tenant:"+currentTenant + " AND imported:" + imported.toString() + ((text != null)?" AND "+text:""));
-        String like = "%";
+        String like = null;
         if(text != null)
             like = "%"+text+"%";
 
@@ -257,5 +257,10 @@ public class PartnerService {
         response.setHasMore((limit + offset) < total);
         response.setItems(result.stream().map(partnerProductMapper::toDto).collect(Collectors.toList()));
         return response;
+    }
+
+    public void deleteProduct(Long id) {
+
+        productRepository.deleteById(id);
     }
 }

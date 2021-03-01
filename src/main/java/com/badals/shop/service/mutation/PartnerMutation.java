@@ -3,6 +3,7 @@ package com.badals.shop.service.mutation;
 import com.badals.shop.aop.logging.TenantContext;
 import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.domain.checkout.helper.PresignedUrl;
+import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.ProductLangDTO;
@@ -76,6 +77,13 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     public Message approveProduct(Long id) {
         return null;
+    }
+    public Message setOrderState(OrderState value) {
+        return null;
+    }
+    public Message deleteProduct(Long id) {
+        partnerService.deleteProduct(id);
+        return new Message("ok");
     }
 
 }
