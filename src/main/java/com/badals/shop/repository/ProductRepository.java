@@ -53,10 +53,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.categories where u.merchantId = ?1")
     List<Product> listForTenantAll(Long merchantId, Pageable pageable);
 
-    @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.categories where u.merchantId = ?1 and u.active = ?2 and u.title like ?3 and u.variationType in ?4")
+    @Query("from Product u left join fetch u.productLangs left join fetch u.merchantStock left join fetch u.categories where u.merchantId = ?1 and u.active = ?2 and (?3 is null or u.title like ?3) and u.variationType in ?4")
     List<Product> listForTenantActive(Long merchantId, Boolean active, String like, List<VariationType> listTypes, Pageable pageable);
 
-    @Query("select count(u) from Product u where u.merchantId = ?1 and u.active = ?2 and u.title like ?3 and u.variationType in ?4")
+    @Query("select count(u) from Product u where u.merchantId = ?1 and u.active = ?2 and (?3 is null or u.title like ?3) and u.variationType in ?4")
     Integer countForTenantActive(Long merchantId, Boolean active, String like, List<VariationType> listTypes);
 
     @Query("select count(u) from Product u where u.merchantId = ?1")
