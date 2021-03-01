@@ -175,6 +175,13 @@ type ProductEnvelope {
 extend type Query {
     partnerProduct(id: ID): PartnerProduct
     partnerProducts( search: String,  limit: Int,  offset: Int,  active: Boolean): MerchantProductResponse
+
+    variationOptions (name: String): VariationOption
+    variations: [VariationOption]
+    hashtagList: [Hashtag]
+
+    #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
+    #partnerOrder(id: ID): Order
 }
 
 extend type Mutation {
@@ -182,4 +189,6 @@ extend type Mutation {
     getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
 
     approveProduct(id: ID): Message
+    setOrderState(value: OrderState): Message
+    deleteProduct(id: Long): Message
 }
