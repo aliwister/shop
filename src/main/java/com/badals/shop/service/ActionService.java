@@ -84,7 +84,7 @@ public class ActionService {
         actionRepository.deleteById(id);
     }
 
-    public List<ActionDTO> orderActions(Long id) {
-        return actionRepository.findAllByObjectId(String.valueOf(id)).stream().map(actionMapper::toDto).collect(Collectors.toList());
+    public List<ActionDTO> auditActivity(Long id, String type) {
+        return actionRepository.findAllByObjectIdAndObject(String.valueOf(id), type).stream().map(actionMapper::toDto).collect(Collectors.toList());
     }
 }

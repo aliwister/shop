@@ -28,7 +28,7 @@ public class OrderItem implements Serializable {
     private String productName;
 
     @Column(name = "quantity")
-    private Integer quantity;
+    private BigDecimal quantity;
 
     @Column(name = "price", precision = 21, scale = 2)
     private BigDecimal price;
@@ -170,16 +170,16 @@ public class OrderItem implements Serializable {
         this.productName = productName;
     }
 
-    public Integer getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public OrderItem quantity(Integer quantity) {
+    public OrderItem quantity(BigDecimal quantity) {
         this.quantity = quantity;
         return this;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 

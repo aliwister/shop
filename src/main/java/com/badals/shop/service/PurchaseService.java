@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -153,14 +155,14 @@ public class PurchaseService {
                 OrderItem o = orderItemRepository.getOne(oi.getId());
                 if (o.getQuantity().intValue() > pi.getQuantity().intValue()) {
                     OrderItem oNew = orderItemMapper.toEntity(orderItemMapper.toDto(o));
-                    oNew.setQuantity(pi.getQuantity().intValue());
-                    o.setQuantity(o.getQuantity().intValue() - pi.getQuantity().intValue());
-                    o.setLineTotal(BigDecimal.valueOf(Math.round(o.getQuantity()*o.getPrice().doubleValue()*10)/10.0));
+                    oNew.setQuantity(pi.getQuantity());
+                    o.setQuantity(o.getQuantity().subtract(pi.getQuantity()));
+                    o.setLineTotal(o.getQuantity().multiply(o.getPrice()).round(new MathContext(2)));
                     oNew.setProduct(o.getProduct());
                     oNew.setSku(o.getSku());
                     oNew.setId(null);
                     oNew.setSequence(o.getOrder().getOrderItems().size()+1);
-                    oNew.setLineTotal(BigDecimal.valueOf(Math.round(oNew.getQuantity()*o.getPrice().doubleValue()*10)/10.0));
+                    oNew.setLineTotal(oNew.getQuantity().multiply(o.getPrice()).round(new MathContext(2)));
                     orderItemRepository.save(o);
                     orderItemRepository.save(oNew);
                     o = oNew;

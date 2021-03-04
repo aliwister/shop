@@ -16,5 +16,5 @@ import java.util.List;
 @Repository
 public interface ActionRepository extends JpaRepository<Action, Long> {
 
-   List<Action> findAllByObjectId(String valueOf);
+   List<Action> findAllByObjectIdAndObject(String objectId, String object);
 }
