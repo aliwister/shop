@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -310,12 +311,12 @@ public class OrderService {
            OrderItem before = order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
                    .findFirst().get();
 
-           if(item.getQuantity() < before.getQuantity())
+           if(item.getQuantity().compareTo(before.getQuantity()) < 0)
                isEditCancel = true;
 
            before.quantity(item.getQuantity())
                    .price(item.getPrice())
-                   .lineTotal(item.getPrice().doubleValue()*item.getQuantity());
+                   .lineTotal(item.getPrice().multiply(item.getQuantity()).round(new MathContext(2)).doubleValue());
        }
        order.setSubtotal(calculateSubtotal(order));
        order.setTotal(calculateTotal(order));

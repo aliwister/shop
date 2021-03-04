@@ -19,7 +19,7 @@ public class OrderItemDTO implements Serializable {
 
     private String productName;
 
-    private Integer quantity;
+    private BigDecimal quantity;
 
     private BigDecimal price;
 
