@@ -62,7 +62,7 @@ public class AuditingAspect {
         int i = 0;
         Action action = new Action();
         action.setAction(methodName);
-        action.setObject(getObject(className));
+        action.setObject(getObject(className).toLowerCase());
 
         if(principal != null)
             action.setCreatedBy(principal);
