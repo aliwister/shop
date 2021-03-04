@@ -23,7 +23,7 @@ public class ActionQuery extends ShopQuery implements GraphQLQueryResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<ActionDTO> orderActions(Long id) {
-        return actionService.orderActions(id);
+    public List<ActionDTO> auditActivity(Long id, String type) {
+        return actionService.auditActivity(id, type);
     }
 }

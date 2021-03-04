@@ -250,8 +250,8 @@ public class PartnerService {
         if(text != null)
             like = "%"+text+"%";
 
-        Integer total = productRepository.countForTenantActive(currentMerchantId, active, like, VariationType.getListTypes());
-        List<Product> result = productRepository.listForTenantActive(currentMerchantId, active, like, VariationType.getListTypes(), PageRequest.of((int) offset / limit, limit));
+        Integer total = productRepository.countForTenantActive(currentMerchantId, active, like, VariationType.CHILD);
+        List<Product> result = productRepository.listForTenantActive(currentMerchantId, active, like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
         MerchantProductResponse response = new MerchantProductResponse();
         response.setTotal(total);
         response.setHasMore((limit + offset) < total);

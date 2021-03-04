@@ -23,7 +23,7 @@ type OrderItem {
     orderId: Long
     sequence: Int
     productName: String
-    quantity: Int
+    quantity: BigDecimal
     price: BigDecimal
     comment: String
     image: String
@@ -250,7 +250,7 @@ extend type Query {
     orders(limit: Int = 10): [Order]
     ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     orderA(id: ID): Order
-
+    auditActivity(id: ID, type: String) : [Action]
 
     purchases(state: [OrderState], offset: Int, limit: Int, searchText: String): PurchaseResponse
     unshippedPurchases: [PurchaseQueue]
@@ -259,5 +259,4 @@ extend type Query {
     purchaseQueue: [PurchaseQueue]
     merchants: [Merchant]
     payments(orderId: ID) : [Payment]
-    orderActions(orderId: ID) : [Action]
 }
