@@ -64,7 +64,7 @@ public class Cart implements Serializable {
     private Carrier carrier;
 
     @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> cartItems = new ArrayList<>();
+    private List<CartItem> cartItems = new ArrayList<CartItem>();
 
     public List<CartItem> getCartItems() {
         return cartItems;
