@@ -43,4 +43,3 @@ public class DetrackDelivery {
    String status;
    String reason;
 }
-
