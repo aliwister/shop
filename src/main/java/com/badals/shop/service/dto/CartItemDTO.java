@@ -21,9 +21,6 @@ public class CartItemDTO implements Serializable {
 
     private Long productId;
 
-    private Long customerId;
-
-
     private String price;
 
     private String salePrice;
@@ -64,7 +61,7 @@ public class CartItemDTO implements Serializable {
             ", quantity=" + getQuantity() +
             ", cart=" + getCartId() +
             ", product=" + getProductId() +
-            ", customer=" + getCustomerId() +
+
             "}";
     }
 }

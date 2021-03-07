@@ -10,14 +10,4 @@ import java.util.List;
  */
 public enum VariationType {
     SIMPLE, PARENT, CHILD;
-    public static List<VariationType> listTypes = new ArrayList<>() {
-        {
-        add(SIMPLE);
-        add(PARENT);
-        }
-    };
-
-    public static List<VariationType> getListTypes() {
-        return listTypes;
-    }
 }
