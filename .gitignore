@@ -6,6 +6,7 @@
 /graphql-test/**
 /src/main/resources/config/liquibase/data/**
 /src/main/resources/config/liquibase/**
+*.flt
 ######################
 # Node
 ######################
