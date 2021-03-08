@@ -10,4 +10,6 @@ public interface CartItemInfo {
    String getTitle();
    BigDecimal getWeight();
    String getSku();
+   Long getAvailability();
+   //Long getMerchantId();
 }
