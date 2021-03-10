@@ -91,10 +91,10 @@ public class PartnerService {
         }
         else {
             if(master.getSku().equals(update.getSku())) {
-                String ref = currentMerchantId.toString() + ChecksumUtil.getChecksum(dto.getSku());
+                //String ref = currentMerchantId.toString() + ChecksumUtil.getChecksum(dto.getSku());
                 master.setSku(update.getSku());
-                master.setRef(Long.valueOf(ref));
-                master.setSlug(ref);
+                //master.setRef(Long.valueOf(ref));
+                //master.setSlug(ref);
             }
             saveLang(master, update);
         }
