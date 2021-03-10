@@ -27,6 +27,8 @@ public class PartnerProduct extends AddProductDTO {
    public Price salePriceObj = new Price();
    public Price costObj= new Price();
 
+   String model;
+
    List<ProductLangDTO> langs;
    List<VariationOption> options;
 
