@@ -50,37 +50,25 @@ type Variation {
 
 type PartnerProduct {
       id: ID           # Auto generated
-
       sku: String
       upc: String
-
+	  model: String
+      hashtags: [String]  #Hashtags
       ref: String      # Auto generated
-
       slug: String     # Must be Unique
       brand: String    # The English value
       name: String    # The English value
-
       image: String    # Main image
-
       priceObj: Price
       costObj: Price
-
-
+	  salePriceObj: Price
       weight: BigDecimal
-
+	  variationType: String     # SIMPLE, CHILD, PARENT
       slug: String
-      variationType: String     # SIMPLE, CHILD, PARENT
       unit: String     #
-
       availability: Int  # In hours
-
-
-      salePriceObj: Price
       quantity: BigDecimal
-
-
       discountInPercent: Int
-
       options: [VariationOption]
       langs: [ProductI18n]
       gallery: [String]   # Ordered
@@ -98,6 +86,11 @@ type ChildProduct {
       slug: String     # Must be Unique
       image: String    # Main image
 
+	  sku: String
+      upc: String
+
+      isDirty: Boolean # Always false on the type
+
       priceObj: Price # null For Parent
       costObj:  Price # null For Parent
       salePriceObj: Price # null For Parent
@@ -110,56 +103,61 @@ type ChildProduct {
 
       gallery: [String]   # Ordered
       variationAttributes: [Attribute]
+
+      active: Boolean
 }
 
 
 input PartnerProductInput {
       id: ID           # Auto generated
-
       sku: String
       upc: String
       model: String
-
       hashtags: [String]  #Hashtags
+      ref: String  #Ignored since read only
       slug: String     # Must be Unique
       brand: String    # The English value
       name: String    # The English value
-
       image: String    # Main image
-
       priceObj: PriceInput # null For Parent
       costObj:  PriceInput # null For Parent
       salePriceObj: PriceInput # null For Parent
-
       weight: BigDecimal # KG
       variationType: String     # SIMPLE, CHILD, PARENT
+      slug: String #readonly
       unit: String
       availability: Int  # In hours
-
       quantity: BigDecimal
-
+      discountInPercent: Int
+	  options: [VariationOptionInput]
+	  langs: [ProductI18nInput]
       gallery: [String]   # Ordered
       children: [ChildProductInput]
-      langs: [ProductI18nInput]
-      options: [VariationOptionInput]
+      
+      
 }
 
 input ChildProductInput {
       id: ID
+	  slug: String     # Must be Unique
+	  image: String    # Main image
+	  
+	  sku: String
+      upc: String
+	  
       isDirty: Boolean     # For new product doesn't matter
 
-      sku: String
-      upc: String
-
-      weight: BigDecimal
-      availability: Int  # In hours
       priceObj: PriceInput
       costObj: PriceInput
       salePriceObj: PriceInput
+
+      weight: BigDecimal
+      availability: Int  # In hours
+
       quantity: BigDecimal
+	  discountInPercent: Int
 
       gallery: [String]   # Ordered
-      image: String    # Main image
       variationAttributes: [AttributeInput]
 
       active: Boolean
