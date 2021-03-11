@@ -96,6 +96,16 @@ public class PartnerService {
                 //master.setRef(Long.valueOf(ref));
                 //master.setSlug(ref);
             }
+            master.setTitle(update.getTitle());
+            master.setWeight(update.getWeight());
+            master.setPrice(update.getPrice());
+            master.setImage(update.getImage());
+            master.setUpc(update.getUpc());
+            master.setHashtags(update.getHashtags());
+            master.setBrand(update.getBrand());
+            master.setUnit(update.getUnit());
+            master.setGallery(update.getGallery());
+
             saveLang(master, update);
         }
 
@@ -112,6 +122,9 @@ public class PartnerService {
             master.setVariationType(VariationType.PARENT);
             saveChildren(master, update, dto, currentMerchantId, _new);
         }
+
+
+
 
         master.setActive(false);
         master.setMerchantId(currentMerchantId);
