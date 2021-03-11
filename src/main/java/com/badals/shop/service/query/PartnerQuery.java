@@ -1,5 +1,6 @@
 package com.badals.shop.service.query;
 
+import com.badals.shop.domain.pojo.I18String;
 import com.badals.shop.domain.pojo.MerchantProductResponse;
 import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.service.*;
@@ -63,6 +64,24 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
    }
    public List<HashtagDTO> hashtagList() {
       return hashtagService.findAll();
+   }
+
+   public List<I18String> brands() {
+      return new ArrayList<I18String>(){{
+         add(new I18String("en", "Coach"));
+         add(new I18String("en", "DKNY"));
+         add(new I18String("en", "Michael Kors"));
+         add(new I18String("en", "Guess"));
+      }};
+   }
+
+   public List<I18String> collections() {
+      return new ArrayList<I18String>(){{
+         add(new I18String("en", "Fashion"));
+         add(new I18String("en", "Auto Performance"));
+         add(new I18String("en", "Power Food"));
+         add(new I18String("en", "Mommy'n Me"));
+      }};
    }
 
 
