@@ -60,9 +60,27 @@ public class PartnerMutation implements GraphQLMutationResolver {
         String merchant = "Badals.com";//TenantContext.getCurrentMerchant();
         String tenant = TenantContext.getCurrentTenant();
 
-        PartnerProduct p = partnerService.savePartnerProduct(product, mId, true);
 
-        return new ProductEnvelope(p, "Success", 202);
+
+        PartnerProduct p = null;
+        StringBuilder message = new StringBuilder();
+        Integer code = 202;
+
+        try {
+            p = partnerService.savePartnerProduct(product, mId, true);
+            message.append("Success");
+        }
+        catch(Throwable e) {
+            e.printStackTrace();
+            while (e != null) {
+                message.append(e.getMessage());
+                e = e.getCause();
+            }
+
+            code = 400;
+        }
+
+        return new ProductEnvelope(p, message.toString(), code);
     }
 
     public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType) {

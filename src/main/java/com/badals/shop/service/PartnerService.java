@@ -17,6 +17,7 @@ import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import graphql.validation.ValidationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,21 +74,30 @@ public class PartnerService {
         return partnerProductMapper.toDto(product);
     }
 
-    public PartnerProduct savePartnerProduct(PartnerProduct dto, Long currentMerchantId, boolean isSaveES) throws ProductNotFoundException {
+    public void sanityCheck(PartnerProduct dto) {
+        if(dto.getSku() == null && dto.getId() != null) {
+            throw new ValidationException("Sku required for new products");
+        }
+    }
+
+    public PartnerProduct savePartnerProduct(PartnerProduct dto, Long currentMerchantId, boolean isSaveES) throws ProductNotFoundException, ValidationException {
         Product update = partnerProductMapper.toEntity(dto);
         final Product master;
         boolean _new = dto.getId() == null;
 
         if(!_new)
             master = productRepository.findByIdJoinChildren(dto.getId(), currentMerchantId).orElseThrow( () ->  new ProductNotFoundException("No Product found for ID"));
-        else
+        else {
             master = partnerProductMapper.toEntity(dto);
+        }
 
         if(_new) {
+
             String ref = currentMerchantId.toString() + ChecksumUtil.getChecksum(dto.getSku());
             master.setRef(Long.valueOf(ref));
             master.setSlug(ref);
-            master.getProductLangs().stream().forEach(x -> x.setProduct(master));
+            if(master.getProductLangs() != null)
+                master.getProductLangs().stream().forEach(x -> x.setProduct(master));
             master.setMerchantId(currentMerchantId);
         }
         else {
@@ -112,9 +123,12 @@ public class PartnerService {
         if(master.getChildren() == null) {
             assert(dto.getPriceObj() != null);
             master.setVariationType(VariationType.SIMPLE);
-            MerchantStock stock = master.getMerchantStock().stream().findFirst().orElse(new MerchantStock());
-            stock = setMerchantStock(stock, master, dto.getPriceObj(), dto.getSalePriceObj(), dto.getCostObj(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
-            if(stock.getId() == null)
+            MerchantStock stock  = null;
+            if(master.getMerchantStock() != null) {
+                stock = master.getMerchantStock().stream().findFirst().orElse(new MerchantStock());
+                stock = setMerchantStock(stock, master, dto.getPriceObj(), dto.getSalePriceObj(), dto.getCostObj(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
+            }
+            if(stock != null && stock.getId() == null)
                 master.addMerchantStock(stock);
         }
         else { // PARENT    //if(product.getVariationType().equals(VariationType.PARENT)) {
@@ -142,7 +156,8 @@ public class PartnerService {
 
 
         if(_new) {
-            masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(generateRef(x.getSku(), currentMerchantId)).merchantId(currentMerchantId).ref(Long.valueOf(x.getSlug())).title(master.getTitle()).parent(master).getMerchantStock().forEach(y -> y.setMerchantId(currentMerchantId)));
+            if(masterChildren != null)
+                masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(generateRef(x.getSku(), currentMerchantId)).merchantId(currentMerchantId).ref(Long.valueOf(x.getSlug())).title(master.getTitle()).parent(master).getMerchantStock().forEach(y -> y.setMerchantId(currentMerchantId)));
             return;
         }
         // Delete removed
@@ -244,16 +259,26 @@ public class PartnerService {
     }
 
     private MerchantStock setMerchantStock(MerchantStock stock, Product master, Price priceObj, Price salePriceObj, Price costPriceObj, BigDecimal quantity, Integer availability, Long currentMerchantId) {
+
+        if(priceObj == null)
+            throw new ValidationException("Price is null");
+
         BigDecimal price = priceObj.getAmount();
         String currency = priceObj.getCurrency();
 
+        if(price == null || currency == null)
+            throw new ValidationException("Price or currency is null");
+
         int discount = 0;
-        if(salePriceObj != null) {
+        if(salePriceObj != null && salePriceObj.getAmount() != null ) {
             double salePrice = salePriceObj.getAmount().doubleValue();
             discount = 100 * (int)((price.doubleValue() - salePrice)/price.doubleValue());
             price = salePriceObj.getAmount();
         }
-        return stock.quantity(quantity).availability(availability).cost(costPriceObj.getAmount()).allow_backorder(false)
+
+
+
+        return stock.quantity(quantity).availability(availability).cost(costPriceObj==null?BigDecimal.ZERO:costPriceObj.getAmount()).allow_backorder(false)
                 .price(price).discount(discount).product(master).merchantId(currentMerchantId);
     }
 
