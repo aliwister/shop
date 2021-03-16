@@ -23,6 +23,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    List<Order> findAllByOrderStateInOrderByCreatedDateDesc(List<OrderState> orderStates, Pageable page);
    List<Order> findAllByOrderByCreatedDateDesc(Pageable page);
 
+   List<Order> findByIdBetween(Long from, Long to);
+
    @Query("from Order o left join o.customer left join fetch o.deliveryAddress where o.id = ?1")
    Optional<Order> findJoinCustomerJoinAddress(Long orderId);
 
@@ -36,4 +38,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
    @Query("select count(u) from Order u where u.orderState in ?1")
    Integer countForState(List<OrderState> orderState);
+
 }

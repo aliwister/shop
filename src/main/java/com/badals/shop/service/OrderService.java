@@ -387,4 +387,9 @@ public class OrderService {
         OrderDTO dto = save(order);
         return dto;
     }
+
+    public void reIndex(Long from, Long to) {
+        List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toDto).collect(Collectors.toList());
+        orderSearchRepository.saveAll(dtos);
+    }
 }
