@@ -78,6 +78,18 @@ public class OrderResource {
             .body(result);
     }
 
+    @PostMapping("/orders/reindex")
+    public ResponseEntity<String> reindex(@RequestParam("_from") Long from, @RequestParam("_to") Long to) throws URISyntaxException {
+        log.debug("REST request to update Order : {} ", from);
+        if (from == null || to == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        orderService.reIndex(from, to);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, from+"-"+to))
+            .body("Fuck yeah");
+    }
+
     /**
      * {@code GET  /orders} : get all the orders.
      *
