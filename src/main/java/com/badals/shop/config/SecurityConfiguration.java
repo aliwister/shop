@@ -86,7 +86,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/activate").permitAll()
             .antMatchers("/graphql").permitAll()
             .antMatchers("/detrack").permitAll()
-            .antMatchers("/api/orders/reindex").permitAll()
             .antMatchers("/api/users/current").permitAll()
             .antMatchers("/api/account/reset-password/init").permitAll()
             .antMatchers("/api/account/reset-password/finish").permitAll()
