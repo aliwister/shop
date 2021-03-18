@@ -52,16 +52,18 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, Product> 
         BigDecimal price = source.priceObj.getAmount();
         assert(price != null);
 
-        Double dPrice = price.doubleValue();
-        BigDecimal cost = source.costObj.getAmount();
-        Double salePrice = price.doubleValue();
-        if(source.getSalePriceObj() != null && source.getSalePriceObj().getAmount() != null) {
-            salePrice = source.getSalePriceObj().getAmount().doubleValue();
+        if(price != null) {
+            Double dPrice = price.doubleValue();
+            BigDecimal cost = source.costObj.getAmount();
+            Double salePrice = price.doubleValue();
+            if (source.getSalePriceObj() != null && source.getSalePriceObj().getAmount() != null) {
+                salePrice = source.getSalePriceObj().getAmount().doubleValue();
+            }
+            int discount = 100 * (int)((dPrice-salePrice)/dPrice);
+            target.getMerchantStock().add(new MerchantStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(cost).allow_backorder(false)
+                    .price(price).discount(discount).product(target));
         }
 
-        int discount = 100 * (int)((dPrice-salePrice)/dPrice);
-        target.getMerchantStock().add(new MerchantStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(cost).allow_backorder(false)
-                .price(price).discount(discount).product(target));
 
     }
 
