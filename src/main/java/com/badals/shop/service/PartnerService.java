@@ -108,6 +108,7 @@ public class PartnerService {
                 //master.setSlug(ref);
             }
             master.setTitle(update.getTitle());
+
             master.setWeight(update.getWeight());
             master.setPrice(update.getPrice());
             master.setImage(update.getImage());
@@ -120,7 +121,7 @@ public class PartnerService {
             saveLang(master, update);
         }
 
-        if(master.getChildren() == null) {
+        if(update.getChildren() == null || update.getVariationType().equals(VariationType.SIMPLE)) {
             assert(dto.getPriceObj() != null);
             master.setVariationType(VariationType.SIMPLE);
             MerchantStock stock  = null;
@@ -249,6 +250,9 @@ public class PartnerService {
 
         for (ProductLang lang: langs) {
             ProductLang pl = masterLangs.stream().filter(x -> x.getLang().equals(lang.getLang())).findFirst().orElse(null);
+            if(lang.getLang().equals("en")) {
+                master.setTitle(lang.getTitle());
+            }
             if (pl == null)
                 master.addProductLang(lang);
             else if (!pl.equals(lang)) {
