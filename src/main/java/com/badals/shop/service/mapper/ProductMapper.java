@@ -133,6 +133,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
 
         ProductLang lang = source.getProductLangs().stream().findFirst().orElse(null);
         if(lang != null) {
+            target.setTitle(lang.getTitle());
             target.setFeatures(lang.getFeatures());
             target.setDescription(lang.getDescription());
             target.setBrowseNode(lang.getBrowseNode());
