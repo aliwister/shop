@@ -79,7 +79,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
             code = 400;
         }
-
+        log.error(message.toString());
         return new ProductEnvelope(p, message.toString(), code);
     }
 
