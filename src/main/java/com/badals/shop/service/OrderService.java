@@ -345,12 +345,12 @@ public class OrderService {
    }
 
     public BigDecimal calculateSubtotal(Order order) {
-        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).round(new MathContext(2)).doubleValue());;
         return sum;
     }
 
     public BigDecimal calculateTotal(Order order) {
-        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).round(new MathContext(2)).doubleValue());;
         if(order.getDeliveryTotal() != null)
             sum = sum.add(order.getDeliveryTotal());
         if(order.getDiscountsTotal() != null)
