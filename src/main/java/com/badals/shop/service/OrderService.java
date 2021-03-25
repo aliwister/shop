@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -323,7 +324,7 @@ public class OrderService {
 
            before.quantity(item.getQuantity())
                    .price(item.getPrice())
-                   .lineTotal(item.getPrice().multiply(item.getQuantity()).round(new MathContext(2)).doubleValue());
+                   .lineTotal(item.getPrice().multiply(item.getQuantity()).setScale(2, RoundingMode.HALF_UP).doubleValue());
        }
        order.setSubtotal(calculateSubtotal(order));
        order.setTotal(calculateTotal(order));
@@ -345,12 +346,12 @@ public class OrderService {
    }
 
     public BigDecimal calculateSubtotal(Order order) {
-        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).round(new MathContext(2));
+        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).setScale(2, RoundingMode.HALF_UP);
         return sum;
     }
 
     public BigDecimal calculateTotal(Order order) {
-        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).round(new MathContext(2));
+        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).setScale(2, RoundingMode.HALF_UP);
         if(order.getDeliveryTotal() != null)
             sum = sum.add(order.getDeliveryTotal());
         if(order.getDiscountsTotal() != null)
