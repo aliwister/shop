@@ -36,6 +36,7 @@ extend type Mutation {
     setSettlementDate(paymentIds: [Long], date: Date): Message
     setProcessedDate(paymentIds: [Long], date: Date): Message
     setAccountingCode(paymentIds: [Long], code: String): Message
+    processCheckoutRefund(token: String, amount: String, ref: String, description: String): Message
 }
 
 extend type Query {

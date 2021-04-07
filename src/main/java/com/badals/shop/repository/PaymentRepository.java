@@ -34,4 +34,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
    @Modifying @Query("update Payment p set p.account = ?2 where p.id in ?1")
    void setAccountingCode(ArrayList<Long> ids, String account);
 
+
+   @Modifying(flushAutomatically = true, clearAutomatically = true)
+   @Query("update Payment p set p.captureId = ?2 where p.trackId in ?1")
+   void updateCaptureId(Long cartId, String captureId);
+
 }
