@@ -70,6 +70,40 @@ public class Address implements Serializable {
     @Column(name = "deleted")
     private String deleted;
 
+    @Column(name = "plus_code")
+    private String plusCode;
+
+    private String lng;
+    private String lat;
+
+    public String getPlusCode() {
+        return plusCode;
+    }
+
+    public void setPlusCode(String plusCode) {
+        this.plusCode = plusCode;
+    }
+
+    public String getLng() {
+        return lng;
+    }
+
+    public void setLng(String lng) {
+        this.lng = lng;
+    }
+
+    public String getLat() {
+        return lat;
+    }
+
+    public void setLat(String lat) {
+        this.lat = lat;
+    }
+/*ALTER TABLE shop.address ADD lng varchar(100) NULL;
+    ALTER TABLE shop.address ADD lat varchar(100) NULL;
+    ALTER TABLE shop.address ADD plus_code varchar(100) NULL;
+*/
+
     @ManyToOne
     @JoinColumn(name = "id_customer")
     @JsonIgnoreProperties("addresses")

@@ -23,6 +23,7 @@ public interface OrderMapper extends EntityMapper<OrderDTO, Order> {
 
     @Mapping(target="cart", ignore = true)
     @Mapping(source = "cart.id", target="cartId")
+    @Mapping(source = "cart.secureKey", target="cartSecureKey")
     OrderDTO toDto(Order order);
 
     default Order fromId(Long id) {
