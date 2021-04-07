@@ -543,6 +543,11 @@
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-translate</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.trust2</groupId>
+            <artifactId>checkoutcom</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
