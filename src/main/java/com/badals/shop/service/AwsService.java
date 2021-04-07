@@ -24,7 +24,7 @@ public class AwsService {
    }
 
 
-   @Value("${aws.s3bucket}")
+   @Value("${badals.s3bucket}")
    private String bucketName;
 
    public AwsService(S3Client s3Client) {
@@ -51,7 +51,6 @@ public class AwsService {
       PresignedGetObjectRequest presignedRequest =
               presigner.presignGetObject(z -> z.signatureDuration(Duration.ofMinutes(10))
                       .getObjectRequest(por -> por.bucket(bucketName).key(objectKey)));
-      // Upload content to the bucket by using this URL
       return presignedRequest.url();
    }
 }

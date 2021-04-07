@@ -21,6 +21,6 @@ public interface CartRepository extends CustomRepository<Cart, Long> {
 
     List<Cart> findByCustomerAndCartStateOrderByIdDesc(Customer user, CartState cartState);
 
-    @Query("from Cart c left join fetch c.customer cc left join fetch cc.addresses where id = ?1")
+    @Query("from Cart c left join fetch c.customer cc left join fetch cc.addresses a where cc.id = ?1 and a.plusCode is not null")
     Cart getCartByCustomerJoinAddresses(Long id);
 }
