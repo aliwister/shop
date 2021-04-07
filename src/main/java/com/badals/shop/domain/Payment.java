@@ -79,6 +79,32 @@ public class Payment extends Auditable implements Serializable {
     @Column(name = "settlement_date")
     private Date settlementDate;
 
+/*
+    ALTER TABLE shop.payment ADD capture_id varchar(100) NULL;
+*/
+
+    @Column(name = "capture_id")
+    private String captureId;
+
+    @Column(name = "track_id")
+    private String trackId;
+
+    public String getTrackId() {
+        return trackId;
+    }
+
+    public void setTrackId(String trackId) {
+        this.trackId = trackId;
+    }
+
+    public String getCaptureId() {
+        return captureId;
+    }
+
+    public void setCaptureId(String captureId) {
+        this.captureId = captureId;
+    }
+
     public Date getSettlementDate() {
         return settlementDate;
     }

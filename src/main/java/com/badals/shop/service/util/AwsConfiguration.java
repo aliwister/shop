@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 public class AwsConfiguration {
    private static S3Client s3;
 
-   @Value("${aws.s3bucket}")
+   @Value("${badals.s3bucket}")
    private String bucketName;
 
    @Bean(name="S3Client")
