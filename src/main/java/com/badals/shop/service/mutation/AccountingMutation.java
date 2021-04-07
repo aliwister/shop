@@ -1,21 +1,16 @@
 package com.badals.shop.service.mutation;
 
 import com.badals.shop.domain.checkout.helper.Message;
+import com.badals.shop.service.CheckoutComService;
 import com.badals.shop.service.OrderService;
 import com.badals.shop.service.PaymentService;
 import com.badals.shop.service.PurchaseService;
-import com.badals.shop.service.dto.OrderDTO;
-import com.badals.shop.service.dto.OrderItemDTO;
-import com.badals.shop.service.dto.PaymentDTO;
-import com.badals.shop.service.dto.PurchaseDTO;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
 /*
@@ -33,11 +28,13 @@ public class AccountingMutation implements GraphQLMutationResolver {
     final private OrderService orderService;
     final private PurchaseService purchaseService;
     final private PaymentService paymentService;
+    final private CheckoutComService checkoutComService;
 
-    public AccountingMutation(OrderService orderService, PurchaseService purchaseService, PaymentService paymentService) {
+    public AccountingMutation(OrderService orderService, PurchaseService purchaseService, PaymentService paymentService, CheckoutComService checkoutComService) {
         this.orderService = orderService;
         this.purchaseService = purchaseService;
         this.paymentService = paymentService;
+        this.checkoutComService = checkoutComService;
     }
 
     @PreAuthorize("hasRole('ROLE_FINANCE')")
@@ -57,5 +54,8 @@ public class AccountingMutation implements GraphQLMutationResolver {
         paymentService.setAccountingCode(paymentIds, code);
         return new Message("Success");
     }
-
+    //@PreAuthorize("hasRole('ROLE_CHECKOUT_REFUND')")
+    public Message processCheckoutRefund(String token, String amount, String ref, String description) throws Exception {
+        return checkoutComService.refund(token, amount, ref, description);
+    }
 }
