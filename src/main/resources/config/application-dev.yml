@@ -160,12 +160,11 @@ mws:
   merchantid: ***REMOVED***
   marketplaceid: ***REMOVED***
 
-aws:
-  s3bucket: face-content-test
-
 badals:
   checkout-app: http://127.0.0.1:8081/checkout/start
   cdnUrl: https://d4gk56dg16f6k.cloudfront.net
+  s3bucket: face-content-test
+  sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
 
 ebay:
   app-id: BadalTra-5d42-45de-b09b-586ff14be57f
