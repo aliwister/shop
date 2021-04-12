@@ -280,7 +280,8 @@ public class PartnerService {
             price = salePriceObj.getAmount();
         }
 
-
+        if(quantity == null)
+            quantity = BigDecimal.ZERO;
 
         return stock.quantity(quantity).availability(availability).cost(costPriceObj==null?BigDecimal.ZERO:costPriceObj.getAmount()).allow_backorder(false)
                 .price(price).discount(discount).product(master).merchantId(currentMerchantId);
