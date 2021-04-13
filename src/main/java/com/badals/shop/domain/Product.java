@@ -459,12 +459,7 @@ public class Product implements Serializable, IMerchantProduct {
     }
 
     public void setGallery(List<Gallery> images) {
-        if(gallery == null)
-            gallery = new ArrayList<>();
-        this.gallery.clear();
-        for(Gallery image: images) {
-            this.gallery.add(new Gallery(image.getUrl()));
-        }
+        this.gallery = images;
     }
 
     public LocalDate getReleaseDate() {
