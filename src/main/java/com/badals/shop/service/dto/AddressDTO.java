@@ -31,6 +31,10 @@ public class AddressDTO implements Serializable {
 
     private Long customerId;
 
+    private String plusCode;
+    private String lat;
+    private String lng;
+
     public AddressDTO() {
     }
 
