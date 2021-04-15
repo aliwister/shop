@@ -18,6 +18,9 @@ type Address {
     city: String
     mobile: String
     alias: String
+             lng: String
+             lat: String
+             plusCode: String
 }
 
 type AddressInput {
@@ -27,6 +30,9 @@ type AddressInput {
     landmark: String
     city: String
     country: String
+             lng: String
+             lat: String
+             plusCode: String
 }
 
 

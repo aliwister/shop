@@ -59,6 +59,7 @@ type Order {
     createdDate: Date
     payments: [Payment]
     balance: BigDecimal
+    cartSecureKey: String
 }
 type Merchant {
     id: ID
