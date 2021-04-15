@@ -201,6 +201,7 @@ input CheckoutCartInput {
     carrier: String
     currency: String
     items: [LineItemInput]
+    allowPickup: Boolean
     #tenantId: Long
 }
 type OrderResponse {
@@ -242,6 +243,8 @@ extend type Mutation {
     refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
 
     addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
+
+
 }
 
 extend type Query {
