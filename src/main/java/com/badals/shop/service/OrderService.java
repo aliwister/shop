@@ -36,6 +36,7 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -277,6 +278,8 @@ public class OrderService {
 
     public OrderDTO setOrderState(Long orderId, OrderState os) {
         Order order = orderRepository.getOne(orderId);
+        if(os.equals(OrderState.PAYMENT_ACCEPTED) && !order.getOrderState().equals(OrderState.PAYMENT_ACCEPTED))
+            order.setInvoiceDate(LocalDate.now());
         order.setOrderState(os);
         if(!os.equals(OrderState.CANCELLED)) {
             order.setSubtotal(calculateSubtotal(order));
