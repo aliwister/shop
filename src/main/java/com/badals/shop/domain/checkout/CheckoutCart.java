@@ -72,6 +72,9 @@ public class CheckoutCart implements Serializable {
     @Column(name="tenant_id")
     private Long tenantId;
 
+    @Column(name="allow_pickup")
+    private Boolean allowPickup;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
