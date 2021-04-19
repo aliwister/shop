@@ -17,7 +17,7 @@
         </p>
         <table>
             <tr th:each="o: ${pricingrequests}">
-                <td><a th:href="'https://www.badals.com/product/' + ${o.sku}"><span th:text="'https://www.badals.com/product/' + ${o.sku}"/></a> </td>
+                <td><a th:href="${baseUrl}+'/product/' + ${o.sku}"><span th:text="${baseUrl}+'/product/' + ${o.sku}"/></a> </td>
             </tr>
         </table>
 

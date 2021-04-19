@@ -12,6 +12,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
@@ -22,6 +23,7 @@ import java.io.IOException;
 public class JWTFilter extends GenericFilterBean {
     private final Logger log = LoggerFactory.getLogger(JWTFilter.class);
     public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String COOKIE_TOKEN = "xbtoken";
 
     private TokenProvider tokenProvider;
 
@@ -47,6 +49,14 @@ public class JWTFilter extends GenericFilterBean {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
+        // Check token in cookie
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null)
+            for(Cookie c : cookies) {
+                if (c.getName().equalsIgnoreCase(COOKIE_TOKEN))
+                    return c.getValue();
+            }
+
         return null;
     }
 }
