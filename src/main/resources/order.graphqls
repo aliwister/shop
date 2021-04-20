@@ -189,6 +189,9 @@ input AddressPojo {
     city: String
     alias: String
     country: String
+    lng: String
+    lat: String
+    plusCode: String
 }
 
 input CheckoutCartInput {
