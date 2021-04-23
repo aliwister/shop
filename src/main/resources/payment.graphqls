@@ -1,0 +1,12 @@
+
+extend type Mutation {
+    sendPaymentSms(id: ID, mobile: String): Message
+    addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
+    refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
+    addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
+    #voidPayment(id: ID): Message
+}
+
+extend type Query {
+    payments(orderId: ID) : [Payment]
+}

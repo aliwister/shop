@@ -5,8 +5,8 @@ import com.badals.shop.aop.logging.TenantContext;
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
-import com.badals.shop.domain.pojo.MerchantProductResponse;
-import com.badals.shop.domain.pojo.ProductResponse;
+import com.badals.shop.graph.MerchantProductResponse;
+import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
@@ -189,12 +189,6 @@ public class ProductService {
         return productMapper.toDto(product);
     }
 
-    public ProductDTO createNewProduct(ProductDTO product) {
-        ProductDTO product2 = save(product);
-
-        return product2;
-    }
-
     final
     ProductLangRepository productLangRepository;
 
@@ -279,7 +273,7 @@ public class ProductService {
     //public static final String LATEST = "LATEST";
    //@Cacheable(cacheNames = LATEST)
    public ProductResponse getLatest(Integer limit) {
-       List<Product> products = productRepository.findByVariationTypeInAndPriceIsNotNullOrderByCreatedDesc(Arrays.asList(new VariationType[]{VariationType.SIMPLE}), PageRequest.of(0,20));
+       List<Product> products = productRepository.findByVariationTypeInAndPriceIsNotNullAndStubEqualsAndHashtagsIsNotNullOrderByCreatedDesc(Arrays.asList(new VariationType[]{VariationType.SIMPLE}), PageRequest.of(0,20), false);
        ProductResponse response = new ProductResponse();
        response.setTotal(products.size());
        response.setItems(products.stream().map(productMapper::toDto).collect(Collectors.toList()));
