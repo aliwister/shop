@@ -2,14 +2,12 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.OrderState;
-import com.badals.shop.domain.pojo.OrderResponse;
-import com.badals.shop.domain.pojo.PurchaseResponse;
+import com.badals.shop.graph.PurchaseResponse;
 import com.badals.shop.repository.MerchantRepository;
 import com.badals.shop.repository.OrderItemRepository;
 import com.badals.shop.repository.PurchaseItemRepository;
 import com.badals.shop.repository.PurchaseRepository;
 import com.badals.shop.repository.projection.PurchaseQueue;
-import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.dto.PurchaseDTO;
 import com.badals.shop.service.dto.PurchaseItemDTO;
@@ -27,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 

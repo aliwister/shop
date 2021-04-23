@@ -1,3 +1,26 @@
+extend type Query {
+    product(slug: String!, cookie: String = ""): Product!
+    products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
+
+    relatedProducts(type: String, slug: String!): [Product!]!
+    categories(type: String!): [Category!]!
+    category(id: Int!): Category!
+
+    productAny(id: ID):Product
+    productAdmin(id: ID):Product
+
+    getProductBySku(sku: String, isParent: Boolean = false):Product
+    getProductByDial(dial: String):Product
+
+    relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
+    findByKeyword(keyword: String): ProductResponse
+}
+
+extend type Mutation {
+    addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
+}
+
+
 enum Condition {
   NEW
   LIKE_NEW
@@ -133,6 +156,130 @@ type Product {
     dial: String
 }
 
+enum Condition {
+  NEW
+  LIKE_NEW
+  VERY_GOOD
+  GOOD
+  FAIR
+}
+
+enum VariationType {
+    SIMPLE
+    CHILD
+    PARENT
+}
+
+enum ProductGroup {
+    BAGS
+    ART
+    BEAUTY
+    BEDDINGS
+    BOOKS
+    CAMERA
+    AUTO
+    FASHION
+    ELECTRONICS
+    HEALTH
+    MUSIC
+    PC
+    SPORTS
+    TOOLS
+    TOYS
+    WATCHES
+}
+
+type ProductResponse {
+  items: [Product!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
+type Attribute {
+    name: String
+    value: String
+}
+
+type VariationOption {
+    label: String
+    name: String
+    values: [String]
+}
+
+type Variation {
+    ref: ID!
+    variationAttributes: [Attribute]
+}
+
+type Category {
+  id: Int!
+  title: String!
+  children: [Category!]!
+  #type: String!
+  icon: String!
+  slug: String!
+}
+type Gallery {
+  url: String!
+}
+
+type Meta {
+  publisher: String!
+  isbn: String!
+  edition: String!
+  country: String!
+  languages: [String!]!
+  numberOfReader: String!
+  numberOfPage: String!
+  samplePDF: String!
+}
+
+
+type Product {
+    id: ID!
+    ref: Long
+    parent: Int
+    sku: String
+    upc: String
+    #price: Price
+    image: String
+    gallery: [Gallery]
+    releaseDate: LocalDate
+    active: Boolean
+    similarProducts: [Int]
+    url: String
+    title: String
+    brand: String
+    group: ProductGroup
+    condition: Condition
+    isUsed: Boolean
+    availableForOrder: Boolean
+    weight: Float
+    volumeWeight: Float
+    variationDimensions: [String]
+    variationOptions: [VariationOption]
+    variationAttributes: [Attribute]
+    variations: [Variation]
+    price: String
+    salePrice: String
+    discountInPercent: Float
+    slug: String
+    categories: [Category]
+
+    author: String
+    unit: String
+    description: String
+    meta: Meta
+    merchantStock: [MerchantStock]
+    hours: Int
+    availability: String
+    features: [String]
+    browseNode: String
+    inStock: Boolean
+    hashtags: [String]
+    dial: String
+}
+
 type LocalizedValue {
     lang: String
     value: string
@@ -166,8 +313,6 @@ input AttributeInput {
     value: String
 }
 
-
-
 input ProductInput {
     sku: String,
     upc: String,
@@ -199,124 +344,9 @@ input ProductInput {
     #variationOptions: [VariationOptionInput]
 }
 
-type ProductResponse {
-  items: [Product!]!
-  total: Int!
-  hasMore: Boolean!
-}
 
-type ProductResponse {
-  items: [Product!]!
-  total: Int!
-  hasMore: Boolean!
-}
-
-type HashtagResponse {
-  items: [Hashtag!]!
-  total: Int!
-  hasMore: Boolean!
-
-}
-
-enum OverrideType {
-    COST
-    WEIGHT
-    SHIPPING
-    AVAILABILITY
-    CONDITION
-    PRICE
-}
-
-type ProductOverride {
-    id: ID
-    sku: String
-    type: OverrideType
-    override: String
-    active: Boolean
-    lazy: Boolean
-}
-
-input ProductOverrideInput {
-    sku: String
-    type: OverrideType
-    override: String
-    active: Boolean
-    lazy: Boolean
-    dial: String
-}
-type PricingRequest {
-    id: ID
-    sku: String
-    ref: String
-    email: String
-    parent: String
-    merchantId: Int
-    merchantName: String
-    createdDate: String
-}
-
-type Hashtag {
-id: ID
-    en: String
-    ar: String
-    icon: String
-    position: Int
-    products: ProductResponse
-}
-
-input HashtagInput {
-id: ID
-    en: String
-    ar: String
-    icon: String
-    position: Int
-}
-
-extend type Query {
-    product(slug: String!, cookie: String = ""): Product!
-                        products(
-                            category: String
-                            text: String
-                            type: String
-        offset: Int = 0
-        limit: Int = 10
-        lang: String
-      ): ProductResponse!
-    relatedProducts(type: String, slug: String!): [Product!]!
-    categories(type: String!): [Category!]!
-    category(id: Int!): Category!
-    productAny(id: ID):Product
-
-    productAdmin(id: ID):Product
-    getProductBySku(sku: String, isParent: Boolean = false):Product
-    getProductByDial(dial: String):Product
-    pricingRequests:[PricingRequest]
-    parentOf(sku: String): String
-    mws(sku: String):Product
-    pas(sku: String):Product
-    pasUk(sku: String):Product
-    ebay(id: String):Product
-    hashtags(        offset: Int = 0
-                     limit: Int = 10): HashtagResponse
-    hashtagsWithProducts(        offset: Int = 0
-                     limit: Int = 10): HashtagResponse
-
-    relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
-    findByKeyword(keyword: String): ProductResponse
-}
-
-extend type Mutation {
-    createNewProduct(product: ProductInput):Product,
-    indexProduct(id: Int): Attribute,
-    addI18n(id: Int,
-            i18n: ProductI18nInput):ProductI18n,
-    pasLookup(sku: String): Product
-    addToPricingQ(sku: String):Message
-    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int, dial: String): Product
-    completePricingRequest(id: Long):Message
-    completePricingRequestAndEmail(id: Long):Message
-    addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
-    createHashtag(hashtag: HashtagInput): Message
-    setHashtags(hashtags: [String], ref: Long): Message
-    setDial(dial: String, ref: Long): Message
+input VariationOptionInput {
+    label: String
+    name: String
+    values: [String]
 }

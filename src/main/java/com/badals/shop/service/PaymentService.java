@@ -2,10 +2,8 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.Order;
 import com.badals.shop.domain.Payment;
-import com.badals.shop.domain.pojo.OrderResponse;
-import com.badals.shop.domain.pojo.PaymentResponse;
+import com.badals.shop.graph.PaymentResponse;
 import com.badals.shop.repository.PaymentRepository;
-import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.PaymentDTO;
 import com.badals.shop.service.mapper.PaymentMapper;
 import org.slf4j.Logger;

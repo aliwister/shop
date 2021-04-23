@@ -1,16 +1,13 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Hashtag;
-import com.badals.shop.domain.pojo.HashtagResponse;
-import com.badals.shop.domain.pojo.ProductResponse;
+import com.badals.shop.graph.HashtagResponse;
 import com.badals.shop.repository.HashtagRepository;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.mapper.HashtagMapper;
-import com.badals.shop.service.pojo.AddProductDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -102,7 +99,7 @@ public class HashtagService {
 
     }
     public static final String LATEST = "LATEST";
-    @Cacheable(cacheNames = LATEST)
+    //@Cacheable(cacheNames = LATEST)
     public HashtagResponse findForListWithProducts(Integer offset, Integer limit) {
         Page<Hashtag> tags = hashtagRepository.findForList(/*orderState, */PageRequest.of((int) offset/limit,limit));
         HashtagResponse response = new HashtagResponse();
