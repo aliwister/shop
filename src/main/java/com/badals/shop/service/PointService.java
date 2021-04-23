@@ -1,19 +1,14 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.Order;
 import com.badals.shop.domain.Payment;
-import com.badals.shop.domain.pojo.PaymentResponse;
 import com.badals.shop.repository.PaymentRepository;
 import com.badals.shop.service.dto.PaymentDTO;
 import com.badals.shop.service.mapper.PaymentMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
