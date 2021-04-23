@@ -27,7 +27,7 @@ public class TenantAspect {
       this.tenantRepository = tenantRepository;
    }
 
-   @Around(value = "execution(* com.badals.shop.service.mutation.MerchantMutation.*(..)) || execution(* com.badals.shop.service.query.MerchantQuery.*(..))")
+   @Around(value = "execution(* com.badals.shop.graph.mutation.MerchantMutation.*(..)) || execution(* com.badals.shop.graph.query.MerchantQuery.*(..))")
    public Object assignForController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
       return assignTenant(proceedingJoinPoint);
    }

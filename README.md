@@ -111,3 +111,6 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 mvn deploy:deploy-file -Dfile=./lib/paapi5-java-sdk-1.0.0.jar -DgroupId=com.amazonservices -DartifactId=paapi5 -Dversion=1.0 -Dpackaging=jar -Durl=https://mymavenrepo.com/repo/xFZB9BHHw4UacjoRlVOe/
 mvn deploy:deploy-file -Dfile=./lib/MWSProductsServiceJavaClientLibrary-2013-08-01.jar -DgroupId=com.amazonservices -DartifactId=mws-products -Dversion=1.0 -Dpackaging=jar -Durl=https://mymavenrepo.com/repo/xFZB9BHHw4UacjoRlVOe/
 mvn deploy:deploy-file -Dfile=./lib/MWSClientJavaRuntime-1.0.jar -DgroupId=com.amazonservices -DartifactId=mws-client -Dversion=1.0 -Dpackaging=jar -Durl=https://mymavenrepo.com/repo/xFZB9BHHw4UacjoRlVOe/
+
+
+mvn install:install-file -Dfile=./lib/checkout-java-v1.20.jar -DgroupId=com.trust2 -DartifactId=checkoutcom -Dversion=1.0 -Dpackaging=jar -DgeneratePom=true

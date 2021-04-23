@@ -82,9 +82,4 @@ public class ProductLangService {
         log.debug("Request to delete ProductLang : {}", id);
         productLangRepository.deleteById(id);
     }
-
-    public ProductLangDTO addI18n(Long id, ProductLangDTO productI18n) {
-        productI18n.setProductId(id);
-        return this.save(productI18n);
-    }
 }

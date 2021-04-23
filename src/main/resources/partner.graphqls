@@ -178,11 +178,9 @@ type I18String {
 extend type Query {
     partnerProduct(id: ID): PartnerProduct
     partnerProducts( search: String,  limit: Int,  offset: Int,  active: Boolean): MerchantProductResponse
-
     variationOptions (name: String): VariationOption
     variations: [VariationOption]
     hashtagList: [Hashtag]
-
     brands: [I18String]
     collections: [I18String]
 
