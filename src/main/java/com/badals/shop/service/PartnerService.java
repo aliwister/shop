@@ -113,6 +113,7 @@ public class PartnerService {
             master.setBrand(update.getBrand());
             master.setUnit(update.getUnit());
             master.setGallery(update.getGallery());
+            master.setVariationOptions(update.getVariationOptions());
 
             saveLang(master, update);
         }
