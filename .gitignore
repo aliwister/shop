@@ -131,7 +131,7 @@ Desktop.ini
 *.*~
 *~
 .merge_file*
-
+**.bak
 ######################
 # Gradle Wrapper
 ######################
