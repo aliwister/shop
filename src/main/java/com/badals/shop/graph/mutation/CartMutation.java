@@ -94,9 +94,13 @@ public class CartMutation implements GraphQLMutationResolver {
     public CheckoutSessionResponse createCheckout(final String secureKey) {
         String token = cartService.createCheckout(secureKey, null);
 
-        CheckoutSessionResponse reponse = new CheckoutSessionResponse();
+        CheckoutSessionResponse response = new CheckoutSessionResponse();
+        response.setSecureKey(token);
+        response.setMessage("Checkout Session created successfully");
+        response.setSuccess(true);
+        response.setCode("200");
 
-        return reponse;
+        return response;
     }
 
 /*    @PreAuthorize("hasRole('ROLE_ADMIN')")
