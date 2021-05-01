@@ -6,6 +6,8 @@ extend type Query {
 extend type Mutation {
     updateCart(secureKey: String, items: [CartItemInput]): CartResponse
     createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
+
+    createCheckout(secureKey: String): CheckoutSessionResponse  #For app
 }
 
 enum CartState {
@@ -25,6 +27,12 @@ type Cart {
 
 type CartResponse {
     cart: Cart
+    success: Boolean
+    message: String
+}
+
+type CheckoutSessionResponse {
+    secureKey: String
     success: Boolean
     message: String
 }
@@ -61,6 +69,8 @@ type CheckoutSession {
     redirectUrl: String,
     secureKey: String
 }
+
+
 
 type Reward {
     id: ID
