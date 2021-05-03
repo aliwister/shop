@@ -6,9 +6,7 @@ import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.service.dto.ProductLangDTO;
 
-import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
@@ -26,6 +24,7 @@ import java.util.List;
 @Component
 public class ProductMutation implements GraphQLMutationResolver {
     private final ProductService productService;
+    private final ProductIndexService productIndexService;
 
     private final Pas5Service pasService;
 
@@ -42,8 +41,9 @@ public class ProductMutation implements GraphQLMutationResolver {
     private final UserService userService;
 
 
-    public ProductMutation(ProductService productService, Pas5Service pasService, HashtagService hashtagService, SpeedDialService speedDialService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
+    public ProductMutation(ProductService productService, ProductIndexService productIndexService, Pas5Service pasService, HashtagService hashtagService, SpeedDialService speedDialService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
         this.productService = productService;
+        this.productIndexService = productIndexService;
         this.pasService = pasService;
         this.hashtagService = hashtagService;
         this.speedDialService = speedDialService;
@@ -67,7 +67,7 @@ public class ProductMutation implements GraphQLMutationResolver {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Attribute indexProduct(final long id) {
-        return this.productService.indexProduct(id);
+        return this.productIndexService.indexProduct(id);
     }
 
 /*
@@ -99,7 +99,7 @@ public class ProductMutation implements GraphQLMutationResolver {
     }
 
     public Message addToElastic( Long id, String  sku, String  name, String  name_ar, List<String> shops) {
-        productService.addToElastic(id, sku, name, name_ar, shops);
+        productIndexService.addToElastic(id, sku, name, name_ar, shops);
         return new Message("success");
     }
 
@@ -111,7 +111,7 @@ public class ProductMutation implements GraphQLMutationResolver {
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message setHashtags(List<String> hashs, Long ref) throws ProductNotFoundException {
-        productService.setHashtags(hashs, ref);
+        productIndexService.setHashtags(hashs, ref);
         return new Message("Done");
     }
 
