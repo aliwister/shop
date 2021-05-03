@@ -33,9 +33,9 @@ public class AuditingAspect {
     @Autowired
     ActionRepository actionRepository;
 
-    @Around("execution(* com.badals.shop.service.query.ProductQuery.product(..)) ||" +
-            "execution(* com.badals.shop.service.query.ProductQuery.getProductBySku(..)) ||" +
-            "execution(* com.badals.shop.service.query.ProductQuery.getProductByDial(..))")
+    @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..)) ||" +
+            "execution(* com.badals.shop.graph.query.ProductQuery.getProductBySku(..)) ||" +
+            "execution(* com.badals.shop.graph.query.ProductQuery.getProductByDial(..))")
     public Object beforeWebMethodExecution1(ProceedingJoinPoint joinPoint) throws Throwable {
         addAction(joinPoint);
         return joinPoint.proceed();

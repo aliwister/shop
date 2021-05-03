@@ -1,5 +1,5 @@
 package com.badals.shop.service.dto;
-import com.badals.shop.domain.pojo.ProductResponse;
+import com.badals.shop.graph.ProductResponse;
 import lombok.Data;
 
 import java.io.Serializable;

@@ -1,0 +1,95 @@
+extend type Query {
+    purchases(state: [OrderState], offset: Int, limit: Int, searchText: String): PurchaseResponse
+    unshippedPurchases: [PurchaseQueue]
+    purchase(id: ID): Purchase
+    purchaseQueue: [PurchaseQueue]
+    merchants: [Merchant]
+}
+
+extend type Mutation {
+    createPurchase(dto: PurchaseInput): Purchase
+    updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
+    cancelPurchase(id: ID, reason: String): Purchase
+    closePurchase(id: ID, reason: String): Purchase
+    setPurchaseState(id: ID, state: OrderState): Purchase
+}
+
+type Merchant {
+    id: ID
+    name: String
+}
+
+type Purchase {
+    id: ID
+    ref: String
+    purchaseItems : [PurchaseItem]
+    currency: String
+    invoiceDate: LocalDate
+    subtotal: BigDecimal
+    deliveryTotal: BigDecimal
+    taxesTotal: BigDecimal
+    discountTotal: BigDecimal
+    total: BigDecimal
+    merchantObj: Merchant
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+}
+
+type PurchaseItem {
+    id: ID
+    sequence: Int
+    price: BigDecimal
+    quantity: BigDecimal
+    description: String
+    orderItems: [OrderItem]
+    productId: Long
+}
+
+type PurchaseQueue {
+    id: ID
+    productName: String
+    quantity: BigDecimal
+    price: BigDecimal
+    cost: BigDecimal
+    image: String
+    weight: BigDecimal
+    url: String
+    sku: String
+    productId: Long
+    orderId: Long
+    attributes: String
+    merchantId: Long
+}
+
+type PurchaseResponse {
+  items: [Purchase!]!
+  total: Int!
+  hasMore: Boolean!
+}
+
+input PurchaseInput {
+    id: ID
+    currency: String
+    subtotal: Float
+    deliveryTotal: Float
+    taxesTotal: Float
+    discountTotal: Float
+    total: Float
+    deliveryAddressId: Int
+    invoiceAddressId: Int
+    merchantId: Int
+    orderState: OrderState
+    ref: String
+}
+
+input PurchaseItemInput {
+    id: Long
+    sequence: Int
+    price: Float
+    quantity: Float
+    description: String
+    orderItems: [OrderItemInput]
+    productId: Long
+}

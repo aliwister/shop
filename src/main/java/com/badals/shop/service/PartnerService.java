@@ -6,22 +6,19 @@ import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
-import com.badals.shop.domain.pojo.MerchantProductResponse;
+import com.badals.shop.graph.MerchantProductResponse;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
-import com.badals.shop.service.dto.ProductLangDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import graphql.validation.ValidationError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.zip.CRC32;
 
 /**
  * Service Implementation for managing {@link Product}.
@@ -54,8 +50,9 @@ public class PartnerService {
     private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
     private final RecycleService recycleService;
+    private final ProductIndexService productIndexService;
 
-    public PartnerService(ProductRepository productRepository, ProductService productService, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService) {
+    public PartnerService(ProductRepository productRepository, ProductService productService, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, ProductIndexService productIndexService) {
         this.productRepository = productRepository;
         this.productService = productService;
         this.messageSource = messageSource;
@@ -67,6 +64,7 @@ public class PartnerService {
         this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
         this.recycleService = recycleService;
+        this.productIndexService = productIndexService;
     }
 
     public PartnerProduct getPartnerProduct(Long id, Long merchantId) {
@@ -117,6 +115,7 @@ public class PartnerService {
             master.setBrand(update.getBrand());
             master.setUnit(update.getUnit());
             master.setGallery(update.getGallery());
+            master.setVariationOptions(update.getVariationOptions());
 
             saveLang(master, update);
         }
@@ -147,7 +146,7 @@ public class PartnerService {
 
         AddProductDTO esDto = addProductMapper.toDto(master);
         if(isSaveES)
-            productService.saveToElastic(esDto);
+            productIndexService.saveToElastic(esDto);
         return partnerProductMapper.toDto(master);
     }
 
