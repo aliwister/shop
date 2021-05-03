@@ -125,8 +125,6 @@ input PurchaseItemInput {
     productId: Long
 }
 
-
-
 type PurchaseQueue {
     id: ID
     productName: String
