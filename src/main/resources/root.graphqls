@@ -33,3 +33,9 @@ type Action {
     createdDate: Date
     createdBy: String
 }
+
+interface MutationResponse {
+  code: String!
+  success: Boolean!
+  message: String!
+}

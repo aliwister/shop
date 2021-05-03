@@ -247,7 +247,7 @@ public class Product implements Serializable, IMerchantProduct {
     @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true)
     private Set<MerchantStock> merchantStock = new HashSet<>();
 
-    @Column(name = "expires", nullable = false, updatable=false, insertable=false)
+    @Column(name = "expires")
     private Instant expires;
 
     public Instant getExpires() {
