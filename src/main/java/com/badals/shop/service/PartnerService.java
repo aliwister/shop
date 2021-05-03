@@ -50,8 +50,9 @@ public class PartnerService {
     private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
     private final RecycleService recycleService;
+    private final ProductIndexService productIndexService;
 
-    public PartnerService(ProductRepository productRepository, ProductService productService, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService) {
+    public PartnerService(ProductRepository productRepository, ProductService productService, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, ProductIndexService productIndexService) {
         this.productRepository = productRepository;
         this.productService = productService;
         this.messageSource = messageSource;
@@ -63,6 +64,7 @@ public class PartnerService {
         this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
         this.recycleService = recycleService;
+        this.productIndexService = productIndexService;
     }
 
     public PartnerProduct getPartnerProduct(Long id, Long merchantId) {
@@ -144,7 +146,7 @@ public class PartnerService {
 
         AddProductDTO esDto = addProductMapper.toDto(master);
         if(isSaveES)
-            productService.saveToElastic(esDto);
+            productIndexService.saveToElastic(esDto);
         return partnerProductMapper.toDto(master);
     }
 
