@@ -201,7 +201,7 @@ public class OrderService {
         return response;
     }
 
-    public void sendPaymnetMessage(Long id) {
+    public void sendPaymentMessage(Long id) {
         Optional<Order> o = orderRepository.findJoinCustomerJoinAddress(id);
         OrderDTO order = o.map(orderMapper::toDto).orElse(null);
     }

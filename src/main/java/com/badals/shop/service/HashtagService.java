@@ -29,15 +29,16 @@ public class HashtagService {
 
     private final HashtagRepository hashtagRepository;
 
-    private final ProductService productService;
+    private final ProductIndexService productIndexService;
 
     private final HashtagMapper hashtagMapper;
 
-    public HashtagService(HashtagRepository hashtagRepository, ProductService productService, HashtagMapper hashtagMapper) {
+    public HashtagService(HashtagRepository hashtagRepository, ProductIndexService productIndexService, HashtagMapper hashtagMapper) {
         this.hashtagRepository = hashtagRepository;
-        this.productService = productService;
+        this.productIndexService = productIndexService;
         this.hashtagMapper = hashtagMapper;
     }
+
 
     /**
      * Save a hashtag.
@@ -108,7 +109,7 @@ public class HashtagService {
         response.setHasMore(tags.hasNext());
 
         response.getItems().forEach(x ->{
-            x.setProducts(productService.findByHashtag(x.getEn()));
+            x.setProducts(productIndexService.findByHashtag(x.getEn()));
         });
 
         return response;
@@ -121,7 +122,7 @@ public class HashtagService {
         response.setHasMore(false);
 
         response.getItems().forEach(x ->{
-            x.setProducts(productService.findByHashtag(x.getEn() + " AND !(ref:" + ref + ")"));
+            x.setProducts(productIndexService.findByHashtag(x.getEn() + " AND !(ref:" + ref + ")"));
         });
 
         return response;

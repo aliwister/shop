@@ -3,10 +3,7 @@ package com.badals.shop.graph.query;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.graph.HashtagResponse;
 import com.badals.shop.graph.ProductResponse;
-import com.badals.shop.service.CategoryService;
-import com.badals.shop.service.HashtagService;
-import com.badals.shop.service.ProductService;
-import com.badals.shop.service.UserService;
+import com.badals.shop.service.*;
 import com.badals.shop.service.dto.CategoryDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
@@ -26,6 +23,7 @@ import java.util.List;
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final ProductService productService;
+   private final ProductIndexService productIndexService;
    private final HashtagService hashtagService;
    //private final MwsLookup mwsLookup;
    private final EbayLookup ebayLookup;
@@ -35,8 +33,9 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final UserService userService;
 
-   public ProductQuery(ProductService productService, HashtagService hashtagService, EbayLookup ebayLookup, CategoryService categoryService, UserService userService) {
+   public ProductQuery(ProductService productService, ProductIndexService productIndexService, HashtagService hashtagService, EbayLookup ebayLookup, CategoryService categoryService, UserService userService) {
       this.productService = productService;
+      this.productIndexService = productIndexService;
       this.hashtagService = hashtagService;
       this.ebayLookup = ebayLookup;
       this.categoryService = categoryService;
@@ -64,7 +63,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductResponse findByKeyword(String keyword) {
-        return productService.findByKeyword(keyword);
+        return productIndexService.findByKeyword(keyword);
     }
 
     public ProductDTO getProductAny(final int id) {
@@ -77,11 +76,11 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
          case "LATEST":
             return productService.getLatest(10);
          case "MAYASEEN":
-            return productService.searchAll(type);
+            return productIndexService.searchAll(type);
          case "capitol-stores":
-            return productService.searchAll(type);
+            return productIndexService.searchAll(type);
       }
-       return productService.findByType(type);//.findAllByCategory(slug, offset, limit);
+       return productIndexService.findByType(type);//.findAllByCategory(slug, offset, limit);
     }
 
    public List<ProductDTO> relatedProducts(String type, String slug) {

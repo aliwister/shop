@@ -46,9 +46,10 @@ public class MerchantMutation implements GraphQLMutationResolver {
 
     @Value("${badals.cdnUrl}")
     private String cdnUrl;
+    private final ProductIndexService productIndexService;
 
 
-    public MerchantMutation(ProductService productService, Pas5Service pasService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
+    public MerchantMutation(ProductService productService, Pas5Service pasService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, ProductIndexService productIndexService) {
         this.productService = productService;
         this.pasService = pasService;
         this.awsService = awsService;
@@ -56,6 +57,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.userService = userService;
+        this.productIndexService = productIndexService;
     }
 
 
@@ -80,7 +82,7 @@ public class MerchantMutation implements GraphQLMutationResolver {
 
     public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
         String t =  TenantContext.getCurrentTenant();
-        productService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(),TenantContext.getCurrentTenant(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
+        productIndexService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(),TenantContext.getCurrentTenant(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
         return new Message("success");
     }
 
