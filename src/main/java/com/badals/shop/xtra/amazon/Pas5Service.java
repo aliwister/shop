@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -316,17 +317,15 @@ public class Pas5Service implements IProductService {
         boolean isMwsLookup = false;
         boolean isReset = true;
 
-        if(product != null && product.getMerchantId() == 11L) {
-
+        if(product != null && product.getMerchantId() == 11L)
             isReset = true;
-        }
 
         if(product != null && product.getWeight() != null)
             isPasLookup = true;
 
-        if(overrides != null && overrides.size() > 0) {
+        if(overrides != null && overrides.size() > 0)
             isPasLookup = true;
-        }
+
         if(!isPasLookup) {
             try {
                 item = mwsLookup.lookup(asin);
@@ -470,6 +469,22 @@ public class Pas5Service implements IProductService {
             stock.setMerchantId(1L);
             product.addMerchantStock(stock.link("amazon.com/dp/"+product.getSku()));
         }
+        long window = 7200;
+        if ( product.getExpires() != null)
+            window = Math.abs(Duration.between(product.getUpdated(), product.getExpires()).getSeconds());
+
+        if ( product.getPrice() != null ) {
+            double diff = product.getPrice().subtract(stock.getPrice()).abs().doubleValue();
+            BigDecimal bPercent = BigDecimal.ONE.subtract(product.getPrice().divide(stock.getPrice()).subtract(BigDecimal.ONE).abs());
+            double percent = bPercent.doubleValue();
+
+            if (diff < .6 || percent < .06)
+                window *= 1 + (1 - percent);
+            else
+                window = BigDecimal.valueOf(window).divide(bPercent).longValue();
+        }
+
+        product.setExpires(Instant.now().plusSeconds(window));
         product.setPrice(new Price(stock.getPrice(), "OMR"));
 
         return product;

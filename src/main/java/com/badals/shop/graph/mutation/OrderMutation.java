@@ -124,7 +124,7 @@ public class OrderMutation implements GraphQLMutationResolver {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message contact(final Long id) {
-        orderService.sendPaymnetMessage(id);
+        orderService.sendPaymentMessage(id);
         return new Message("SMS Sent successfully");
     }
 
