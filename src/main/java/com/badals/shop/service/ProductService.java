@@ -146,8 +146,6 @@ public class ProductService {
                 return addProductMapper.toProductDto(addProductDTO);
         }
 
-
-
         Product product = productRepository.findBySlugJoinCategories(slug).get();
         if(product == null)
             throw new ProductNotFoundException("Invalid Product");
@@ -166,7 +164,7 @@ public class ProductService {
             product = pas5Service.lookup(product.getSku(),false, false, false, false);
             return this.getProductBySku(product.getSku());
         }
-        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(14400))) {
+        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(Pas5Service.DEFAULT_WINDOW))) {
             product = pas5Service.lookup(product.getSku(),false, false, false, false);
             return this.getProductBySku(product.getSku());
         }

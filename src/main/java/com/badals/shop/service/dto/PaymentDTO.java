@@ -31,6 +31,7 @@ public class PaymentDTO implements Serializable {
     @NotNull
     private Date createdDate;
 
+    private Boolean voided;
 
     private Long orderId;
 
