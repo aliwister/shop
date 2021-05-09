@@ -89,6 +89,17 @@ public class Payment extends Auditable implements Serializable {
     @Column(name = "track_id")
     private String trackId;
 
+    @Column(name = "void")
+    private Boolean voided;
+
+    public Boolean getVoided() {
+        return voided;
+    }
+
+    public void setVoided(Boolean voided) {
+        this.voided = voided;
+    }
+
     public String getTrackId() {
         return trackId;
     }

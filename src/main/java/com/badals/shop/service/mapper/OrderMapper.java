@@ -42,7 +42,8 @@ public interface OrderMapper extends EntityMapper<OrderDTO, Order> {
         BigDecimal balance = target.getTotal();
         if(target.getPayments() != null) {
             for (PaymentDTO p: target.getPayments())
-                balance = balance.subtract(p.getAmount());
+                if(!p.getVoided())
+                    balance = balance.subtract(p.getAmount());
             target.setBalance(balance);
         }
 
