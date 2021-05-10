@@ -558,7 +558,7 @@ public class Pas5Service implements IProductService {
 
         if(product.getWeight() == null)
             product.setWeight(currentWeight);
-        if((product.getWeight() == null || product.getWeight().doubleValue() < .001) && !isParent) {
+        if((product.getWeight() == null || product.getWeight().doubleValue() < PasUtility.MINWEIGHT) && !isParent) {
             BigDecimal weight = productRepo.lookupWeight(product.getSku());
             product.setWeight(weight);
         }
