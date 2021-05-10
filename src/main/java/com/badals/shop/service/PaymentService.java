@@ -130,6 +130,8 @@ public class PaymentService {
    @Modifying @Transactional
    public void voidPayment(Long id) {
        Payment p = paymentRepository.getOne(id);
+       if(p.getProcessedDate() != null || p.getSettlementDate() != null)
+          throw new IllegalStateException("Cannot void a processed payment");
        p.setVoided(true);
        paymentRepository.save(p);
    }

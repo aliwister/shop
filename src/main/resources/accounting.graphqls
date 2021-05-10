@@ -16,6 +16,7 @@ type Payment {
     processedDate: Date
     customer: String
     cartId: String
+    voided: Boolean
 }
 
 input PaymentInput {
