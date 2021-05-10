@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,5 +125,12 @@ public class PaymentService {
 
    public void setAccountingCode(ArrayList<Long> payments, String code) {
        paymentRepository.setAccountingCode(payments, code);
+   }
+
+   @Modifying @Transactional
+   public void voidPayment(Long id) {
+       Payment p = paymentRepository.getOne(id);
+       p.setVoided(true);
+       paymentRepository.save(p);
    }
 }
