@@ -13,10 +13,11 @@ public class PasUtility {
    private static final double USD2OMR = .386;
    private static final double LB2KG = 0.453592;
    private static final double OMRPERKG = 3.4;
+   public static final double MINWEIGHT = 0.001;
 
    public static BigDecimal calculatePrice(BigDecimal cost, BigDecimal weight, double localShipping, double margin, double risk, double fixed, boolean isPrime, boolean isFulfilledByAmazon, String shippingCountry) throws PricingException {
       double dWeight = weight.doubleValue()*LB2KG;
-      if (dWeight < .0001) {
+      if (dWeight < MINWEIGHT) {
          throw new PricingException("Unable to caculate the price [weight=0]");
       }
       if (dWeight < .05)
@@ -119,7 +120,7 @@ public class PasUtility {
 
    public static BigDecimal calculateWeight(BigDecimal weight, ProductOverride override) {
       if (override == null) return weight;
-      if(!override.isLazy()  ||  (override.isLazy() && (weight == null || weight.doubleValue() < .001)))
+      if(!override.isLazy()  ||  (override.isLazy() && (weight == null || weight.doubleValue() < MINWEIGHT)))
          return new BigDecimal(override.getOverride());
       return weight;
    }

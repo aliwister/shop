@@ -38,6 +38,7 @@ import java.util.zip.CRC32;
 @Service
 public class Pas5Service implements IProductService {
 
+    public static final long DEFAULT_WINDOW = 14400;
     private final Logger log = LoggerFactory.getLogger(Pas5Service.class);
     private final ProductRepository productRepo;
     private final CategoryRepository categoryRepository;
@@ -84,12 +85,36 @@ public class Pas5Service implements IProductService {
     }
 
     @Transactional
+    /**
+     * Entry point
+     */
     public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild, boolean forcePas) throws NoOfferException, PricingException {
 
         Product product = productRepo.findBySkuJoinChildren(asin, 1L).orElse(null);
 
-        if(!forcePas)
-            return mwsItemShortCircuit(product, asin, isParent, isRebuild);
+        // Get PAS to check how many variation dimensions are there since MWS missed some variation attributes
+        int dimCount = 0;
+        GetVariationsResponse variationsResponse = pasLookup.variationLookup(asin, 1);
+        if(variationsResponse.getErrors() != null && variationsResponse.getErrors().get(0).getCode().equalsIgnoreCase("noresults")) {
+            // This is a SIMPLE item
+        }
+        else {
+            VariationSummary summary = variationsResponse.getVariationsResult().getVariationSummary();
+            dimCount = summary.getVariationDimensions().size();
+            int pageCount = summary.getPageCount();
+            if (pageCount < 6) // If 5 pages of dimensions or less continue with pas
+                forcePas = true;
+        }
+
+        if(!forcePas) {
+            try {
+                return mwsItemShortCircuit(product, asin, isRebuild, dimCount);
+            }
+            catch (IncorrectDimensionsException e) {
+                // swallow and continue with PAS
+            }
+        }
+
 
         //PasItemNode current = pasItemNodeSearchRepository.findById(asin);
         if (product == null) {
@@ -100,7 +125,6 @@ public class Pas5Service implements IProductService {
             isParent = product.getVariationType().equals(VariationType.PARENT);
             if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
                 return product;
-
         }
         if(isParent) isRebuild = true;
 
@@ -158,7 +182,7 @@ public class Pas5Service implements IProductService {
         product = initProduct(product, item, isParent, overrides);
         product = productRepo.save(product);
         if(isRebuild) {
-            GetVariationsResponse variationsResponse = pasLookup.variationLookup(asin, 1);
+            //GetVariationsResponse variationsResponse = pasLookup.variationLookup(asin, 1);
             if (variationsResponse != null && variationsResponse.getVariationsResult() != null) {
                 PasLookupParser.parseDimensions(product, variationsResponse);
                 int page = 1;
@@ -226,17 +250,10 @@ public class Pas5Service implements IProductService {
 
     @Transactional
     Product createStubs(Product parent, PasItemNode parentItem ) {
-        //final Product finalParent = new Product();
-        //finalParent.setVariationType(VariationType.PARENT);
-
         List<VariationOption> options = new ArrayList<>();
         final List<Variation> variations = new ArrayList<>();
         initProduct(parent, parentItem, true, null);
 
-
-        //Set<String> skus = parentItem.getVariations().keySet();
-
-        //List<Product> existingChildren =
         parent.setVariationType(VariationType.PARENT);
         if(parent.getId() == null)
             productRepo.saveAndFlush(parent);
@@ -303,7 +320,7 @@ public class Pas5Service implements IProductService {
         return pasItemMapper.itemToPasItemNode(doc.get(asin));
     }
 
-    private Product mwsItemShortCircuit(Product product, String asin, boolean isParent, boolean isRebuild) throws NoOfferException, PricingException {
+    private Product mwsItemShortCircuit(Product product, String asin, boolean isRebuild, Integer dimCount) throws NoOfferException, PricingException, IncorrectDimensionsException {
 
         List<ProductOverride> overrides = findOverrides(asin, null);
         //Product finalParent = null;
@@ -363,7 +380,8 @@ public class Pas5Service implements IProductService {
                 if(parent == null) {
                     PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
                     parent = productRepo.findOneBySkuAndMerchantId(item.getParentAsin(),1L).orElse(createProduct(new Product(), parentItem));
-
+                    if(parent != null && parent.getVariationDimensions() != null && parent.getVariationDimensions().size() < dimCount)
+                        throw new IncorrectDimensionsException("MWS missing dimensions. "+dimCount+" expected "+parent.getVariationDimensions().size()+ " found.");
                     //TODO: Find all children and assign to it (must exclude them from stub creation)
                     parent = createStubs(parent, parentItem);
                     Product child = parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().get();
@@ -457,19 +475,19 @@ public class Pas5Service implements IProductService {
             return child;
     }
 
-    MerchantStock getMerchantStock(Product product) {
+    private MerchantStock getMerchantStock(Product product) {
         if(product.getMerchantStock() == null)
             return new MerchantStock();
 
         return product.getMerchantStock().stream().findFirst().orElse(new MerchantStock());
     }
 
-    Product setMerchantStock(Product product, MerchantStock stock, BigDecimal quantity) {
+    private Product setMerchantStock(Product product, MerchantStock stock, BigDecimal quantity) {
         if(stock.getId() == null) {
             stock.setMerchantId(1L);
             product.addMerchantStock(stock.link("amazon.com/dp/"+product.getSku()));
         }
-        long window = 7200;
+        long window = DEFAULT_WINDOW;
         if ( product.getExpires() != null)
             window = Math.abs(Duration.between(product.getUpdated(), product.getExpires()).getSeconds());
 
@@ -490,9 +508,9 @@ public class Pas5Service implements IProductService {
         return product;
     }
 
-    Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
+    private Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
 
-        if (p.getWeight() == null || p.getWeight().doubleValue() < .01) return p;
+        if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
         MwsItemNode n = mwsLookup.fetch(p.getSku());
         Product product = p;
         try {
@@ -508,9 +526,9 @@ public class Pas5Service implements IProductService {
         return product;
     }
 
-    Product pricePas(Product p, PasItemNode item, List<ProductOverride> overrides) throws NoOfferException {
+    private Product pricePas(Product p, PasItemNode item, List<ProductOverride> overrides) throws NoOfferException {
 
-        if (p.getWeight() == null || p.getWeight().doubleValue() < .01) return p;
+        if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
         //MwsItemNode n = mwsLookup.fetch(p.getSku());
         Product product = p;
 
