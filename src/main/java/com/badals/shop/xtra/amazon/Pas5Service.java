@@ -35,6 +35,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 
+import static com.badals.shop.service.util.AccessUtil.opt;
+
 @Service
 public class Pas5Service implements IProductService {
 
@@ -102,7 +104,9 @@ public class Pas5Service implements IProductService {
             VariationSummary summary = variationsResponse.getVariationsResult().getVariationSummary();
             dimCount = summary.getVariationDimensions().size();
             int pageCount = summary.getPageCount();
-            if (pageCount < 6) // If 5 pages of dimensions or less continue with pas
+            final GetVariationsResponse variationsResponseFinal = variationsResponse;
+            BigDecimal weight = opt(() -> variationsResponseFinal.getVariationsResult().getItems().get(0).getItemInfo().getProductInfo().getItemDimensions().getWeight().getDisplayValue());
+            if (pageCount < 6 && weight != null && weight.doubleValue() > PasUtility.MINWEIGHT) // If 5 pages of dimensions or less continue with pas
                 forcePas = true;
         }
 
