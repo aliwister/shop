@@ -128,7 +128,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
              */
             //System.out.println("LOCALE:"+LocaleContextHolder.getLocale());
             Map<String, String> a = processAvailability(hours);
-            target.setAvailability(a.get(LocaleContextHolder.getLocale().toString()));
+            target.setAvailability(a.get(LocaleContextHolder.getLocale().toString().substring(0,2)));
         }
 
         ProductLang lang = source.getProductLangs().stream().findFirst().orElse(null);
