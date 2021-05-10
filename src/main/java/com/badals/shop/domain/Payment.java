@@ -90,7 +90,7 @@ public class Payment extends Auditable implements Serializable {
     private String trackId;
 
     @Column(name = "void")
-    private Boolean voided;
+    private Boolean voided = false;
 
     public Boolean getVoided() {
         return voided;
