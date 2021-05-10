@@ -21,7 +21,12 @@ public class PaymentMutation implements GraphQLMutationResolver {
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message voidPayment(Long id) {
-        this.paymentService.voidPayment(id);
+        try {
+            this.paymentService.voidPayment(id);
+        } catch (IllegalStateException e) {
+            return new Message("Failure");
+        }
+
         return new Message("Success");
     }
 
