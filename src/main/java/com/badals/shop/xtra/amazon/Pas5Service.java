@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -497,13 +498,13 @@ public class Pas5Service implements IProductService {
 
         if ( product.getPrice() != null ) {
             double diff = product.getPrice().subtract(stock.getPrice()).abs().doubleValue();
-            BigDecimal bPercent = BigDecimal.ONE.subtract(product.getPrice().divide(stock.getPrice()).subtract(BigDecimal.ONE).abs());
+            BigDecimal bPercent = BigDecimal.ONE.subtract(product.getPrice().divide(stock.getPrice(),8, RoundingMode.HALF_EVEN).subtract(BigDecimal.ONE).abs());
             double percent = bPercent.doubleValue();
 
             if (diff < .6 || percent < .06)
                 window *= 1 + (1 - percent);
             else
-                window = BigDecimal.valueOf(window).divide(bPercent).longValue();
+                window = BigDecimal.valueOf(window).divide(bPercent, 8, RoundingMode.HALF_EVEN).longValue();
         }
 
         product.setExpires(Instant.now().plusSeconds(window));
