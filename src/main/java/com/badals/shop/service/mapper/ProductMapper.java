@@ -174,7 +174,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
         }
         else if(hours < 60*24) {
             availability.put("en", "2 to 3 months");
-            availability.put("ar", "2 - 3 شهور");
+            availability.put("ar", "2 - 3 أشهر");
         }
         return availability;
     }
