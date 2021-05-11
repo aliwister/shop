@@ -141,7 +141,7 @@ type Product {
     discountInPercent: Float
     slug: String
     categories: [Category]
-
+    variationType: VariationType
     author: String
     unit: String
     description: String
@@ -156,38 +156,7 @@ type Product {
     dial: String
 }
 
-enum Condition {
-  NEW
-  LIKE_NEW
-  VERY_GOOD
-  GOOD
-  FAIR
-}
 
-enum VariationType {
-    SIMPLE
-    CHILD
-    PARENT
-}
-
-enum ProductGroup {
-    BAGS
-    ART
-    BEAUTY
-    BEDDINGS
-    BOOKS
-    CAMERA
-    AUTO
-    FASHION
-    ELECTRONICS
-    HEALTH
-    MUSIC
-    PC
-    SPORTS
-    TOOLS
-    TOYS
-    WATCHES
-}
 
 type ProductResponse {
   items: [Product!]!
@@ -195,90 +164,7 @@ type ProductResponse {
   hasMore: Boolean!
 }
 
-type Attribute {
-    name: String
-    value: String
-}
 
-type VariationOption {
-    label: String
-    name: String
-    values: [String]
-}
-
-type Variation {
-    ref: ID!
-    variationAttributes: [Attribute]
-}
-
-type Category {
-  id: Int!
-  title: String!
-  children: [Category!]!
-  #type: String!
-  icon: String!
-  slug: String!
-}
-type Gallery {
-  url: String!
-}
-
-type Meta {
-  publisher: String!
-  isbn: String!
-  edition: String!
-  country: String!
-  languages: [String!]!
-  numberOfReader: String!
-  numberOfPage: String!
-  samplePDF: String!
-}
-
-
-type Product {
-    id: ID!
-    ref: Long
-    parent: Int
-    sku: String
-    upc: String
-    #price: Price
-    image: String
-    gallery: [Gallery]
-    releaseDate: LocalDate
-    active: Boolean
-    similarProducts: [Int]
-    url: String
-    title: String
-    brand: String
-    group: ProductGroup
-    condition: Condition
-    isUsed: Boolean
-    availableForOrder: Boolean
-    weight: Float
-    volumeWeight: Float
-    variationDimensions: [String]
-    variationOptions: [VariationOption]
-    variationAttributes: [Attribute]
-    variations: [Variation]
-    price: String
-    salePrice: String
-    discountInPercent: Float
-    slug: String
-    categories: [Category]
-
-    author: String
-    unit: String
-    description: String
-    meta: Meta
-    merchantStock: [MerchantStock]
-    hours: Int
-    availability: String
-    features: [String]
-    browseNode: String
-    inStock: Boolean
-    hashtags: [String]
-    dial: String
-}
 
 type LocalizedValue {
     lang: String
@@ -303,10 +189,6 @@ input MerchantStockInput {
     price: BigDecimal
 }
 
-type Attribute {
-    name: String,
-    value: String
-}
 
 input AttributeInput {
     name: String,
@@ -342,11 +224,4 @@ input ProductInput {
     quantity: Int
     #volumeWeight: Float,
     #variationOptions: [VariationOptionInput]
-}
-
-
-input VariationOptionInput {
-    label: String
-    name: String
-    values: [String]
 }
