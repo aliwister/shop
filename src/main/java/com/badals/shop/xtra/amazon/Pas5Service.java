@@ -117,6 +117,7 @@ public class Pas5Service implements IProductService {
             }
             catch (IncorrectDimensionsException e) {
                 // swallow and continue with PAS
+                log.info("Iam catching IncorrectDimensionsException");
             }
         }
 
@@ -385,8 +386,8 @@ public class Pas5Service implements IProductService {
                 if(parent == null) {
                     PasItemNode parentItem = mwsLookup.lookup(item.getParentAsin());
                     parent = productRepo.findOneBySkuAndMerchantId(item.getParentAsin(),1L).orElse(createProduct(new Product(), parentItem));
-                    if(parent != null && parent.getVariationDimensions() != null && parent.getVariationDimensions().size() < dimCount)
-                        throw new IncorrectDimensionsException("MWS missing dimensions. "+dimCount+" expected "+parent.getVariationDimensions().size()+ " found.");
+                    if(parentItem != null && parentItem.getVariationDimensions() != null && parentItem.getVariationDimensions().size() < dimCount)
+                        throw new IncorrectDimensionsException("MWS missing dimensions. "+dimCount+" expected "+parentItem.getVariationDimensions().size()+ " found.");
                     //TODO: Find all children and assign to it (must exclude them from stub creation)
                     parent = createStubs(parent, parentItem);
                     Product child = parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().get();
