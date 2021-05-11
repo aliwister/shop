@@ -130,6 +130,7 @@ public class OrderService {
 
     @Transactional
     public OrderDTO getOrderConfirmation(String reference, String confirmationKey) throws OrderNotFoundException {
+        log.info("reference + confirmation key = ", reference, confirmationKey);
         Order order = orderRepository.findOrderByReferenceAndConfirmationKey(reference, confirmationKey).orElse(null);
         if(order == null) {
             throw new OrderNotFoundException("Order Not Found");
