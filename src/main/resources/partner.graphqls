@@ -183,7 +183,7 @@ extend type Query {
     hashtagList: [Hashtag]
     brands: [I18String]
     collections: [I18String]
-
+    currencies: [Currency]
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
 }
