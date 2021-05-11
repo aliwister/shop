@@ -1,5 +1,6 @@
 package com.badals.shop.graph.query;
 
+import com.badals.shop.domain.enumeration.Currency;
 import com.badals.shop.domain.pojo.I18String;
 import com.badals.shop.graph.MerchantProductResponse;
 import com.badals.shop.domain.pojo.VariationOption;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.badals.shop.domain.enumeration.Currency.*;
 
 @Component
 public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
@@ -81,6 +84,16 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
          add(new I18String("en", "Auto Performance"));
          add(new I18String("en", "Power Food"));
          add(new I18String("en", "Mommy'n Me"));
+      }};
+   }
+
+   public List<Currency> currencies() {
+      return new ArrayList<com.badals.shop.domain.enumeration.Currency>(){{
+         add(OMR);
+         add(AED);
+         add(SAR);
+         add(KWD);
+         add(QAR);
       }};
    }
 

@@ -14,8 +14,8 @@ enum OrderState {
 }
 
 type Currency {
-    id: ID!,
     code: String
+    #label: String
 }
 
 type OrderItem {
