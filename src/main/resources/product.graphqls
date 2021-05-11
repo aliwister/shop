@@ -168,7 +168,7 @@ type ProductResponse {
 
 type LocalizedValue {
     lang: String
-    value: string
+    value: String
 }
 
 type MerchantStock {
