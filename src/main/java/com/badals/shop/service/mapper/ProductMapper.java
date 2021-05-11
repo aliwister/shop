@@ -149,17 +149,17 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
             availability.put("ar","متوفر حالا");
         }
         else if(hours <= 48) {
-            availability.put("en", "2-3 Days");
+            availability.put("en", "2 - 3 Days");
             availability.put("ar", "خلال يومين الى 3");
         }
-        /* else if(hours < 5*24) {
-            availability.put("en", "5 to 7 days");
-            availability.put("ar", "5 الى 7 أيام");
+        else if(hours < 5*24) {
+            availability.put("en", "5 to 7 working days");
+            availability.put("ar", "5 الى 7 أيام عمل");
         }
         else if(hours < 8*24) {
-            availability.put("en", "10 to 10 days");
-            availability.put("ar", "7 الى 10 أيام");
-        }*/
+            availability.put("en", "7 to 10 working days");
+            availability.put("ar", "7 الى 10 أيام عمل");
+        }
         else if(hours < 8*24) {
             availability.put("en", "2 to 3 weeks");
             availability.put("ar", "2 - 3 أسابيع");
