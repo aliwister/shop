@@ -161,4 +161,61 @@ public class PasLookup {
 
       return getVariationsResources;
    }
+   List<SearchItemsResource> searchItemsResources() {
+      List<SearchItemsResource> searchItemsResources = new ArrayList<SearchItemsResource>();
+      searchItemsResources.add(SearchItemsResource.PARENTASIN);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_TITLE);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_FEATURES);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_EXTERNALIDS);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_MANUFACTUREINFO);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_CLASSIFICATIONS);
+
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_BYLINEINFO);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_PRODUCTINFO);
+
+      searchItemsResources.add(SearchItemsResource.IMAGES_PRIMARY_LARGE);
+      searchItemsResources.add(SearchItemsResource.IMAGES_VARIANTS_LARGE);
+
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_AVAILABILITY_MINORDERQUANTITY);
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_AVAILABILITY_TYPE);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_TECHNICALINFO);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_CONTENTINFO);
+      searchItemsResources.add(SearchItemsResource.ITEMINFO_CONTENTRATING);
+
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISAMAZONFULFILLED);
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISPRIMEELIGIBLE);
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_DELIVERYINFO_ISFREESHIPPINGELIGIBLE);
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_DELIVERYINFO_SHIPPINGCHARGES);
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_PRICE);
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_MERCHANTINFO);
+      searchItemsResources.add(SearchItemsResource.OFFERS_LISTINGS_PRICE);
+      searchItemsResources.add(SearchItemsResource.OFFERS_SUMMARIES_LOWESTPRICE);
+      searchItemsResources.add(SearchItemsResource.OFFERS_SUMMARIES_OFFERCOUNT);
+
+      searchItemsResources.add(SearchItemsResource.BROWSENODEINFO_BROWSENODES);
+      searchItemsResources.add(SearchItemsResource.BROWSENODEINFO_BROWSENODES_ANCESTOR);
+      searchItemsResources.add(SearchItemsResource.BROWSENODEINFO_BROWSENODES_SALESRANK);
+      searchItemsResources.add(SearchItemsResource.BROWSENODEINFO_WEBSITESALESRANK);
+      searchItemsResources.add(SearchItemsResource.SEARCHREFINEMENTS);
+
+      return searchItemsResources;
+   }
+
+   public SearchItemsResponse searchItems(String keyword) {
+      SearchItemsRequest getItemsRequest = new SearchItemsRequest().keywords(keyword).partnerTag(partnerTag)
+              .resources(searchItemsResources()).partnerType(PartnerType.ASSOCIATES);
+      try {
+         SearchItemsResponse response = api.searchItems(getItemsRequest);
+
+         if(response.getErrors() != null && response.getErrors().size() > 0) {
+            switch(response.getErrors().get(0).getCode()) {
+               case "ItemNotAccessible":
+                  //Do mws lookup
+            }
+         }
+         return response;
+      } catch (Exception e) {
+         throw new RuntimeException(e);
+      }
+   }
 }
