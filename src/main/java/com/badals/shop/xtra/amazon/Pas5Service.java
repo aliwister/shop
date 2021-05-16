@@ -11,10 +11,12 @@ import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.Variation;
 import com.badals.shop.domain.pojo.VariationOption;
+import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.CategoryRepository;
 import com.badals.shop.repository.MerchantRepository;
 import com.badals.shop.repository.ProductOverrideRepository;
 import com.badals.shop.repository.ProductRepository;
+import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.xtra.IProductService;
 import com.badals.shop.xtra.amazon.mws.MwsItemNode;
@@ -22,6 +24,7 @@ import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import com.badals.shop.xtra.amazon.mws.MwsLookupParser;
 import com.badals.shop.xtra.amazon.paapi5.PasLookup;
 import com.badals.shop.xtra.amazon.paapi5.PasLookupParser;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -87,6 +90,7 @@ public class Pas5Service implements IProductService {
         return false;
     }
 
+    @SneakyThrows
     @Transactional
     /**
      * Entry point
@@ -98,8 +102,15 @@ public class Pas5Service implements IProductService {
         // Get PAS to check how many variation dimensions are there since MWS missed some variation attributes
         int dimCount = 0;
         GetVariationsResponse variationsResponse = pasLookup.variationLookup(asin, 1);
-        if(variationsResponse.getErrors() != null && variationsResponse.getErrors().get(0).getCode().equalsIgnoreCase("noresults")) {
-            // This is a SIMPLE item
+        if(variationsResponse.getErrors() != null){
+            String errCode =  variationsResponse.getErrors().get(0).getCode();
+            if (errCode.equalsIgnoreCase("noresults")) {
+                // This is a SIMPLE item
+            }
+            else if (errCode.equalsIgnoreCase("ItemNotAccessible")){
+                return mwsItemShortCircuit(product, asin, true, 0);
+            }
+
         }
         else {
             VariationSummary summary = variationsResponse.getVariationsResult().getVariationSummary();
@@ -160,8 +171,8 @@ public class Pas5Service implements IProductService {
             if(response.getErrors() != null && response.getErrors().size() > 0 ) {
                 ErrorData error = response.getErrors().get(0);
                 if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
-                    mwsLookup.lookup(asin);
-                    return null;
+                    //response = mwsLookup.lookup(asin);
+                    return mwsItemShortCircuit(product, asin, true, 0);
                 }
             }
             doc = parse_response(response.getItemsResult().getItems());
@@ -339,9 +350,9 @@ public class Pas5Service implements IProductService {
         boolean isPasLookup = false;
         boolean isMwsLookup = false;
         boolean isReset = true;
-
+/*
         if(product != null && product.getMerchantId() == 11L)
-            isReset = true;
+            isReset = true;*/
 
         if(product != null && product.getWeight() != null)
             isPasLookup = true;
@@ -600,5 +611,27 @@ public class Pas5Service implements IProductService {
             mappedResponse.put(item.getASIN(), item);
         }
         return mappedResponse;
+    }
+
+
+    public ProductResponse searchItems(String keyword) throws NoOfferException {
+        SearchItemsResponse search = pasLookup.searchItems(keyword);
+        if (search.getErrors() != null)
+            throw new NoOfferException("No results found");
+
+        ProductResponse response = new ProductResponse();
+        List<ProductDTO> dtos = new ArrayList<ProductDTO>();
+
+        for(Item x : search.getSearchResult().getItems()) {
+            PasItemNode item = pasItemMapper.itemToPasItemNode(x);
+            Product product = initProduct(new Product(), item, false, null);
+            dtos.add(productMapper.toDto(product));
+        }
+
+        response.setItems(dtos);
+        response.setTotal(dtos.size());
+        response.setHasMore(false);
+
+        return response;
     }
 }
