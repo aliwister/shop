@@ -93,7 +93,7 @@ public class AuditingAspect {
 
     private String getObject(String className) {
         if(className.toLowerCase().endsWith("mutation"))
-            return className.substring(33, className.length() - 8);
+            return className.substring(31, className.length() - 8);
 
         if(className.toLowerCase().endsWith("query"))
             return "product";
