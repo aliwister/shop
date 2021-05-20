@@ -21,23 +21,27 @@ type Address {
              lng: String
              lat: String
              plusCode: String
+    country: String
 }
 
 type AddressInput {
+    id: ID
     line1: String
     line2: String
-    name: String
-    landmark: String
+    firstName: String
+    lastName: String
     city: String
     country: String
-             lng: String
-             lat: String
-             plusCode: String
+    mobile: String
+    alias: String
+    lng: String
+    lat: String
+    plusCode: String
 }
-
 
 extend type Mutation {
     resetPassword(email: String): String
+    #saveAddress(address: AddressInput): AddressResponse
     #signUp(email: String, password: String, firstName: String, lastName: String, mobile: String, title: String, birthDate: String): Customer
     #updatePhone(phone: String!): Customer
     #addAddress(address: AddressInput): [Address]
@@ -52,4 +56,45 @@ extend type Query {
     me: Customer
     meTest(id: Long): Customer
     customers: [Customer]
+    addressDescription(isoCode: String, lang: String): AddressFormat
+}
+
+enum AddressField {
+    firstName, lastName, line1, line2, postalCode, state, city, mobile, alias, country
+}
+
+enum OptionType {
+    REQUIRED, OPTIONAL, NONE
+}
+
+enum FieldType {
+    TEXT, REMOTE_SELECT, REMOTE_AUTOCOMPLETE, SELECT, CHECKBOX, AUTOCOMPLETE, MOBILE
+}
+
+type AddressFormat {
+    inputFormat: String
+    displayFormat: String
+    descriptions: [FieldDescription]
+    gmap: OptionType
+}
+
+type FieldDescription {
+    field: AddressField
+    label: String
+    isRequired: Boolean
+    regex: String
+    fieldType: FieldType
+    options: [Option]
+}
+
+type Option {
+    label: String
+    value: String
+}
+
+type AddressResponse {
+    address: Address
+    success: Boolean
+    message: String
+    code: String
 }
