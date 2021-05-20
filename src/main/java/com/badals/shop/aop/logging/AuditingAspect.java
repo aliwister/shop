@@ -41,7 +41,7 @@ public class AuditingAspect {
         return joinPoint.proceed();
     }
 
-    @Around("execution(* com.badals.shop.service.mutation.*.*(..))")
+    @Around("execution(* com.badals.shop.graph.mutation.*.*(..))")
     public Object beforeWebMethodExecution2(ProceedingJoinPoint joinPoint) throws Throwable {
         addAction(joinPoint);
         return joinPoint.proceed();
