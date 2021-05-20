@@ -34,6 +34,7 @@ public class AddressDTO implements Serializable {
     private String plusCode;
     private String lat;
     private String lng;
+    private String country;
 
     public AddressDTO() {
     }
