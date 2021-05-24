@@ -22,9 +22,10 @@ type Address {
              lat: String
              plusCode: String
     country: String
+    state: String
 }
 
-type AddressInput {
+input AddressInput {
     id: ID
     line1: String
     line2: String
@@ -32,6 +33,7 @@ type AddressInput {
     lastName: String
     city: String
     country: String
+    state: String
     mobile: String
     alias: String
     lng: String
@@ -41,7 +43,8 @@ type AddressInput {
 
 extend type Mutation {
     resetPassword(email: String): String
-    #saveAddress(address: AddressInput): AddressResponse
+    saveAddress(address: AddressInput): AddressResponse
+    deleteAddress(id: ID): AddressResponse
     #signUp(email: String, password: String, firstName: String, lastName: String, mobile: String, title: String, birthDate: String): Customer
     #updatePhone(phone: String!): Customer
     #addAddress(address: AddressInput): [Address]
@@ -50,13 +53,19 @@ extend type Mutation {
 }
 
 extend type Query {
-    getAddresses(customerId: Int): [Address]
+    #getAddresses(customerId: Int): [Address]
     customer(mobile: String): Customer
     #getAddress(addressId: Int): Address
     me: Customer
     meTest(id: Long): Customer
     customers: [Customer]
+    addresses: AddressList
     addressDescription(isoCode: String, lang: String): AddressFormat
+}
+
+type AddressList {
+    addresses: [Address]
+    displayFormat: String
 }
 
 enum AddressField {

@@ -65,16 +65,35 @@ public class Address implements Serializable {
     private String alias;
 
     @Column(name = "active")
-    private String active;
+    private Boolean active;
 
     @Column(name = "deleted")
-    private String deleted;
+    private Boolean deleted;
 
     @Column(name = "plus_code")
     private String plusCode;
 
     private String lng;
     private String lat;
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    private String state;
+    private String country;
 
     public String getPlusCode() {
         return plusCode;
@@ -118,11 +137,11 @@ public class Address implements Serializable {
         this.postCode = postCode;
     }
 
-    public String getDeleted() {
+    public Boolean getDeleted() {
         return deleted;
     }
 
-    public void setDeleted(String deleted) {
+    public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
     }
 
@@ -216,16 +235,16 @@ public class Address implements Serializable {
         this.mobile = mobile;
     }
 
-    public String getActive() {
+    public Boolean getActive() {
         return active;
     }
 
-    public Address active(String active) {
+    public Address active(Boolean active) {
         this.active = active;
         return this;
     }
 
-    public void setActive(String active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 
