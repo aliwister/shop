@@ -144,8 +144,8 @@ public class OrderService {
         if (addressPojo != null && addressPojo.getSave()) {
             Address address = checkoutAddressMapper.addressPojoToAddress(addressPojo);
             address.setCustomer(customer);
-            address.setActive("1");
-            address.setDeleted("0");
+            address.setActive(true);
+            address.setDeleted(false);
             address.setIdCountry(164L);
             address = addressRepository.save(address);
             order.setDeliveryAddressPojo(null);
