@@ -189,8 +189,8 @@ public class PartnerService {
             }
             Product pl = masterChildren.stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
             ChildProduct dto2 = dto.getChildren().stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
-            if(!dto2.isDirty)
-                continue;
+/*            if(!dto2.isDirty)
+                continue;*/
             //String ref = currentMerchantId.toString() + String.valueOf(ChecksumUtil.getChecksum(c.getSku()));
             //pl.setRef(Long.valueOf(ref));
             ///pl.setSlug(ref);
