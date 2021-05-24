@@ -1,21 +1,19 @@
 package com.badals.shop.graph.query;
 
-import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.Customer;
+import com.badals.shop.graph.AddressList;
+import com.badals.shop.service.AddressService;
 import com.badals.shop.service.CustomerService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.UserService;
-import com.badals.shop.service.dto.AddressDTO;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.mapper.CustomerMapper;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
-import lombok.Data;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /*
 query {
@@ -50,21 +48,19 @@ query {
 public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
 
     private final ProductService productService;
+    private final AddressService addressService;
 
     private final CustomerMapper customerMapper;
 
     private final UserService userService;
     private final CustomerService customerService;
 
-    public CustomerQuery(ProductService productService, CustomerMapper customerMapper, UserService userService, CustomerService customerService) {
+    public CustomerQuery(ProductService productService, AddressService addressService, CustomerMapper customerMapper, UserService userService, CustomerService customerService) {
         this.productService = productService;
-        this.customerMapper = customerMapper;
+       this.addressService = addressService;
+       this.customerMapper = customerMapper;
         this.userService = userService;
         this.customerService = customerService;
-    }
-
-    public List<AddressDTO> getAddresses(final int id) {
-return null;
     }
 
     public List<CustomerDTO> customers() {
@@ -126,8 +122,11 @@ return null;
             }};
 
             return addressFormat;
+    }
 
+    public AddressList addresses () {
+       Customer loginUser = userService.getUserWithAuthorities().orElse(new Customer(1L));
+       return new AddressList(addressService.customerAddresses(loginUser), "({alias}){firstName}{lastName}_{line1}_{line2}_{state}_{mobile}");
     }
 
 }
-
