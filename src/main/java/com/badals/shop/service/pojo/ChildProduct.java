@@ -24,6 +24,6 @@ public class ChildProduct extends AddProductDTO {
    public Price salePriceObj = new Price();
    public Price costObj= new Price();
 
-   boolean isDirty = false;
-   boolean active = false;
+   public Boolean isDirty;
+   public Boolean active;
 }
