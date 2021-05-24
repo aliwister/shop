@@ -50,9 +50,10 @@ public class PartnerService {
     private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
     private final RecycleService recycleService;
+    private final SlugService slugService;
     private final ProductIndexService productIndexService;
 
-    public PartnerService(ProductRepository productRepository, ProductService productService, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, ProductIndexService productIndexService) {
+    public PartnerService(ProductRepository productRepository, ProductService productService, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService) {
         this.productRepository = productRepository;
         this.productService = productService;
         this.messageSource = messageSource;
@@ -64,6 +65,7 @@ public class PartnerService {
         this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
         this.recycleService = recycleService;
+        this.slugService = slugService;
         this.productIndexService = productIndexService;
     }
 
@@ -91,7 +93,7 @@ public class PartnerService {
 
         if(_new) {
 
-            String ref = currentMerchantId.toString() + ChecksumUtil.getChecksum(dto.getSku());
+            String ref = slugService.generateRef(dto.getSku(), currentMerchantId);
             master.setRef(Long.valueOf(ref));
             master.setSlug(ref);
             if(master.getProductLangs() != null)
@@ -157,7 +159,7 @@ public class PartnerService {
 
         if(_new) {
             if(masterChildren != null)
-                masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(generateRef(x.getSku(), currentMerchantId)).merchantId(currentMerchantId).ref(Long.valueOf(x.getSlug())).title(master.getTitle()).parent(master).getMerchantStock().forEach(y -> y.setMerchantId(currentMerchantId)));
+                masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(slugService.generateRef(x.getSku(), currentMerchantId)).merchantId(currentMerchantId).ref(Long.valueOf(x.getSlug())).title(master.getTitle()).parent(master).getMerchantStock().forEach(y -> y.setMerchantId(currentMerchantId)));
             return;
         }
         // Delete removed
@@ -187,16 +189,16 @@ public class PartnerService {
             }
             Product pl = masterChildren.stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
             ChildProduct dto2 = dto.getChildren().stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
-            if(!dto2.isDirty())
+            if(!dto2.isDirty)
                 continue;
-            String ref = currentMerchantId.toString() + String.valueOf(ChecksumUtil.getChecksum(c.getSku()));
-            pl.setRef(Long.valueOf(ref));
-            pl.setSlug(ref);
+            //String ref = currentMerchantId.toString() + String.valueOf(ChecksumUtil.getChecksum(c.getSku()));
+            //pl.setRef(Long.valueOf(ref));
+            ///pl.setSlug(ref);
             pl.setVariationAttributes(c.getVariationAttributes());
             pl.setTitle(generateTitle(master.getTitle(), c.getVariationAttributes()));
             pl.setImage(c.getImage());
             pl.setGallery(c.getGallery());
-            pl.sku(c.getSku()).image(c.getImage()).upc(c.getImage()).weight(c.getWeight()).gallery(c.getGallery());
+            pl.sku(c.getSku()).image(c.getImage()).upc(c.getUpc()).weight(c.getWeight()).gallery(c.getGallery());
             MerchantStock stock = pl.getMerchantStock().stream().findFirst().orElse(new MerchantStock());
             stock = setMerchantStock(stock, master, dto2.getPriceObj(), dto2.getSalePriceObj(), dto2.getCostObj(), dto2.getQuantity(), dto2.getAvailability(), currentMerchantId);
             if(stock.getId() == null)
@@ -209,10 +211,6 @@ public class PartnerService {
         return title + variationAttributes.stream().map(Attribute::getValue).collect(Collectors.joining(", "));
     }
 
-
-    private String generateRef(String sku, Long currentMerchantId) {
-        return currentMerchantId.toString() + String.valueOf(ChecksumUtil.getChecksum(sku));
-    }
 
     public void deleteImage(Long id, String image) throws ProductNotFoundException {
         final Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
