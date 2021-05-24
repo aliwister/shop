@@ -25,7 +25,8 @@ public class AddressDTO implements Serializable {
 
     private String mobile;
 
-    private String active;
+    private Boolean active;
+    private Boolean deleted;
 
     private String alias;
 
@@ -35,6 +36,7 @@ public class AddressDTO implements Serializable {
     private String lat;
     private String lng;
     private String country;
+    private String state;
 
     public AddressDTO() {
     }

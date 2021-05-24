@@ -1,12 +1,14 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Address;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.service.dto.AddressDTO;
 import com.badals.shop.service.mapper.AddressMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,10 @@ public class AddressService {
     public AddressDTO save(AddressDTO addressDTO) {
         log.debug("Request to save Address : {}", addressDTO);
         Address address = addressMapper.toEntity(addressDTO);
+
+        address.setIdCountry(getCountryFromLocale(addressDTO.getCountry()));
+        //addressService.getCountryFromLocale(l.getCountry())
+
         address = addressRepository.save(address);
         return addressMapper.toDto(address);
     }
@@ -81,5 +87,29 @@ public class AddressService {
     public void delete(Long id) {
         log.debug("Request to delete Address : {}", id);
         addressRepository.deleteById(id);
+    }
+
+    public Boolean isAddressUsed(Long id) {
+       if(addressRepository.findInOrders(id) == 0)
+           return false;
+
+       return true;
+    }
+
+    @Modifying
+    public void retireAddress(Long id) {
+        addressRepository.retireAddress(id);
+    }
+
+    public Long getCountryFromLocale(String country) {
+        return addressRepository.findCountryByCode(country);
+    }
+
+    public void deleteAddressByFlag(Long id) {
+        addressRepository.deleteAddressByFlag(id);
+    }
+
+    public List<AddressDTO> customerAddresses(Customer c) {
+        return addressRepository.findAddressesByCustomerEqualsAndActiveIsTrueAndDeletedIsFalse(c).stream().map(addressMapper::toDto).collect(Collectors.toList());
     }
 }

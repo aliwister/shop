@@ -22,12 +22,17 @@ public class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public Customer() {
+    }
+
+    public Customer(Long id) {
+        this.id = id;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_customer")
     private Long id;
-
-
 
     @Column(name = "company")
     private String company;
