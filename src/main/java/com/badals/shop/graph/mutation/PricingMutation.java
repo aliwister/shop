@@ -75,9 +75,9 @@ public class PricingMutation implements GraphQLMutationResolver {
             return null;
         ProductDTO productDTO = null;
         if(merchantId == 1L)
-            productDTO = productService.lookupForcePas(sku, false, false, true);
+            productDTO = productService.lookupPas(sku, false, false);
         else if(merchantId == -1L)
-            productDTO = productService.lookupForcePas(sku, false, false, false);
+            productDTO = productService.lookupPas(sku, false, false);
         else if(merchantId == 0L)
             productDTO = productService.lookupPas(sku, true, false);
         else if(merchantId == 2L)
