@@ -43,6 +43,7 @@ public class KeepaLookup {
       String url = lookupUri+id + (isRating?"&rating=1":"&rating=0");
       log.info(url);
       KeepaResponse response =  restTemplate.getForObject(url,KeepaResponse.class);
+      log.info("keepa response");
       if (response.getProducts() == null || response.getProducts().size() == 0)
          throw new PricingException("Invalid API Response");
 
@@ -53,8 +54,9 @@ public class KeepaLookup {
       if(product.getProductType().equals(ProductType.INVALID))
          throw new ProductNotFoundException("This item is invalid");
 
+      log.info("mapping to pasitemnode");
       PasItemNode node = keepaMapper.itemToPasItemNode(product);
-
+      log.info("done mapping to pasitemnode");
       product = null;
       response = null;
 
