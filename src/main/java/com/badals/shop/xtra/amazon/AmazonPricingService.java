@@ -84,13 +84,13 @@ public class AmazonPricingService implements IProductService {
 
         // Does Product Exist?
         Product product = productRepo.findBySkuJoinChildren(asin, AMAZON_US_MERCHANT_ID).orElse(new Product());
-
+        return pas5Service.mwsItemShortCircuit(product, asin, false, 0);
 /*        if (product.getId() == null)
             buildKeepa(product, asin, true);
 
         else if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))*/
 
-                    return buildKeepa(product, asin, false);
+                    //return buildKeepa(product, asin, false);
 
 
 
