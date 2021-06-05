@@ -53,7 +53,12 @@ public class KeepaLookup {
       if(product.getProductType().equals(ProductType.INVALID))
          throw new ProductNotFoundException("This item is invalid");
 
-      return keepaMapper.itemToPasItemNode(product);
+      PasItemNode node = keepaMapper.itemToPasItemNode(product);
+
+      product = null;
+      response = null;
+
+      return node;
    }
 
 
