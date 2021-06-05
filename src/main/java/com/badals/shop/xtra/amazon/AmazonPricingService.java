@@ -90,9 +90,13 @@ public class AmazonPricingService implements IProductService {
         if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
             return product;
 
+
+        if (product.getStub())
+            return buildKeepa(product, asin, false);
+
         // check pas flag
         if (isRebuild) {
-            return buildKeepa(product, asin, false);
+            return buildKeepa(product, asin, true);
         }
 
 /*        if (product.getStub())
