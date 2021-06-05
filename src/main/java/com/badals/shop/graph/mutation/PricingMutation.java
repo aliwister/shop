@@ -11,6 +11,7 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductOverrideDTO;
 import com.badals.shop.service.dto.SpeedDialDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.IncorrectDimensionsException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
@@ -65,7 +66,7 @@ public class PricingMutation implements GraphQLMutationResolver {
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws PricingException, NoOfferException, ProductNotFoundException, ExecutionException, InterruptedException {
+    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws PricingException, NoOfferException, ProductNotFoundException, ExecutionException, InterruptedException, IncorrectDimensionsException {
         if(override != null && !override.trim().isEmpty()) {
             ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
             productOverrideService.saveOrUpdate(dto);
