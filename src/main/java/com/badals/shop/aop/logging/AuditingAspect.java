@@ -74,8 +74,7 @@ public class AuditingAspect {
             String key, value;
             key = codeSignature.getParameterNames()[i];
             value = joinPoint == null || joinPoint.getArgs() == null || joinPoint.getArgs()[i] == null?"":joinPoint.getArgs()[i].toString();
-            System.out.println("First parameter's name: " + key);
-            System.out.println("First argument's value: " + value);
+
 
 /*            if (key.equalsIgnoreCase("status") || key.equalsIgnoreCase("state"))
                 action.setState(value);*/

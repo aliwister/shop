@@ -45,7 +45,6 @@ public class ProductService {
 
     private final Logger log = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository productRepository;
-    private final Pas5Service pas5Service;
     private final AmazonPricingService amazonPricingService;
     private final PasUKService pasUKService;
     private final EbayService ebayService;
@@ -61,9 +60,11 @@ public class ProductService {
     private final ProductLangRepository productLangRepository;
     private final Translate translateService;
 
-    public ProductService(ProductRepository productRepository, Pas5Service pas5Service, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
+    public static final long DEFAULT_WINDOW = 14400;
+
+    public ProductService(ProductRepository productRepository, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
         this.productRepository = productRepository;
-        this.pas5Service = pas5Service;
+
         this.amazonPricingService = amazonPricingService;
         this.pasUKService = pasUKService;
         this.ebayService = ebayService;
@@ -159,16 +160,16 @@ public class ProductService {
             product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
         }
         else if(product.getStub() != null && product.getStub()) {
-            product = pas5Service.lookup(product.getSku(),false, false, false, false);
+            product = amazonPricingService.lookup(product.getSku(),false);
             return this.getProductBySku(product.getSku());
         }
 
         if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
-            product = pas5Service.lookup(product.getSku(),false, false, false, false);
+            product = amazonPricingService.lookup(product.getSku(),false);
             return this.getProductBySku(product.getSku());
         }
-        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(Pas5Service.DEFAULT_WINDOW))) {
-            product = pas5Service.lookup(product.getSku(),false, false, false, false);
+        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
+            product = amazonPricingService.lookup(product.getSku(), true);
             return this.getProductBySku(product.getSku());
         }
 
@@ -296,12 +297,14 @@ public class ProductService {
         return this.getProductBySku(sku);
     }
 
+/*
     public ProductDTO lookupForcePas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild, true);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             productIndexService.indexProduct(p.getId());
         return this.getProductBySku(sku);
     }
+*/
 
     public ProductDTO lookupForcePasUk(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.pasUKService.lookup(sku, isParent, isRedis, isRebuild, true);
