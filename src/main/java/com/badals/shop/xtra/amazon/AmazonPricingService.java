@@ -116,7 +116,7 @@ public class AmazonPricingService implements IProductService {
     @Transactional
     Product buildKeepa(Product product, String asin, Boolean isRating) throws PricingException, ProductNotFoundException, NoOfferException, IncorrectDimensionsException {
         PasItemNode item = null;
-        if (redisPasRepository.getHashOperations().hasKey("keepa", asin)) {
+        /*if (redisPasRepository.getHashOperations().hasKey("keepa", asin)) {
             try {
                 item = (PasItemNode) redisPasRepository.getHashOperations().get("keepa", asin);
             }
@@ -124,17 +124,17 @@ public class AmazonPricingService implements IProductService {
                 redisPasRepository.getHashOperations().delete("keepa", asin);
             }
         }
-        else {
+        else {*/
             try {
                 item = keepaLookup.lookup(asin, isRating);
-                redisPasRepository.getHashOperations().put("keepa", asin, item);
+                //redisPasRepository.getHashOperations().put("keepa", asin, item);
                 product.setPasFlag(true);
                 product.setApi(Api.KEEPA);
             } catch (ItemNotAccessibleException e) {
                 product.setPasFlag(false);
                 return pas5Service.mwsItemShortCircuit(product, asin, true, 0);
             }
-        }
+
 
         List<ProductOverride> overrides = helper.findOverrides(asin, item.getParentAsin());
 
