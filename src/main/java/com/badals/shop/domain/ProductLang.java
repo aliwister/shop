@@ -1,4 +1,5 @@
 package com.badals.shop.domain;
+import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.xtra.IProductLang;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.SelectBeforeUpdate;
@@ -154,6 +155,18 @@ public class ProductLang implements Serializable, IProductLang {
         this.product = product;
         return this;
     }
+
+    public List<Attribute> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(List<Attribute> attributes) {
+        this.attributes = attributes;
+    }
+
+    @Type(type = "json")
+    @Column(name = "attributes", columnDefinition = "string")
+    List<Attribute> attributes;
 
     public void setProduct(Product product) {
         this.product = product;

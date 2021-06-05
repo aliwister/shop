@@ -2,6 +2,7 @@ package com.badals.shop.xtra.amazon;
 
 import com.amazon.paapi5.v1.*;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.xtra.keepa.KProduct;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -38,7 +39,7 @@ public interface PasItemMapper {
    @Mapping(source = "itemInfo.productInfo.color.displayValue", target="color")
    @Mapping(source = "itemInfo.productInfo.size.displayValue", target="size")
    @Mapping(source = "itemInfo.productInfo.unitCount.displayValue", target="unitCount")
-   @Mapping(source = "itemInfo.productInfo.isAdultProduct.displayValue", target="adult")
+   @Mapping(source = "itemInfo.productInfo.isAdultProduct.displayValue", target="adultProduct")
    @Mapping(source = "itemInfo.classifications.productGroup.displayValue", target="productGroup")
    //@Mapping(source = "", target="starRating")
    @Mapping(target = "cost", ignore = true)
@@ -47,6 +48,7 @@ public interface PasItemMapper {
    @Mapping(target = "availabilityType", ignore = true)
    @Mapping(target = "availabilityMessage", ignore = true)
    PasItemNode itemToPasItemNode(Item item);
+
 
    @AfterMapping
    default void afterMapping(@MappingTarget PasItemNode target, Item source) {

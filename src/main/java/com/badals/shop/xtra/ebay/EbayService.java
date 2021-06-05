@@ -65,7 +65,7 @@ public class EbayService {
       }
       ProductLang lang = getLang(product);
 
-      lang = (ProductLang) PasLookupParser.parseProductI18n(lang, item);
+      lang = (ProductLang) PasLookupParser.parseProductI18n(lang, item, "en");
 
       if(lang.getId() == null) {
          product.addProductLang(lang);
