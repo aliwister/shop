@@ -288,11 +288,8 @@ public class ProductService {
        return response;
    }
 
-    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
-        return lookupPas(sku, false, isRedis, isRebuild);
-    }
 
-    public ProductDTO lookupPas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
+    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.amazonPricingService.lookup(sku, true);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             productIndexService.indexProduct(p.getId());
