@@ -114,7 +114,7 @@ public class AmazonPricingService implements IProductService {
        // if (!product.getPrimeFlag())
         //    return priceMws(product, asin);
 
-        return pricePas(product, asin);
+        return buildKeepa(product, asin, true);
 
     }
     @Transactional
@@ -206,6 +206,7 @@ public class AmazonPricingService implements IProductService {
             variations.add(new Variation(child.getRef(), value));
         }
 
+        item = null;
         parent.setChildren(children);
         parent.setVariations(variations);
         parent = productRepo.save(parent);
