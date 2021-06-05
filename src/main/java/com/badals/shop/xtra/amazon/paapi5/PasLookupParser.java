@@ -6,9 +6,11 @@ import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductOverride;
 import com.badals.shop.domain.enumeration.OverrideType;
 import com.badals.shop.domain.pojo.VariationOption;
+import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.xtra.IMerchantProduct;
 import com.badals.shop.xtra.IProductLang;
 import com.badals.shop.xtra.amazon.*;
+import org.hibernate.annotations.Check;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -34,31 +36,31 @@ public class PasLookupParser {
     public static IMerchantProduct parseProduct(IMerchantProduct p, PasItemNode i, boolean isParent, List<ProductOverride> overrides, Long merchantId, String refPrepend, String slugPrepend) {
         //Reset price
         p.setPrice(null);
-
-        CRC32 checksum = new CRC32();
-        checksum.update(i.getId().getBytes());
-        long ref = checksum.getValue();
-        p.ref(Long.parseLong(refPrepend+ref)).slug(String.valueOf(slugPrepend+ref))
-                .active(true)
-                .sku(i.getId())
-                .url(i.getUrl())
-                .image(i.getImage())
-                .brand(i.getBrand())
-                .weight(PasUtility.calculateWeight(i.getParsedWeight(), getOverride(overrides, OverrideType.WEIGHT)))
-                .title(i.getTitle())
-                .upc(i.getUpc())
-                .merchantId(merchantId)
-                .gallery(i.gallerizeImages())
-                .inStock(true);
+        if(p.getRef() == null) {
+            String ref = ChecksumUtil.getChecksum(i.getId());
+            p.ref(Long.parseLong(refPrepend + ref)).slug(String.valueOf(slugPrepend + ref));
+        }
+        p.active(true)
+        .sku(i.getId())
+        .url(i.getUrl())
+        .image(i.getImage())
+        .brand(i.getBrand())
+        .weight(PasUtility.calculateWeight(i.getParsedWeight(), getOverride(overrides, OverrideType.WEIGHT)))
+        .title(i.getTitle())
+        .upc(i.getUpc())
+        .merchantId(merchantId)
+        .gallery(i.gallerizeImages())
+        .inStock(true);
         //p.setTenantId()
         return p;
     }
 
-    public static IProductLang parseProductI18n(IProductLang p, PasItemNode i) {
+    public static IProductLang parseProductI18n(IProductLang p, PasItemNode i, String lang) {
+
         p.setFeatures(i.getFeatures());
         p.setTitle(i.getTitle());
         p.setModel(i.getModel());
-        p.setLang("en");
+        p.setLang(lang);
         p.setDescription(i.getEditorial());
         p.setBrowseNode(i.getBrowseNode());
         return p;

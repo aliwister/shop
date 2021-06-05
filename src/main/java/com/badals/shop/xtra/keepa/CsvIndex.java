@@ -1,0 +1,46 @@
+package com.badals.shop.xtra.keepa;
+
+public enum CsvIndex {
+   AMAZON (0),
+   NEW (1),
+   USED (2),
+   SALES (3),
+   LISTPRICE (4),
+   COLLECTIBLE (5),
+   REFURBISHED (6),
+   NEW_FBM_SHIPPING (7),
+   LIGHTNING_DEAL (8),
+   WAREHOUSE (9),
+   NEW_FBA (10),
+   COUNT_NEW (11),
+   COUNT_USED (12),
+   COUNT_REFURBISHED (13),
+   COUNT_COLLECTIBLE (14),
+   EXTRA_INFO_UPDATES (15),
+   RATING (16),
+   COUNT_REVIEWS (17),
+   BUY_BOX_SHIPPING (18),
+   USED_NEW_SHIPPING (19),
+   USED_VERY_GOOD_SHIPPING (20),
+   USED_GOOD_SHIPPING (21),
+   USED_ACCEPTABLE_SHIPPING (22),
+   COLLECTIBLE_NEW_SHIPPING (23),
+   COLLECTIBLE_VERY_GOOD_SHIPPING (24),
+   COLLECTIBLE_GOOD_SHIPPING (25),
+   COLLECTIBLE_ACCEPTABLE_SHIPPING (26),
+   REFURBISHED_SHIPPING (27),
+   EBAY_NEW_SHIPPING (28),
+   EBAY_USED_SHIPPING (29),
+   TRADE_IN (30),
+   RENTAL (31);
+
+   private Integer code;
+
+   CsvIndex(Integer code) {
+      this.code = code;
+   }
+
+   public int getValue() {
+      return code;
+   }
+}

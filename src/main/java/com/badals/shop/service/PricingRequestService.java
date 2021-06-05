@@ -1,7 +1,9 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.PricingRequest;
+import com.badals.shop.domain.ProductOverride;
 import com.badals.shop.repository.PricingRequestRepository;
+import com.badals.shop.repository.ProductOverrideRepository;
 import com.badals.shop.service.dto.PricingRequestDTO;
 import com.badals.shop.service.mapper.PricingRequestMapper;
 import com.badals.shop.xtra.amazon.PricingException;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +29,13 @@ public class PricingRequestService {
     private final Logger log = LoggerFactory.getLogger(PricingRequestService.class);
 
     private final PricingRequestRepository pricingRequestRepository;
+    private final ProductOverrideRepository productOverrideRepository;
 
     private final PricingRequestMapper pricingRequestMapper;
 
-    public PricingRequestService(PricingRequestRepository pricingRequestRepository, PricingRequestMapper pricingRequestMapper) {
+    public PricingRequestService(PricingRequestRepository pricingRequestRepository, ProductOverrideRepository productOverrideRepository, PricingRequestMapper pricingRequestMapper) {
         this.pricingRequestRepository = pricingRequestRepository;
+        this.productOverrideRepository = productOverrideRepository;
         this.pricingRequestMapper = pricingRequestMapper;
     }
 
@@ -112,4 +117,11 @@ public class PricingRequestService {
         List<Long> list = dtos.stream().map(PricingRequestDTO::getId).collect(Collectors.toList());
         pricingRequestRepository.updateEmailSentWhereIdIn(list);
     }
+
+    public List<ProductOverride> findOverrides(String asin, String parent) {
+        if (parent == null)
+            return productOverrideRepository.findBySku(asin);
+        return productOverrideRepository.findBySkuIn(Arrays.asList(new String[]{asin, parent}));
+    }
+
 }

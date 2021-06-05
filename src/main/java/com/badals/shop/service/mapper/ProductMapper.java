@@ -1,8 +1,10 @@
 package com.badals.shop.service.mapper;
 
 import com.amazon.paapi5.v1.VariationAttribute;
+import com.badals.shop.aop.logging.LocaleContext;
 import com.badals.shop.domain.*;
 
+import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Variation;
@@ -104,10 +106,27 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     }
     @AfterMapping
     default void afterMapping(@MappingTarget ProductDTO target, Product source) {
+        String langCode = LocaleContext.getLocale().substring(0,2);
+
         if (target.getGallery() == null) {
             target.setGallery(new ArrayList<Gallery>());
         }
+
+        final String prepend;
+        if(!target.getImage().startsWith("https://"))
+            if(source.getMerchantId() == 1)
+                prepend = "https://m.media-amazon.com/images/I/";
+            else
+                prepend = null;
+        else
+            prepend = null;
+
         target.getGallery().add(0, new Gallery(source.getImage()));
+
+        if(prepend != null) {
+            target.setImage(prepend + target.getImage());
+            target.setGallery(target.getGallery().stream().map(x-> new Gallery(prepend+x.getUrl())).collect(Collectors.toList()));
+        }
 
         // Process sale price and discount percentage
         MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
@@ -128,15 +147,29 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
              */
             //System.out.println("LOCALE:"+LocaleContextHolder.getLocale());
             Map<String, String> a = processAvailability(hours);
-            target.setAvailability(a.get(LocaleContextHolder.getLocale().toString().substring(0,2)));
+            target.setAvailability(a.get(langCode));
         }
 
-        ProductLang lang = source.getProductLangs().stream().findFirst().orElse(null);
+
+
+        ProductLang lang = source.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
+        ProductLang parentLang = lang;
+
+        if(source.getVariationType() == VariationType.CHILD)
+            parentLang = source.getParent().getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(lang);
+
+        if(lang == null && !langCode.equals("en")) {
+            lang = source.getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
+            parentLang = lang;
+            if(source.getVariationType() == VariationType.CHILD)
+                parentLang = source.getParent().getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(lang);
+        }
+
         if(lang != null) {
             target.setTitle(lang.getTitle());
-            target.setFeatures(lang.getFeatures());
-            target.setDescription(lang.getDescription());
-            target.setBrowseNode(lang.getBrowseNode());
+            target.setFeatures(parentLang.getFeatures());
+            target.setDescription(parentLang.getDescription());
+            target.setBrowseNode(parentLang.getBrowseNode());
         }
     }
 

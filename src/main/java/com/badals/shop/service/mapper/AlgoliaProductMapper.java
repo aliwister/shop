@@ -29,48 +29,57 @@ public interface AlgoliaProductMapper {
     @Mapping(target = "hierarchicalCategories", ignore = true)
     @Mapping(target = "availability", ignore = true)
     @Mapping(target = "merchant", ignore = true)
+    @Mapping(target = "title", ignore = true)
+    @Mapping(target = "brand", ignore = true)
+    @Mapping(target = "variationOptions", ignore = true)
+    @Mapping(target = "attributes", ignore = true)
     AlgoliaProduct producttoAlgoliaProduct(Product product);
 
     @AfterMapping
     default void afterMapping(@MappingTarget AlgoliaProduct target, Product source) {
-        ProductLang lang = source.getProductLangs().stream().findFirst().orElse(null);
-        if(lang != null) {
-            target.setTitle(lang.getTitle());
-            String t = "";
-            Map cats = new HashMap<String, String>();
-            String[] s = lang.getBrowseNode().split(">");
-            int i = 1;
-            for (String l : s) {
-                if (t.isEmpty()) {
-                    t += l;
-                } else {
-                    t += " > " + l;
-                }
 
-                cats.put("lvl" + i++, t.trim());
+        source.getProductLangs().stream().forEach(
+            x -> {
+                target.getTitle().put(x.getLang(), x.getTitle());
+                target.getBrand().put(x.getLang(), x.getBrand());
+                target.getHierarchicalCategories().put(x.getLang(), parseCategories(x.getBrowseNode()));
             }
-            target.setHierarchicalCategories(cats);
-        }
+        );
+
+        MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
+        target.setAvailability(stock.getAvailability());
 
         if(source.getPrice() != null) {
             Map price = new HashMap<String, String>();
-            price.put("OMR", source.getPrice());
+            stock.getPrices().forEach(
+                    x-> price.put(x.getCurrency(), x.getAmount())
+            );
             target.setPrice(price);
         }
 
-        MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
-        if(stock.getAvailability() != null) {
-            Map<String, String> map = ProductMapper.processAvailability(stock.getAvailability());
-            target.setAvailability(map.get("en"));
-            target.setAvailability_ar(map.get("ar"));
-        }
     }
 
-    @Mapping(source = "name", target = "title")
-    @Mapping(source = "name_ar", target = "title_ar")
-    @Mapping(target = "availability", ignore = true)
+    private Map<String, String> parseCategories(String browseNode) {
+        String t = "";
+        Map cats = new HashMap<String, String>();
+        String[] s = browseNode.split(">");
+        int i = 1;
+        for (String l : s) {
+            if (t.isEmpty()) {
+                t += l;
+            } else {
+                t += " > " + l;
+            }
+
+            cats.put("lvl" + i++, t.trim());
+        }
+        return cats;
+    }
+
     @Mapping(target = "price", ignore = true)
-    @Mapping(source="availability", target = "hours")
+    @Mapping(target = "brand", ignore = true)
+    @Mapping(target = "merchant", ignore = true)
+    @Mapping(source="availability", target = "availability")
     AlgoliaProduct addProductToAlgoliaProduct(AddProductDTO doc);
 
     @AfterMapping
@@ -90,7 +99,7 @@ public interface AlgoliaProductMapper {
 
                 cats.put("lvl" + i++, t.trim());
             }
-            target.setHierarchicalCategories(cats);
+            target.getHierarchicalCategories().put("en", cats);
         }
         if(source.getBrowseNode_ar() != null) {
             String t = "";
@@ -106,7 +115,7 @@ public interface AlgoliaProductMapper {
 
                 cats.put("lvl" + i++, t.trim());
             }
-            target.setHierarchicalCategories_ar(cats);
+            target.getHierarchicalCategories().put("ar", cats);
         }
 
         if(source.getSalePrice()!= null) {
@@ -116,10 +125,10 @@ public interface AlgoliaProductMapper {
         }
 
 
-        if(source.getAvailability() != null) {
+/*        if(source.getAvailability() != null) {
             Map<String, String> map = ProductMapper.processAvailability(source.getAvailability());
             target.setAvailability(map.get("en"));
             target.setAvailability_ar(map.get("ar"));
-        }
+        }*/
     }
 }

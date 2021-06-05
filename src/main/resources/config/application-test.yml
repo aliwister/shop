@@ -165,6 +165,9 @@ jhipster:
 
 # application:
 # application:
+translate:
+  key: AIzaSyBL1StO62qTC5QTo3Ds8wKrIfwO6vMNMMY
+
 pas:
   key: ***REMOVED***
   secret: ***REMOVED***

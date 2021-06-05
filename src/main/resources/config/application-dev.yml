@@ -83,9 +83,9 @@ spring:
   thymeleaf:
     cache: false
   redis:
-    host: redis-19246.c15.us-east-1-4.ec2.cloud.redislabs.com
-    port: 19246
-    password: IFpOoXYxfcQtZx2edgtgRSkmcMKHiRFA
+    host: redis-15021.c135.eu-central-1-1.ec2.cloud.redislabs.com
+    port: 15021
+    password: Vl0wz1HVcaskE4Z9b3D8MIbBQefLOXkT
   cache:
     type: redis
 server:
@@ -142,6 +142,9 @@ jhipster:
 # ===================================================================
 
 # application:
+translate:
+  key: AIzaSyBL1StO62qTC5QTo3Ds8wKrIfwO6vMNMMY
+
 pas:
   key: ***REMOVED***
   secret: ***REMOVED***
