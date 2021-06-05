@@ -135,6 +135,7 @@ public class AmazonPricingService implements IProductService {
                 product.setPasFlag(true);
                 product.setApi(Api.KEEPA);
             } catch (ItemNotAccessibleException e) {
+                e.printStackTrace();
                 product.setPasFlag(false);
                 return pas5Service.mwsItemShortCircuit(product, asin, true, 0);
             }
