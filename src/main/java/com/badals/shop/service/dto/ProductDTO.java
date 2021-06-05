@@ -123,6 +123,10 @@ public class ProductDTO implements Serializable {
 
     List<String> features;
 
+    String rating;
+
+    String _locale;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

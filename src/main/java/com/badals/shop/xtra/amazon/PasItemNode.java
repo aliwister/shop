@@ -35,7 +35,6 @@ public class PasItemNode implements Serializable {
    String url;
    String brand;
 
-   String manufacturer;
    BigDecimal listPrice;
    BigDecimal savingsAmount;
    Integer savingsPercentage;
@@ -43,7 +42,6 @@ public class PasItemNode implements Serializable {
    String title;
    String description;
 
-   String model;
 
    String itemWeight;
    String itemWeightUnit;
@@ -57,18 +55,35 @@ public class PasItemNode implements Serializable {
    String itemLength;
    String itemWidth;
 
+   boolean adultProduct;
+   String unitCount;
 
+   String starRating;
+
+
+   /** Attributes **/
+   String size;
+   String edition;
+   String format;
+   String type;
+   String upc;
+   String ean;
+   String isbn;
    String productGroup;
    String productType;
    String partNumber;
    String releaseDate;
    String color;
-   boolean adult;
-   String unitCount;
-   String size;
+   String model;
+   String manufacturer;
+   String author;
+   String binding;
+   Integer numberOfPages;
+   Integer publicationDate;
+   String audienceRating;
+   /*************/
 
-   String starRating;
-
+   List<String> frequentlyBoughtTogether;
    List<PasItemNode> children;
    List<String> features;
 
@@ -81,9 +96,7 @@ public class PasItemNode implements Serializable {
    String browseNode;
    String editorial;
 
-   String upc;
-   String ean;
-   String isbn;
+
 
    VariationType variationType;
 
@@ -188,4 +201,46 @@ public class PasItemNode implements Serializable {
    }
 
 
+   public List<Attribute> parseAttributes() {
+      List map = new ArrayList();
+      if( size != null)
+         map.add(new Attribute("size", size));
+      if( edition != null)
+         map.add(new Attribute("edition", edition));
+      if( format != null)
+         map.add(new Attribute("format", format));
+      if( type != null)
+         map.add(new Attribute("type", type));
+      if( upc != null)
+         map.add(new Attribute("upc", upc));
+      if( ean != null)
+         map.add(new Attribute("ean", ean));
+      if( isbn != null)
+         map.add(new Attribute("isbn", isbn));
+      if( productGroup != null)
+         map.add(new Attribute("productGroup", productGroup));
+      if( productType != null)
+         map.add(new Attribute("productType", productType));
+      if( partNumber != null)
+         map.add(new Attribute("partNumber", partNumber));
+      if( releaseDate != null)
+         map.add(new Attribute("releaseDate", releaseDate));
+      if( color != null)
+         map.add(new Attribute("color", color));
+      if( model != null)
+         map.add(new Attribute("model", model));
+      if( manufacturer != null)
+         map.add(new Attribute("manufacturer", manufacturer));
+      if( author != null)
+         map.add(new Attribute("author", author));
+      if( binding != null)
+         map.add(new Attribute("binding", binding));
+      if( numberOfPages != null)
+         map.add(new Attribute("numberOfPages", String.valueOf(numberOfPages)));
+      if( publicationDate != null)
+         map.add(new Attribute("publicationDate", String.valueOf(publicationDate)));
+      if( audienceRating != null)
+         map.add(new Attribute("audienceRating", audienceRating));
+      return map;
+   }
 }

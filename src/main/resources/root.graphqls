@@ -18,9 +18,14 @@ scalar LocalTime
 scalar OffsetDateTime
 
 scalar BigDecimal
+directive @uppercase on FIELD_DEFINITION
 
 type Message {
     value: String
+}
+
+interface LocalizedObject {
+    _locale: String
 }
 
 type Action {

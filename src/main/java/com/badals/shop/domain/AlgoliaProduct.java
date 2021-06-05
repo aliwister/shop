@@ -2,6 +2,7 @@ package com.badals.shop.domain;
 
 import com.badals.shop.domain.enumeration.Condition;
 import com.badals.shop.domain.pojo.ProductI18;
+import com.badals.shop.domain.pojo.VariationOption;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -21,51 +22,36 @@ public class AlgoliaProduct implements Serializable {
 
     @JsonProperty("objectID")
     private Long ref;
-    //private Long parent;
     private Long upc;
     private String sku;
-    private String title;
-    private String title_ar;
+    private Map<String, String> title = new HashMap<>();
     private String slug;
 
-    Map hierarchicalCategories;
-    Map hierarchicalCategories_ar;
+    private Map<String, Map<String, String>> hierarchicalCategories = new HashMap<>();
+    private Map<String, String> brand = new HashMap<>();
+    //private Map<String, String> availability = new HashMap<>();
 
-
-    private String brand;
-    private String brand_ar;
-
-    private String availability;
-    private String availability_ar;
-
-    //private String group;
-
-    private Map<String, BigDecimal> price;
+    private Map<String, BigDecimal> price = new HashMap<>();
     private String image;
     private Long quantity;
+
     private String tenant;
-    private String merchant;
+    private Map<String, String> merchant = new HashMap<>();
+
     private String unit;
 
     private Integer discountInPercent;
 
-    private Long hours;
+    private Integer availability;
+    private BigDecimal rating;
 
-    //private LocalDate releaseDate;
+    private Boolean isPrime;
+    private String shipsFrom;
 
-    @NotNull
-    //private Boolean active;
+    private Boolean isVariation;
 
-    @Lob
-    //private List<String> similarProducts;
-
-    //private String url;
-
-    //private Condition condition;
-    //private Boolean isUsed;
-    //private Boolean availableForOrder;
+    private Map<String, String> attributes = new HashMap<>();
+    private Map<String, List<VariationOption>> variationOptions = new HashMap<>();
 
     private BigDecimal weight;
-    //private BigDecimal volumeWeight;
-
 }
