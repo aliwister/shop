@@ -50,14 +50,14 @@ public class AmazonPricingService implements IProductService {
     private final PasLookup pasLookup;
     private final MwsLookup mwsLookup;
     private final KeepaLookup keepaLookup;
-    private final RedisPasRepository redisPasRepository;
+    //private final RedisPasRepository redisPasRepository;
     private final ProductMapper productMapper;
     private final PasItemMapper pasItemMapper;
     private final PricingRequestService pricingRequestService;
     private final SlugService slugService;
     private final Pas5Service pas5Service;
 
-    public AmazonPricingService(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, PricingHelperService pricingHelperService, @Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, KeepaLookup keepaLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper, PricingRequestService pricingRequestService, SlugService slugService, Pas5Service pas5Service) {
+    public AmazonPricingService(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, PricingHelperService pricingHelperService, @Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, KeepaLookup keepaLookup, /*RedisPasRepository redisPasRepository,*/ ProductMapper productMapper, PasItemMapper pasItemMapper, PricingRequestService pricingRequestService, SlugService slugService, Pas5Service pas5Service) {
         this.productRepo = productRepo;
         this.categoryRepository = categoryRepository;
         this.merchantRepository = merchantRepository;
@@ -65,7 +65,7 @@ public class AmazonPricingService implements IProductService {
         this.pasLookup = pasLookup;
         this.mwsLookup = mwsLookup;
         this.keepaLookup = keepaLookup;
-        this.redisPasRepository = redisPasRepository;
+        //this.redisPasRepository = redisPasRepository;
         this.productMapper = productMapper;
         this.pasItemMapper = pasItemMapper;
         this.pricingRequestService = pricingRequestService;
