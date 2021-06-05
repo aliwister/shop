@@ -2,7 +2,7 @@ package com.badals.shop.xtra.keepa;
 
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.ItemNotAccessibleException;
-import com.badals.shop.xtra.amazon.Pas5Service;
+
 import com.badals.shop.xtra.amazon.PasItemNode;
 import com.badals.shop.xtra.amazon.PricingException;
 import org.slf4j.Logger;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
@@ -38,6 +37,9 @@ public class KeepaLookup {
       APP_ID = "2fk5l4evnaer7h24jrn18ahu1vpk5o1dv692mdnmdqat1uuh8j9kn5l44mjismia";
       lookupUri = "https://api.keepa.com/product?key="+APP_ID+"&domain=1&history=1&days=1&asin="; //B0928WTNY1";
    }
+
+
+
 
    public PasItemNode lookup(String id, Boolean isRating) throws ProductNotFoundException, PricingException, ItemNotAccessibleException {
       String url = lookupUri+id + (isRating?"&rating=1":"&rating=0");

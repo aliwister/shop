@@ -23,6 +23,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public class PricingMutation implements GraphQLMutationResolver {
@@ -64,7 +65,7 @@ public class PricingMutation implements GraphQLMutationResolver {
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws PricingException, NoOfferException, ProductNotFoundException {
+    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws PricingException, NoOfferException, ProductNotFoundException, ExecutionException, InterruptedException {
         if(override != null && !override.trim().isEmpty()) {
             ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
             productOverrideService.saveOrUpdate(dto);
