@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
@@ -55,7 +56,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.getAllProducts(count);
       //return null;
    }
-   public ProductDTO product (String slug, String cookie, String _locale) throws ProductNotFoundException, NoOfferException, PricingException, IncorrectDimensionsException {
+   public ProductDTO product (String slug, String cookie, String _locale) throws ProductNotFoundException, NoOfferException, PricingException, IncorrectDimensionsException, ExecutionException, InterruptedException {
 
 
       ProductDTO dto = this.productService.getProductBySlug(slug);
@@ -115,7 +116,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return categoryService.findOne((long) id).orElse(null);
    }
 
-   public ProductDTO getProductBySku(final String sku, final boolean isParent) throws ProductNotFoundException, PricingException, NoOfferException, IncorrectDimensionsException {
+   public ProductDTO getProductBySku(final String sku, final boolean isParent) throws ProductNotFoundException, PricingException, NoOfferException, IncorrectDimensionsException, ExecutionException, InterruptedException {
       log.info("GetProductBySky: pasService.lookup("+sku+")");
       //ProductDTO product;
 

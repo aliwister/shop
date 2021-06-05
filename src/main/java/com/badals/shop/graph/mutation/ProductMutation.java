@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 @Component
@@ -78,7 +79,7 @@ public class ProductMutation implements GraphQLMutationResolver {
 */
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException, NoOfferException {
+    public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException, NoOfferException, ExecutionException, InterruptedException {
         return this.productService.lookupPas(asin, false, false);
     }
 
