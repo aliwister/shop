@@ -376,7 +376,7 @@ public class Pas5Service implements IProductService {
                 isMwsLookup = false;
             }
         }
-        if(isPasLookup) {
+/*        if(isPasLookup) {
             try {
                 item = callPas(asin);
             }
@@ -386,7 +386,7 @@ public class Pas5Service implements IProductService {
                 else
                     throw e;
             }
-        }
+        }*/
             //redisPasRepository.getHashOperations().put("pas", asin, item);
 
         // Not Exists
