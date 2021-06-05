@@ -2,8 +2,11 @@ package com.badals.shop.xtra.keepa;
 
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.ItemNotAccessibleException;
+import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PasItemNode;
 import com.badals.shop.xtra.amazon.PricingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
@@ -23,6 +26,8 @@ public class KeepaLookup {
    private final String APP_ID;
    private final String lookupUri;
 
+   private final Logger log = LoggerFactory.getLogger(KeepaLookup.class);
+
    public KeepaLookup(KeepaMapper keepaMapper) {
       this.keepaMapper = keepaMapper;
       MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
@@ -36,6 +41,7 @@ public class KeepaLookup {
 
    public PasItemNode lookup(String id, Boolean isRating) throws ProductNotFoundException, PricingException, ItemNotAccessibleException {
       String url = lookupUri+id + (isRating?"&rating=1":"&rating=0");
+      log.info(url);
       KeepaResponse response =  restTemplate.getForObject(url,KeepaResponse.class);
       if (response.getProducts() == null || response.getProducts().size() == 0)
          throw new PricingException("Invalid API Response");
