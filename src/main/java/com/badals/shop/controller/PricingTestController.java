@@ -52,8 +52,8 @@ public class PricingTestController {
       return mwsLookup.getMatchingProduct(sku);
    }
 
-/*   @RequestMapping(path="/keepam/{sku}")
+   @RequestMapping(path="/keepam/{sku}")
    @ResponseBody public PasItemNode keepam(@PathVariable("sku") String sku) throws PricingException, ProductNotFoundException, ItemNotAccessibleException {
       return keepaLookup.lookup(sku, true);
-   }*/
+   }
 }

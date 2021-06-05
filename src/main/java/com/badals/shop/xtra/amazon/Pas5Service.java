@@ -353,9 +353,9 @@ public class Pas5Service implements IProductService {
         List<ProductOverride> overrides = findOverrides(asin, null);
         //Product finalParent = null;
         PasItemNode item = null;
-        //if(product == null || product.getStub()) {
-            //item = mwsLookup.lookup(asin);
-        //}
+        if(product == null || product.getStub()) {
+            item = mwsLookup.lookup(asin);
+        }
 
 
         boolean isPasLookup = false;
@@ -365,11 +365,11 @@ public class Pas5Service implements IProductService {
         if(product != null && product.getMerchantId() == 11L)
             isReset = true;*/
 
-        if(product != null && product.getWeight() != null)
+/*        if(product != null && product.getWeight() != null)
             isPasLookup = true;
 
         if(overrides != null && overrides.size() > 0)
-            isPasLookup = true;
+            isPasLookup = true;*/
 
         if(!isPasLookup) {
             try {
