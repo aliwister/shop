@@ -28,7 +28,7 @@ public class LocaleAspect {
         CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
 
         int i = 0;
-
+        LocaleContext.setLocale("en");
         try {
             String state = "";
             for(Object o : args) {
