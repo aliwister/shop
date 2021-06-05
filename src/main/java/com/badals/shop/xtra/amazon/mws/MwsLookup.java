@@ -88,7 +88,7 @@ public class MwsLookup {
             RelationshipList r = x.getRelationships();
             for (Object obj : r.getAny()) {
                 Node attribute = (Node) obj;
-                log.debug(attribute.getLocalName());
+                //log.debug(attribute.getLocalName());
                 String type = attribute.getLocalName();
                 String relationSku = getAsin(attribute.getChildNodes());
 
@@ -99,7 +99,7 @@ public class MwsLookup {
                 }
                 else if (type.equals("VariationChild")) {
                     pas.setVariationType(VariationType.PARENT);
-                    log.debug("Has Child:"+relationSku);
+                    //log.debug("Has Child:"+relationSku);
                     if (attribute.hasChildNodes()) {
                         NodeList list = attribute.getChildNodes();
                         ArrayList<Attribute> varList = new ArrayList<>();
@@ -118,7 +118,7 @@ public class MwsLookup {
        }
 
        if (x.isSetAttributeSets()) {
-           log.debug("                    Attributes");
+           //log.debug("                    Attributes");
            AttributeSetList attributeSetList = x.getAttributeSets();
            for (Object obj : attributeSetList.getAny()) {
                Node attribute = (Node) obj;
@@ -186,9 +186,9 @@ public class MwsLookup {
                node.setProductType(value);
                break;
            case "SmallImageURL":
-               log.debug(value);
+               //log.debug(value);
                value = value.replace("http://ecx.images-amazon.com/", "https://m.media-amazon.com/").replace("._SL75_.jpg", ".jpg");
-               log.debug(value);
+               //log.debug(value);
                node.setImage(value);
                break;
            case "Title":
@@ -279,11 +279,11 @@ public class MwsLookup {
             GetLowestOfferListingsForASINResponse response = client.getLowestOfferListingsForASIN(request);
             ResponseHeaderMetadata rhmd = response.getResponseHeaderMetadata();
             // We recommend logging every the request id and timestamp of every call.
-            log.debug("Response:");
-            log.debug("RequestId: "+rhmd.getRequestId());
-            log.debug("Timestamp: "+rhmd.getTimestamp());
-            String responseXml = response.toXML();
-            log.debug(responseXml);
+            //log.debug("Response:");
+            //log.debug("RequestId: "+rhmd.getRequestId());
+            //log.debug("Timestamp: "+rhmd.getTimestamp());
+            //String responseXml = response.toXML();
+            //log.debug(responseXml);
             return response;
         } catch (MarketplaceWebServiceProductsException ex) {
             // Exception properties are important for diagnostics.
@@ -314,11 +314,11 @@ public class MwsLookup {
           GetMatchingProductResponse response = client.getMatchingProduct(request);
           ResponseHeaderMetadata rhmd = response.getResponseHeaderMetadata();
           // We recommend logging every the request id and timestamp of every call.
-          log.debug("Response:");
+/*          log.debug("Response:");
           log.debug("RequestId: "+rhmd.getRequestId());
           log.debug("Timestamp: "+rhmd.getTimestamp());
           String responseXml = response.toXML();
-          log.debug(responseXml);
+          log.debug(responseXml);*/
           return response;
       } catch (MarketplaceWebServiceProductsException ex) {
           // Exception properties are important for diagnostics.

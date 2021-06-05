@@ -1,4 +1,6 @@
 package com.badals.shop.domain;
+import com.badals.shop.domain.pojo.Gallery;
+import com.badals.shop.domain.pojo.Price;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.SelectBeforeUpdate;
 import org.hibernate.annotations.Type;
@@ -8,6 +10,7 @@ import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * A MerchantStock.
@@ -89,9 +92,19 @@ public class MerchantStock implements Serializable {
     @JsonIgnoreProperties("merchantStocks")
     private Product product;
 
+   @Type(type = "json")
+   @Column(name = "price_obj", columnDefinition = "string")
+   List<Price> prices;
 
+   public List<Price> getPrices() {
+      return prices;
+   }
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
+   public void setPrices(List<Price> prices) {
+      this.prices = prices;
+   }
+
+   // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
     }

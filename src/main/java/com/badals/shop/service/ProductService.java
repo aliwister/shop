@@ -1,5 +1,6 @@
 package com.badals.shop.service;
 
+import com.badals.shop.aop.logging.LocaleContext;
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.graph.MerchantProductResponse;
@@ -15,14 +16,14 @@ import com.badals.shop.service.pojo.AddProductDTO;
 
 import com.badals.shop.service.util.ValidationUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import com.badals.shop.xtra.amazon.NoOfferException;
-import com.badals.shop.xtra.amazon.Pas5Service;
-import com.badals.shop.xtra.amazon.PasUKService;
-import com.badals.shop.xtra.amazon.PricingException;
+import com.badals.shop.xtra.amazon.*;
 import com.badals.shop.xtra.ebay.EbayService;
+import com.google.cloud.translate.Translate;
+import com.google.cloud.translate.Translation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,7 @@ public class ProductService {
     private final Logger log = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository productRepository;
     private final Pas5Service pas5Service;
+    private final AmazonPricingService amazonPricingService;
     private final PasUKService pasUKService;
     private final EbayService ebayService;
 
@@ -57,11 +59,12 @@ public class ProductService {
     private final ProductContentService productContentService;
 
     private final ProductLangRepository productLangRepository;
+    private final Translate translateService;
 
-
-    public ProductService(ProductRepository productRepository, Pas5Service pas5Service, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository) {
+    public ProductService(ProductRepository productRepository, Pas5Service pas5Service, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
         this.productRepository = productRepository;
         this.pas5Service = pas5Service;
+        this.amazonPricingService = amazonPricingService;
         this.pasUKService = pasUKService;
         this.ebayService = ebayService;
         this.productMapper = productMapper;
@@ -71,8 +74,8 @@ public class ProductService {
         this.productIndexService = productIndexService;
         this.productContentService = productContentService;
         this.productLangRepository = productLangRepository;
+        this.translateService = translateService;
     }
-
 
     /**
      * Save a product.
@@ -199,10 +202,66 @@ public class ProductService {
         //if(product.getPrice() == null)
         //    throw new PricingException("Invalid price");
         //if(isSaveES)
-        productIndexService.saveToElastic(product);
+        //productIndexService.saveToElastic(product);
+        translateProduct(product);
+
+
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
 
     }
+
+    private void translateProduct(Product product) {
+        String langCode = LocaleContext.getLocale();
+        ProductLang lang = product.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
+
+        if(product.getVariationType() == VariationType.SIMPLE && lang != null)
+            return;
+
+        ProductLang childLang = product.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
+        ProductLang childEn = product.getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
+        if(childLang == null && childEn != null) {
+            ProductLang target = new ProductLang();
+            target = translateChild(childEn, target, langCode);
+            if(product.getVariationType() == VariationType.SIMPLE)
+                target = translateParent(childEn, target, langCode);
+            product.addProductLang(target);
+            productRepository.save(product);
+        }
+
+        if(product.getVariationType() == VariationType.SIMPLE) {
+            return;
+        }
+
+        ProductLang parentLang = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
+        if (parentLang != null)
+            return;
+
+        ProductLang parentEn = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
+        if(parentLang == null && parentEn != null) {
+            ProductLang target = new ProductLang();
+            target = translateParent(parentEn, target, langCode);
+            Product parent = product.getParent();
+            parent.addProductLang(target);
+            productRepository.save(parent);
+        }
+    }
+
+    private ProductLang translateParent(ProductLang en, ProductLang target, String lang) {
+        Translate.TranslateOption o = Translate.TranslateOption.targetLanguage(lang);
+        if(en.getFeatures() != null)
+            target.setFeatures( translateService.translate(en.getFeatures(),o).stream().map(Translation::getTranslatedText).collect(Collectors.toList()));
+        if(en.getDescription() != null)
+            target.setDescription(translateService.translate(en.getDescription(), o).getTranslatedText());
+        target.setLang(lang);
+        return target;
+    }
+    private ProductLang translateChild(ProductLang en, ProductLang target, String lang) {
+        Translate.TranslateOption o = Translate.TranslateOption.targetLanguage(lang);
+        target.setTitle(translateService.translate(en.getTitle(), o).getTranslatedText());
+        target.setLang(lang);
+        return target;
+    }
+
 
     public ProductDTO getProductByDial(String dial) throws ProductNotFoundException, PricingException {
         Long ref = speedDialService.findRefByDial(dial);
@@ -234,7 +293,7 @@ public class ProductService {
     }
 
     public ProductDTO lookupPas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
-        Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild, false);
+        Product p = this.amazonPricingService.lookup(sku, true);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             productIndexService.indexProduct(p.getId());
         return this.getProductBySku(sku);
@@ -440,7 +499,6 @@ public class ProductService {
 
         return false;
     }
-
 /*
     public <U> U log(Customer loginUser, String slug, cookie) {
        productRepository.log(loginUser.getId(), slug, cookie);

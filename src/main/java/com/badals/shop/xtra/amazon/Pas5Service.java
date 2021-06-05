@@ -24,6 +24,9 @@ import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import com.badals.shop.xtra.amazon.mws.MwsLookupParser;
 import com.badals.shop.xtra.amazon.paapi5.PasLookup;
 import com.badals.shop.xtra.amazon.paapi5.PasLookupParser;
+import com.google.cloud.translate.Translate;
+import com.google.cloud.translate.TranslateOptions;
+import com.google.cloud.translate.Translation;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +58,10 @@ public class Pas5Service implements IProductService {
     private final RedisPasRepository redisPasRepository;
     private final ProductMapper productMapper;
     private final PasItemMapper pasItemMapper;
+    private final Translate translateService;
 
 
-    public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, @Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper) {
+    public Pas5Service(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, ProductOverrideRepository productOverrideRepository, @Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper, Translate translateService) {
         this.productRepo = productRepo;
         this.categoryRepository = categoryRepository;
         this.merchantRepository = merchantRepository;
@@ -67,6 +71,7 @@ public class Pas5Service implements IProductService {
         this.redisPasRepository = redisPasRepository;
         this.productMapper = productMapper;
         this.pasItemMapper = pasItemMapper;
+        this.translateService = translateService;
     }
 
     public Boolean existsBySku(String sku) {
@@ -97,11 +102,14 @@ public class Pas5Service implements IProductService {
      */
     public Product lookup(String asin, boolean isParent, boolean isRedis, boolean isRebuild, boolean forcePas) throws NoOfferException, PricingException {
 
+        // Does Product Exist?
         Product product = productRepo.findBySkuJoinChildren(asin, 1L).orElse(null);
 
         // Get PAS to check how many variation dimensions are there since MWS missed some variation attributes
         int dimCount = 0;
         GetVariationsResponse variationsResponse = pasLookup.variationLookup(asin, 1);
+
+        // Pas Error Flag
         if(variationsResponse.getErrors() != null){
             String errCode =  variationsResponse.getErrors().get(0).getCode();
             if (errCode.equalsIgnoreCase("noresults")) {
@@ -113,6 +121,7 @@ public class Pas5Service implements IProductService {
 
         }
         else {
+            //
             VariationSummary summary = variationsResponse.getVariationsResult().getVariationSummary();
             dimCount = summary.getVariationDimensions().size();
             int pageCount = summary.getPageCount();
@@ -144,7 +153,6 @@ public class Pas5Service implements IProductService {
                 return product;
         }
         if(isParent) isRebuild = true;
-
 
         //if (product != null) // && product.getUpdated())
         List<Product> mws = new ArrayList<>();
@@ -337,7 +345,7 @@ public class Pas5Service implements IProductService {
         return pasItemMapper.itemToPasItemNode(doc.get(asin));
     }
 
-    private Product mwsItemShortCircuit(Product product, String asin, boolean isRebuild, Integer dimCount) throws NoOfferException, PricingException, IncorrectDimensionsException {
+    public Product mwsItemShortCircuit(Product product, String asin, boolean isRebuild, Integer dimCount) throws NoOfferException, PricingException, IncorrectDimensionsException {
 
         List<ProductOverride> overrides = findOverrides(asin, null);
         //Product finalParent = null;
@@ -563,10 +571,10 @@ public class Pas5Service implements IProductService {
         return product;
     }
 
-    ProductLang getLang(Product product) {
+    ProductLang getLang(Product product, final String lang) {
         if(product.getProductLangs() == null)
             return new ProductLang();
-        return product.getProductLangs().stream().findFirst().orElse(new ProductLang());
+        return product.getProductLangs().stream().filter(x -> x.getLang().equalsIgnoreCase(lang)).findFirst().orElse(new ProductLang());
     }
 
     Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
@@ -579,13 +587,19 @@ public class Pas5Service implements IProductService {
             BigDecimal weight = productRepo.lookupWeight(product.getSku());
             product.setWeight(weight);
         }
-        ProductLang lang = getLang(product);
+        ProductLang en = getLang(product, "en");
+        ProductLang ar = getLang(product, "ar");
 
-        lang = (ProductLang) PasLookupParser.parseProductI18n(lang, item);
+        en = (ProductLang) PasLookupParser.parseProductI18n(en, item, "en");
+        //ar = (ProductLang) PasLookupParser.parseProductI18n(ar, item, "ar");
 
-        if(lang.getId() == null) {
-            product.addProductLang(lang);
+        if(en.getId() == null) {
+            product.addProductLang(en);
         }
+/*        //if(ar.getId() == null) {
+            ar = translate(en, "ar");
+            product.addProductLang(ar);
+        //}*/
         //if(item.get() == null || (!item.isSuperSaver() && !item.isPrime()))
           //  return product;
         if(isParent)

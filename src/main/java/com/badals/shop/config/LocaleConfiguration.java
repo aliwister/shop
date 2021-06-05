@@ -24,6 +24,7 @@ public class LocaleConfiguration implements WebMvcConfigurer {
                 if (StringUtils.isBlank(request.getHeader("Accept-Language"))) {
                     return Locale.getDefault();
                 }
+                System.out.println("Accept-Language: "+request.getHeader("Accept-Language"));
                 List<Locale.LanguageRange> list = Locale.LanguageRange.parse(request.getHeader("Accept-Language"));
                 Locale locale = Locale.lookup(list, Constants.LOCALES);
                 return locale;
@@ -36,7 +37,7 @@ public class LocaleConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
-        localeChangeInterceptor.setParamName("language");
+        localeChangeInterceptor.setParamName("lang");
         registry.addInterceptor(localeChangeInterceptor);
     }
 }

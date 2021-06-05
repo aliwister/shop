@@ -8,16 +8,24 @@ import com.badals.shop.service.dto.CategoryDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 
+import com.badals.shop.xtra.amazon.IncorrectDimensionsException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.badals.shop.xtra.ebay.EbayLookup;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
@@ -33,6 +41,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final UserService userService;
 
+
    public ProductQuery(ProductService productService, ProductIndexService productIndexService, HashtagService hashtagService, EbayLookup ebayLookup, CategoryService categoryService, UserService userService) {
       this.productService = productService;
       this.productIndexService = productIndexService;
@@ -46,7 +55,9 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.getAllProducts(count);
       //return null;
    }
-   public ProductDTO product (String slug, String cookie) throws ProductNotFoundException, NoOfferException, PricingException {
+   public ProductDTO product (String slug, String cookie, String _locale) throws ProductNotFoundException, NoOfferException, PricingException, IncorrectDimensionsException {
+
+
       ProductDTO dto = this.productService.getProductBySlug(slug);
       Customer loginUser = userService.getUserWithAuthorities().orElse(null);
       //CompletableFuture.supplyAsync(() -> productService.log(loginUser, slug, cookie))
@@ -64,6 +75,11 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductResponse findByKeyword(String keyword) {
         return productIndexService.findByKeyword(keyword);
+    }
+
+
+    public ProductResponse findByKeywordIndex(String keyword) throws NoOfferException {
+        return productIndexService.findFromPas(keyword);
     }
 
     public ProductDTO getProductAny(final int id) {
@@ -99,7 +115,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return categoryService.findOne((long) id).orElse(null);
    }
 
-   public ProductDTO getProductBySku(final String sku, final boolean isParent) throws ProductNotFoundException, PricingException, NoOfferException {
+   public ProductDTO getProductBySku(final String sku, final boolean isParent) throws ProductNotFoundException, PricingException, NoOfferException, IncorrectDimensionsException {
       log.info("GetProductBySky: pasService.lookup("+sku+")");
       ProductDTO product;
       if(isParent)
@@ -125,7 +141,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.lookupEbay(id);
    }
 
-   public ProductDTO pas(String sku) throws ProductNotFoundException, NoOfferException, PricingException {
+   public ProductDTO pas(String sku) throws ProductNotFoundException, NoOfferException, PricingException, IncorrectDimensionsException {
       return productService.lookupForcePas(sku, false,false, true);
    }
 

@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.badals.shop.domain.converter.StringListConverter;
+import com.badals.shop.domain.enumeration.Api;
 import com.badals.shop.domain.enumeration.Condition;
 import com.badals.shop.domain.enumeration.ProductGroup;
 import com.badals.shop.domain.enumeration.VariationType;
@@ -283,12 +284,24 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "variation_attributes", columnDefinition = "string")
     List<Attribute> variationAttributes;
 
+
+
     @Column(name = "price")
     BigDecimal price;
 
     @Column
     String currency;
 
+    @Column
+    String rating;
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
 
     @ManyToOne
     @JoinColumn(name="merchant_id", insertable = false, updatable = false)
@@ -296,6 +309,38 @@ public class Product implements Serializable, IMerchantProduct {
 
     @Column(name = "merchant_id")
     private Long merchantId;
+
+    private Api api;
+
+    @Column(name = "pricing_api")
+    private Api pricingApi;
+
+    @Column(name = "pas_flag")
+    private Boolean pasFlag;
+
+    public Api getApi() {
+        return api;
+    }
+
+    public void setApi(Api api) {
+        this.api = api;
+    }
+
+    public Api getPricingApi() {
+        return pricingApi;
+    }
+
+    public void setPricingApi(Api pricingApi) {
+        this.pricingApi = pricingApi;
+    }
+
+    public Boolean getPasFlag() {
+        return pasFlag;
+    }
+
+    public void setPasFlag(Boolean pasFlag) {
+        this.pasFlag = pasFlag;
+    }
 
     public Merchant getMerchant() {
         return merchant;
@@ -756,4 +801,8 @@ public class Product implements Serializable, IMerchantProduct {
     }
 
 
+    public Product variationAttributes(List<Attribute> value) {
+        this.setVariationAttributes(value);
+        return this;
+    }
 }

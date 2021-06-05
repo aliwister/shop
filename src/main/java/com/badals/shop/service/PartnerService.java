@@ -93,9 +93,9 @@ public class PartnerService {
 
         if(_new) {
 
-            String ref = slugService.generateRef(dto.getSku(), currentMerchantId);
-            master.setRef(Long.valueOf(ref));
-            master.setSlug(ref);
+            Long ref = slugService.generateRef(dto.getSku(), currentMerchantId);
+            master.setRef(ref);
+            master.setSlug(String.valueOf(ref));
             if(master.getProductLangs() != null)
                 master.getProductLangs().stream().forEach(x -> x.setProduct(master));
             master.setMerchantId(currentMerchantId);
@@ -159,7 +159,7 @@ public class PartnerService {
 
         if(_new) {
             if(masterChildren != null)
-                masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(slugService.generateRef(x.getSku(), currentMerchantId)).merchantId(currentMerchantId).ref(Long.valueOf(x.getSlug())).title(master.getTitle()).parent(master).getMerchantStock().forEach(y -> y.setMerchantId(currentMerchantId)));
+                masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(String.valueOf(slugService.generateRef(x.getSku(), currentMerchantId))).merchantId(currentMerchantId).ref(Long.valueOf(x.getSlug())).title(master.getTitle()).parent(master).getMerchantStock().forEach(y -> y.setMerchantId(currentMerchantId)));
             return;
         }
         // Delete removed

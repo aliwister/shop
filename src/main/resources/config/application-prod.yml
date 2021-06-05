@@ -165,6 +165,9 @@ jhipster:
 
 # application:
 # application:
+translate:
+  key: AIzaSyBL1StO62qTC5QTo3Ds8wKrIfwO6vMNMMY
+  
 pas:
   key: AKIAJYRYOVGAHDQSWXFA
   secret: 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
