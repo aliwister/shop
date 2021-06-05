@@ -116,7 +116,8 @@ public class Pas5Service implements IProductService {
                 // This is a SIMPLE item
             }
             else if (errCode.equalsIgnoreCase("ItemNotAccessible")){
-                return mwsItemShortCircuit(product, asin, true, 0);
+                if( mwsItemShortCircuit(product, asin, true, 0))
+                    return product;
             }
 
         }
@@ -133,7 +134,8 @@ public class Pas5Service implements IProductService {
 
         if(!forcePas) {
             try {
-                return mwsItemShortCircuit(product, asin, isRebuild, dimCount);
+                if( mwsItemShortCircuit(product, asin, isRebuild, dimCount))
+                    return product;
             }
             catch (IncorrectDimensionsException e) {
                 // swallow and continue with PAS
@@ -180,7 +182,8 @@ public class Pas5Service implements IProductService {
                 ErrorData error = response.getErrors().get(0);
                 if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
                     //response = mwsLookup.lookup(asin);
-                    return mwsItemShortCircuit(product, asin, true, 0);
+                    if( mwsItemShortCircuit(product, asin, true, 0))
+                        return product;
                 }
             }
             doc = parse_response(response.getItemsResult().getItems());
@@ -345,7 +348,7 @@ public class Pas5Service implements IProductService {
         return pasItemMapper.itemToPasItemNode(doc.get(asin));
     }
 
-    public Product mwsItemShortCircuit(Product product, String asin, boolean isRebuild, Integer dimCount) throws NoOfferException, PricingException, IncorrectDimensionsException {
+    public boolean mwsItemShortCircuit(Product product, String asin, boolean isRebuild, Integer dimCount) throws NoOfferException, PricingException, IncorrectDimensionsException {
 
         List<ProductOverride> overrides = findOverrides(asin, null);
         //Product finalParent = null;
@@ -483,7 +486,7 @@ public class Pas5Service implements IProductService {
             }
         }
         updated = productRepo.save(updated);
-        return updated;
+        return true;
     }
 
     private Product initStub(String key, List<Attribute> value, Product parent) {

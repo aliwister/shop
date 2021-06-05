@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class AmazonPricingService implements IProductService {
@@ -79,34 +80,37 @@ public class AmazonPricingService implements IProductService {
     /**
      * Entry point
      */
-    public Product lookup(String asin, boolean isRebuild) throws NoOfferException, PricingException {
+    public Boolean lookup(String asin, boolean isRebuild) throws NoOfferException, PricingException {
 
         // Does Product Exist?
         Product product = productRepo.findBySkuJoinChildren(asin, AMAZON_US_MERCHANT_ID).orElse(new Product());
 
-        if (product.getId() == null)
-            return buildKeepa(product, asin, true);
+/*        if (product.getId() == null)
+            buildKeepa(product, asin, true);
 
-        if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
-            return product;
+        else if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))*/
+
+                    return buildKeepa(product, asin, false);
 
 
-        if (product.getStub())
-            return buildKeepa(product, asin, false);
+
+/*
+        else if (product.getStub())
+            buildKeepa(product, asin, false);
 
         // check pas flag
-        if (isRebuild) {
-            return buildKeepa(product, asin, true);
+        else if (isRebuild) {
+             buildKeepa(product, asin, true);
         }
 
-/*        if (product.getStub())
+*//*        if (product.getStub())
             //return createChild(asin);
 
         if (product.getVariationType().equals(VariationType.PARENT))
             return product;
 
         if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
-            return product;*/
+            return product;*//*
 
         //if (product.getPasErrorFlag())
          //   return priceMws(product, asin);
@@ -114,11 +118,11 @@ public class AmazonPricingService implements IProductService {
        // if (!product.getPrimeFlag())
         //    return priceMws(product, asin);
 
-        return buildKeepa(product, asin, true);
-
+        buildKeepa(product, asin, true);
+        return true;*/
     }
     @Transactional
-    Product buildKeepa(Product product, String asin, Boolean isRating) throws PricingException, ProductNotFoundException, NoOfferException, IncorrectDimensionsException {
+    Boolean buildKeepa(Product product, String asin, Boolean isRating) throws PricingException, ProductNotFoundException, NoOfferException, IncorrectDimensionsException {
         PasItemNode item = null;
         /*if (redisPasRepository.getHashOperations().hasKey("keepa", asin)) {
             try {
@@ -158,7 +162,7 @@ public class AmazonPricingService implements IProductService {
         // Is part of variation? No
         if (item.getVariationType() == VariationType.SIMPLE) {
             product = productRepo.save(product);
-            return product;
+            return true;
         }
 
         // Yes
@@ -211,7 +215,7 @@ public class AmazonPricingService implements IProductService {
         parent.setChildren(children);
         parent.setVariations(variations);
         parent = productRepo.save(parent);
-        return parent;
+        return true;
     }
 
 

@@ -33,8 +33,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
+
 
 /**
  * Service Implementation for managing {@link Product}.
@@ -142,7 +145,7 @@ public class ProductService {
     }
 
 
-    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException, NoOfferException, PricingException {
+    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException, NoOfferException, PricingException, ExecutionException, InterruptedException {
         char c = slug.charAt(0);
         if (c >= 'A' && c <= 'Z') {
             AddProductDTO addProductDTO = productSearchRepository.findBySlug(slug);
@@ -160,20 +163,35 @@ public class ProductService {
             product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
         }
         else if(product.getStub() != null && product.getStub()) {
-            product = amazonPricingService.lookup(product.getSku(),false);
+            lookup(product.getSku());
             return this.getProductBySku(product.getSku());
         }
 
         if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
-            product = amazonPricingService.lookup(product.getSku(),false);
+            lookup(product.getSku());
             return this.getProductBySku(product.getSku());
         }
         else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
-            product = amazonPricingService.lookup(product.getSku(), true);
+            lookup(product.getSku());
             return this.getProductBySku(product.getSku());
         }
 
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
+    }
+
+
+    public Boolean lookup(String sku) throws ExecutionException, InterruptedException {
+        CompletableFuture<Boolean> supply = CompletableFuture.supplyAsync(() -> {
+            try {
+                return amazonPricingService.lookup(sku,false);
+            } catch (NoOfferException e) {
+                e.printStackTrace();
+            } catch (PricingException e) {
+                e.printStackTrace();
+            }
+            return false;
+        });
+        return supply.get();
     }
 
     public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {
@@ -290,11 +308,15 @@ public class ProductService {
    }
 
 
-    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
-        Product p = this.amazonPricingService.lookup(sku, true);
-        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
-            productIndexService.indexProduct(p.getId());
+    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException, ExecutionException, InterruptedException {
+        //Product p = this.amazonPricingService.lookup(sku, true);
+/*        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
+            productIndexService.indexProduct(p.getId());*/
+
+        lookup(sku);
         return this.getProductBySku(sku);
+
+        //throw new PricingException("Bummer");
     }
 
 /*
