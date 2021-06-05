@@ -17,7 +17,8 @@ import java.util.Optional;
 @Component
 public class LocaleAspect {
 
-    @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..))")
+    @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..)) || "+
+            "execution(* com.badals.shop.graph.query.ProductQuery.getProductBySku(..))")
     public Object beforeWebMethodExecution1(ProceedingJoinPoint joinPoint) throws Throwable {
         setLocale(joinPoint);
         return joinPoint.proceed();
