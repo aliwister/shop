@@ -112,8 +112,12 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
             target.setGallery(new ArrayList<Gallery>());
         }
 
+        if(target.getImage() == null && target.getGallery().size() > 0)
+            target.setImage(target.getGallery().get(0).getUrl());
+
+
         final String prepend;
-        if(!target.getImage().startsWith("https://"))
+        if(target.getImage() != null && !target.getImage().startsWith("https://"))
             if(source.getMerchantId() == 1)
                 prepend = "https://m.media-amazon.com/images/I/";
             else
@@ -121,12 +125,16 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
         else
             prepend = null;
 
-        target.getGallery().add(0, new Gallery(source.getImage()));
+        if(target.getGallery().size() == 0 && target.getImage() != null)
+            target.getGallery().add(0, new Gallery(source.getImage()));
 
         if(prepend != null) {
             target.setImage(prepend + target.getImage());
             target.setGallery(target.getGallery().stream().map(x-> new Gallery(prepend+x.getUrl())).collect(Collectors.toList()));
         }
+
+        if(target.getRating() == null && target.getVariationType() == VariationType.CHILD && source.getParent() != null)
+            target.setRating(source.getParent().getRating());
 
         // Process sale price and discount percentage
         MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
