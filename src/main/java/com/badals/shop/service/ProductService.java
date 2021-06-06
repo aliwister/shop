@@ -164,19 +164,16 @@ public class ProductService {
         }
         else if(product.getStub() != null && product.getStub()) {
             Product p = lookup(product.getSku());
-            return productMapper.toDto(p);
-            //return this.getProductBySku(product.getSku());
+            return this.getProductBySku(p, product.getSku());
         }
 
         if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
             Product p = lookup(product.getSku());
-            return productMapper.toDto(p);
-            //return this.getProductBySku(product.getSku());
+            return this.getProductBySku(p, product.getSku());
         }
         else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
             Product p = lookup(product.getSku());
-            return productMapper.toDto(p);
-            //return this.getProductBySku(product.getSku());
+            return this.getProductBySku(p, product.getSku());
         }
 
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
@@ -201,9 +198,12 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDTO getProductBySku(String sku) throws ProductNotFoundException, PricingException {
-        Product product = productRepository.findBySkuJoinCategories( sku).get();
+    public ProductDTO getProductBySku(Product product, String sku) throws ProductNotFoundException, PricingException {
+        //Product product = productRepository.findBySkuJoinCategories( sku).get();
         if(product == null )
+            product = productRepository.findBySkuJoinCategories( sku).get();
+
+        if(product == null)
             throw new ProductNotFoundException("Invalid Product");
 
         if(product.getVariationType().equals(VariationType.PARENT)) {
@@ -216,19 +216,20 @@ public class ProductService {
         //    throw new PricingException("Invalid price");
         //if(isSaveES)
         //productIndexService.saveToElastic(product);
-        translateProduct(product);
+        product = translateProduct(product);
+        if(product == null)
+            throw new ProductNotFoundException("Invalid Product");
 
-
-        return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
+        return productMapper.toDto(product);
 
     }
 
-    private void translateProduct(Product product) {
+    private Product translateProduct(Product product) {
         String langCode = LocaleContext.getLocale();
         ProductLang lang = product.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
 
         if(product.getVariationType() == VariationType.SIMPLE && lang != null)
-            return;
+            return product;
 
         ProductLang childLang = product.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
         ProductLang childEn = product.getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
@@ -238,16 +239,16 @@ public class ProductService {
             if(product.getVariationType() == VariationType.SIMPLE)
                 target = translateParent(childEn, target, langCode);
             product.addProductLang(target);
-            productRepository.save(product);
+            product = productRepository.save(product);
         }
 
         if(product.getVariationType() == VariationType.SIMPLE) {
-            return;
+            return product;
         }
 
         ProductLang parentLang = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
         if (parentLang != null)
-            return;
+            return product;
 
         ProductLang parentEn = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
         if(parentLang == null && parentEn != null) {
@@ -255,8 +256,10 @@ public class ProductService {
             target = translateParent(parentEn, target, langCode);
             Product parent = product.getParent();
             parent.addProductLang(target);
-            productRepository.save(parent);
+            parent = productRepository.save(parent);
+            return parent;
         }
+        return product;
     }
 
     private ProductLang translateParent(ProductLang en, ProductLang target, String lang) {
@@ -307,8 +310,8 @@ public class ProductService {
 /*        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             productIndexService.indexProduct(p.getId());*/
 
-        lookup(sku);
-        return this.getProductBySku(sku);
+        Product p = lookup(sku);
+        return this.getProductBySku(p, sku);
 
         //throw new PricingException("Bummer");
     }
@@ -326,7 +329,7 @@ public class ProductService {
         Product p = this.pasUKService.lookup(sku, isParent, isRedis, isRebuild, true);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             productIndexService.indexProduct(p.getId());
-        return this.getProductBySku(sku);
+        return this.getProductBySku(p, sku);
     }
 
     public String getParentOf(String sku) {
