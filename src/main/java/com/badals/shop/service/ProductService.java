@@ -169,30 +169,22 @@ public class ProductService {
         }
 
         if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
-            lookup(product.getSku());
-            return this.getProductBySku(product.getSku());
+            Product p = lookup(product.getSku());
+            return productMapper.toDto(p);
+            //return this.getProductBySku(product.getSku());
         }
         else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
-            lookup(product.getSku());
-            return this.getProductBySku(product.getSku());
+            Product p = lookup(product.getSku());
+            return productMapper.toDto(p);
+            //return this.getProductBySku(product.getSku());
         }
 
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
     }
 
 
-    public Product lookup(String sku) throws ExecutionException, InterruptedException {
-        CompletableFuture<Product> supply = CompletableFuture.supplyAsync(() -> {
-            try {
-                return amazonPricingService.lookup(sku,false);
-            } catch (NoOfferException e) {
-                e.printStackTrace();
-            } catch (PricingException e) {
-                e.printStackTrace();
-            }
-            return null;
-        });
-        return supply.join();
+    public Product lookup(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
+        return amazonPricingService.lookup(sku,false);
     }
 
     public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {

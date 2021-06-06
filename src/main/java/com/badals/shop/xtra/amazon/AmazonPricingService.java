@@ -88,7 +88,7 @@ public class AmazonPricingService implements IProductService {
         if (product.getId() == null)
             return buildKeepa(product, asin, true);
 
-        else if (product.getStub())
+        else if (product.getStub() != null && product.getStub())
             return buildKeepa(product, asin, false);
 
         else if (isRebuild) {
@@ -101,7 +101,7 @@ public class AmazonPricingService implements IProductService {
 
         return buildKeepa(product, asin, true);
     }
-    @Transactional
+
     Product buildKeepa(Product product, String asin, Boolean isRating) throws PricingException, ProductNotFoundException, NoOfferException, IncorrectDimensionsException {
         PasItemNode item = null;
         /*if (redisPasRepository.getHashOperations().hasKey("keepa", asin)) {
