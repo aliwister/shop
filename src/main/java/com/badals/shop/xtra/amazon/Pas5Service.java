@@ -115,10 +115,10 @@ public class Pas5Service implements IProductService {
             if (errCode.equalsIgnoreCase("noresults")) {
                 // This is a SIMPLE item
             }
-            else if (errCode.equalsIgnoreCase("ItemNotAccessible")){
+/*            else if (errCode.equalsIgnoreCase("ItemNotAccessible")){
                 if( mwsItemShortCircuit(product, asin, true, 0))
                     return product;
-            }
+            }*/
 
         }
         else {
@@ -132,6 +132,7 @@ public class Pas5Service implements IProductService {
                 forcePas = true;
         }
 
+/*
         if(!forcePas) {
             try {
                 if( mwsItemShortCircuit(product, asin, isRebuild, dimCount))
@@ -142,6 +143,7 @@ public class Pas5Service implements IProductService {
                 log.info("Iam catching IncorrectDimensionsException");
             }
         }
+*/
 
 
         //PasItemNode current = pasItemNodeSearchRepository.findById(asin);
@@ -182,8 +184,8 @@ public class Pas5Service implements IProductService {
                 ErrorData error = response.getErrors().get(0);
                 if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
                     //response = mwsLookup.lookup(asin);
-                    if( mwsItemShortCircuit(product, asin, true, 0))
-                        return product;
+/*                    if( mwsItemShortCircuit(product, asin, true, 0))
+                        return product;*/
                 }
             }
             doc = parse_response(response.getItemsResult().getItems());
@@ -348,7 +350,7 @@ public class Pas5Service implements IProductService {
         return pasItemMapper.itemToPasItemNode(doc.get(asin));
     }
 
-    public boolean mwsItemShortCircuit(Product product, String asin, boolean isRebuild, Integer dimCount) throws NoOfferException, PricingException, IncorrectDimensionsException {
+    public Product mwsItemShortCircuit(Product product, String asin, boolean isRebuild, Integer dimCount) throws NoOfferException, PricingException, IncorrectDimensionsException {
 
         List<ProductOverride> overrides = findOverrides(asin, null);
         //Product finalParent = null;
@@ -486,7 +488,7 @@ public class Pas5Service implements IProductService {
             }
         }
         updated = productRepo.save(updated);
-        return true;
+        return updated;
     }
 
     private Product initStub(String key, List<Attribute> value, Product parent) {
