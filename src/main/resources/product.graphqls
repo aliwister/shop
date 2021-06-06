@@ -9,7 +9,7 @@ extend type Query {
     productAny(id: ID):Product
     productAdmin(id: ID):Product
 
-    getProductBySku(sku: String, isParent: Boolean = false):Product
+    getProductBySku(sku: String, isParent: Boolean = false, _locale: String):Product
     getProductByDial(dial: String):Product
 
     relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
