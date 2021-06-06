@@ -116,7 +116,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return categoryService.findOne((long) id).orElse(null);
    }
 
-   public ProductDTO getProductBySku(final String sku, final boolean isParent) throws ProductNotFoundException, PricingException, NoOfferException, IncorrectDimensionsException, ExecutionException, InterruptedException {
+   public ProductDTO getProductBySku(final String sku, final boolean isParent, String _locale) throws ProductNotFoundException, PricingException, NoOfferException, IncorrectDimensionsException, ExecutionException, InterruptedException {
       log.info("GetProductBySky: pasService.lookup("+sku+")");
       //ProductDTO product;
 
