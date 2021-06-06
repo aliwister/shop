@@ -9,10 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.TEXT_PLAIN;
@@ -20,6 +23,7 @@ import static org.springframework.http.MediaType.TEXT_PLAIN;
 @Component
 public class KeepaLookup {
 
+   //private final WebClient client;
    private final RestTemplate restTemplate;
    private final KeepaMapper keepaMapper;
    private final String APP_ID;
@@ -31,6 +35,7 @@ public class KeepaLookup {
       this.keepaMapper = keepaMapper;
       MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
       converter.setSupportedMediaTypes(Arrays.asList(TEXT_PLAIN, APPLICATION_JSON));
+      //client = WebClient.create("https://api.keepa.com");
       restTemplate = new RestTemplate();
       restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
       restTemplate.getMessageConverters().add(converter);
@@ -38,13 +43,13 @@ public class KeepaLookup {
       lookupUri = "https://api.keepa.com/product?key="+APP_ID+"&domain=1&history=1&days=1&asin="; //B0928WTNY1";
    }
 
-
-
-
    public PasItemNode lookup(String id, Boolean isRating) throws ProductNotFoundException, PricingException, ItemNotAccessibleException {
-      String url = lookupUri+id + (isRating?"&rating=1":"&rating=0");
-      log.info(url);
-      KeepaResponse response =  restTemplate.getForObject(url,KeepaResponse.class);
+
+      CompletableFuture<KeepaResponse> responseFuture = lookupAsync(id, isRating);
+
+      KeepaResponse response = responseFuture.join();
+
+
       log.info("keepa response");
       if (response.getProducts() == null || response.getProducts().size() == 0)
          throw new PricingException("Invalid API Response");
@@ -61,14 +66,22 @@ public class KeepaLookup {
       log.info("done mapping to pasitemnode");
       product = null;
       response = null;
-
       return node;
+   }
+
+   @Async
+   public CompletableFuture<KeepaResponse> lookupAsync(String id, Boolean isRating) {
+      String url = lookupUri+id + (isRating?"&rating=1":"&rating=0");
+      log.info(url);
+      //KeepaResponse response =  restTemplate.get().uri(uri).retrieve().bodyToMono(KeepaResponse.class);
+      KeepaResponse response =  restTemplate.getForObject(url,KeepaResponse.class);
+      return CompletableFuture.completedFuture(response);
    }
 
 
    public static void main (String args[]) throws PricingException, ProductNotFoundException, ItemNotAccessibleException {
-      KeepaLookup lookup = new KeepaLookup(null);
-      PasItemNode response =  lookup.lookup("B0928WTNY1", true);
+      //KeepaLookup lookup = new KeepaLookup(null);
+      //PasItemNode response =  lookup.lookup("B0928WTNY1", true);
       //KProduct product = response.getProducts().get(0);
       //List<List<Integer>> csv = (List<List<Integer>>) product.getCsv();
       //System.out.println(response.processingTimeInMs);
