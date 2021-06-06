@@ -23,6 +23,7 @@ import com.google.cloud.translate.Translation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,6 @@ public class ProductService {
     private final AmazonPricingService amazonPricingService;
     private final PasUKService pasUKService;
     private final EbayService ebayService;
-    private final Pas5Service pas5Service;
 
     private final ProductMapper productMapper;
     private final AddProductMapper addProductMapper;
@@ -65,13 +65,12 @@ public class ProductService {
 
     public static final long DEFAULT_WINDOW = 14400;
 
-    public ProductService(ProductRepository productRepository, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, Pas5Service pas5Service, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
+    public ProductService(ProductRepository productRepository, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
         this.productRepository = productRepository;
 
         this.amazonPricingService = amazonPricingService;
         this.pasUKService = pasUKService;
         this.ebayService = ebayService;
-        this.pas5Service = pas5Service;
         this.productMapper = productMapper;
         this.addProductMapper = addProductMapper;
         this.productSearchRepository = productSearchRepository;
@@ -146,7 +145,7 @@ public class ProductService {
     }
 
 
-    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException, NoOfferException, PricingException, ExecutionException, InterruptedException, IncorrectDimensionsException {
+    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException, NoOfferException, PricingException, ExecutionException, InterruptedException {
         char c = slug.charAt(0);
         if (c >= 'A' && c <= 'Z') {
             AddProductDTO addProductDTO = productSearchRepository.findBySlug(slug);
@@ -164,16 +163,17 @@ public class ProductService {
             product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
         }
         else if(product.getStub() != null && product.getStub()) {
-            pas5Service.mwsItemShortCircuit(product, product.getSku(), false, 0);
-            return this.getProductBySku(product.getSku());
+            Product p = lookup(product.getSku());
+            return productMapper.toDto(p);
+            //return this.getProductBySku(product.getSku());
         }
 
         if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
-            pas5Service.mwsItemShortCircuit(product, product.getSku(), false, 0);
+            lookup(product.getSku());
             return this.getProductBySku(product.getSku());
         }
         else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
-            pas5Service.mwsItemShortCircuit(product, product.getSku(), false, 0);
+            lookup(product.getSku());
             return this.getProductBySku(product.getSku());
         }
 
@@ -181,8 +181,8 @@ public class ProductService {
     }
 
 
-    public Boolean lookup(String sku) throws ExecutionException, InterruptedException {
-        CompletableFuture<Boolean> supply = CompletableFuture.supplyAsync(() -> {
+    public Product lookup(String sku) throws ExecutionException, InterruptedException {
+        CompletableFuture<Product> supply = CompletableFuture.supplyAsync(() -> {
             try {
                 return amazonPricingService.lookup(sku,false);
             } catch (NoOfferException e) {
@@ -190,9 +190,9 @@ public class ProductService {
             } catch (PricingException e) {
                 e.printStackTrace();
             }
-            return false;
+            return null;
         });
-        return supply.get();
+        return supply.join();
     }
 
     public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {
@@ -208,6 +208,7 @@ public class ProductService {
         return products.stream().map(productMapper::toDto).collect(Collectors.toList());
     }
 
+    @Transactional
     public ProductDTO getProductBySku(String sku) throws ProductNotFoundException, PricingException {
         Product product = productRepository.findBySkuJoinCategories( sku).get();
         if(product == null )
@@ -309,14 +310,12 @@ public class ProductService {
    }
 
 
-    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException, ExecutionException, InterruptedException, IncorrectDimensionsException {
+    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException, ExecutionException, InterruptedException {
         //Product p = this.amazonPricingService.lookup(sku, true);
 /*        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             productIndexService.indexProduct(p.getId());*/
 
-        //lookup(sku);
-        Product p = productRepository.findBySkuJoinChildren(sku, 1L).orElse(null);
-        pas5Service.mwsItemShortCircuit(p, sku, false, 0);
+        lookup(sku);
         return this.getProductBySku(sku);
 
         //throw new PricingException("Bummer");
