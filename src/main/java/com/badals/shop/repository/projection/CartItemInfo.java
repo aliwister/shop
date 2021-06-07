@@ -11,5 +11,5 @@ public interface CartItemInfo {
    BigDecimal getWeight();
    String getSku();
    Long getAvailability();
-   //Long getMerchantId();
+   Long getMerchantId();
 }
