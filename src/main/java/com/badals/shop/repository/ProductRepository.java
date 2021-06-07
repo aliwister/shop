@@ -74,4 +74,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update Product u set u.parentId = ?1 where u.sku in ?2")
     void updateParentAllBySku(Long parentId, Set<String> keySet);
+
+    List<Product> findAllBySkuIsInAndMerchantId(Set<String> keySet, Long merchantId);
 }
