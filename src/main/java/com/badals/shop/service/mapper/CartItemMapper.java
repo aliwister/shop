@@ -22,6 +22,7 @@ public interface CartItemMapper extends EntityMapper<CartItemDTO, CartItem> {
     @Mapping(source = "product.slug", target = "slug")
     @Mapping(source = "product.image", target = "image")
     @Mapping(source = "product.url", target = "url")
+    @Mapping(source = "product.merchantId", target = "merchantId")
     @Mapping(source = "product.price", target = "price", qualifiedByName = "doubleToString")
     @Mapping(source = "product.price", target = "salePrice", qualifiedByName = "doubleToString")
     CartItemDTO toDto(CartItem cartItem);
@@ -36,6 +37,13 @@ public interface CartItemMapper extends EntityMapper<CartItemDTO, CartItem> {
         if (target.getQuantity() == null) {
             target.setQuantity(1);
         }
+    }
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget CartItemDTO target, CartItem source) {
+        if (target.getImage() != null && !target.getImage().startsWith("https://"))
+            if(target.getMerchantId() == 1)
+                target.setImage("https://m.media-amazon.com/images/I/"+target.getImage());
     }
 
 /*    @AfterMapping
