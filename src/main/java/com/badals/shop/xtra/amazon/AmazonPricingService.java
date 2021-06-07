@@ -171,23 +171,38 @@ public class AmazonPricingService implements IProductService {
         // Deactivate All Children
         children.stream().forEach(x -> x.setActive(false));
 
+
+
         // Update existing children
         //productRepo.updateParentAllBySku(parent.getRef(), item.getVariations().keySet());
         //parent = productRepo.findBySkuJoinChildren(parent.getSku(), AMAZON_US_MERCHANT_ID).orElse(parent);
 
+        // Existing children
+        List<Product> existingChildren = productRepo.findAllBySkuIsInAndMerchantId(item.getVariations().keySet(), AMAZON_US_MERCHANT_ID);
+
+
         for (String childAsin : item.getVariations().keySet()) {
             List<Attribute> value = item.getVariations().get(childAsin);
-            Product child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(helper.initStub(childAsin, value, AMAZON_US_MERCHANT_ID));
+            Product child = null;
             if(asin.equals(childAsin))
                 child = product.variationAttributes(value);
 
-            if(child.getId() ==  null)
+            if (child == null)
+                child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
+
+            if (child == null)
+                child = existingChildren.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
+
+            if (child == null)
+                child = helper.initStub(childAsin, value, AMAZON_US_MERCHANT_ID);
+
+            if(child.getId() ==  null || child.getParentId() != parent.getRef()) {
+                child.setParent(parent);
+                child.setParentId(parent.getRef());
                 children.add(child);
+            }
 
             child.setActive(true);
-            child.setParent(parent);
-            child.setParentId(parent.getRef());
-
             variations.add(new Variation(child.getRef(), value));
         }
 
