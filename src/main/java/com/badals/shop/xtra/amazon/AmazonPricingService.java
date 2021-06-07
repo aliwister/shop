@@ -99,7 +99,11 @@ public class AmazonPricingService implements IProductService {
             return product;
         // check pas flag
 
-        return buildKeepa(product, asin, true);
+        String parentAsin = null;
+        if(product.getParent() != null)
+            parentAsin = product.getParent().getSku();
+
+        return helper.priceMws(product, helper.findOverrides(asin, parentAsin));
     }
 
     Product buildKeepa(Product product, String asin, Boolean isRating) throws PricingException, ProductNotFoundException, NoOfferException, IncorrectDimensionsException {
@@ -124,7 +128,6 @@ public class AmazonPricingService implements IProductService {
                 return pas5Service.mwsItemShortCircuit(product, asin, true, 0);
             }
 
-
         List<ProductOverride> overrides = helper.findOverrides(asin, item.getParentAsin());
 
         // Create & Price Product
@@ -138,6 +141,10 @@ public class AmazonPricingService implements IProductService {
                 product = helper.priceMws(product, overrides);
             }
         }
+
+        // If stub
+        if (product.getStub())
+            return productRepo.save(product);
 
         // Is part of variation? No
         if (item.getVariationType() == VariationType.SIMPLE) {
@@ -160,8 +167,11 @@ public class AmazonPricingService implements IProductService {
             parent = product;
 
         // Save parent
+        List<Product> existingChildren = null;
         if(parent.getId() == null) {
             parent = productRepo.saveAndFlush(parent);
+            existingChildren = productRepo.findAllBySkuIsInAndMerchantId(item.getVariations().keySet(), AMAZON_US_MERCHANT_ID);
+
             //parent = productRepo.findBySkuJoinChildren(item.getParentAsin(), AMAZON_US_MERCHANT_ID).orElse(new Product());
         }
 
@@ -171,16 +181,7 @@ public class AmazonPricingService implements IProductService {
         // Deactivate All Children
         children.stream().forEach(x -> x.setActive(false));
 
-
-
-        // Update existing children
-        //productRepo.updateParentAllBySku(parent.getRef(), item.getVariations().keySet());
-        //parent = productRepo.findBySkuJoinChildren(parent.getSku(), AMAZON_US_MERCHANT_ID).orElse(parent);
-
         // Existing children
-        List<Product> existingChildren = productRepo.findAllBySkuIsInAndMerchantId(item.getVariations().keySet(), AMAZON_US_MERCHANT_ID);
-
-
         for (String childAsin : item.getVariations().keySet()) {
             List<Attribute> value = item.getVariations().get(childAsin);
             Product child = null;
@@ -190,7 +191,7 @@ public class AmazonPricingService implements IProductService {
             if (child == null)
                 child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
 
-            if (child == null)
+            if (child == null && existingChildren != null)
                 child = existingChildren.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
 
             if (child == null)
