@@ -21,7 +21,7 @@ public interface CheckoutLineItemMapper {
    @AfterMapping
    default void afterMapping(@MappingTarget LineItem target, CartItemInfo source) {
       if (target.getImage() != null && !target.getImage().startsWith("https://"))
-         if (source.getMerchantId() == 1)
+         if (source.getMerchantId() != null && source.getMerchantId() == 1)
             target.setImage("https://m.media-amazon.com/images/I/" + target.getImage());
    }
 }
