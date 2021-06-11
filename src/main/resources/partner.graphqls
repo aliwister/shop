@@ -192,7 +192,9 @@ extend type Mutation {
     savePartnerProduct(product: PartnerProductInput): ProductEnvelope
     getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
 
-    approveProduct(id: ID): Message
+    publishProduct(id: ID): Message
+    unpublishProduct(id: ID): Message
+
     setOrderState(value: OrderState): Message
     deleteProduct(id: Long): Message
 }
