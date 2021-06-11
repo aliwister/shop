@@ -355,7 +355,7 @@ public class Pas5Service implements IProductService {
         List<ProductOverride> overrides = findOverrides(asin, null);
         //Product finalParent = null;
         PasItemNode item = null;
-        if(product == null || product.getStub()) {
+        if(product == null || product.getStub() == null || product.getStub()) {
             item = mwsLookup.lookup(asin);
         }
 
