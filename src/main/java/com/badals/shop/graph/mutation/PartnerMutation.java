@@ -90,8 +90,13 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey,m+"/"+fileKey, "200");
     }
 
-    public Message approveProduct(Long id) {
-        return null;
+    public Message publishProduct(Long id) throws ProductNotFoundException {
+        partnerService.setProductPublished(id, true);
+        return new Message("Product published successfully");
+    }
+    public Message unpublishProduct(Long id) throws ProductNotFoundException {
+        partnerService.setProductPublished(id, false);
+        return new Message("Product set to draft successfully");
     }
     public Message setOrderState(OrderState value) {
         return null;
