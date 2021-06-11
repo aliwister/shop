@@ -81,12 +81,13 @@ public class AmazonPricingService implements IProductService {
      * Entry point
      */
     public Product lookup(String asin, boolean isRebuild) throws NoOfferException, PricingException {
-        //return pas5Service.mwsItemShortCircuit(product, asin, false, 0);
+        //
         // Does Product Exist?
         Product product = productRepo.findBySkuJoinChildren(asin, AMAZON_US_MERCHANT_ID).orElse(new Product());
 
         if (product.getId() == null)
-            return buildKeepa(product, asin, true);
+            return pas5Service.mwsItemShortCircuit(product, asin, false, 0);
+            //return buildKeepa(product, asin, true);
 
         else if (product.getStub() != null && product.getStub())
             return buildKeepa(product, asin, false);
