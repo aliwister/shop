@@ -303,4 +303,15 @@ public class PartnerService {
 
         productRepository.deleteById(id);
     }
+
+   public void setProductPublished(Long id, Boolean value) throws ProductNotFoundException {
+       final Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+       product.setActive(value);
+       if(product.getChildren() != null) {
+           product.getChildren().stream().forEach(x -> x.setActive(value));
+       }
+       productRepository.save(product);
+   }
+
+
 }
