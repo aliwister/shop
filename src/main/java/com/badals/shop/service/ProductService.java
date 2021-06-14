@@ -18,6 +18,7 @@ import com.badals.shop.service.util.ValidationUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.*;
 import com.badals.shop.xtra.ebay.EbayService;
+import com.badals.shop.xtra.keepa.KeepaResponse;
 import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.Translation;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 
 import java.time.Instant;
@@ -37,6 +40,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 
 /**
@@ -181,8 +186,17 @@ public class ProductService {
 
 
     public Product lookup(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
+/*
+        return amazonPricingService.lookup(sku,false);
+*/
+        return null;
+    }
+
+/*
+    public Mono<Product> lookupMono(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
         return amazonPricingService.lookup(sku,false);
     }
+*/
 
     public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {
         List<Product> products = productRepository.findAllByCategorySlug(slug);
@@ -314,6 +328,10 @@ public class ProductService {
         return this.getProductBySku(p, sku);
 
         //throw new PricingException("Bummer");
+    }
+
+    public Mono<ProductDTO> lookupMono(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException, ExecutionException, InterruptedException {
+        return Mono.just(new ProductDTO());
     }
 
 /*
@@ -517,6 +535,13 @@ public class ProductService {
         }
 
         return false;
+    }
+
+    public ProductDTO getProductFromSearch(ProductDTO dto) {
+        Product product = productMapper.toEntity(dto);
+        product = amazonPricingService.initSearchStub(product, AmazonPricingService.AMAZON_US_MERCHANT_ID);
+        product =  productRepository.save(product);
+        return productMapper.toDto(product);
     }
 /*
     public <U> U log(Customer loginUser, String slug, cookie) {
