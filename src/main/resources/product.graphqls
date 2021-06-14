@@ -1,4 +1,9 @@
+type Subscription {
+    getProductBySku(sku: String, isParent: Boolean = false, _locale: String):Attribute!
+}
+
 extend type Query {
+    productFromSearch(dto: ProductInput): Product
     product(slug: String!, cookie: String = "", _locale: String): Product!
     products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
 
@@ -211,7 +216,7 @@ input ProductInput {
     #active: Boolean,
     #similarProducts: [Int],
     url: String,
-    name: String,
+    title: String,
     brand: String,
     group: String,
     features: String,
