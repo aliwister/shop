@@ -50,6 +50,7 @@ type Variation {
 
 type PartnerProduct {
       id: ID           # Auto generated
+      active: Boolean
       sku: String
       upc: String
 	  model: String
