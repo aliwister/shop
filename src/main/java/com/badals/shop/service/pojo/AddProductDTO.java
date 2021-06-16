@@ -30,6 +30,7 @@ public class AddProductDTO {
 
    Long id;
    String sku;
+   Boolean active;
    String upc;
    Long ref;
    String slug;
