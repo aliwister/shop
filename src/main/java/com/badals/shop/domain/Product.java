@@ -318,6 +318,9 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "pas_flag")
     private Boolean pasFlag;
 
+    @Column(name = "deleted")
+    private Boolean deleted;
+
     public Api getApi() {
         return api;
     }
@@ -804,5 +807,9 @@ public class Product implements Serializable, IMerchantProduct {
     public Product variationAttributes(List<Attribute> value) {
         this.setVariationAttributes(value);
         return this;
+    }
+
+    public void removeChild(Product child) {
+        this.children.remove(child);
     }
 }
