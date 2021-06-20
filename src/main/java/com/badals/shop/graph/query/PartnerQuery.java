@@ -10,6 +10,7 @@ import com.badals.shop.service.pojo.PartnerProduct;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -35,17 +36,15 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
       this.userService = userService;
    }
 
-   //@PreAuthorize("hasRole('ROLE_MERCHANT')")
+   @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PartnerProduct partnerProduct(Long id) {
-       Long mId = 1L;//TenantContext.getCurrentMerchantId();
-       return partnerService.getPartnerProduct(id, mId);
+       return partnerService.getPartnerProduct(id);
     }
-
+   @PreAuthorize("hasRole('ROLE_MERCHANT')")
    public MerchantProductResponse partnerProducts(String search, Integer limit, Integer offset, Boolean active) {
-      Long mId = 1L;//TenantContext.getCurrentMerchantId();
-      return partnerService.findAllByMerchant(mId, search, limit, offset, active);
+      return partnerService.findPartnerProducts(search, limit, offset, active);
    }
-
+   @PreAuthorize("hasRole('ROLE_MERCHANT')")
    public VariationOption variationOptions(String name) {
       if (name.equals("size")) {
          return new VariationOption("size", "Size", new ArrayList<String>(){{add("Small"); add("Medium"); add("Large");}});
@@ -69,6 +68,7 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
       return hashtagService.findAll();
    }
 
+   @PreAuthorize("hasRole('ROLE_MERCHANT')")
    public List<I18String> brands() {
       return new ArrayList<I18String>(){{
          add(new I18String("en", "Coach"));
@@ -77,7 +77,7 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
          add(new I18String("en", "Guess"));
       }};
    }
-
+   @PreAuthorize("hasRole('ROLE_MERCHANT')")
    public List<I18String> collections() {
       return new ArrayList<I18String>(){{
          add(new I18String("en", "Fashion"));

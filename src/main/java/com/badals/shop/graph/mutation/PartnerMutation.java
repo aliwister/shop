@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -49,22 +50,14 @@ public class PartnerMutation implements GraphQLMutationResolver {
         this.awsService = awsService;
     }
 
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public ProductEnvelope savePartnerProduct(PartnerProduct product) throws ProductNotFoundException {
-        String t =  TenantContext.getCurrentTenant();
-        log.info("Tenant: " + t);
-        Long mId = 1L;//TenantContext.getCurrentMerchantId();
-        Long tId = TenantContext.getCurrentTenantId();
-        String merchant = "Badals.com";//TenantContext.getCurrentMerchant();
-        String tenant = TenantContext.getCurrentTenant();
-
-
-
         PartnerProduct p = null;
         StringBuilder message = new StringBuilder();
         Integer code = 202;
 
         try {
-            p = partnerService.savePartnerProduct(product, mId, true);
+            p = partnerService.savePartnerProduct(product, true);
             message.append("Success");
         }
         catch(Throwable e) {
@@ -80,20 +73,22 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new ProductEnvelope(p, message.toString(), code);
     }
 
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType) {
-        String t =  "badals";//TenantContext.getCurrentTenant();
-        String m = "badals";//TenantContext.getCurrentMerchant();
+        String t = TenantContext.getCurrentTenant();
+        String m = TenantContext.getCurrentMerchant();
         String fileKey = ChecksumUtil.getChecksum(filename + LocalDate.now())+filename.substring(filename.length() - 4);
         String objectKey = "_m/" + m + "/" + fileKey;
 
         URL url = awsService.presignPutUrl(objectKey, contentType);
         return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey,m+"/"+fileKey, "200");
     }
-
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public Message publishProduct(Long id) throws ProductNotFoundException {
         partnerService.setProductPublished(id, true);
         return new Message("Product published successfully");
     }
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public Message unpublishProduct(Long id) throws ProductNotFoundException {
         partnerService.setProductPublished(id, false);
         return new Message("Product set to draft successfully");
@@ -101,7 +96,9 @@ public class PartnerMutation implements GraphQLMutationResolver {
     public Message setOrderState(OrderState value) {
         return null;
     }
-    public Message deleteProduct(Long id) {
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public Message deleteProduct(Long id) throws ProductNotFoundException {
         partnerService.deleteProduct(id);
         return new Message("ok");
     }

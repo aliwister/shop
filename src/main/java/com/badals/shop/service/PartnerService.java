@@ -1,5 +1,6 @@
 package com.badals.shop.service;
 
+import com.badals.shop.aop.logging.TenantContext;
 import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
@@ -69,7 +70,8 @@ public class PartnerService {
         this.productIndexService = productIndexService;
     }
 
-    public PartnerProduct getPartnerProduct(Long id, Long merchantId) {
+    public PartnerProduct getPartnerProduct(Long id) {
+        Long merchantId = TenantContext.getCurrentMerchantId();
         Product product = productRepository.findByIdJoinChildren(id, merchantId).get();
         return partnerProductMapper.toDto(product);
     }
@@ -80,7 +82,8 @@ public class PartnerService {
         }
     }
 
-    public PartnerProduct savePartnerProduct(PartnerProduct dto, Long currentMerchantId, boolean isSaveES) throws ProductNotFoundException, ValidationException {
+    public PartnerProduct savePartnerProduct(PartnerProduct dto, boolean isSaveES) throws ProductNotFoundException, ValidationException {
+        Long currentMerchantId = TenantContext.getCurrentMerchantId();
         Product update = partnerProductMapper.toEntity(dto);
         final Product master;
         boolean _new = dto.getId() == null;
@@ -284,8 +287,9 @@ public class PartnerService {
                 .price(price).discount(discount).product(master).merchantId(currentMerchantId);
     }
 
-    public MerchantProductResponse findAllByMerchant(Long currentMerchantId, String text, Integer limit, Integer offset, Boolean active) {
+    public MerchantProductResponse findPartnerProducts(String text, Integer limit, Integer offset, Boolean active) {
         //List<AddProductDTO> result = search("tenant:"+currentTenant + " AND imported:" + imported.toString() + ((text != null)?" AND "+text:""));
+        Long currentMerchantId = TenantContext.getCurrentMerchantId();
         String like = null;
         if(text != null)
             like = "%"+text+"%";
@@ -299,19 +303,28 @@ public class PartnerService {
         return response;
     }
 
-    public void deleteProduct(Long id) {
-
-        productRepository.deleteById(id);
+    public void deleteProduct(Long id) throws ProductNotFoundException {
+        final Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+        verifyOwnership(product);
+        productRepository.delete(true, id);
     }
 
    public void setProductPublished(Long id, Boolean value) throws ProductNotFoundException {
        final Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+       verifyOwnership(product);
+
        product.setActive(value);
        if(product.getChildren() != null) {
            product.getChildren().stream().forEach(x -> x.setActive(value));
        }
        productRepository.save(product);
    }
+
+    private void verifyOwnership(Product product) throws ProductNotFoundException {
+        Long mId = TenantContext.getCurrentMerchantId();
+        if(product.getMerchantId() != mId)
+            throw new ProductNotFoundException("Product not available");
+    }
 
 
 }
