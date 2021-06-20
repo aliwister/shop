@@ -10,6 +10,7 @@ import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.repository.ProductOverrideRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.service.SlugService;
+import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.PasItemNode;
 import com.badals.shop.xtra.amazon.PasUtility;
@@ -157,6 +158,14 @@ public class PricingHelperService {
       Long ref = slugService.generateRef(key, merchantId);
       p.slug(String.valueOf(ref)).ref(ref).merchantId(merchantId).active(true).sku(key).stub(true).inStock(true).title("stub");
       p.setVariationAttributes(value);
+      p.setMerchantId(merchantId);
+      return p;
+   }
+
+   public Product initSearchStub(Product p, Long merchantId) {
+      p.setVariationType(VariationType.CHILD);
+      Long ref = slugService.generateRef(p.getSku(), merchantId);
+      p.slug(String.valueOf(ref)).ref(ref).merchantId(merchantId).active(true).stub(true).inStock(true);
       p.setMerchantId(merchantId);
       return p;
    }
