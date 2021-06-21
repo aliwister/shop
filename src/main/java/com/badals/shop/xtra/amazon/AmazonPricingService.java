@@ -91,26 +91,22 @@ public class AmazonPricingService implements IProductService {
     /**
      * Entry point
      */
-
     public Mono<Product> lookup(String asin, boolean isRebuild) throws NoOfferException, PricingException {
         //return pas5Service.mwsItemShortCircuit(product, asin, false, 0);
         // Does Product Exist?
         Product product = productRepo.findBySkuJoinChildren(asin, AMAZON_US_MERCHANT_ID).orElse(new Product());
 
-
-
         if (product.getId() == null)
-            return buildKeepa( asin, true);
-/*
-        else if (product.getStub() != null && product.getStub())
-            return buildKeepa(product, asin, false);
+            return buildKeepa( asin, false);
 
-        else if (isRebuild) {
-            return buildKeepa(product, asin, true);
-        }
+        if (product.getStub() != null && product.getStub())
+            return buildKeepa(asin, false);
 
-        else if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
-            return product;
+        if (isRebuild)
+            return buildKeepa(asin, false);
+
+        if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
+            return Mono.just(product);
         // check pas flag*/
 
         String parentAsin = null;
@@ -190,15 +186,17 @@ public class AmazonPricingService implements IProductService {
                             parent = helper.initProduct(parent, item, true, overrides);
                             parent = helper.updateParentFromChildQuery(parent, item.getParentAsin(), AMAZON_US_MERCHANT_ID);
                         }
-                    }
-                    else
+                        if (parent.getRating() == null || parent.getRating().isEmpty()) {
+                            parent.setRating(product.getRating());
+                        }
+                    } else
                         parent = product;
 
                     // Save parent
                     List<Product> existingChildren = null;
-                    if(parent.getId() == null) {
+                    if (parent.getId() == null) {
                         parent = productRepo.saveAndFlush(parent);
-                        existingChildren = productRepo.findAllBySkuIsInAndMerchantId(item.getVariations().keySet(), AMAZON_US_MERCHANT_ID);
+                        existingChildren = productRepo.findBySkuInAndMerchantId(item.getVariations().keySet(), AMAZON_US_MERCHANT_ID);
 
                         //parent = productRepo.findBySkuJoinChildren(item.getParentAsin(), AMAZON_US_MERCHANT_ID).orElse(new Product());
                     }
@@ -212,9 +210,15 @@ public class AmazonPricingService implements IProductService {
                     // Existing children
                     for (String childAsin : item.getVariations().keySet()) {
                         List<Attribute> value = item.getVariations().get(childAsin);
-                        Product child = null;
-                        if(asin.equals(childAsin))
+                        Product child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
+
+                        if (asin.equals(childAsin)) {
+                            try {
+                                children.remove(child);
+                            } catch(Exception e) {/*swallow*/}
                             child = product.variationAttributes(value);
+                            children.add(child);
+                        }
 
                         if (child == null)
                             child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
@@ -225,7 +229,7 @@ public class AmazonPricingService implements IProductService {
                         if (child == null)
                             child = helper.initStub(childAsin, value, AMAZON_US_MERCHANT_ID);
 
-                        if(child.getId() ==  null || child.getParentId() != parent.getRef()) {
+                        if (child.getId() == null || child.getParentId() != parent.getRef()) {
                             child.setParent(parent);
                             child.setParentId(parent.getRef());
                             children.add(child);
@@ -240,7 +244,8 @@ public class AmazonPricingService implements IProductService {
                     parent.setVariations(variations);
                     parent = productRepo.saveAndFlush(parent);
 
-                    return parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().orElse(parent);
+                    Product ret =  parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().orElse(parent);
+                    return ret;
                 });
 
 
@@ -257,8 +262,6 @@ public class AmazonPricingService implements IProductService {
 
 
     }
-
-
 
     Product pricePas(Product product, String asin) {
         List<String> list = new ArrayList();

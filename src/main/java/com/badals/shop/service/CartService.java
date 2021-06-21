@@ -274,6 +274,8 @@ public class CartService {
         cart = cartRepository.getCartByCustomerJoinAddresses(cart.getId());
         List<CartItemInfo> cartItems = cartItemRepository.findCartItemsWithProductNative(cart.getId());
 
+        //cartItems.stream().filter(x->x.getImage() != null && !x.getImage().startsWith("http")).map()
+
 
         CheckoutCart checkoutCart = checkoutCartRepository.findBySecureKey(cart.getSecureKey()).orElse(new CheckoutCart());
         checkoutCart.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
