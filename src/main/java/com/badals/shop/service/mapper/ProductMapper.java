@@ -92,7 +92,12 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
 
             for (Variation v : source.getParent().getVariations()) {
                 for(Attribute attribute: v.getVariationAttributes()) {
-                    variationOptions.stream().filter(y -> attribute.getName().toLowerCase().startsWith(y.getName().toLowerCase())).findFirst().get().getValues().add(attribute.getValue());
+                    try {
+                        variationOptions.stream().filter(y -> attribute.getName().toLowerCase().startsWith(y.getName().toLowerCase())).findFirst().get().getValues().add(attribute.getValue());
+                    }
+                    catch (NoSuchElementException e) {
+                        target.setStub(true);
+                    }
                 }
 
             }
