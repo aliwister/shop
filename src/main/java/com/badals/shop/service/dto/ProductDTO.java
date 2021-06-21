@@ -93,6 +93,8 @@ public class ProductDTO implements Serializable {
 
     private Boolean isUsed;
 
+    private Boolean isPrime;
+
     private Boolean availableForOrder;
 
     private BigDecimal weight;

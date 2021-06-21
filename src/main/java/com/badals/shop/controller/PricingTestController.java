@@ -5,21 +5,21 @@ import com.amazon.paapi5.v1.GetVariationsResponse;
 import com.amazon.paapi5.v1.SearchItemsResponse;
 import com.amazonservices.mws.products.model.Product;
 import com.badals.shop.service.CartService;
+import com.badals.shop.service.ProductService;
+import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.ItemNotAccessibleException;
-import com.badals.shop.xtra.amazon.PasItemMapper;
+import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.PasItemNode;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.badals.shop.xtra.amazon.mws.MwsItemNode;
 import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import com.badals.shop.xtra.amazon.paapi5.PasLookup;
 import com.badals.shop.xtra.keepa.KeepaLookup;
-import com.badals.shop.xtra.keepa.KeepaMapper;
 import com.badals.shop.xtra.keepa.KeepaResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
@@ -41,11 +42,13 @@ public class PricingTestController {
    private final MwsLookup mwsLookup;
    private final KeepaLookup keepaLookup;
    private final WebClient webClient;
+   private final ProductService productService;
 
-   public PricingTestController(@Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, KeepaLookup keepaLookup) {
+   public PricingTestController(@Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, KeepaLookup keepaLookup, ProductService productService) {
       this.pasLookup = pasLookup;
       this.mwsLookup = mwsLookup;
       this.keepaLookup = keepaLookup;
+      this.productService = productService;
       webClient = WebClient.create();
    }
    @RequestMapping(path="/pas/{sku}")
@@ -102,5 +105,12 @@ public class PricingTestController {
 
                  return s;
               });
+   }
+
+   @RequestMapping(path="/product/{sku}")
+   @ResponseBody
+   @ResponseStatus(OK)
+   public Mono<ProductDTO> product(@PathVariable("sku") String sku) throws PricingException, NoOfferException, ExecutionException, InterruptedException {
+      return productService.lookupMono(sku);
    }
 }
