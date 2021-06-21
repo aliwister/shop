@@ -165,6 +165,7 @@ type Product implements LocalizedObject {
     dial: String
     rating: String
     _locale: String
+    stub: Boolean
 }
 
 
