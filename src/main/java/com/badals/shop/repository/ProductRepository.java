@@ -1,9 +1,11 @@
 package com.badals.shop.repository;
+
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.enumeration.VariationType;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -75,7 +77,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("update Product u set u.parentId = ?1 where u.sku in ?2")
     void updateParentAllBySku(Long parentId, Set<String> keySet);
 
+
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update Product u set u.deleted = ?1, u.active = 0 where u.id in ?2")
     void delete(Boolean delete, Long id);
+
+    List<Product> findAllBySkuIsInAndMerchantId(Set<String> keySet, Long merchantId);
+
 }
