@@ -4,6 +4,7 @@ import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.ProductOverride;
+import com.badals.shop.domain.enumeration.OverrideType;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Price;
@@ -136,8 +137,12 @@ public class PricingHelperService {
 
 
    public Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
+      if(overrides != null && !overrides.isEmpty()) {
+         p.setWeight(PasUtility.calculateWeight(p.getWeight(),PasLookupParser.getOverride(overrides, OverrideType.WEIGHT)));
+      }
 
       if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
+
       MwsItemNode n = mwsLookup.fetch(p.getSku());
       Product product = p;
       try {
