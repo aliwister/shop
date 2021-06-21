@@ -45,10 +45,11 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
+      maximum-pool-size: 50
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     database: MYSQL
-    show-sql: false
+    show-sql: true
     properties:
       hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: true
@@ -77,9 +78,9 @@ spring:
   thymeleaf:
     cache: true
   redis:
-    host: redis-19246.c15.us-east-1-4.ec2.cloud.redislabs.com
-    port: 19246
-    password: IFpOoXYxfcQtZx2edgtgRSkmcMKHiRFA
+    host: redis-15021.c135.eu-central-1-1.ec2.cloud.redislabs.com
+    port: 15021
+    password: Vl0wz1HVcaskE4Z9b3D8MIbBQefLOXkT
 
 # ===================================================================
 # To enable TLS in production, generate a certificate using:

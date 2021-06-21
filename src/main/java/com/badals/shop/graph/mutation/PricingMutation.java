@@ -74,13 +74,13 @@ public class PricingMutation implements GraphQLMutationResolver {
         if(submitOnly)
             return null;
         ProductDTO productDTO = null;
-        if(merchantId == 1L)
+/*        if(merchantId == 1L)
             productDTO = productService.lookupForcePas(sku, false, false, true);
         else if(merchantId == -1L)
             productDTO = productService.lookupForcePas(sku, false, false, false);
         else if(merchantId == 0L)
             productDTO = productService.lookupPas(sku, true, false);
-        else if(merchantId == 2L)
+        else */if(merchantId == 2L)
             productDTO = productService.lookupEbay(sku);
 
 
