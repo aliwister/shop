@@ -1,0 +1,50 @@
+GET add-product/_search
+{
+  "query": {
+    "query_string": {
+      "query": 1236122625
+
+    }
+  }
+}
+
+POST add-product/_delete_by_query
+{
+  "query": {
+    "range": {
+    "id": {
+        "gte": 10,
+        "lte": 200000,
+        "boost": 2.0
+      }
+    }
+  }
+}
+
+DELETE add-product/_doc/357374
+
+
+POST /order/_update_by_query?conflicts=proceed
+{
+  "script": {
+    "source":"ctx._source.customer.active=true"
+  },
+    "query": {
+    "term": {
+      "customer.active": "1"
+    }
+  }
+}
+
+POST /order/_update_by_query?conflicts=proceed
+{
+  "script": {
+    "source":"for (int i=0;i< ctx._source.customer.addresses.size();i++) { ctx._source.customer.addresses[i].active = true} "
+  },
+    "query": {
+    "exists": {
+      "field": "customer.addresses"
+
+    }
+  }
+}
