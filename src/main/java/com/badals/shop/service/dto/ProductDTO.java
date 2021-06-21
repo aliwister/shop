@@ -39,14 +39,16 @@ public class ProductDTO implements Serializable {
 
     private String upc;
 
+/*
     @NotNull
+*/
     private String price;
 
     private String salePrice;
 
     private float discountInPercent = 0;
 
-    @NotNull
+/*    @NotNull*/
     private String currency;
 
     private String image;
@@ -56,7 +58,9 @@ public class ProductDTO implements Serializable {
 
     private LocalDate releaseDate;
 
+/*
     @NotNull
+*/
     private Boolean active;
 
     @Lob
@@ -88,6 +92,8 @@ public class ProductDTO implements Serializable {
     private Condition condition;
 
     private Boolean isUsed;
+
+    private Boolean isPrime;
 
     private Boolean availableForOrder;
 
@@ -124,6 +130,8 @@ public class ProductDTO implements Serializable {
     List<String> features;
 
     String rating;
+
+    Boolean stub;
 
     String _locale;
 

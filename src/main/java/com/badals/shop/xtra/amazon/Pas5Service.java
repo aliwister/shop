@@ -115,9 +115,10 @@ public class Pas5Service implements IProductService {
             if (errCode.equalsIgnoreCase("noresults")) {
                 // This is a SIMPLE item
             }
-            else if (errCode.equalsIgnoreCase("ItemNotAccessible")){
-                return mwsItemShortCircuit(product, asin, true, 0);
-            }
+/*            else if (errCode.equalsIgnoreCase("ItemNotAccessible")){
+                if( mwsItemShortCircuit(product, asin, true, 0))
+                    return product;
+            }*/
 
         }
         else {
@@ -131,15 +132,18 @@ public class Pas5Service implements IProductService {
                 forcePas = true;
         }
 
+/*
         if(!forcePas) {
             try {
-                return mwsItemShortCircuit(product, asin, isRebuild, dimCount);
+                if( mwsItemShortCircuit(product, asin, isRebuild, dimCount))
+                    return product;
             }
             catch (IncorrectDimensionsException e) {
                 // swallow and continue with PAS
                 log.info("Iam catching IncorrectDimensionsException");
             }
         }
+*/
 
 
         //PasItemNode current = pasItemNodeSearchRepository.findById(asin);
@@ -180,7 +184,8 @@ public class Pas5Service implements IProductService {
                 ErrorData error = response.getErrors().get(0);
                 if (error.getCode().trim().equalsIgnoreCase("ItemNotAccessible")) {
                     //response = mwsLookup.lookup(asin);
-                    return mwsItemShortCircuit(product, asin, true, 0);
+/*                    if( mwsItemShortCircuit(product, asin, true, 0))
+                        return product;*/
                 }
             }
             doc = parse_response(response.getItemsResult().getItems());
@@ -350,9 +355,9 @@ public class Pas5Service implements IProductService {
         List<ProductOverride> overrides = findOverrides(asin, null);
         //Product finalParent = null;
         PasItemNode item = null;
-        //if(product == null || product.getStub()) {
-            //item = mwsLookup.lookup(asin);
-        //}
+        if(product == null || product.getStub() == null || product.getStub()) {
+            item = mwsLookup.lookup(asin);
+        }
 
 
         boolean isPasLookup = false;
@@ -362,11 +367,11 @@ public class Pas5Service implements IProductService {
         if(product != null && product.getMerchantId() == 11L)
             isReset = true;*/
 
-        if(product != null && product.getWeight() != null)
+/*        if(product != null && product.getWeight() != null)
             isPasLookup = true;
 
         if(overrides != null && overrides.size() > 0)
-            isPasLookup = true;
+            isPasLookup = true;*/
 
         if(!isPasLookup) {
             try {
@@ -376,7 +381,7 @@ public class Pas5Service implements IProductService {
                 isMwsLookup = false;
             }
         }
-        if(isPasLookup) {
+/*        if(isPasLookup) {
             try {
                 item = callPas(asin);
             }
@@ -386,7 +391,7 @@ public class Pas5Service implements IProductService {
                 else
                     throw e;
             }
-        }
+        }*/
             //redisPasRepository.getHashOperations().put("pas", asin, item);
 
         // Not Exists

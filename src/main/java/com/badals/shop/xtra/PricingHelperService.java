@@ -4,12 +4,14 @@ import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.ProductOverride;
+import com.badals.shop.domain.enumeration.OverrideType;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.repository.ProductOverrideRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.service.SlugService;
+import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.PasItemNode;
 import com.badals.shop.xtra.amazon.PasUtility;
@@ -55,7 +57,8 @@ public class PricingHelperService {
       BigDecimal currentWeight = product.getWeight();
       product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides, 1L, "", "");
 
-      product.setRating(item.getStarRating());
+      if(item.getStarRating() != null && !item.getStarRating().isEmpty())
+         product.setRating(item.getStarRating());
 
       if(product.getWeight() == null)
          product.setWeight(currentWeight);
@@ -134,8 +137,12 @@ public class PricingHelperService {
 
 
    public Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
+      if(overrides != null && !overrides.isEmpty()) {
+         p.setWeight(PasUtility.calculateWeight(p.getWeight(),PasLookupParser.getOverride(overrides, OverrideType.WEIGHT)));
+      }
 
       if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
+
       MwsItemNode n = mwsLookup.fetch(p.getSku());
       Product product = p;
       try {
@@ -157,6 +164,14 @@ public class PricingHelperService {
       Long ref = slugService.generateRef(key, merchantId);
       p.slug(String.valueOf(ref)).ref(ref).merchantId(merchantId).active(true).sku(key).stub(true).inStock(true).title("stub");
       p.setVariationAttributes(value);
+      p.setMerchantId(merchantId);
+      return p;
+   }
+
+   public Product initSearchStub(Product p, Long merchantId) {
+      p.setVariationType(VariationType.SEARCH);
+      Long ref = slugService.generateRef(p.getSku(), merchantId);
+      p.slug(String.valueOf(ref)).ref(ref).merchantId(merchantId).active(true).stub(true).inStock(true);
       p.setMerchantId(merchantId);
       return p;
    }

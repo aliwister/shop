@@ -24,17 +24,25 @@ import com.badals.shop.xtra.amazon.mws.MwsLookup;
 import com.badals.shop.xtra.amazon.mws.MwsLookupParser;
 import com.badals.shop.xtra.amazon.paapi5.PasLookup;
 import com.badals.shop.xtra.amazon.paapi5.PasLookupParser;
+import com.badals.shop.xtra.keepa.KProduct;
 import com.badals.shop.xtra.keepa.KeepaLookup;
+import com.badals.shop.xtra.keepa.KeepaMapper;
+import com.badals.shop.xtra.keepa.KeepaResponse;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 @Service
 public class AmazonPricingService implements IProductService {
@@ -50,14 +58,16 @@ public class AmazonPricingService implements IProductService {
     private final PasLookup pasLookup;
     private final MwsLookup mwsLookup;
     private final KeepaLookup keepaLookup;
-    private final RedisPasRepository redisPasRepository;
+    //private final RedisPasRepository redisPasRepository;
     private final ProductMapper productMapper;
     private final PasItemMapper pasItemMapper;
     private final PricingRequestService pricingRequestService;
     private final SlugService slugService;
     private final Pas5Service pas5Service;
+    private final WebClient webClient;
+    private final KeepaMapper keepaMapper;
 
-    public AmazonPricingService(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, PricingHelperService pricingHelperService, @Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, KeepaLookup keepaLookup, RedisPasRepository redisPasRepository, ProductMapper productMapper, PasItemMapper pasItemMapper, PricingRequestService pricingRequestService, SlugService slugService, Pas5Service pas5Service) {
+    public AmazonPricingService(ProductRepository productRepo, CategoryRepository categoryRepository, MerchantRepository merchantRepository, PricingHelperService pricingHelperService, @Qualifier("us") PasLookup pasLookup, MwsLookup mwsLookup, KeepaLookup keepaLookup, /*RedisPasRepository redisPasRepository,*/ ProductMapper productMapper, PasItemMapper pasItemMapper, PricingRequestService pricingRequestService, SlugService slugService, Pas5Service pas5Service, KeepaMapper keepaMapper) {
         this.productRepo = productRepo;
         this.categoryRepository = categoryRepository;
         this.merchantRepository = merchantRepository;
@@ -65,12 +75,14 @@ public class AmazonPricingService implements IProductService {
         this.pasLookup = pasLookup;
         this.mwsLookup = mwsLookup;
         this.keepaLookup = keepaLookup;
-        this.redisPasRepository = redisPasRepository;
+        //this.redisPasRepository = redisPasRepository;
         this.productMapper = productMapper;
         this.pasItemMapper = pasItemMapper;
         this.pricingRequestService = pricingRequestService;
         this.slugService = slugService;
         this.pas5Service = pas5Service;
+        this.keepaMapper = keepaMapper;
+        webClient = WebClient.create();
     }
 
 
@@ -79,44 +91,34 @@ public class AmazonPricingService implements IProductService {
     /**
      * Entry point
      */
-    public Product lookup(String asin, boolean isRebuild) throws NoOfferException, PricingException {
-
+    public Mono<Product> lookup(String asin, boolean isRebuild) throws NoOfferException, PricingException {
+        //return pas5Service.mwsItemShortCircuit(product, asin, false, 0);
         // Does Product Exist?
         Product product = productRepo.findBySkuJoinChildren(asin, AMAZON_US_MERCHANT_ID).orElse(new Product());
 
         if (product.getId() == null)
-            return buildKeepa(product, asin, true);
+            return buildKeepa( asin, false);
+
+        if (product.getStub() != null && product.getStub())
+            return buildKeepa(asin, false);
+
+        if (isRebuild)
+            return buildKeepa(asin, false);
 
         if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
-            return product;
+            return Mono.just(product);
+        // check pas flag*/
 
-        // check pas flag
-        if (isRebuild) {
-            return buildKeepa(product, asin, false);
-        }
+        String parentAsin = null;
+        if(product.getParent() != null)
+            parentAsin = product.getParent().getSku();
 
-/*        if (product.getStub())
-            //return createChild(asin);
-
-        if (product.getVariationType().equals(VariationType.PARENT))
-            return product;
-
-        if (product.getExpires() != null && product.getExpires().isAfter(Instant.now()))
-            return product;*/
-
-        //if (product.getPasErrorFlag())
-         //   return priceMws(product, asin);
-
-       // if (!product.getPrimeFlag())
-        //    return priceMws(product, asin);
-
-        return pricePas(product, asin);
-
+        return Mono.just(helper.priceMws(product, helper.findOverrides(asin, parentAsin)));
     }
-    @Transactional
-    Product buildKeepa(Product product, String asin, Boolean isRating) throws PricingException, ProductNotFoundException, NoOfferException, IncorrectDimensionsException {
-        PasItemNode item = null;
-        if (redisPasRepository.getHashOperations().hasKey("keepa", asin)) {
+
+    Mono<Product> buildKeepa(String asin, Boolean isRating) throws PricingException, ProductNotFoundException, NoOfferException, IncorrectDimensionsException {
+        //PasItemNode item = null;
+        /*if (redisPasRepository.getHashOperations().hasKey("keepa", asin)) {
             try {
                 item = (PasItemNode) redisPasRepository.getHashOperations().get("keepa", asin);
             }
@@ -124,91 +126,142 @@ public class AmazonPricingService implements IProductService {
                 redisPasRepository.getHashOperations().delete("keepa", asin);
             }
         }
-        else {
-            try {
+        else {*/
+
+        final UriComponentsBuilder builder =
+                UriComponentsBuilder.fromHttpUrl("https://api.keepa.com/product?key=2fk5l4evnaer7h24jrn18ahu1vpk5o1dv692mdnmdqat1uuh8j9kn5l44mjismia&domain=1&rating=0&history=1&days=1")
+                        .queryParam("asin", asin);
+        return webClient
+                .get()
+                .uri(builder.build().encode().toUri())
+                .accept(APPLICATION_JSON_UTF8)
+                .retrieve()
+                .bodyToMono(KeepaResponse.class)
+                .retry(4)
+                .doOnError(e -> log.error("Boom!", e))
+                .map(response -> {
+
+                    // This is your transformation step.
+                    // Map is synchronous so will run in the thread that processed the response.
+                    // Alternatively use flatMap (asynchronous) if the step will be long running.
+                    // For example, if it needs to make a call out to the database to do the transformation.
+                    KProduct kproduct = response.getProducts().get(0);
+                    PasItemNode item = keepaMapper.itemToPasItemNode(kproduct);
+                    List<ProductOverride> overrides = helper.findOverrides(asin, item.getParentAsin());
+                    Product product = productRepo.findBySkuJoinChildren(asin, AMAZON_US_MERCHANT_ID).orElse(new Product());
+
+                    // Create & Price Product
+                    product = helper.initProduct(product, item, item.getVariationType() == VariationType.PARENT, overrides);
+                    product.setVariationType(item.getVariationType());
+
+                    if (item.getVariationType() != VariationType.PARENT) {
+                        product.setPricingApi(Api.KEEPA);
+                        if (product.getPrice() == null) {
+                            product.setPricingApi(Api.MWS);
+                            try {
+                                product = helper.priceMws(product, overrides);
+                            } catch (NoOfferException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    // If stub
+                    if (product.getStub())
+                        return productRepo.save(product);
+
+                    // Is part of variation? No
+                    if (item.getVariationType() == VariationType.SIMPLE) {
+                        product = productRepo.save(product);
+                        return product;
+                    }
+
+                    // Yes
+                    Product parent = null;
+                    if (item.getVariationType() == VariationType.CHILD) {
+                        helper.resetDescriptions(product);
+                        parent = productRepo.findBySkuJoinChildren(item.getParentAsin(), AMAZON_US_MERCHANT_ID).orElse(new Product());
+
+                        if (parent.getId() == null) {
+                            parent = helper.initProduct(parent, item, true, overrides);
+                            parent = helper.updateParentFromChildQuery(parent, item.getParentAsin(), AMAZON_US_MERCHANT_ID);
+                        }
+                        if (parent.getRating() == null || parent.getRating().isEmpty()) {
+                            parent.setRating(product.getRating());
+                        }
+                    } else
+                        parent = product;
+
+                    // Save parent
+                    List<Product> existingChildren = null;
+                    if (parent.getId() == null) {
+                        parent = productRepo.saveAndFlush(parent);
+                        existingChildren = productRepo.findBySkuInAndMerchantId(item.getVariations().keySet(), AMAZON_US_MERCHANT_ID);
+
+                        //parent = productRepo.findBySkuJoinChildren(item.getParentAsin(), AMAZON_US_MERCHANT_ID).orElse(new Product());
+                    }
+
+                    Set<Product> children = parent.getChildren();
+                    List<Variation> variations = new ArrayList<Variation>();
+
+                    // Deactivate All Children
+                    children.stream().forEach(x -> x.setActive(false));
+
+                    // Existing children
+                    for (String childAsin : item.getVariations().keySet()) {
+                        List<Attribute> value = item.getVariations().get(childAsin);
+                        Product child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
+
+                        if (asin.equals(childAsin)) {
+                            try {
+                                children.remove(child);
+                            } catch(Exception e) {/*swallow*/}
+                            child = product.variationAttributes(value);
+                            children.add(child);
+                        }
+
+                        if (child == null)
+                            child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
+
+                        if (child == null && existingChildren != null)
+                            child = existingChildren.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(null);
+
+                        if (child == null)
+                            child = helper.initStub(childAsin, value, AMAZON_US_MERCHANT_ID);
+
+                        if (child.getId() == null || child.getParentId() != parent.getRef()) {
+                            child.setParent(parent);
+                            child.setParentId(parent.getRef());
+                            children.add(child);
+                        }
+
+                        child.setActive(true);
+                        variations.add(new Variation(child.getRef(), value));
+                    }
+
+                    item = null;
+                    parent.setChildren(children);
+                    parent.setVariations(variations);
+                    parent = productRepo.saveAndFlush(parent);
+
+                    Product ret =  parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().orElse(parent);
+                    return ret;
+                });
+
+
+/*            try {
                 item = keepaLookup.lookup(asin, isRating);
-                redisPasRepository.getHashOperations().put("keepa", asin, item);
+                //redisPasRepository.getHashOperations().put("keepa", asin, item);
                 product.setPasFlag(true);
                 product.setApi(Api.KEEPA);
             } catch (ItemNotAccessibleException e) {
+                e.printStackTrace();
                 product.setPasFlag(false);
                 return pas5Service.mwsItemShortCircuit(product, asin, true, 0);
-            }
-        }
+            }*/
 
-        List<ProductOverride> overrides = helper.findOverrides(asin, item.getParentAsin());
 
-        // Create & Price Product
-        product = helper.initProduct(product, item, item.getVariationType() == VariationType.PARENT, overrides);
-        product.setVariationType(item.getVariationType());
-
-        if (item.getVariationType() != VariationType.PARENT) {
-            product.setPricingApi(Api.KEEPA);
-            if (product.getPrice() == null) {
-                product.setPricingApi(Api.MWS);
-                product = helper.priceMws(product, overrides);
-            }
-        }
-
-        // Is part of variation? No
-        if (item.getVariationType() == VariationType.SIMPLE) {
-            product = productRepo.save(product);
-            return product;
-        }
-
-        // Yes
-        Product parent = null;
-        if (item.getVariationType() == VariationType.CHILD) {
-            helper.resetDescriptions(product);
-            parent = productRepo.findBySkuJoinChildren(item.getParentAsin(), AMAZON_US_MERCHANT_ID).orElse(new Product());
-
-            if (parent.getId() == null) {
-                parent = helper.initProduct(parent, item, true, overrides);
-                parent = helper.updateParentFromChildQuery(parent, item.getParentAsin(), AMAZON_US_MERCHANT_ID);
-            }
-        }
-        else
-            parent = product;
-
-        // Save parent
-        if(parent.getId() == null) {
-            parent = productRepo.saveAndFlush(parent);
-            //parent = productRepo.findBySkuJoinChildren(item.getParentAsin(), AMAZON_US_MERCHANT_ID).orElse(new Product());
-        }
-
-        Set<Product> children = parent.getChildren();
-        List<Variation> variations = new ArrayList<Variation>();
-
-        // Deactivate All Children
-        children.stream().forEach(x -> x.setActive(false));
-
-        // Update existing children
-        //productRepo.updateParentAllBySku(parent.getRef(), item.getVariations().keySet());
-        //parent = productRepo.findBySkuJoinChildren(parent.getSku(), AMAZON_US_MERCHANT_ID).orElse(parent);
-
-        for (String childAsin : item.getVariations().keySet()) {
-            List<Attribute> value = item.getVariations().get(childAsin);
-            Product child = children.stream().filter(x -> x.getSku().equals(childAsin)).findFirst().orElse(helper.initStub(childAsin, value, AMAZON_US_MERCHANT_ID));
-            if(asin.equals(childAsin))
-                child = product.variationAttributes(value);
-
-            if(child.getId() ==  null)
-                children.add(child);
-
-            child.setActive(true);
-            child.setParent(parent);
-            child.setParentId(parent.getRef());
-
-            variations.add(new Variation(child.getRef(), value));
-        }
-
-        parent.setChildren(children);
-        parent.setVariations(variations);
-        parent = productRepo.save(parent);
-        return parent;
     }
-
-
 
     Product pricePas(Product product, String asin) {
         List<String> list = new ArrayList();
@@ -329,6 +382,10 @@ public class AmazonPricingService implements IProductService {
         response.setHasMore(false);
 
         return response;
+    }
+
+    public Product initSearchStub(Product product, Long merchantId) {
+        return helper.initSearchStub(product, merchantId);
     }
 
 }
