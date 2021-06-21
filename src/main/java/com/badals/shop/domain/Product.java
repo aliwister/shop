@@ -805,4 +805,8 @@ public class Product implements Serializable, IMerchantProduct {
         this.setVariationAttributes(value);
         return this;
     }
+
+    public void removeChild(Product child) {
+        this.children.remove(child);
+    }
 }

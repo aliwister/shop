@@ -11,7 +11,6 @@ import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductOverrideDTO;
 import com.badals.shop.service.dto.SpeedDialDTO;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import com.badals.shop.xtra.amazon.IncorrectDimensionsException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
@@ -24,7 +23,6 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @Component
 public class PricingMutation implements GraphQLMutationResolver {
@@ -66,7 +64,7 @@ public class PricingMutation implements GraphQLMutationResolver {
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws PricingException, NoOfferException, ProductNotFoundException, ExecutionException, InterruptedException, IncorrectDimensionsException {
+    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws PricingException, NoOfferException, ProductNotFoundException {
         if(override != null && !override.trim().isEmpty()) {
             ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
             productOverrideService.saveOrUpdate(dto);
@@ -76,13 +74,13 @@ public class PricingMutation implements GraphQLMutationResolver {
         if(submitOnly)
             return null;
         ProductDTO productDTO = null;
-        if(merchantId == 1L)
-            productDTO = productService.lookupPas(sku, false, false);
+/*        if(merchantId == 1L)
+            productDTO = productService.lookupForcePas(sku, false, false, true);
         else if(merchantId == -1L)
-            productDTO = productService.lookupPas(sku, false, false);
+            productDTO = productService.lookupForcePas(sku, false, false, false);
         else if(merchantId == 0L)
             productDTO = productService.lookupPas(sku, true, false);
-        else if(merchantId == 2L)
+        else */if(merchantId == 2L)
             productDTO = productService.lookupEbay(sku);
 
 

@@ -13,7 +13,6 @@ import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.PricingException;
 import com.badals.shop.xtra.ebay.EbayLookup;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +21,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
-import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Flow;
 
 @Component
 public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
@@ -119,22 +116,18 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return categoryService.findOne((long) id).orElse(null);
    }
 
-   public Publisher<ProductDTO> getProductBySku(final String sku, final boolean isParent, String _locale) throws ProductNotFoundException, PricingException, NoOfferException, IncorrectDimensionsException, ExecutionException, InterruptedException {
+   public ProductDTO getProductBySku(final String sku, final boolean isParent, final String _locale) throws ProductNotFoundException, PricingException, NoOfferException, IncorrectDimensionsException {
       log.info("GetProductBySky: pasService.lookup("+sku+")");
-      //ProductDTO product;
-
-         //return  productService.lookupPas(sku, true,true, false);
-      ProductDTO dto = productService.lookupPas(sku, true, false);
-      return Mono.just(dto);
+      ProductDTO product;
+/*      if(isParent)
+         return  productService.lookupPas(sku, true,true, false);
+      return productService.lookupPas(sku, true, false);*/
+      return null;
    }
 
    public ProductDTO getProductByDial(final String dial) throws ProductNotFoundException, PricingException, NoOfferException {
       log.info("getProductByDial: ("+dial+")");
       return productService.getProductByDial(dial);
-   }
-
-   public ProductDTO productFromSearch(final ProductDTO dto) {
-      return productService.getProductFromSearch(dto);
    }
 
    public List<ProductDTO> pendingMerchantProducts(Long merchantId) {
@@ -150,14 +143,15 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.lookupEbay(id);
    }
 
-   public ProductDTO pas(String sku) throws ProductNotFoundException, NoOfferException, PricingException, IncorrectDimensionsException {
-      //return productService.lookupForcePas(sku, false,false, true);
-      return null;
-   }
+/*   public ProductDTO pas(String sku) throws ProductNotFoundException, NoOfferException, PricingException, IncorrectDimensionsException {
+      return productService.lookupForcePas(sku, false,false, true);
+   }*/
 
+/*
    public ProductDTO pasUk(String sku) throws ProductNotFoundException, NoOfferException, PricingException {
       return productService.lookupForcePasUk(sku, false,false, true);
    }
+*/
 
    public HashtagResponse hashtags(Integer offset,Integer limit ) {
       return hashtagService.findForList(offset, limit);

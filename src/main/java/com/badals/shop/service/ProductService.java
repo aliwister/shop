@@ -18,17 +18,14 @@ import com.badals.shop.service.util.ValidationUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.*;
 import com.badals.shop.xtra.ebay.EbayService;
-import com.badals.shop.xtra.keepa.KeepaResponse;
 import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.Translation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 
@@ -36,12 +33,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 
 /**
@@ -167,36 +161,79 @@ public class ProductService {
                 throw new ProductNotFoundException("Lonely Parent");
             product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
         }
-        else if(product.getStub() != null && product.getStub()) {
-            Product p = lookup(product.getSku());
-            return this.getProductBySku(p, product.getSku());
+        if(product.getStub() != null && product.getStub()) {
+            //Product p = lookup(product.getSku());
+            return productMapper.toDto(product);
         }
 
         if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
-            Product p = lookup(product.getSku());
-            return this.getProductBySku(p, product.getSku());
+            //Product p = lookup(product.getSku());
+            product.setStub(true);
+            return productMapper.toDto(product);
+            //return this.getProductBySku(p, product.getSku());
         }
         else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
-            Product p = lookup(product.getSku());
-            return this.getProductBySku(p, product.getSku());
+            product.setStub(true);
+            return productMapper.toDto(product);
+            //Product p = lookup(product.getSku());
+            //return this.getProductBySku(p, product.getSku());
         }
 
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
     }
 
+    public Mono<ProductDTO> getBySlugMono(String slug) throws ProductNotFoundException, NoOfferException, PricingException, ExecutionException, InterruptedException {
+        char c = slug.charAt(0);
+        if (c >= 'A' && c <= 'Z') {
+            AddProductDTO addProductDTO = productSearchRepository.findBySlug(slug);
+            if(addProductDTO != null)
+                return Mono.just(addProductMapper.toProductDto(addProductDTO));
+        }
+
+        Product product = productRepository.findBySlugJoinCategories(slug).get();
+        if(product == null)
+            throw new ProductNotFoundException("Invalid Product");
+
+        if(product.getVariationType().equals(VariationType.PARENT)) {
+            if(product.getChildren().size() <1)
+                throw new ProductNotFoundException("Lonely Parent");
+            product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
+        }
+
+        if(product.getStub() != null && product.getStub()) {
+            //Product p = lookup(product.getSku());
+            //return this.getProductBySku(p, product.getSku());
+            return lookupMono(product.getSku());
+        }
+
+        if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
+            //Product p = lookup(product.getSku());
+            //return this.getProductBySku(p, product.getSku());
+            return lookupMono(product.getSku());
+        }
+        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
+/*            Product p = lookup(product.getSku());
+            return this.getProductBySku(p, product.getSku());*/
+            return lookupMono(product.getSku());
+        }
+
+        return Mono.just(productRepository.findBySlugJoinCategories(product.getSlug()).get()).map(productMapper::toDto);
+    }
+
 
     public Product lookup(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
 /*
+<<<<<<< Updated upstream
+=======
         return amazonPricingService.lookup(sku,false);
 */
         return null;
     }
 
-/*
-    public Mono<Product> lookupMono(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
-        return amazonPricingService.lookup(sku,false);
+    public Mono<ProductDTO> lookupMono(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
+        return amazonPricingService.lookup(sku,false).map(productMapper::toDto);
+
     }
-*/
 
     public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {
         List<Product> products = productRepository.findAllByCategorySlug(slug);
@@ -537,9 +574,15 @@ public class ProductService {
         return false;
     }
 
-    public ProductDTO getProductFromSearch(ProductDTO dto) {
-        Product product = productMapper.toEntity(dto);
-        product = amazonPricingService.initSearchStub(product, AmazonPricingService.AMAZON_US_MERCHANT_ID);
+    public ProductDTO createStubFromSearch(ProductDTO dto) {
+        Product product = productRepository.findBySku(dto.getSku()).orElse(productMapper.toEntity(dto));
+        if(product.getId() != null) {
+            product.setRating(dto.getRating());
+        }
+        if(product.getId() == null) {
+            product = amazonPricingService.initSearchStub(product, AmazonPricingService.AMAZON_US_MERCHANT_ID);
+
+        }
         product =  productRepository.save(product);
         return productMapper.toDto(product);
     }

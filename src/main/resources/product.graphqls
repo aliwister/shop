@@ -3,7 +3,7 @@ type Subscription {
 }
 
 extend type Query {
-    productFromSearch(dto: ProductInput): Product
+
     product(slug: String!, cookie: String = "", _locale: String): Product!
     products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
 
@@ -20,10 +20,12 @@ extend type Query {
     relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
     findByKeyword(keyword: String): ProductResponse
 
+
     findByKeywordIndex(keyword: String): ProductResponse
 }
 
 extend type Mutation {
+    createStubFromSearch(dto: ProductInput): Product
     addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
 }
 
@@ -231,6 +233,8 @@ input ProductInput {
     weight: Float,
     availability: Int,
     quantity: Int
+    isPrime: Boolean
+    rating: String
     #volumeWeight: Float,
     #variationOptions: [VariationOptionInput]
 }
