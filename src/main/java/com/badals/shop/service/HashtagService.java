@@ -2,6 +2,7 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.Hashtag;
 import com.badals.shop.graph.HashtagResponse;
+import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.HashtagRepository;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.mapper.HashtagMapper;
@@ -128,4 +129,7 @@ public class HashtagService {
         return response;
     }
 
+   public ProductResponse hashtagProducts(String tag) {
+       return productIndexService.findByHashtag(tag);
+   }
 }

@@ -160,4 +160,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    public HashtagResponse hashtagsWithProducts(Integer offset,Integer limit ) {
       return hashtagService.findForListWithProducts(offset, limit);
    }
+   public ProductResponse hashtagProducts(String tag ) {
+      return hashtagService.hashtagProducts(tag);
+   }
 }
