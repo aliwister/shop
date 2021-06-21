@@ -110,17 +110,30 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
 
     @AfterMapping
     default void afterMapping(@MappingTarget AddProductDTO target, Product source) {
-        //if (source.getGallery() == null) {
-        List<String> gallery = new ArrayList<String>();
-        //}
-        //target.getGallery().add(0, source.getImage());
-        if(source.getGallery() != null) {
-            for (Gallery g : source.getGallery()) {
-                gallery.add(g.getUrl());
-            }
-            target.setGallery(gallery);
+        if (target.getGallery() == null) {
+            target.setGallery(new ArrayList<String>());
         }
 
+        if(target.getImage() == null && target.getGallery().size() > 0)
+            target.setImage(target.getGallery().get(0));
+
+
+        final String prepend;
+        if(target.getImage() != null && !target.getImage().startsWith("https://"))
+            if(source.getMerchantId() == 1)
+                prepend = "https://m.media-amazon.com/images/I/";
+            else
+                prepend = null;
+        else
+            prepend = null;
+
+        if(target.getGallery().size() == 0 && target.getImage() != null)
+            target.getGallery().add(0, source.getImage());
+
+        if(prepend != null) {
+            target.setImage(prepend + target.getImage());
+            target.setGallery(target.getGallery().stream().map(x-> prepend+x).collect(Collectors.toList()));
+        }
         // Process sale price and discount percentage
         MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
         if (stock != null) {

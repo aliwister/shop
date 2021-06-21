@@ -27,7 +27,7 @@ extend type Query {
              limit: Int = 10): HashtagResponse
     hashtagsWithProducts(offset: Int = 0
                      limit: Int = 10): HashtagResponse
-
+    hashtagProducts(hashtag: String): ProductResponse
 }
 
 extend type Mutation {
