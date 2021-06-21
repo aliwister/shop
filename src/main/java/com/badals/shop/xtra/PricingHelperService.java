@@ -56,7 +56,8 @@ public class PricingHelperService {
       BigDecimal currentWeight = product.getWeight();
       product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides, 1L, "", "");
 
-      product.setRating(item.getStarRating());
+      if(item.getStarRating() != null && !item.getStarRating().isEmpty())
+         product.setRating(item.getStarRating());
 
       if(product.getWeight() == null)
          product.setWeight(currentWeight);
@@ -163,7 +164,7 @@ public class PricingHelperService {
    }
 
    public Product initSearchStub(Product p, Long merchantId) {
-      p.setVariationType(VariationType.CHILD);
+      p.setVariationType(VariationType.SEARCH);
       Long ref = slugService.generateRef(p.getSku(), merchantId);
       p.slug(String.valueOf(ref)).ref(ref).merchantId(merchantId).active(true).stub(true).inStock(true);
       p.setMerchantId(merchantId);

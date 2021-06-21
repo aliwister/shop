@@ -8,7 +8,6 @@ import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.ProductDTO;
 
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import com.badals.shop.xtra.amazon.IncorrectDimensionsException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
 import com.badals.shop.xtra.amazon.PricingException;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 
 @Component
@@ -80,8 +78,9 @@ public class ProductMutation implements GraphQLMutationResolver {
 */
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException, NoOfferException, ExecutionException, InterruptedException, IncorrectDimensionsException {
-        return this.productService.lookupPas(asin, false, false);
+    public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException, NoOfferException {
+        return null;
+        //return this.productService.lookupPas(asin, false, false);
     }
 
     //@PreAuthorize("isAuthenticated()")
@@ -121,6 +120,10 @@ public class ProductMutation implements GraphQLMutationResolver {
     public Message setDial(String dial, Long ref){
         speedDialService.addDial(dial, ref);
         return new Message("Done");
+    }
+
+    public ProductDTO createStubFromSearch(ProductDTO dto) {
+        return productService.createStubFromSearch(dto);
     }
 }
 
