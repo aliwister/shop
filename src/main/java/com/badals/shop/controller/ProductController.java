@@ -16,10 +16,7 @@ import com.badals.shop.xtra.keepa.KeepaResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
@@ -45,5 +42,12 @@ public class ProductController {
    @ResponseStatus(OK)
    public Mono<ProductDTO> slug(@PathVariable("slug") String sku) throws PricingException, NoOfferException, ExecutionException, InterruptedException, ProductNotFoundException {
       return productService.getBySlugMono(sku);
+   }
+
+   @RequestMapping(path="/product/sku",method = RequestMethod.POST)
+   @ResponseBody
+   @ResponseStatus(OK)
+   public Mono<ProductDTO> sku(@RequestParam("sku") String sku) throws PricingException, NoOfferException, ExecutionException, InterruptedException, ProductNotFoundException {
+      return productService.lookupMono(sku);
    }
 }
