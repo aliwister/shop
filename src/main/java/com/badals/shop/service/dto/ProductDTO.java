@@ -131,6 +131,8 @@ public class ProductDTO implements Serializable {
 
     String rating;
 
+    Boolean stub;
+
     String _locale;
 
     @Override
