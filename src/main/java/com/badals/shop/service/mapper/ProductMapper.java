@@ -168,8 +168,11 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
         ProductLang lang = source.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
         ProductLang parentLang = lang;
 
-        if(source.getVariationType() == VariationType.CHILD)
-            parentLang = source.getParent().getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(lang);
+        if(source.getVariationType() == VariationType.CHILD) {
+            parentLang = lang;
+            if(source.getParent().getProductLangs() != null)
+                parentLang = source.getParent().getProductLangs().stream().filter(x -> x.getLang().equals(langCode)).findFirst().orElse(lang);
+        }
 
         if(lang == null && !langCode.equals("en")) {
             lang = source.getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
