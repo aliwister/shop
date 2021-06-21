@@ -23,18 +23,20 @@ import com.google.cloud.translate.Translation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
+
 
 /**
  * Service Implementation for managing {@link Product}.
@@ -45,7 +47,6 @@ public class ProductService {
 
     private final Logger log = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository productRepository;
-    private final Pas5Service pas5Service;
     private final AmazonPricingService amazonPricingService;
     private final PasUKService pasUKService;
     private final EbayService ebayService;
@@ -61,9 +62,11 @@ public class ProductService {
     private final ProductLangRepository productLangRepository;
     private final Translate translateService;
 
-    public ProductService(ProductRepository productRepository, Pas5Service pas5Service, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
+    public static final long DEFAULT_WINDOW = 14400;
+
+    public ProductService(ProductRepository productRepository, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
         this.productRepository = productRepository;
-        this.pas5Service = pas5Service;
+
         this.amazonPricingService = amazonPricingService;
         this.pasUKService = pasUKService;
         this.ebayService = ebayService;
@@ -141,7 +144,7 @@ public class ProductService {
     }
 
 
-    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException, NoOfferException, PricingException {
+    public ProductDTO getProductBySlug(String slug) throws ProductNotFoundException, NoOfferException, PricingException, ExecutionException, InterruptedException {
         char c = slug.charAt(0);
         if (c >= 'A' && c <= 'Z') {
             AddProductDTO addProductDTO = productSearchRepository.findBySlug(slug);
@@ -158,21 +161,78 @@ public class ProductService {
                 throw new ProductNotFoundException("Lonely Parent");
             product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
         }
-        else if(product.getStub() != null && product.getStub()) {
-            product = pas5Service.lookup(product.getSku(),false, false, false, false);
-            return this.getProductBySku(product.getSku());
+        if(product.getStub() != null && product.getStub()) {
+            //Product p = lookup(product.getSku());
+            return productMapper.toDto(product);
         }
 
         if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
-            product = pas5Service.lookup(product.getSku(),false, false, false, false);
-            return this.getProductBySku(product.getSku());
+            //Product p = lookup(product.getSku());
+            product.setStub(true);
+            return productMapper.toDto(product);
+            //return this.getProductBySku(p, product.getSku());
         }
-        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(Pas5Service.DEFAULT_WINDOW))) {
-            product = pas5Service.lookup(product.getSku(),false, false, false, false);
-            return this.getProductBySku(product.getSku());
+        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
+            product.setStub(true);
+            return productMapper.toDto(product);
+            //Product p = lookup(product.getSku());
+            //return this.getProductBySku(p, product.getSku());
         }
 
         return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
+    }
+
+    public Mono<ProductDTO> getBySlugMono(String slug) throws ProductNotFoundException, NoOfferException, PricingException, ExecutionException, InterruptedException {
+        char c = slug.charAt(0);
+        if (c >= 'A' && c <= 'Z') {
+            AddProductDTO addProductDTO = productSearchRepository.findBySlug(slug);
+            if(addProductDTO != null)
+                return Mono.just(addProductMapper.toProductDto(addProductDTO));
+        }
+
+        Product product = productRepository.findBySlugJoinCategories(slug).get();
+        if(product == null)
+            throw new ProductNotFoundException("Invalid Product");
+
+        if(product.getVariationType().equals(VariationType.PARENT)) {
+            if(product.getChildren().size() <1)
+                throw new ProductNotFoundException("Lonely Parent");
+            product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
+        }
+
+        if(product.getStub() != null && product.getStub()) {
+            //Product p = lookup(product.getSku());
+            //return this.getProductBySku(p, product.getSku());
+            return lookupMono(product.getSku());
+        }
+
+        if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
+            //Product p = lookup(product.getSku());
+            //return this.getProductBySku(p, product.getSku());
+            return lookupMono(product.getSku());
+        }
+        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
+/*            Product p = lookup(product.getSku());
+            return this.getProductBySku(p, product.getSku());*/
+            return lookupMono(product.getSku());
+        }
+
+        return Mono.just(productRepository.findBySlugJoinCategories(product.getSlug()).get()).map(productMapper::toDto);
+    }
+
+
+    public Product lookup(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
+/*
+<<<<<<< Updated upstream
+=======
+        return amazonPricingService.lookup(sku,false);
+*/
+        return null;
+    }
+
+    public Mono<ProductDTO> lookupMono(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
+        return amazonPricingService.lookup(sku,false).map(productMapper::toDto);
+
     }
 
     public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {
@@ -188,9 +248,13 @@ public class ProductService {
         return products.stream().map(productMapper::toDto).collect(Collectors.toList());
     }
 
-    public ProductDTO getProductBySku(String sku) throws ProductNotFoundException, PricingException {
-        Product product = productRepository.findBySkuJoinCategories( sku).get();
+    @Transactional
+    public ProductDTO getProductBySku(Product product, String sku) throws ProductNotFoundException, PricingException {
+        //Product product = productRepository.findBySkuJoinCategories( sku).get();
         if(product == null )
+            product = productRepository.findBySkuJoinCategories( sku).get();
+
+        if(product == null)
             throw new ProductNotFoundException("Invalid Product");
 
         if(product.getVariationType().equals(VariationType.PARENT)) {
@@ -203,19 +267,20 @@ public class ProductService {
         //    throw new PricingException("Invalid price");
         //if(isSaveES)
         //productIndexService.saveToElastic(product);
-        translateProduct(product);
+        product = translateProduct(product);
+        if(product == null)
+            throw new ProductNotFoundException("Invalid Product");
 
-
-        return productRepository.findBySlugJoinCategories(product.getSlug()).map(productMapper::toDto).orElse(null);
+        return productMapper.toDto(product);
 
     }
 
-    private void translateProduct(Product product) {
+    private Product translateProduct(Product product) {
         String langCode = LocaleContext.getLocale();
         ProductLang lang = product.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
 
         if(product.getVariationType() == VariationType.SIMPLE && lang != null)
-            return;
+            return product;
 
         ProductLang childLang = product.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
         ProductLang childEn = product.getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
@@ -225,16 +290,16 @@ public class ProductService {
             if(product.getVariationType() == VariationType.SIMPLE)
                 target = translateParent(childEn, target, langCode);
             product.addProductLang(target);
-            productRepository.save(product);
+            product = productRepository.save(product);
         }
 
         if(product.getVariationType() == VariationType.SIMPLE) {
-            return;
+            return product;
         }
 
         ProductLang parentLang = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
         if (parentLang != null)
-            return;
+            return product;
 
         ProductLang parentEn = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
         if(parentLang == null && parentEn != null) {
@@ -242,8 +307,10 @@ public class ProductService {
             target = translateParent(parentEn, target, langCode);
             Product parent = product.getParent();
             parent.addProductLang(target);
-            productRepository.save(parent);
+            parent = productRepository.save(parent);
+            return parent;
         }
+        return product;
     }
 
     private ProductLang translateParent(ProductLang en, ProductLang target, String lang) {
@@ -288,29 +355,36 @@ public class ProductService {
        return response;
    }
 
-    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
-        return lookupPas(sku, false, isRedis, isRebuild);
+
+    public ProductDTO lookupPas(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException, ExecutionException, InterruptedException {
+        //Product p = this.amazonPricingService.lookup(sku, true);
+/*        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
+            productIndexService.indexProduct(p.getId());*/
+
+        Product p = lookup(sku);
+        return this.getProductBySku(p, sku);
+
+        //throw new PricingException("Bummer");
     }
 
-    public ProductDTO lookupPas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
-        Product p = this.amazonPricingService.lookup(sku, true);
-        if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
-            productIndexService.indexProduct(p.getId());
-        return this.getProductBySku(sku);
+    public Mono<ProductDTO> lookupMono(String sku, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException, ExecutionException, InterruptedException {
+        return Mono.just(new ProductDTO());
     }
 
+/*
     public ProductDTO lookupForcePas(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.pas5Service.lookup(sku, isParent, isRedis, isRebuild, true);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             productIndexService.indexProduct(p.getId());
         return this.getProductBySku(sku);
     }
+*/
 
     public ProductDTO lookupForcePasUk(String sku, boolean isParent, boolean isRedis, boolean isRebuild) throws ProductNotFoundException, PricingException, NoOfferException {
         Product p = this.pasUKService.lookup(sku, isParent, isRedis, isRebuild, true);
         if(p.getVariationType() == VariationType.SIMPLE && p.getPrice() != null)
             productIndexService.indexProduct(p.getId());
-        return this.getProductBySku(sku);
+        return this.getProductBySku(p, sku);
     }
 
     public String getParentOf(String sku) {
@@ -498,6 +572,19 @@ public class ProductService {
         }
 
         return false;
+    }
+
+    public ProductDTO createStubFromSearch(ProductDTO dto) {
+        Product product = productRepository.findBySku(dto.getSku()).orElse(productMapper.toEntity(dto));
+        if(product.getId() != null) {
+            product.setRating(dto.getRating());
+        }
+        if(product.getId() == null) {
+            product = amazonPricingService.initSearchStub(product, AmazonPricingService.AMAZON_US_MERCHANT_ID);
+
+        }
+        product =  productRepository.save(product);
+        return productMapper.toDto(product);
     }
 /*
     public <U> U log(Customer loginUser, String slug, cookie) {

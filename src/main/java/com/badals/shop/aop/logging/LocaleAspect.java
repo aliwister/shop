@@ -18,7 +18,8 @@ import java.util.Optional;
 public class LocaleAspect {
 
     @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..)) || "+
-            "execution(* com.badals.shop.graph.query.ProductQuery.getProductBySku(..))")
+            "execution(* com.badals.shop.graph.query.ProductQuery.getProductBySku(..)) || " +
+            "execution(* com.badals.shop.*.product(..)))")
     public Object beforeWebMethodExecution1(ProceedingJoinPoint joinPoint) throws Throwable {
         setLocale(joinPoint);
         return joinPoint.proceed();
@@ -36,8 +37,8 @@ public class LocaleAspect {
                 String key, value;
                 key = codeSignature.getParameterNames()[i];
                 value = joinPoint == null || joinPoint.getArgs() == null || joinPoint.getArgs()[i] == null?"":joinPoint.getArgs()[i].toString();
-                System.out.println("First parameter's name: " + key);
-                System.out.println("First argument's value: " + value);
+/*                System.out.println("First parameter's name: " + key);
+                System.out.println("First argument's value: " + value);*/
 
                 if (key.equalsIgnoreCase("_locale"))
                     LocaleContext.setLocale(value);

@@ -68,10 +68,12 @@ public interface KeepaMapper {
       }
 
       //browseNode
-      String browseNode = source.getCategoryTree().stream()
-              .map(CategoryTree::getName)
-              .collect(Collectors.joining(" > "));
-      target.setBrowseNode(browseNode);
+      if(source.getCategoryTree() !=null) {
+         String browseNode = source.getCategoryTree().stream()
+                 .map(CategoryTree::getName)
+                 .collect(Collectors.joining(" > "));
+         target.setBrowseNode(browseNode);
+      }
 
       //upc
       if(source.getUpcList() != null)

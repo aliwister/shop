@@ -4,6 +4,7 @@ package com.badals.shop.graph.query;
 import com.badals.shop.service.PricingRequestService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.dto.PricingRequestDTO;
+import com.badals.shop.service.dto.ProductDTO;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

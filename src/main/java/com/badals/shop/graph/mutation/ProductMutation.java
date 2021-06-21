@@ -79,7 +79,8 @@ public class ProductMutation implements GraphQLMutationResolver {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException, NoOfferException {
-        return this.productService.lookupPas(asin, false, false);
+        return null;
+        //return this.productService.lookupPas(asin, false, false);
     }
 
     //@PreAuthorize("isAuthenticated()")
@@ -119,6 +120,10 @@ public class ProductMutation implements GraphQLMutationResolver {
     public Message setDial(String dial, Long ref){
         speedDialService.addDial(dial, ref);
         return new Message("Done");
+    }
+
+    public ProductDTO createStubFromSearch(ProductDTO dto) {
+        return productService.createStubFromSearch(dto);
     }
 }
 

@@ -10,4 +10,9 @@ import java.util.List;
 public class KeepaResponse {
    List<KProduct> products;
    String processingTimeInMs;
+
+   public List<KProduct> getProducts() {
+      return products;
+   }
+
 }

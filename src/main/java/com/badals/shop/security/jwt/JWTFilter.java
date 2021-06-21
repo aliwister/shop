@@ -23,6 +23,7 @@ import java.io.IOException;
 public class JWTFilter extends GenericFilterBean {
     private final Logger log = LoggerFactory.getLogger(JWTFilter.class);
     public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String AUTHORIZATION_HEADER_SMALL = "authorization";
     public static final String COOKIE_TOKEN = "xbtoken";
 
     private TokenProvider tokenProvider;
@@ -48,6 +49,13 @@ public class JWTFilter extends GenericFilterBean {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
+        }
+        bearerToken = request.getHeader(AUTHORIZATION_HEADER_SMALL);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        if (StringUtils.hasText(bearerToken) && !bearerToken.startsWith("Bearer ")) {
+            return bearerToken;
         }
         // Check token in cookie
         Cookie[] cookies = request.getCookies();
