@@ -30,7 +30,6 @@ public class AddProductDTO {
 
    Long id;
    String sku;
-   Boolean active;
    String upc;
    Long ref;
    String slug;
@@ -51,6 +50,8 @@ public class AddProductDTO {
    Integer availability;
    BigDecimal salePrice;
    BigDecimal quantity;
+
+   Boolean active;
 
    List<String> gallery;
 
