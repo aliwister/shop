@@ -34,6 +34,7 @@ type MerchantProduct {
       gallery: [String]
       browseNode: String
       browseNode_ar: String
+      active: Boolean
 
 }
 

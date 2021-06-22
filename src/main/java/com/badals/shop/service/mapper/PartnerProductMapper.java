@@ -116,6 +116,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Produ
 
     @AfterMapping
     default void afterMapping(@MappingTarget PartnerProduct target, Product source) {
+        String langCode = "en";
         //if (source.getGallery() == null) {
         List<String> gallery = new ArrayList<String>();
         //}
@@ -147,6 +148,11 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Produ
             Move to language files
              */
             target.setAvailability(hours);
+        }
+
+        ProductLang lang = source.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
+        if(lang != null) {
+            target.setName(lang.getTitle());
         }
     }
 
