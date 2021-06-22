@@ -135,7 +135,8 @@ public class ProductIndexService {
     }
 
     public ProductResponse findByHashtag(String hashtag) {
-        List<AddProductDTO> result = search(hashtag );
+        //List<AddProductDTO> result = search(hashtag );
+        List<AddProductDTO> result = productSearchRepository.findByHashtagsContains(hashtag);
         ProductResponse response = new ProductResponse();
         response.setTotal(6);
         response.setHasMore(false);
