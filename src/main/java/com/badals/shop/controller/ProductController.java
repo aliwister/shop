@@ -48,6 +48,6 @@ public class ProductController {
    @ResponseBody
    @ResponseStatus(OK)
    public Mono<ProductDTO> sku(@RequestParam("sku") String sku) throws PricingException, NoOfferException, ExecutionException, InterruptedException, ProductNotFoundException {
-      return productService.lookupMono(sku);
+      return productService.lookupMono(sku, true);
    }
 }

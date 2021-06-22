@@ -234,6 +234,10 @@ public class ProductService {
         return amazonPricingService.lookup(sku,false).map(productMapper::toDto);
 
     }
+    public Mono<ProductDTO> lookupMono(String sku, Boolean rebuild) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
+        return amazonPricingService.lookup(sku,true).map(productMapper::toDto);
+
+    }
 
     public ProductResponse findAllByCategory(String slug, Integer offset, Integer limit) {
         List<Product> products = productRepository.findAllByCategorySlug(slug);
