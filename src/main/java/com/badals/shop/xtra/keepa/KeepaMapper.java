@@ -61,8 +61,9 @@ public interface KeepaMapper {
       }
       if(source.getAvailabilityAmazon() == 0) {
          target.setPrime(true);
-         Double price = csv.get(CsvIndex.AMAZON.getValue()).get(1)/100.0;
-         target.setCost(BigDecimal.valueOf(price));
+         Integer cost = csv.get(CsvIndex.AMAZON.getValue()).get(1);
+         if (cost != -1)
+            target.setCost(BigDecimal.valueOf(cost/100.0));
          target.setMaxHours("48");
          target.setAvailabilityType("Now");
       }
