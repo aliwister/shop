@@ -196,11 +196,11 @@ public class AmazonPricingService implements IProductService {
                     List<Product> existingChildren = null;
                     if (parent.getId() == null) {
                         parent = productRepo.saveAndFlush(parent);
-                        existingChildren = productRepo.findBySkuInAndMerchantId(item.getVariations().keySet(), AMAZON_US_MERCHANT_ID);
+
 
                         //parent = productRepo.findBySkuJoinChildren(item.getParentAsin(), AMAZON_US_MERCHANT_ID).orElse(new Product());
                     }
-
+                    existingChildren = productRepo.findBySkuInAndMerchantId(item.getVariations().keySet(), AMAZON_US_MERCHANT_ID);
                     Set<Product> children = parent.getChildren();
                     List<Variation> variations = new ArrayList<Variation>();
 
