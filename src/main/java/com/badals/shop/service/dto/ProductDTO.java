@@ -68,7 +68,7 @@ public class ProductDTO implements Serializable {
 
     private String url;
 
-    @NotNull
+    
     @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
     private String title;
 
