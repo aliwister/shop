@@ -23,8 +23,8 @@ import java.util.Optional;
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
    Page<Purchase> findAllByOrderByCreatedDateDesc(Pageable page);
 
-   @Query("select p from Purchase p left join p.merchant order by p.id DESC")
-   Page<Purchase> findForPurchaseList(Pageable page);
+   @Query("select p from Purchase p left join p.merchant where (?1 is null or p.merchant.name like CONCAT(?1, '%') or p.ref like CONCAT('%', ?1, '%')) order by p.id DESC")
+   Page<Purchase> findForPurchaseList(Pageable page, String search);
 
    @Query("from Purchase p left join fetch p.purchaseItems i left join fetch i.orderItems where p.id = ?1 order by i.sequence")
    Optional<Purchase>  findForUpdate(Long id);

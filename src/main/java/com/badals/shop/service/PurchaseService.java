@@ -114,7 +114,7 @@ public class PurchaseService {
     }
 
     public PurchaseResponse findForPurchaseList(List<OrderState> orderState, Integer offset, Integer limit, String searchText) {
-        Page<Purchase> orders = purchaseRepository.findForPurchaseList(/*orderState, */PageRequest.of((int) offset/limit,limit));
+        Page<Purchase> orders = purchaseRepository.findForPurchaseList(/*orderState, */PageRequest.of((int) offset/limit,limit), searchText);
         PurchaseResponse response = new PurchaseResponse();
         response.setTotal(orders.getNumber());
         response.setItems(orders.getContent().stream().map(purchaseMapper::toDto).collect(Collectors.toList()));
