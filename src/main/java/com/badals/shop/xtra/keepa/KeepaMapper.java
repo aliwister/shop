@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.badals.shop.service.util.AccessUtil.null2Zero;
 import static com.badals.shop.service.util.AccessUtil.opt;
 import static com.badals.shop.xtra.keepa.ProductType.VARIATION_PARENT;
 
@@ -41,6 +42,13 @@ public interface KeepaMapper {
    default void afterMapping(@MappingTarget PasItemNode target, KProduct source) {
       // Hardcoded weight units
       target.setItemWeightUnit("Grams");
+      target.setItemLengthUnit("mm");
+
+/*    // vol weight
+      if( source.getPackageWeight() != null)
+         target.setPackageWeight(source.getPackageWeight().toString());
+      else
+         target.(source.getPackageWeight().toString());*/
 
       // URL
       target.setUrl("https://www.amazon.com/dp/"+source.getAsin());
@@ -59,6 +67,18 @@ public interface KeepaMapper {
       if (csv.get(CsvIndex.RATING.getValue()) != null) {
          target.setStarRating(String.valueOf(csv.get(CsvIndex.RATING.getValue()).get(1)/10.0));
       }
+
+
+      if(Math.max(Math.max(null2Zero(source.getPackageLength()), null2Zero(source.getPackageWidth())), null2Zero(source.getPackageHeight())) > 1590) {
+         target.setOverSize(true);
+      }
+      if(Math.max(null2Zero(source.getPackageWeight()), null2Zero(source.getItemWeight())) > 69000) {
+         target.setOverSize(true);
+      }
+
+
+
+
       if(source.getAvailabilityAmazon() == 0) {
          target.setPrime(true);
          Integer cost = csv.get(CsvIndex.AMAZON.getValue()).get(1);

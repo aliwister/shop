@@ -46,6 +46,7 @@ public class PasLookupParser {
         .image(i.getImage())
         .brand(i.getBrand())
         .weight(PasUtility.calculateWeight(i.getParsedWeight(), getOverride(overrides, OverrideType.WEIGHT)))
+        .volumeWeight(PasUtility.calculateVolWeight(i.getPackageLength(), i.getPackageWidth(), i.getPackageHeight(), i.getItemLengthUnit()))
         .title(i.getTitle())
         .upc(i.getUpc())
         .merchantId(merchantId)
@@ -71,8 +72,7 @@ public class PasLookupParser {
         if (cost == null)
             throw new NoOfferException("Offers is null");
 
-        BigDecimal weight = product.getWeight();
-        //weight = ;
+        BigDecimal weight = product.getComputedWeight();
 
         if(weight == null)
             throw new NoOfferException("Weight is null");
@@ -83,7 +83,7 @@ public class PasLookupParser {
         double margin = 5, risk = 2, fixed = 1.1;
         double localShipping = (item.getShippingCharges() != null)?item.getShippingCharges().doubleValue():0;
 
-        BigDecimal price = PasUtility.calculatePrice(cost, weight, localShipping, margin, risk, fixed, item.isPrime(), item.isSuperSaver(), item.getShippingCountry());
+        BigDecimal price = PasUtility.calculatePrice(cost, weight, localShipping, margin, risk, fixed, item.isPrime(), item.isSuperSaver(), item.getShippingCountry(), item.isOverSize());
         price = calculatePrice(price, getOverride(overrides, OverrideType.PRICE));
         int availability =  PasUtility.parseAvailability(item);
 
