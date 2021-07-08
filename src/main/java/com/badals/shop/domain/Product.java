@@ -140,6 +140,17 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
+    @NotNull
+    private Boolean oversize;
+
+    public Boolean getOversize() {
+        return oversize;
+    }
+
+    public void setOversize(Boolean oversize) {
+        this.oversize = oversize;
+    }
+
     public Boolean getStub() {
         return stub;
     }
@@ -811,5 +822,12 @@ public class Product implements Serializable, IMerchantProduct {
 
     public void removeChild(Product child) {
         this.children.remove(child);
+    }
+
+    public BigDecimal getComputedWeight() {
+        if(volumeWeight != null && volumeWeight.compareTo(weight) == 1) {
+            return volumeWeight;
+        }
+        return weight;
     }
 }

@@ -3,6 +3,7 @@ package com.badals.shop.xtra.amazon;
 import com.badals.shop.domain.ProductOverride;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -15,8 +16,9 @@ public class PasUtility {
    private static final double OMRPERKG = 3.4;
    private static final double OMRPERKGMORETHAN5 = 3.2;
    public static final double MINWEIGHT = 0.001;
+   private static final double OVERSIZE_CHARGE_OMR = 35;
 
-   public static BigDecimal calculatePrice(BigDecimal cost, BigDecimal weight, double localShipping, double margin, double risk, double fixed, boolean isPrime, boolean isFulfilledByAmazon, String shippingCountry) throws PricingException {
+   public static BigDecimal calculatePrice(BigDecimal cost, BigDecimal weight, double localShipping, double margin, double risk, double fixed, boolean isPrime, boolean isFulfilledByAmazon, String shippingCountry, boolean oversize) throws PricingException {
       double dWeight = weight.doubleValue()*LB2KG;
       if (dWeight < MINWEIGHT) {
          throw new PricingException("Unable to caculate the price [weight=0]");
@@ -52,6 +54,8 @@ public class PasUtility {
       //if(!isInsurance) 	$insurance = 0;
       double dPrice = (dCost + c_add + insurance  ) * USD2OMR + fixed + w_add;
       dPrice = Math.round(dPrice*9.9)/10.0;
+      if(oversize)
+         dPrice += OVERSIZE_CHARGE_OMR;
 
       BigDecimal price = BigDecimal.valueOf(dPrice);
       return price;
@@ -128,5 +132,20 @@ public class PasUtility {
       if(!override.isLazy()  ||  (override.isLazy() && (weight == null || weight.doubleValue() < MINWEIGHT)))
          return new BigDecimal(override.getOverride());
       return weight;
+   }
+
+   public static BigDecimal calculateVolWeight(String l, String w, String h, String unit) {
+      try {
+         if (unit.equalsIgnoreCase("mm")) {
+            return BigDecimal.valueOf(2.2 * Double.valueOf(l) * Double.valueOf(w) * Double.valueOf(h) / 1000.0 / 5000).setScale(4, RoundingMode.HALF_UP);
+         }
+         if (unit.equalsIgnoreCase("inches")) {
+            return BigDecimal.valueOf(Double.valueOf(l) * Double.valueOf(w) * Double.valueOf(h) / 135 );
+         }
+      }
+      catch (Exception e) {
+         return null;
+      }
+      return null;
    }
 }

@@ -51,6 +51,8 @@ public class PasItemNode implements Serializable {
    String packageLength;
    String packageWidth;
 
+   String itemLengthUnit;
+
    String itemHeight;
    String itemLength;
    String itemWidth;
@@ -108,6 +110,7 @@ public class PasItemNode implements Serializable {
    boolean superSaver = false;
    boolean prime = false;
    boolean freeShipping = false;
+   boolean overSize = false;
    BigDecimal shippingCharges;
 
    BigDecimal omanShippingCharges;
