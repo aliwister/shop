@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class MwsLookupParser {
-   public static MerchantStock parseStock(MerchantStock stock, MwsItemNode i, BigDecimal weight, List<ProductOverride> overrides) throws PricingException, NoOfferException {
+   public static MerchantStock parseStock(MerchantStock stock, MwsItemNode i, BigDecimal weight, List<ProductOverride> overrides, boolean oversize) throws PricingException, NoOfferException {
       // @Todo catch options with no offers
 
       OfferNode offer = selectOffer(i);
@@ -27,7 +27,7 @@ public class MwsLookupParser {
       double margin = 5, risk = 2, fixed = 1.1;
       double localShipping = 0;
 
-      BigDecimal price = PasUtility.calculatePrice(offer.getCost(), weight, localShipping, margin, risk, fixed, isPrime, isFulfilledByAmazon, null);
+      BigDecimal price = PasUtility.calculatePrice(offer.getCost(), weight, localShipping, margin, risk, fixed, isPrime, isFulfilledByAmazon, null, oversize);
       return stock.store("Amazon.com").quantity(BigDecimal.valueOf(99)).cost(BigDecimal.valueOf(dCost)).availability(availability).allow_backorder(true).price(price).location("USA");
    }
 

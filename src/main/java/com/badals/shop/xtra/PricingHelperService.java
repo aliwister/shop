@@ -56,7 +56,7 @@ public class PricingHelperService {
    public Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
       BigDecimal currentWeight = product.getWeight();
       product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides, 1L, "", "");
-
+      product.setOversize(item.isOverSize());
       if(item.getStarRating() != null && !item.getStarRating().isEmpty())
          product.setRating(item.getStarRating());
 
@@ -142,11 +142,13 @@ public class PricingHelperService {
       }
 
       if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
+      boolean oversize = false;
+
 
       MwsItemNode n = mwsLookup.fetch(p.getSku());
       Product product = p;
       try {
-         product = setMerchantStock(p, MwsLookupParser.parseStock(getMerchantStock(p),n, p.getWeight(), overrides), BigDecimal.valueOf(99L));
+         product = setMerchantStock(p, MwsLookupParser.parseStock(getMerchantStock(p),n, p.getComputedWeight(), overrides, p.getOversize()), BigDecimal.valueOf(99L));
          product.inStock(true);
       } catch (PricingException e) {
          product.setPrice((BigDecimal) null);

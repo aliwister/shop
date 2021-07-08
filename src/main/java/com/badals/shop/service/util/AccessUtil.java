@@ -18,5 +18,9 @@ public final class AccessUtil {
             return null;
         }
     }
-
+    public static Integer null2Zero(Integer i) {
+        if(i == null)
+            return 0;
+        return i;
+    }
 }
