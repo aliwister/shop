@@ -141,7 +141,7 @@ public class Product implements Serializable, IMerchantProduct {
     private Boolean active;
 
     @NotNull
-    private Boolean oversize;
+    private Boolean oversize= false;
 
     public Boolean getOversize() {
         return oversize;
