@@ -313,25 +313,7 @@ public class AmazonPricingService implements IProductService {
         return pasItemMapper.itemToPasItemNode(doc.get(asin));
     }
 
-
-    private Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
-
-        if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
-        MwsItemNode n = mwsLookup.fetch(p.getSku());
-        Product product = p;
-        try {
-            product = helper.setMerchantStock(p, MwsLookupParser.parseStock(helper.getMerchantStock(p),n, p.getWeight(), overrides), BigDecimal.valueOf(99L));
-            product.inStock(true);
-        } catch (PricingException e) {
-            product.setPrice((BigDecimal) null);
-            //e.printStackTrace();
-        } catch (NoOfferException e) {
-            //product = setMerchantStock(p, getMerchantStock(p),BigDecimal.ZERO);
-            product.inStock(false);
-        }
-        return product;
-    }
-
+    
     private Product pricePas(Product p, PasItemNode item, List<ProductOverride> overrides) throws NoOfferException {
 
         if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
