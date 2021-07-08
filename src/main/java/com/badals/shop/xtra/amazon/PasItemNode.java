@@ -134,7 +134,7 @@ public class PasItemNode implements Serializable {
          children = new ArrayList<PasItemNode>();
    }
    private static final BigDecimal LB2KG = BigDecimal.valueOf(0.453592);
-   private static final BigDecimal LB2G = BigDecimal.valueOf(200);
+   private static final BigDecimal LB2G = BigDecimal.valueOf(453.6);
    private static final BigDecimal LB2OUNCE = BigDecimal.valueOf(14);
 
 
