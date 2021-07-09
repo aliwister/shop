@@ -159,7 +159,7 @@ public class ProductService {
         if(product.getVariationType().equals(VariationType.PARENT)) {
             if(product.getChildren().size() <1)
                 throw new ProductNotFoundException("Lonely Parent");
-            product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
+            product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().orElse(product.getChildren().stream().findFirst().get());
         }
         if(product.getStub() != null && product.getStub()) {
             //Product p = lookup(product.getSku());
