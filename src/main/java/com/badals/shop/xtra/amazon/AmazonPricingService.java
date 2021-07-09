@@ -113,7 +113,9 @@ public class AmazonPricingService implements IProductService {
         if(product.getParent() != null)
             parentAsin = product.getParent().getSku();
 
-        return Mono.just(helper.priceMws(product, helper.findOverrides(asin, parentAsin)));
+        product = helper.priceMws(product, helper.findOverrides(asin, parentAsin));
+
+        return Mono.just(product);
     }
 
     Mono<Product> buildKeepa(String asin, Boolean isRating) throws PricingException, ProductNotFoundException, NoOfferException, IncorrectDimensionsException {
@@ -147,6 +149,7 @@ public class AmazonPricingService implements IProductService {
                     // For example, if it needs to make a call out to the database to do the transformation.
                     KProduct kproduct = response.getProducts().get(0);
                     PasItemNode item = keepaMapper.itemToPasItemNode(kproduct);
+
                     List<ProductOverride> overrides = helper.findOverrides(asin, item.getParentAsin());
                     Product product = productRepo.findBySkuJoinChildren(asin, AMAZON_US_MERCHANT_ID).orElse(new Product());
 
@@ -167,7 +170,7 @@ public class AmazonPricingService implements IProductService {
                     }
 
                     // If stub
-                    if (product.getStub())
+                    if (product.getStub() != null && product.getStub())
                         return productRepo.save(product);
 
                     // Is part of variation? No
@@ -244,7 +247,7 @@ public class AmazonPricingService implements IProductService {
                     parent.setVariations(variations);
                     parent = productRepo.saveAndFlush(parent);
 
-                    Product ret =  parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().orElse(parent);
+                    Product ret =  parent.getChildren().stream().filter(x -> x.getSku().equals(asin)).findFirst().orElse(parent.getChildren().stream().findFirst().get());
                     return ret;
                 });
 
@@ -313,7 +316,7 @@ public class AmazonPricingService implements IProductService {
         return pasItemMapper.itemToPasItemNode(doc.get(asin));
     }
 
-    
+
     private Product pricePas(Product p, PasItemNode item, List<ProductOverride> overrides) throws NoOfferException {
 
         if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
