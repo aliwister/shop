@@ -142,17 +142,22 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
             target.setRating(source.getParent().getRating());
 
         // Process sale price and discount percentage
-        MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
+        MerchantStock stock = opt(() ->  source.getMerchantStock().stream().findFirst().get());
         if (stock != null) {
-            target.setSalePrice(stock.getPrice().toPlainString());
-            target.setPrice(stock.getPrice().toPlainString());
-            target.setDiscountInPercent(0);
 
-            if(stock.getDiscount() != null) {
-                int discount = stock.getDiscount();
-                target.setDiscountInPercent(discount);
-                target.setPrice(String.valueOf((int)(10*stock.getPrice().doubleValue()/(1.0-discount*.01))/10.0 ));
-            }
+            /*// Product price of 0 not allowed
+            if(stock.getPrice().compareTo(BigDecimal.ZERO) == 1 ) {*/
+                target.setSalePrice(stock.getPrice().toPlainString());
+                target.setPrice(stock.getPrice().toPlainString());
+                target.setDiscountInPercent(0);
+
+                if(stock.getDiscount() != null) {
+                    int discount = stock.getDiscount();
+                    target.setDiscountInPercent(discount);
+                    target.setPrice(String.valueOf((int)(10*stock.getPrice().doubleValue()/(1.0-discount*.01))/10.0 ));
+                }
+            //}
+
             int hours = stock.getAvailability();
             /*
             @Todo
