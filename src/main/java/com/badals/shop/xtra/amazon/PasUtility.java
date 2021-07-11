@@ -14,7 +14,7 @@ public class PasUtility {
    private static final double USD2OMR = .386;
    private static final double LB2KG = 0.453592;
    private static final double OMRPERKG = 3.4;
-   private static final double OMRPERKGMORETHAN5 = 3.2;
+   private static final double OMRPERKGMORETHAN5 = 2.5;
    public static final double MINWEIGHT = 0.001;
    private static final double OVERSIZE_CHARGE_OMR = 35;
 
