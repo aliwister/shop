@@ -17,6 +17,7 @@ type Payment {
     customer: String
     cartId: String
     voided: Boolean
+    invoiceNum: String
 }
 
 input PaymentInput {
