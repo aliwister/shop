@@ -79,6 +79,9 @@ public class Payment extends Auditable implements Serializable {
     @Column(name = "settlement_date")
     private Date settlementDate;
 
+    @Column(name = "invoice_num")
+    private String invoiceNum;
+
 /*
     ALTER TABLE shop.payment ADD capture_id varchar(100) NULL;
 */
