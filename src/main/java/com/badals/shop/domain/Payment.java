@@ -79,6 +79,14 @@ public class Payment extends Auditable implements Serializable {
     @Column(name = "settlement_date")
     private Date settlementDate;
 
+    public String getInvoiceNum() {
+        return invoiceNum;
+    }
+
+    public void setInvoiceNum(String invoiceNum) {
+        this.invoiceNum = invoiceNum;
+    }
+
     @Column(name = "invoice_num")
     private String invoiceNum;
 
