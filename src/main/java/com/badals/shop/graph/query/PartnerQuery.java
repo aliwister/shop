@@ -6,6 +6,7 @@ import com.badals.shop.graph.MerchantProductResponse;
 import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.HashtagDTO;
+import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
@@ -28,12 +29,14 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
    private static final Logger log = LoggerFactory.getLogger(PartnerQuery.class);
 
    private final UserService userService;
+   private final TenantService tenantService;
 
-   public PartnerQuery(PartnerService partnerService, HashtagService hashtagService, CategoryService categoryService, UserService userService) {
+   public PartnerQuery(PartnerService partnerService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
       this.partnerService = partnerService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
+      this.tenantService = tenantService;
    }
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
@@ -97,7 +100,9 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
       }};
    }
 
-
+   public TenantDTO tenantByName(String name) {
+      return tenantService.findOneByName(name);
+   }
 
    //partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
    //partnerOrder(id: ID): Order
