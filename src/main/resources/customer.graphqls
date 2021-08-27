@@ -90,7 +90,9 @@ type AddressFormat {
 type FieldDescription {
     field: AddressField
     label: String
-    isRequired: Boolean
+    required: Boolean
+    minLength: Int
+    maxLength: Int
     regex: String
     fieldType: FieldType
     options: [Option]

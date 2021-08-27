@@ -30,4 +30,7 @@ public interface TenantRepository extends JpaRepository<Tenant, Long> {
     @Query("select tenant from Tenant tenant left join fetch tenant.merchants left join fetch tenant.customers where tenant.id =:id")
     Optional<Tenant> findOneWithEagerRelationships(@Param("id") Long id);
 
+    @Query
+    Optional<Tenant> findByNameIgnoreCase(String name);
+
 }

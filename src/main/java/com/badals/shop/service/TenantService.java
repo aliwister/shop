@@ -93,4 +93,8 @@ public class TenantService {
         log.debug("Request to delete Tenant : {}", id);
         tenantRepository.deleteById(id);
     }
+
+    public TenantDTO findOneByName(String name) {
+        return tenantRepository.findByNameIgnoreCase(name).map(tenantMapper::toDto).orElse(null);
+    }
 }

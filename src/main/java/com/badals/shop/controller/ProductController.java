@@ -41,7 +41,8 @@ public class ProductController {
    @ResponseBody
    @ResponseStatus(OK)
    public Mono<ProductDTO> slug(@PathVariable("slug") String sku) throws PricingException, NoOfferException, ExecutionException, InterruptedException, ProductNotFoundException {
-      return productService.getBySlugMono(sku);
+      Mono<ProductDTO> mono =  productService.getBySlugMono(sku);
+      return mono;
    }
 
    @RequestMapping(path="/product/sku",method = RequestMethod.POST)
