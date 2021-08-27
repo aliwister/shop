@@ -185,8 +185,20 @@ extend type Query {
     brands: [I18String]
     collections: [I18String]
     currencies: [Currency]
+    tenantByName (name: String): Tenant
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
+}
+
+type Tenant {
+    name: String
+    maxProducts: Int
+    planName: String
+    discountRate: Int
+    active: Boolean
+    monthlyFee: BigDecimal
+    skuPrefix: String
+    contractStartDate: LocalDate
 }
 
 extend type Mutation {
