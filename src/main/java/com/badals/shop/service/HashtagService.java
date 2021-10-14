@@ -6,6 +6,7 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.HashtagRepository;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.mapper.HashtagMapper;
+import com.badals.shop.service.tenant.TenantProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +32,14 @@ public class HashtagService {
     private final HashtagRepository hashtagRepository;
 
     private final ProductIndexService productIndexService;
+    private final TenantProductService productService;
 
     private final HashtagMapper hashtagMapper;
 
-    public HashtagService(HashtagRepository hashtagRepository, ProductIndexService productIndexService, HashtagMapper hashtagMapper) {
+    public HashtagService(HashtagRepository hashtagRepository, ProductIndexService productIndexService, TenantProductService productService, HashtagMapper hashtagMapper) {
         this.hashtagRepository = hashtagRepository;
         this.productIndexService = productIndexService;
+        this.productService = productService;
         this.hashtagMapper = hashtagMapper;
     }
 
@@ -91,7 +94,7 @@ public class HashtagService {
         hashtagRepository.deleteById(id);
     }
 
-    public HashtagResponse findForList(Integer offset,Integer limit ) {
+    public HashtagResponse findForList(String tenant, Integer offset,Integer limit ) {
         Page<Hashtag> orders = hashtagRepository.findForList(/*orderState, */PageRequest.of((int) offset/limit,limit));
         HashtagResponse response = new HashtagResponse();
         response.setTotal(orders.getNumber());
@@ -129,7 +132,8 @@ public class HashtagService {
         return response;
     }
 
-   public ProductResponse hashtagProducts(String tag) {
-       return productIndexService.findByHashtag(tag);
+   public ProductResponse hashtagProducts(String tenant, String tag) {
+
+      return productIndexService.findByTenantAndHashtag(tenant, tag);
    }
 }

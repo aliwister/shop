@@ -72,7 +72,7 @@ public class AddProductDTO {
    Long merchantId;
 
    String url;
-   String dial;
+
 
    Boolean inStock;
    List<String> hashtags;

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.List;
 import java.util.Locale;
@@ -59,8 +58,6 @@ public class CartMutation implements GraphQLMutationResolver {
     @Value("${badals.checkout-app}")
     String checkoutAppUrl;
 
-    @Autowired
-    private LocaleResolver locale;
 
     public CartMutation(CartService cartService, CheckoutCartRepository checkoutCartRepository) {
         this.cartService = cartService;

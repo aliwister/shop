@@ -1,11 +1,14 @@
 package com.badals.shop.web.rest.vm;
 
+import lombok.Data;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
  * View Model object for storing a user's credentials.
  */
+@Data
 public class LoginVM {
 
     @NotNull
@@ -18,29 +21,7 @@ public class LoginVM {
 
     private Boolean rememberMe;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Boolean isRememberMe() {
-        return rememberMe;
-    }
-
-    public void setRememberMe(Boolean rememberMe) {
-        this.rememberMe = rememberMe;
-    }
+    private String csrfToken;
 
     @Override
     public String toString() {
