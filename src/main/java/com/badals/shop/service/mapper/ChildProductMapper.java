@@ -2,6 +2,8 @@ package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
+import com.badals.shop.domain.ProfileProduct;
+import com.badals.shop.domain.ProfileStock;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.service.dto.ProductDTO;
@@ -19,28 +21,27 @@ import java.util.List;
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
  */
 @Mapper(componentModel = "spring", uses = {ProductLangMapper.class, MerchantStockMapper.class, ProductLangMapper.class})
-public interface ChildProductMapper extends EntityMapper<ChildProduct, Product> {
+public interface ChildProductMapper extends EntityMapper<ChildProduct, ProfileProduct> {
 
-    @Mapping(target = "productLangs", ignore = true)
-    @Mapping(target = "removeProductLang", ignore = true)
-    @Mapping(target = "merchantStock", ignore = true)
+    //@Mapping(target = "productLangs", ignore = true)
+    //@Mapping(target = "removeProductLang", ignore = true)
+    //@Mapping(target = "merchantStock", ignore = true)
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
     @Mapping(target = "title", source = "name")
-    @Mapping(target = "price", source = "priceObj.amount")
-    @Mapping(target = "currency", source = "priceObj.currency")
-    @Mapping(target = "dial", ignore = true)
-    Product toEntity(ChildProduct productDTO);
+    @Mapping(target = "price", source = "priceObj")
+    //@Mapping(target = "currency", source = "priceObj.currency")
+    ProfileProduct toEntity(ChildProduct productDTO);
 
-    @Mapping(source = "price", target = "priceObj.amount")
-    @Mapping(source = "currency", target = "priceObj.currency")
+    @Mapping(source = "price", target = "priceObj")
+    //@Mapping(source = "currency", target = "priceObj.currency")
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
-    @Mapping(source="dial.dial", target="dial")
-    ChildProduct toDto(Product product);
+    @Mapping(target = "price", ignore = true)
+    ChildProduct toDto(ProfileProduct product);
 
     @AfterMapping
-    default void afterMapping(@MappingTarget Product target, ChildProduct source) {
+    default void afterMapping(@MappingTarget ProfileProduct target, ChildProduct source) {
         if(source.getGallery() != null) {
             List<Gallery> gallery = new ArrayList<Gallery>();
             for(String g: source.getGallery()) {
@@ -49,26 +50,26 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, Product> 
             target.setGallery(gallery);
         }
 
-        BigDecimal price = source.priceObj.getAmount();
+        Price price = source.priceObj;
         assert(price != null);
 
         if(price != null) {
-            Double dPrice = price.doubleValue();
-            BigDecimal cost = source.costObj.getAmount();
-            Double salePrice = price.doubleValue();
-            if (source.getSalePriceObj() != null && source.getSalePriceObj().getAmount() != null) {
-                salePrice = source.getSalePriceObj().getAmount().doubleValue();
+            Double dPrice = price.getAmount().doubleValue();
+            Price cost = source.costObj;
+            Double salePrice = price.getAmount().doubleValue();
+            if (source.getSalePrice() != null ) {
+                salePrice = source.getSalePrice().doubleValue();
             }
             int discount = 100 * (int)((dPrice-salePrice)/dPrice);
-            target.getMerchantStock().add(new MerchantStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(cost).allow_backorder(false)
-                    .price(price).discount(discount).product(target));
+            target.getStock().add(new ProfileStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(cost).allow_backorder(false)
+                    .price(price).product(target));
         }
 
 
     }
 
     @AfterMapping
-    default void afterMapping(@MappingTarget ChildProduct target, Product source) {
+    default void afterMapping(@MappingTarget ChildProduct target, ProfileProduct source) {
         //if (source.getGallery() == null) {
         List<String> gallery = new ArrayList<String>();
         //}
@@ -81,19 +82,19 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, Product> 
         }
 
         // Process sale price and discount percentage
-        MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
+        ProfileStock stock = source.getStock().stream().findFirst().orElse(null);
         if (stock != null) {
-            target.setSalePriceObj(new Price(stock.getPrice(), source.getCurrency()));
-            target.setPriceObj(new Price(source.getPrice(), source.getCurrency()));
+            target.setSalePriceObj(stock.getPrice());
+            target.setPriceObj(source.getPrice());
             target.setDiscountInPercent(0);
-            target.setCostObj(new Price(stock.getCost(), source.getCurrency()));
+            target.setCostObj(stock.getCost());
             target.setQuantity(stock.getQuantity());
 
-            if(stock.getDiscount() != null) {
+/*            if(stock.getDiscount() != null) {
                 int discount = stock.getDiscount();
                 target.setDiscountInPercent(discount);
                 //target.setPrice(new BigDecimal((int)(10*stock.getPrice().doubleValue()/(1.0-discount*.01))/10.0 ));
-            }
+            }*/
             int hours = stock.getAvailability();
             /*
             @Todo

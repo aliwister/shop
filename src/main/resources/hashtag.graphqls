@@ -23,11 +23,12 @@ input HashtagInput {
 }
 
 extend type Query {
-    hashtags(offset: Int = 0
+    hashtags(tenant: String,
+             offset: Int = 0,
              limit: Int = 10): HashtagResponse
     hashtagsWithProducts(offset: Int = 0
                      limit: Int = 10): HashtagResponse
-    hashtagProducts(hashtag: String): ProductResponse
+    hashtagProducts(tenant: String, hashtag: String): ProductResponse
 }
 
 extend type Mutation {

@@ -33,7 +33,6 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
 
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
-    @Mapping(source="dial.dial", target="dial")
     AddProductDTO toDto(Product product);
 
     @Mapping(target="hours", source = "availability")
@@ -187,5 +186,8 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
         purchase.setId(id);
         return purchase;
     }
-
+    @Mapping(target = "price", ignore = true)
+    @Mapping(target = "gallery", ignore = true)
+    @Mapping(target = "merchant", ignore = true)
+   AddProductDTO toDto(ProfileProduct master);
 }

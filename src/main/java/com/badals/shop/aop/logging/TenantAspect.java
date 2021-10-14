@@ -28,7 +28,7 @@ public class TenantAspect {
    }
 
    @Around(value = "execution(* com.badals.shop.graph.mutation.MerchantMutation.*(..)) || execution(* com.badals.shop.graph.query.MerchantQuery.*(..)) || " +
-           "execution(* com.badals.shop.graph.mutation.PartnerMutation.*(..)) || execution(* com.badals.shop.graph.query.PartnerQuery.*(..))")
+           "execution(* com.badals.shop.graph.mutation.TenantMutation.*(..)) || execution(* com.badals.shop.graph.query.TenantQuery.*(..))")
    public Object assignForController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
       return assignTenant(proceedingJoinPoint);
    }

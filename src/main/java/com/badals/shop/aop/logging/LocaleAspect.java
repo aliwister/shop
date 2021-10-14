@@ -19,6 +19,8 @@ public class LocaleAspect {
 
     @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..)) || "+
             "execution(* com.badals.shop.graph.query.ProductQuery.getProductBySku(..)) || " +
+            "execution(* com.badals.shop.graph.query.TenantQuery.*(..)) || " +
+            "execution(* com.badals.shop.graph.mutation.TenantMutation.*(..)) || " +
             "execution(* com.badals.shop.*.product(..)))")
     public Object beforeWebMethodExecution1(ProceedingJoinPoint joinPoint) throws Throwable {
         setLocale(joinPoint);
@@ -40,8 +42,10 @@ public class LocaleAspect {
 /*                System.out.println("First parameter's name: " + key);
                 System.out.println("First argument's value: " + value);*/
 
-                if (key.equalsIgnoreCase("_locale"))
+                if (key.equalsIgnoreCase("_locale")) {
                     LocaleContext.setLocale(value);
+                    break;
+                }
 
                 i++;
             }

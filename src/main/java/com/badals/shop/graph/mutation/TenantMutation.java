@@ -1,12 +1,19 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.aop.logging.TenantContext;
+import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.domain.checkout.helper.PresignedUrl;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.graph.CartResponse;
+import com.badals.shop.graph.TenantCartResponse;
 import com.badals.shop.service.*;
+import com.badals.shop.service.dto.CartDTO;
+import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.pojo.ProductEnvelope;
+import com.badals.shop.service.tenant.TenantCartService;
+import com.badals.shop.service.tenant.TenantProductService;
 import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
@@ -14,18 +21,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Locale;
 
 
 @Component
-public class PartnerMutation implements GraphQLMutationResolver {
-    private final Logger log = LoggerFactory.getLogger(PartnerMutation.class);
+public class TenantMutation implements GraphQLMutationResolver {
+    private final Logger log = LoggerFactory.getLogger(TenantMutation.class);
 
-    private final PartnerService partnerService;
+    private final TenantProductService productService;
+    private final TenantCartService cartService;
 
     private final ProductLangService productLangService;
 
@@ -41,8 +52,9 @@ public class PartnerMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public PartnerMutation(PartnerService partnerService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
-        this.partnerService = partnerService;
+    public TenantMutation(TenantProductService productService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
+        this.productService = productService;
+        this.cartService = cartService;
         this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
@@ -57,7 +69,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         Integer code = 202;
 
         try {
-            p = partnerService.savePartnerProduct(product, true);
+            p = productService.savePartnerProduct(product, true);
             message.append("Success");
         }
         catch(Throwable e) {
@@ -85,12 +97,12 @@ public class PartnerMutation implements GraphQLMutationResolver {
     }
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public Message publishProduct(Long id) throws ProductNotFoundException {
-        partnerService.setProductPublished(id, true);
+        productService.setProductPublished(id, true);
         return new Message("Product published successfully");
     }
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public Message unpublishProduct(Long id) throws ProductNotFoundException {
-        partnerService.setProductPublished(id, false);
+        productService.setProductPublished(id, false);
         return new Message("Product set to draft successfully");
     }
     public Message setOrderState(OrderState value) {
@@ -99,9 +111,19 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public Message deleteProduct(Long id) throws ProductNotFoundException {
-        partnerService.deleteProduct(id);
+        productService.deleteProduct(id);
         return new Message("ok");
     }
 
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    public CartResponse updateTenantCart(final String secureKey, final List<CartItemDTO> items, boolean isMerge, String _locale) {
+        Locale l = LocaleContextHolder.getLocale();
+        CartDTO cart = this.cartService.updateCart(secureKey, items, isMerge);
+        CartResponse response = new CartResponse();
+        response.setCart(cart);
+        response.setSuccess(true);
+        response.setMessage("Cart Saved Successfully");
+        return response;
+    }
 }
 

@@ -12,6 +12,7 @@ import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.pojo.AddProductDTO;
+import com.badals.shop.service.tenant.TenantService;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
@@ -137,6 +138,15 @@ public class ProductIndexService {
     public ProductResponse findByHashtag(String hashtag) {
         //List<AddProductDTO> result = search(hashtag );
         List<AddProductDTO> result = productSearchRepository.findByHashtagsContains(hashtag);
+        ProductResponse response = new ProductResponse();
+        response.setTotal(6);
+        response.setHasMore(false);
+        response.setItems(result.stream().map(addProductMapper::toProductDto).collect(Collectors.toList()));
+        return response;
+    }
+    public ProductResponse findByTenantAndHashtag(String tenant, String hashtag) {
+        //List<AddProductDTO> result = search(hashtag );
+        List<AddProductDTO> result = productSearchRepository.findByTenantEqualsAndHashtagsContains(tenant, hashtag);
         ProductResponse response = new ProductResponse();
         response.setTotal(6);
         response.setHasMore(false);

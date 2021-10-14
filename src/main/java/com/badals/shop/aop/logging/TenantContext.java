@@ -7,6 +7,9 @@ public class TenantContext {
    private static ThreadLocal<Long> currentTenantId = new InheritableThreadLocal<>();
    private static ThreadLocal<Long> currentMerchantId = new InheritableThreadLocal<>();
 
+   private static ThreadLocal<String> currentProfile = new InheritableThreadLocal<>();
+   private static ThreadLocal<Long> currentProfileId = new InheritableThreadLocal<>();
+
    public static String getCurrentTenant() {
       return currentTenant.get();
    }
@@ -31,6 +34,21 @@ public class TenantContext {
       currentMerchant.set(tenant);
    }
 
+   public static String getCurrentProfile() {
+      return currentProfile.get();
+   }
+
+   public static void setCurrentProfile(String tenant) {
+      currentProfile.set(tenant);
+   }
+   public static Long getCurrentProfileId() {
+      return currentProfileId.get();
+   }
+
+   public static void setCurrentProfileId(Long tenant) {
+      currentProfileId.set(tenant);
+   }
+
    public static Long getCurrentMerchantId() {
       return currentMerchantId.get();
    }
@@ -44,5 +62,6 @@ public class TenantContext {
       currentMerchant.set(null);
       currentTenantId.set(null);
       currentMerchantId.set(null);
+      currentProfile.set(null);
    }
 }

@@ -30,7 +30,7 @@ public interface CustomerMapper extends EntityMapper<CustomerDTO, Customer> {
     @Named("plusCode")
     @AfterMapping
     default void doAfterMapping(@MappingTarget CustomerDTO dto) {
-        dto.setAddresses(dto.getAddresses().stream().filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
+        //dto.setAddresses(dto.getAddresses().stream().filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
     }
 
 
