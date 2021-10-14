@@ -1,9 +1,6 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.Category;
-import com.badals.shop.domain.MerchantStock;
-import com.badals.shop.domain.Product;
-import com.badals.shop.domain.ProductLang;
+import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
@@ -27,29 +24,32 @@ import java.util.stream.Collectors;
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
  */
 @Mapper(componentModel = "spring", uses = {ProductLangMapper.class, MerchantStockMapper.class, ProductLangMapper.class, ChildProductMapper.class})
-public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Product> {
+public interface PartnerProductMapper extends EntityMapper<PartnerProduct, ProfileProduct> {
 
-    @Mapping(source="langs", target = "productLangs")
+    //@Mapping(source="langs", target = "productLangs")
     @Mapping(source="options", target = "variationOptions")
-    @Mapping(target = "removeProductLang", ignore = true)
-    @Mapping(target = "merchantStock", ignore = true)
+    //@Mapping(target = "removeProductLang", ignore = true)
+    //@Mapping(target = "merchantStock", ignore = true)
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
+    @Mapping(target = "children", ignore = true)
+
     @Mapping(target = "title", source = "name")
-    @Mapping(target = "price", source = "priceObj.amount")
-    @Mapping(target = "currency", source = "priceObj.currency")
-    @Mapping(target = "dial", ignore = true)
-    Product toEntity(PartnerProduct productDTO);
+    @Mapping(target = "price", source = "priceObj")
+    //@Mapping(target = "currency", source = "priceObj.currency")
+    //@Mapping(target = "dial", ignore = true)
+    ProfileProduct toEntity(PartnerProduct productDTO);
 
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
-    @Mapping(source="dial.dial", target="dial")
-    @Mapping(source="productLangs", target = "langs")
+    //@Mapping(source="dial.dial", target="dial")
+    //@Mapping(source="productLangs", target = "langs")
     @Mapping(source="variationOptions", target = "options")
-    PartnerProduct toDto(Product product);
+    @Mapping(target = "price", ignore = true)
+    PartnerProduct toDto(ProfileProduct product);
 
     @AfterMapping
-    default void afterMapping(@MappingTarget Product target, PartnerProduct source) {
+    default void afterMapping(@MappingTarget ProfileProduct target, PartnerProduct source) {
         if(source.getGallery() != null) {
             List<Gallery> gallery = new ArrayList<Gallery>();
             for(String g: source.getGallery()) {
@@ -58,11 +58,14 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Produ
             target.setGallery(gallery);
         }
 
-/*        if(source.getType() == null)
+        if(source.getVariationType() == null)
             target.setVariationType(VariationType.SIMPLE);
         else
-            target.setVariationType(VariationType.valueOf(source.getType()));
+            target.setVariationType(VariationType.valueOf(source.getVariationType()));
 
+
+        //target(name);
+/*
         ProductLang langAr = new ProductLang().lang("ar").description(source.getDescription_ar()).title(source.getName_ar()).brand(source.getBrand_ar()).browseNode(source.getBrowseNode());
         if(source.getFeatures_ar() != null)
             langAr.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
@@ -115,7 +118,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Produ
     }
 
     @AfterMapping
-    default void afterMapping(@MappingTarget PartnerProduct target, Product source) {
+    default void afterMapping(@MappingTarget PartnerProduct target, ProfileProduct source) {
         String langCode = "en";
         //if (source.getGallery() == null) {
         List<String> gallery = new ArrayList<String>();
@@ -129,19 +132,19 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Produ
         }
 
         // Process sale price and discount percentage
-        MerchantStock stock = source.getMerchantStock().stream().findFirst().orElse(null);
+        ProfileStock stock = source.getStock().stream().findFirst().orElse(null);
         if (stock != null) {
-            target.setSalePriceObj(new Price(stock.getPrice(), source.getCurrency()));
-            target.setPriceObj(new Price(source.getPrice(), source.getCurrency()));
+            target.setSalePriceObj(stock.getPrice());
+            target.setPriceObj(source.getPrice());
             target.setDiscountInPercent(0);
-            target.setCostObj(new Price(stock.getCost(), source.getCurrency()));
+            target.setCostObj(stock.getCost());
             target.setQuantity(stock.getQuantity());
 
-            if(stock.getDiscount() != null) {
+/*            if(stock.getDiscount() != null) {
                 int discount = stock.getDiscount();
                 target.setDiscountInPercent(discount);
                 //target.setPrice(new BigDecimal((int)(10*stock.getPrice().doubleValue()/(1.0-discount*.01))/10.0 ));
-            }
+            }*/
             int hours = stock.getAvailability();
             /*
             @Todo
@@ -149,11 +152,8 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Produ
              */
             target.setAvailability(hours);
         }
-
-        ProductLang lang = source.getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
-        if(lang != null) {
-            target.setName(lang.getTitle());
-        }
+        String name = source.getLangs().stream().filter(x -> x != null && x.getLang().equals("en")).findFirst().get().getName();
+        target.setName(name);
     }
 
     default Product fromId(Long id) {
