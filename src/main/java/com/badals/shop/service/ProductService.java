@@ -490,10 +490,6 @@ public class ProductService {
         //dto.setImported(true);
 
 
-        if(dto.getDial() != null && dto.getDial().startsWith("*")) {
-            speedDialService.save(new SpeedDialDTO().dial(dto.getDial()).ref(product.getRef()).expires(Instant.now()));
-        }
-
         if(isSaveES)
             productIndexService.saveToElastic(dto);
         return  addProductMapper.toDto(product);
