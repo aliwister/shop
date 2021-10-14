@@ -4,7 +4,7 @@ public class LocaleContext {
    public static String getLocale() {
       String ret = locale.get();
       if (ret == null || ret.length() < 2)
-         return "en";
+         return "en-OM";
       return locale.get();
    }
 

@@ -1,12 +1,10 @@
 extend type Query {
-    cart(secureKey: String, items: [CartItemInput]): Cart
     rewards: [Reward]
 }
 
 extend type Mutation {
     updateCart(secureKey: String, items: [CartItemInput]): CartResponse
     createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
-
     createCheckout(secureKey: String): CheckoutSessionResponse  #For app
 }
 

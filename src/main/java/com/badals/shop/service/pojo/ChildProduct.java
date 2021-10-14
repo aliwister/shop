@@ -22,7 +22,7 @@ public class ChildProduct extends AddProductDTO {
    List<Attribute> variationAttributes;
    public Price priceObj = new Price();
    public Price salePriceObj = new Price();
-   public Price costObj= new Price();
+   public Price costObj = new Price();
 
    public Boolean isDirty;
    public Boolean active;

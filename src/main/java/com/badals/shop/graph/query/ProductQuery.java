@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -153,14 +152,14 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    }
 */
 
-   public HashtagResponse hashtags(Integer offset,Integer limit ) {
-      return hashtagService.findForList(offset, limit);
+   public HashtagResponse hashtags(String tenant, Integer offset,Integer limit ) {
+      return hashtagService.findForList(tenant, offset, limit);
    }
 
    public HashtagResponse hashtagsWithProducts(Integer offset,Integer limit ) {
       return hashtagService.findForListWithProducts(offset, limit);
    }
-   public ProductResponse hashtagProducts(String tag ) {
-      return hashtagService.hashtagProducts(tag);
+   public ProductResponse hashtagProducts(String tenant, String tag ) {
+      return hashtagService.hashtagProducts(tenant, tag);
    }
 }

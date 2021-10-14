@@ -146,7 +146,7 @@ type LineItem {
     sku: String
     image: String
     name: String
-    quantity: Float
+    quantity: Int
     price: Float
     cost: Float
     subTotal: Float

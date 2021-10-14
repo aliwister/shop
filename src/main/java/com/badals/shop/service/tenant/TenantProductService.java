@@ -1,22 +1,29 @@
-package com.badals.shop.service;
+package com.badals.shop.service.tenant;
 
 import com.badals.shop.aop.logging.TenantContext;
-import com.badals.shop.domain.MerchantStock;
-import com.badals.shop.domain.Product;
-import com.badals.shop.domain.ProductLang;
+import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
-import com.badals.shop.graph.MerchantProductResponse;
 import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.repository.ProductRepository;
+import com.badals.shop.graph.PartnerProductResponse;
+import com.badals.shop.graph.ProductResponse;
+import com.badals.shop.repository.ProfileHashtagRepository;
+import com.badals.shop.repository.ProfileProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
+import com.badals.shop.service.ProductIndexService;
+import com.badals.shop.service.RecycleService;
+import com.badals.shop.service.SlugService;
+import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
+import com.badals.shop.xtra.amazon.NoOfferException;
+import com.badals.shop.xtra.amazon.PricingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -26,9 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -36,16 +45,18 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
-public class PartnerService {
+public class TenantProductService {
 
-    private final Logger log = LoggerFactory.getLogger(PartnerService.class);
-    private final ProductRepository productRepository;
-    private final ProductService productService;
+    private final Logger log = LoggerFactory.getLogger(TenantProductService.class);
+    private final ProfileProductRepository productRepository;
     private final MessageSource messageSource;
-    private final ProductMapper productMapper;
     private final AddProductMapper addProductMapper;
     private final PartnerProductMapper partnerProductMapper;
     private final ChildProductMapper childProductMapper;
+
+    private final ProfileHashtagRepository hashtagRepository;
+    private final ProfileHashtagMapper profileHashtagMapper;
+    private final ProfileProductMapper productMapper;
 
     private final ProductLangMapper productLangMapper;
     private final ProductSearchRepository productSearchRepository;
@@ -54,14 +65,15 @@ public class PartnerService {
     private final SlugService slugService;
     private final ProductIndexService productIndexService;
 
-    public PartnerService(ProductRepository productRepository, ProductService productService, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService) {
+    public TenantProductService(ProfileProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, ProfileHashtagRepository hashtagRepository, ProfileHashtagMapper profileHashtagMapper, ProfileProductMapper profileProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService) {
         this.productRepository = productRepository;
-        this.productService = productService;
         this.messageSource = messageSource;
-        this.productMapper = productMapper;
+        this.productMapper = profileProductMapper;
         this.addProductMapper = addProductMapper;
         this.partnerProductMapper = partnerProductMapper;
         this.childProductMapper = childProductMapper;
+        this.hashtagRepository = hashtagRepository;
+        this.profileHashtagMapper = profileHashtagMapper;
         this.productLangMapper = productLangMapper;
         this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
@@ -71,8 +83,8 @@ public class PartnerService {
     }
 
     public PartnerProduct getPartnerProduct(Long id) {
-        Long merchantId = TenantContext.getCurrentMerchantId();
-        Product product = productRepository.findByIdJoinChildren(id, merchantId).get();
+        Long tenantId = TenantContext.getCurrentTenantId();
+        ProfileProduct product = productRepository.findByIdJoinChildren(id, tenantId).get();
         return partnerProductMapper.toDto(product);
     }
 
@@ -84,8 +96,9 @@ public class PartnerService {
 
     public PartnerProduct savePartnerProduct(PartnerProduct dto, boolean isSaveES) throws ProductNotFoundException, ValidationException {
         Long currentMerchantId = TenantContext.getCurrentMerchantId();
-        Product update = partnerProductMapper.toEntity(dto);
-        final Product master;
+        Long currentTenantId = TenantContext.getCurrentTenantId();
+        ProfileProduct update = partnerProductMapper.toEntity(dto);
+        final ProfileProduct master;
         boolean _new = dto.getId() == null;
 
         if(!_new)
@@ -97,11 +110,12 @@ public class PartnerService {
         if(_new) {
 
             Long ref = slugService.generateRef(dto.getSku(), currentMerchantId);
-            master.setRef(ref);
+            master.setRef(String.valueOf(ref));
             master.setSlug(String.valueOf(ref));
-            if(master.getProductLangs() != null)
-                master.getProductLangs().stream().forEach(x -> x.setProduct(master));
+/*            if(master.getProductLangs() != null)
+                master.getProductLangs().stream().forEach(x -> x.setProduct(master));*/
             master.setMerchantId(currentMerchantId);
+            master.setTenantId(currentTenantId);
         }
         else {
             if(master.getSku().equals(update.getSku())) {
@@ -111,7 +125,7 @@ public class PartnerService {
                 //master.setSlug(ref);
             }
             master.setTitle(update.getTitle());
-
+            master.setLangs(update.getLangs());
             master.setWeight(update.getWeight());
             master.setPrice(update.getPrice());
             master.setImage(update.getImage());
@@ -122,19 +136,19 @@ public class PartnerService {
             master.setGallery(update.getGallery());
             master.setVariationOptions(update.getVariationOptions());
 
-            saveLang(master, update);
+            //saveLang(master, update);
         }
 
         if(update.getChildren() == null || update.getVariationType().equals(VariationType.SIMPLE)) {
             assert(dto.getPriceObj() != null);
             master.setVariationType(VariationType.SIMPLE);
-            MerchantStock stock  = null;
-            if(master.getMerchantStock() != null) {
-                stock = master.getMerchantStock().stream().findFirst().orElse(new MerchantStock());
-                stock = setMerchantStock(stock, master, dto.getPriceObj(), dto.getSalePriceObj(), dto.getCostObj(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
+            ProfileStock stock  = null;
+            if(master.getStock() != null) {
+                stock = master.getStock().stream().findFirst().orElse(new ProfileStock());
+                stock = setStock(stock, master, dto.getPriceObj(), dto.getSalePriceObj()==null?dto.getPriceObj():dto.getSalePriceObj(), dto.getCostObj(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
             }
             if(stock != null && stock.getId() == null)
-                master.addMerchantStock(stock);
+                master.addStock(stock);
         }
         else { // PARENT    //if(product.getVariationType().equals(VariationType.PARENT)) {
             assert(dto.getPriceObj() == null);
@@ -150,26 +164,26 @@ public class PartnerService {
         productRepository.save(master);
 
         AddProductDTO esDto = addProductMapper.toDto(master);
-        if(isSaveES)
-            productIndexService.saveToElastic(esDto);
+/*        if(isSaveES)
+            productIndexService.saveToElastic(esDto);*/
         return partnerProductMapper.toDto(master);
     }
 
-    private void saveChildren(Product master, Product update, PartnerProduct dto, Long currentMerchantId, boolean _new) {
-        Set<Product> masterChildren = master.getChildren();
-        Set<Product> updateChildren = update.getChildren();
+    private void saveChildren(ProfileProduct master, ProfileProduct update, PartnerProduct dto, Long currentMerchantId, boolean _new) {
+        Set<ProfileProduct> masterChildren = master.getChildren();
+        Set<ProfileProduct> updateChildren = update.getChildren();
 
 
         if(_new) {
             if(masterChildren != null)
-                masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(String.valueOf(slugService.generateRef(x.getSku(), currentMerchantId))).merchantId(currentMerchantId).ref(Long.valueOf(x.getSlug())).title(master.getTitle()).parent(master).getMerchantStock().forEach(y -> y.setMerchantId(currentMerchantId)));
+                masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(String.valueOf(slugService.generateRef(x.getSku(), currentMerchantId))).merchantId(currentMerchantId).ref(x.getSlug()).title(master.getTitle()).parent(master));
             return;
         }
         // Delete removed
-        List<Product> remove = new ArrayList<Product>();
-        for (Product c : masterChildren) {
+        List<ProfileProduct> remove = new ArrayList<ProfileProduct>();
+        for (ProfileProduct c : masterChildren) {
             //product.getChildren().stream().forEach(x -> x.variationType(VariationType.SIMPLE).active(true).ref(Long.parseLong(product.getRef().toString() + i++)).setParent(product));
-            Product pl = updateChildren.stream().filter(x -> x.getId() != null && x.getId().equals(c.getId())).findFirst().orElse(null);
+            ProfileProduct pl = updateChildren.stream().filter(x -> x.getId() != null && x.getId().equals(c.getId())).findFirst().orElse(null);
             if (pl == null) {
                 recyleImages(master, c);
                 remove.add(c);
@@ -177,20 +191,20 @@ public class PartnerService {
         }
         masterChildren.removeAll(remove);
 
-        for (Product c: updateChildren) {
+        for (ProfileProduct c: updateChildren) {
 
             if (c == null || c.getId() == null) {
                 String ref = currentMerchantId.toString() + String.valueOf(ChecksumUtil.getChecksum(c.getSku()));
-                c.setRef(Long.valueOf(ref));
+                c.setRef(ref);
                 c.setSlug(ref);
                 c.setActive(true);
                 c.setTitle(generateTitle(master.getTitle(), c.getVariationAttributes()));
                 c.setMerchantId(currentMerchantId);
-                c.getMerchantStock().stream().findFirst().get().setMerchantId(currentMerchantId);
+                //c.getStock().stream().findFirst().get().setMerchantId(currentMerchantId);
                 master.addChild(c);
                 continue;
             }
-            Product pl = masterChildren.stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
+            ProfileProduct pl = masterChildren.stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
             ChildProduct dto2 = dto.getChildren().stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
 /*            if(!dto2.isDirty)
                 continue;*/
@@ -202,10 +216,10 @@ public class PartnerService {
             pl.setImage(c.getImage());
             pl.setGallery(c.getGallery());
             pl.sku(c.getSku()).image(c.getImage()).upc(c.getUpc()).weight(c.getWeight()).gallery(c.getGallery());
-            MerchantStock stock = pl.getMerchantStock().stream().findFirst().orElse(new MerchantStock());
-            stock = setMerchantStock(stock, master, dto2.getPriceObj(), dto2.getSalePriceObj(), dto2.getCostObj(), dto2.getQuantity(), dto2.getAvailability(), currentMerchantId);
+            ProfileStock stock = pl.getStock().stream().findFirst().orElse(new ProfileStock());
+            stock = setStock(stock, master, dto2.getPriceObj(), dto2.getSalePriceObj(), dto2.getCostObj(), dto2.getQuantity(), dto2.getAvailability(), currentMerchantId);
             if(stock.getId() == null)
-                pl.addMerchantStock(stock);
+                pl.addStock(stock);
 
         }
     }
@@ -216,7 +230,7 @@ public class PartnerService {
 
 
     public void deleteImage(Long id, String image) throws ProductNotFoundException {
-        final Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+        final ProfileProduct product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
         List<Gallery> gallery = product.getGallery();
         gallery.remove(new Gallery(image));
         productRepository.saveAndFlush(product);
@@ -224,7 +238,7 @@ public class PartnerService {
         recycleService.recycleS3("s3", image);
     }
 
-    public void recyleImages(Product parent, Product child) {
+    public void recyleImages(ProfileProduct parent, ProfileProduct child) {
         List<Gallery> gallery = parent.getGallery();
         if (gallery.indexOf(new Gallery(child.getImage())) < 0) {
             recycleService.recycleS3("s3", child.getImage());
@@ -237,32 +251,8 @@ public class PartnerService {
         }
     }
 
-    private void saveLang(Product master, Product update) {
-        Set<ProductLang> masterLangs = master.getProductLangs();
-        Set<ProductLang> langs = update.getProductLangs();
 
-        // Delete removed
-        for (ProductLang lang: masterLangs) {
-            ProductLang pl = langs.stream().filter(x -> x.getLang().equals(lang.getLang())).findFirst().orElse(null);
-            if (pl == null)
-                masterLangs.remove(pl);
-        }
-
-        for (ProductLang lang: langs) {
-            ProductLang pl = masterLangs.stream().filter(x -> x.getLang().equals(lang.getLang())).findFirst().orElse(null);
-            if(lang.getLang().equals("en")) {
-                master.setTitle(lang.getTitle());
-            }
-            if (pl == null)
-                master.addProductLang(lang);
-            else if (!pl.equals(lang)) {
-                pl.setFeatures(lang.getFeatures());
-                pl.title(lang.getTitle()).description(lang.getDescription()).brand(lang.getBrand()).model(lang.getModel());
-            }
-        }
-    }
-
-    private MerchantStock setMerchantStock(MerchantStock stock, Product master, Price priceObj, Price salePriceObj, Price costPriceObj, BigDecimal quantity, Integer availability, Long currentMerchantId) {
+    private ProfileStock setStock(ProfileStock stock, ProfileProduct master, Price priceObj, Price salePriceObj, Price costPriceObj, BigDecimal quantity, Integer availability, Long currentMerchantId) {
 
         if(priceObj == null)
             throw new ValidationException("Price is null");
@@ -283,20 +273,20 @@ public class PartnerService {
         if(quantity == null)
             quantity = BigDecimal.ZERO;
 
-        return stock.quantity(quantity).availability(availability).cost(costPriceObj==null?BigDecimal.ZERO:costPriceObj.getAmount()).allow_backorder(false)
-                .price(price).discount(discount).product(master).merchantId(currentMerchantId);
+        return stock.quantity(quantity).availability(availability).cost(costPriceObj).allow_backorder(false)
+                .price(salePriceObj).product(master);
     }
 
-    public MerchantProductResponse findPartnerProducts(String text, Integer limit, Integer offset, Boolean active) {
+    public PartnerProductResponse findPartnerProducts(String text, Integer limit, Integer offset, Boolean active) {
         //List<AddProductDTO> result = search("tenant:"+currentTenant + " AND imported:" + imported.toString() + ((text != null)?" AND "+text:""));
-        Long currentMerchantId = TenantContext.getCurrentMerchantId();
+        Long tenantId = TenantContext.getCurrentTenantId();
         String like = null;
         if(text != null)
             like = "%"+text+"%";
 
-        Integer total = productRepository.countForTenantActive(currentMerchantId, active, like, VariationType.CHILD);
-        List<Product> result = productRepository.listForTenantActive(currentMerchantId, active, like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
-        MerchantProductResponse response = new MerchantProductResponse();
+        Integer total = productRepository.countForTenant(tenantId, like, VariationType.CHILD);
+        List<ProfileProduct> result = productRepository.listForTenantAll(tenantId, like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
+        PartnerProductResponse response = new PartnerProductResponse();
         response.setTotal(total);
         response.setHasMore((limit + offset) < total);
         response.setItems(result.stream().map(partnerProductMapper::toDto).collect(Collectors.toList()));
@@ -304,13 +294,13 @@ public class PartnerService {
     }
 
     public void deleteProduct(Long id) throws ProductNotFoundException {
-        final Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+        final ProfileProduct product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
         verifyOwnership(product);
         productRepository.delete(true, id);
     }
 
    public void setProductPublished(Long id, Boolean value) throws ProductNotFoundException {
-       final Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+       final ProfileProduct product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
        verifyOwnership(product);
 
        product.setActive(value);
@@ -320,11 +310,64 @@ public class PartnerService {
        productRepository.save(product);
    }
 
-    private void verifyOwnership(Product product) throws ProductNotFoundException {
-        Long mId = TenantContext.getCurrentMerchantId();
-        if(product.getMerchantId() != mId)
+    private void verifyOwnership(ProfileProduct product) throws ProductNotFoundException {
+        Long mId = TenantContext.getCurrentTenantId();
+        if(product.getTenantId().longValue() != mId)
             throw new ProductNotFoundException("Product not available");
     }
 
 
+    public ProductResponse findByHashtagAndTenantId(String tag, Long tenantId) {
+        List<ProductDTO> products = productRepository.findActiveTagProductsForTenant(tag, tenantId).stream().map(productMapper::toDto).collect(Collectors.toList());
+        ProductResponse response = new ProductResponse();
+        response.setItems(products);
+        response.setTotal(products.size());
+        response.setHasMore(false);
+        return response;
+    }
+
+    public List<ProfileHashtagDTO> getTags(Long tenantId) {
+        return hashtagRepository.findForList(tenantId).stream().map(profileHashtagMapper::toDto).collect(Collectors.toList());
+    }
+
+    public ProductDTO findProductBySlug(String slug) throws ProductNotFoundException {
+        Long profileId = TenantContext.getCurrentProfileId();
+        ProfileProduct product = productRepository.findBySlug(slug, profileId).get();
+
+        if(product == null)
+            throw new ProductNotFoundException("Invalid Product");
+
+        if(product.getVariationType().equals(VariationType.PARENT)) {
+            if(product.getChildren().size() <1)
+                throw new ProductNotFoundException("Lonely Parent");
+            product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().orElse(product.getChildren().stream().findFirst().get());
+        }
+        if(product.getStub() != null && product.getStub()) {
+            //Product p = lookup(product.getSku());
+            return productMapper.toDto(product);
+        }
+
+        if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
+            //Product p = lookup(product.getSku());
+            product.setStub(true);
+            return productMapper.toDto(product);
+            //return this.getProductBySku(p, product.getSku());
+        }
+/*        else if (product.getExpires() == null && product.getUpdated().isBefore(Instant.now().minusSeconds(DEFAULT_WINDOW))) {
+            product.setStub(true);
+            return productMapper.toDto(product);
+            //Product p = lookup(product.getSku());
+            //return this.getProductBySku(p, product.getSku());
+        }*/
+
+        return productRepository.findBySlug(slug, profileId).map(productMapper::toDto).orElse(null);
+
+    }
+
+    public boolean exists(String productId) {
+        if (productRepository.findOneByRef(productId).isPresent())
+            return true;
+
+        return false;
+    }
 }

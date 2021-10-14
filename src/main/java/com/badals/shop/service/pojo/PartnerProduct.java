@@ -1,6 +1,7 @@
 package com.badals.shop.service.pojo;
 
 import com.badals.shop.domain.pojo.Price;
+import com.badals.shop.domain.pojo.TenantProductLang;
 import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.service.dto.ProductLangDTO;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class PartnerProduct extends AddProductDTO {
 
    String model;
 
-   List<ProductLangDTO> langs;
+   List<TenantProductLang> langs;
    List<VariationOption> options;
 
 }

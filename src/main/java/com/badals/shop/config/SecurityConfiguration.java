@@ -87,6 +87,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/product/**").permitAll()
             .antMatchers("/pricing/**").permitAll()
             .antMatchers("/graphql").permitAll()
+            .antMatchers("/**/graphql").permitAll()
             .antMatchers("/detrack").permitAll()
             .antMatchers("/checkout1432u102398019238092183").permitAll()
             .antMatchers("/api/users/current").permitAll()
