@@ -11,7 +11,7 @@ import com.badals.shop.service.dto.*;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.tenant.TenantCartService;
 import com.badals.shop.service.tenant.TenantProductService;
-import com.badals.shop.service.tenant.TenantService;
+import com.badals.shop.service.TenantService;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
