@@ -22,7 +22,6 @@ import static com.badals.shop.domain.enumeration.Currency.*;
 @Component
 public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
 
-   private final PartnerService partnerService;
    private final HashtagService hashtagService;
 
    private final CategoryService categoryService;
@@ -31,8 +30,7 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
    private final UserService userService;
    private final TenantService tenantService;
 
-   public PartnerQuery(PartnerService partnerService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
-      this.partnerService = partnerService;
+   public PartnerQuery(HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
