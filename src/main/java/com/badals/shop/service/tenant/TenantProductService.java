@@ -14,6 +14,7 @@ import com.badals.shop.repository.search.ProductSearchRepository;
 import com.badals.shop.service.ProductIndexService;
 import com.badals.shop.service.RecycleService;
 import com.badals.shop.service.SlugService;
+import com.badals.shop.service.TenantService;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;

@@ -1,6 +1,6 @@
 package com.badals.shop.web.rest;
 
-import com.badals.shop.service.tenant.TenantService;
+import com.badals.shop.service.TenantService;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
 import com.badals.shop.service.dto.TenantDTO;
 

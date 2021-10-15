@@ -3,7 +3,7 @@ package com.badals.shop.web.rest;
 import com.badals.shop.ShopApp;
 import com.badals.shop.domain.Tenant;
 import com.badals.shop.repository.TenantRepository;
-import com.badals.shop.service.tenant.TenantService;
+import com.badals.shop.service.TenantService;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.mapper.TenantMapper;
 import com.badals.shop.web.rest.errors.ExceptionTranslator;

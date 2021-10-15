@@ -4,10 +4,12 @@ import com.badals.shop.domain.enumeration.Currency;
 import com.badals.shop.domain.pojo.I18String;
 import com.badals.shop.graph.MerchantProductResponse;
 import com.badals.shop.domain.pojo.VariationOption;
+import com.badals.shop.graph.PartnerProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
+import com.badals.shop.service.tenant.TenantProductService;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import static com.badals.shop.domain.enumeration.Currency.*;
 @Component
 public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
 
+   private final TenantProductService partnerService;
    private final HashtagService hashtagService;
 
    private final CategoryService categoryService;
@@ -30,7 +33,8 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
    private final UserService userService;
    private final TenantService tenantService;
 
-   public PartnerQuery(HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
+   public PartnerQuery(TenantProductService partnerService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
+      this.partnerService = partnerService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
@@ -42,7 +46,7 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
        return partnerService.getPartnerProduct(id);
     }
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
-   public MerchantProductResponse partnerProducts(String search, Integer limit, Integer offset, Boolean active) {
+   public PartnerProductResponse partnerProducts(String search, Integer limit, Integer offset, Boolean active) {
       return partnerService.findPartnerProducts(search, limit, offset, active);
    }
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
