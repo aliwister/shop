@@ -7,6 +7,7 @@ type Customer {
     totalPoints: Long
     spentPoints: Long
     addresses: [Address]
+    allowPickup: Boolean
 }
 
 type Address {
