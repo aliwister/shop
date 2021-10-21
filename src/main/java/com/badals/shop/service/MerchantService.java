@@ -82,4 +82,8 @@ public class MerchantService {
         log.debug("Request to delete Merchant : {}", id);
         merchantRepository.deleteById(id);
     }
+
+    public MerchantDTO merchantByDomain(String domain) {
+        return merchantRepository.findMerchantByDomain(domain).map(merchantMapper::toDto).orElse(null);
+    }
 }
