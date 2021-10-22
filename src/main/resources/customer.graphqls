@@ -8,6 +8,7 @@ type Customer {
     spentPoints: Long
     addresses: [Address]
     allowPickup: Boolean
+    plusDiscount: Int
 }
 
 type Address {

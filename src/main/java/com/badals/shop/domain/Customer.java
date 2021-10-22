@@ -76,6 +76,10 @@ public class Customer implements Serializable {
     @Column(name = "allow_pickup")
     private Boolean allowPickup;
 
+    @Getter @Setter
+    @Column(name = "plus_discount")
+    private Integer plusDiscount;
+
     @Column(name = "reset_password_token")
     private String resetKey;
 
