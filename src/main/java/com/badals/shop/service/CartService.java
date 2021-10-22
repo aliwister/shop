@@ -7,6 +7,7 @@ import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
 import com.badals.shop.domain.checkout.helper.CheckoutCartMapper;
 import com.badals.shop.domain.checkout.helper.CheckoutLineItemMapper;
+import com.badals.shop.domain.checkout.helper.LineItem;
 import com.badals.shop.repository.*;
 import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.repository.projection.CartItemInfo;
@@ -262,7 +263,7 @@ public class CartService {
         return this.createCheckoutWithCart(secureKey, items).getSecureKey();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CheckoutCart createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
         //Cart cart = cartRepository.findBySecureKey(secureKey).orElse(new Cart()); //cartMapper.toEntity(cartDTO);
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
@@ -284,6 +285,26 @@ public class CartService {
         checkoutCart.setSecureKey(cart.getSecureKey());
         checkoutCart.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
         checkoutCart.setEmail(cart.getCustomer().getEmail());
+        checkoutCart.setAllowPickup(customer.getAllowPickup());
+
+        checkoutCart = checkoutCartRepository.save(checkoutCart);
+        return checkoutCart;
+    }
+
+    @Transactional
+    public CheckoutCart createCheckoutPlus(String secureKey, List<LineItem> items) {
+        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+        Customer customer = customerRepository.findByIdJoinAddresses(loginUser.getId()).get();
+
+        CheckoutCart checkoutCart = new CheckoutCart();
+        checkoutCart.setItems(items);
+        if (customer.getAddresses() != null && customer.getAddresses().size() > 0)
+            checkoutCart.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
+        checkoutCart.setSecureKey(secureKey);
+        checkoutCart.setName(customer.getFirstname() + " " + customer.getFirstname());
+        checkoutCart.setEmail(customer.getEmail());
+        checkoutCart.setAllowPickup(customer.getAllowPickup());
+        checkoutCart.setPhone(customer.getMobile());
 
         checkoutCart = checkoutCartRepository.save(checkoutCart);
         return checkoutCart;
