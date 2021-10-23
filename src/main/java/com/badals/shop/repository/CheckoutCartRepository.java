@@ -19,4 +19,6 @@ import java.util.Optional;
 public interface CheckoutCartRepository extends JpaRepository<CheckoutCart, Long> {
 
     Optional<CheckoutCart> findBySecureKey(String secureKey);
+
+    Optional<CheckoutCart> findBySecureKeyAndCheckedOut(String secureKey, Boolean checkedOut);
 }

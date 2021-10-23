@@ -141,41 +141,6 @@ type PurchaseQueue {
     merchantId: Long
 }
 
-type LineItem {
-    productId: Int
-    sku: String
-    image: String
-    name: String
-    quantity: Float
-    price: Float
-    cost: Float
-    subTotal: Float
-    url: String
-}
-type CheckoutCart {
-    id: ID!
-    ref: String
-    name: String
-    phone: String
-    email: String
-    secureKey: String
-    carrier: String
-    currency: String
-    items: [LineItem]
-    #tenantId: Long
-}
-input LineItemInput {
-    productId: Long
-    sku: String
-    image: String
-    name: String
-    quantity: Float
-    price: Float
-    cost: Float
-    subTotal: Float
-    url: String
-    ref: String
-}
 
 input AddressPojo {
     id: ID
@@ -239,8 +204,6 @@ extend type Mutation {
     sendOrderLevelEmail(id:ID, template:String): Message
     sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
 
-    createCart(cart: CheckoutCartInput): CheckoutCart
-    createPlusCart(items: [LineItemInput]): CheckoutCart
     editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
     #cancelOrder(id: ID): Order
     refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment

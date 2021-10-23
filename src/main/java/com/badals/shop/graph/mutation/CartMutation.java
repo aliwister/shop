@@ -127,8 +127,8 @@ public class CartMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    public CheckoutCart createPlusCart(List<LineItem> items) {
-        CheckoutCart cart = cartService.createCheckoutPlus(CartService.createUIUD(), items);
+    public CheckoutCart createPlusCart(String secureKey, List<LineItem> items) {
+        CheckoutCart cart = cartService.createCheckoutPlus(secureKey, items);
         return cart;
     }
 }
