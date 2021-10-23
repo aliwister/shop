@@ -296,11 +296,24 @@ public class CartService {
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
         Customer customer = customerRepository.findByIdJoinAddresses(loginUser.getId()).get();
 
-        CheckoutCart checkoutCart = new CheckoutCart();
+        //if (secureKey == null)
+        CheckoutCart checkoutCart;
+        if (secureKey == null)
+            checkoutCart = new CheckoutCart();
+        else
+            checkoutCart = checkoutCartRepository.findBySecureKeyAndCheckedOut(secureKey, false).orElse(new CheckoutCart());
+
+
         checkoutCart.setItems(items);
         if (customer.getAddresses() != null && customer.getAddresses().size() > 0)
             checkoutCart.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
-        checkoutCart.setSecureKey(secureKey);
+
+        if(checkoutCart.getId() == null )
+            checkoutCart.setSecureKey(CartService.createUIUD());
+
+
+
+
         checkoutCart.setName(customer.getFirstname() + " " + customer.getFirstname());
         checkoutCart.setEmail(customer.getEmail());
         checkoutCart.setAllowPickup(customer.getAllowPickup());
@@ -321,4 +334,13 @@ public class CartService {
    public CheckoutCart createCustomCart(CheckoutCart cart) {
         return cart;
    }
+
+    public CheckoutCart plusCart(String secureKey) {
+        CheckoutCart cart = checkoutCartRepository.findBySecureKey(secureKey).orElse(null);
+        if(cart != null) {
+            if(cart.getCheckedOut() != null && cart.getCheckedOut())
+                return null;
+        }
+        return cart;
+    }
 }
