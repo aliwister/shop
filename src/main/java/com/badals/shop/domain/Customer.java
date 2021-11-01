@@ -2,6 +2,8 @@ package com.badals.shop.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
@@ -33,6 +35,8 @@ public class Customer implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_customer")
     private Long id;
+
+
 
     @Column(name = "company")
     private String company;
@@ -67,6 +71,14 @@ public class Customer implements Serializable {
 
     @Column(name = "active")
     private Integer active;
+
+    @Getter @Setter
+    @Column(name = "allow_pickup")
+    private Boolean allowPickup;
+
+    @Getter @Setter
+    @Column(name = "plus_discount")
+    private Integer plusDiscount;
 
     @Column(name = "reset_password_token")
     private String resetKey;

@@ -1,11 +1,15 @@
 extend type Query {
     rewards: [Reward]
+    plusCart(secureKey: String): CheckoutCart
 }
 
 extend type Mutation {
     updateCart(secureKey: String, items: [CartItemInput]): CartResponse
     createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
     createCheckout(secureKey: String): CheckoutSessionResponse  #For app
+
+    createCart(cart: CheckoutCartInput): CheckoutCart
+    createPlusCart(secureKey: String, items: [LineItemInput]): CheckoutCart
 }
 
 enum CartState {
@@ -78,4 +82,41 @@ type Reward {
     discountValue: Long
     discountValidDays: Long
     points: Long
+}
+
+type LineItem {
+    productId: Long
+    sku: String
+    image: String
+    name: String
+    quantity: Float
+    price: Float
+    cost: Float
+    subTotal: Float
+    url: String
+    ref: String
+}
+type CheckoutCart {
+    id: ID!
+    ref: String
+    name: String
+    phone: String
+    email: String
+    secureKey: String
+    carrier: String
+    currency: String
+    items: [LineItem]
+    #tenantId: Long
+}
+input LineItemInput {
+    productId: Long
+    sku: String
+    image: String
+    name: String
+    quantity: Float
+    price: Float
+    cost: Float
+    subTotal: Float
+    url: String
+    ref: String
 }
