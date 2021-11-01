@@ -1,10 +1,15 @@
 package com.badals.shop.graph.mutation;
 
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.domain.checkout.helper.LineItem;
+import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.graph.CartResponse;
 import com.badals.shop.graph.CheckoutSessionResponse;
 import com.badals.shop.repository.CheckoutCartRepository;
+import com.badals.shop.repository.CustomerRepository;
 import com.badals.shop.service.CartService;
+import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.pojo.CheckoutSession;
@@ -13,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -54,14 +60,17 @@ public class CartMutation implements GraphQLMutationResolver {
 
     private final CheckoutCartRepository checkoutCartRepository;
 
-
+    private final UserService userService;
+    private final CustomerRepository customerRepository;
     @Value("${badals.checkout-app}")
     String checkoutAppUrl;
 
 
-    public CartMutation(CartService cartService, CheckoutCartRepository checkoutCartRepository) {
+    public CartMutation(CartService cartService, CheckoutCartRepository checkoutCartRepository, UserService userService, CustomerRepository customerRepository) {
         this.cartService = cartService;
         this.checkoutCartRepository = checkoutCartRepository;
+        this.userService = userService;
+        this.customerRepository = customerRepository;
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
@@ -111,6 +120,12 @@ public class CartMutation implements GraphQLMutationResolver {
     public CheckoutCart createCart(CheckoutCart cart) {
         cart.setSecureKey(CartService.createUIUD());
         cart = checkoutCartRepository.save(cart);
+        return cart;
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public CheckoutCart createPlusCart(String secureKey, List<LineItem> items) {
+        CheckoutCart cart = cartService.createCheckoutPlus(secureKey, items);
         return cart;
     }
 }

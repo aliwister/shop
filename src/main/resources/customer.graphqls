@@ -7,6 +7,8 @@ type Customer {
     totalPoints: Long
     spentPoints: Long
     addresses: [Address]
+    allowPickup: Boolean
+    plusDiscount: Int
 }
 
 type Address {
@@ -57,6 +59,7 @@ extend type Query {
     customer(mobile: String): Customer
     #getAddress(addressId: Int): Address
     me: Customer
+    mePlus: Customer
     meTest(id: Long): Customer
     customers: [Customer]
     addresses: AddressList

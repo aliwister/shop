@@ -239,7 +239,6 @@ extend type Mutation {
     sendOrderLevelEmail(id:ID, template:String): Message
     sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
 
-    createCart(cart: CheckoutCartInput): CheckoutCart
     editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
     #cancelOrder(id: ID): Order
     refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment

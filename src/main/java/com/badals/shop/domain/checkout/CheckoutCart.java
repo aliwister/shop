@@ -73,7 +73,10 @@ public class CheckoutCart implements Serializable {
     private Long tenantId;
 
     @Column(name="allow_pickup")
-    private Boolean allowPickup;
+    private Boolean allowPickup = false;
+
+    @Column(name="checked_out")
+    private Boolean checkedOut = false;
 
     @Override
     public boolean equals(Object o) {
