@@ -1,5 +1,6 @@
 package com.badals.shop.graph.query;
 
+import com.badals.shop.domain.checkout.CheckoutCart;
 import com.badals.shop.service.CartService;
 import com.badals.shop.service.RewardService;
 import com.badals.shop.service.dto.CartDTO;
@@ -62,6 +63,11 @@ public class CartQuery extends ShopQuery implements GraphQLQueryResolver {
 
     public List<RewardDTO> rewards() {
         return rewardService.findAll();
+    }
+
+
+    public CheckoutCart plusCart(final String secureKey) {
+        return cartService.plusCart(secureKey);
     }
 }
 

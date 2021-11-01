@@ -1,5 +1,8 @@
 package com.badals.shop.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 import java.io.Serializable;
@@ -23,6 +26,11 @@ public class Merchant implements Serializable {
 
     @Column(name = "added")
     private Instant added;
+
+    @Getter
+    @Setter
+    @Column(name = "domain")
+    private String domain;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
