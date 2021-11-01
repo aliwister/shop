@@ -69,7 +69,16 @@ public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
 
     @PreAuthorize("hasRole('ROLE_USER')")
     public CustomerDTO me() {
-        return  userService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
+       CustomerDTO customerDTO = userService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
+       return customerDTO;
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public CustomerDTO mePlus() {
+       Customer customer = userService.getUserWithAuthorities().orElse(null);
+       if(customer != null)
+          return customerService.findOne(customer.getId()).orElse(null);
+       return null;
     }
 
     @PreAuthorize("hasRole('ROLE_NONE')")

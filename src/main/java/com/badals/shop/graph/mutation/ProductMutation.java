@@ -17,6 +17,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -122,7 +123,7 @@ public class ProductMutation implements GraphQLMutationResolver {
         return new Message("Done");
     }
 
-    public ProductDTO createStubFromSearch(ProductDTO dto) {
+    public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
         return productService.createStubFromSearch(dto);
     }
 }

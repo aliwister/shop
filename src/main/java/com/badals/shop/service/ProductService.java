@@ -8,8 +8,8 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.ProductLangRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
+import com.badals.shop.service.dto.MerchantDTO;
 import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.service.dto.SpeedDialDTO;
 import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.ProductMapper;
 import com.badals.shop.service.pojo.AddProductDTO;
@@ -29,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
@@ -50,6 +52,7 @@ public class ProductService {
     private final AmazonPricingService amazonPricingService;
     private final PasUKService pasUKService;
     private final EbayService ebayService;
+    private final MerchantService merchantService;
 
     private final ProductMapper productMapper;
     private final AddProductMapper addProductMapper;
@@ -64,12 +67,13 @@ public class ProductService {
 
     public static final long DEFAULT_WINDOW = 14400;
 
-    public ProductService(ProductRepository productRepository, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
+    public ProductService(ProductRepository productRepository, AmazonPricingService amazonPricingService, PasUKService pasUKService, EbayService ebayService, MerchantService merchantService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
         this.productRepository = productRepository;
 
         this.amazonPricingService = amazonPricingService;
         this.pasUKService = pasUKService;
         this.ebayService = ebayService;
+        this.merchantService = merchantService;
         this.productMapper = productMapper;
         this.addProductMapper = addProductMapper;
         this.productSearchRepository = productSearchRepository;
@@ -574,13 +578,23 @@ public class ProductService {
         return false;
     }
 
-    public ProductDTO createStubFromSearch(ProductDTO dto) {
-        Product product = productRepository.findBySku(dto.getSku()).orElse(productMapper.toEntity(dto));
+    public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
+
+        Long merchantId = AmazonPricingService.AMAZON_US_MERCHANT_ID;
+
+        if(dto.getUrl() != null) {
+            String domain = getDomainName(dto.getUrl());
+            MerchantDTO merchant = merchantService.merchantByDomain(domain);
+            if(merchant != null)
+                merchantId = merchant.getId();
+        }
+        Product product = productRepository.findOneBySkuAndMerchantId(dto.getSku(), merchantId).orElse(productMapper.toEntity(dto));
+
         if(product.getId() != null) {
             product.setRating(dto.getRating());
         }
         if(product.getId() == null) {
-            product = amazonPricingService.initSearchStub(product, AmazonPricingService.AMAZON_US_MERCHANT_ID);
+            product = amazonPricingService.initSearchStub(product, merchantId);
 
         }
         product =  productRepository.save(product);
@@ -595,4 +609,11 @@ public class ProductService {
 //    public List<ProductDTO> listForMerchantsAll(Long merchantId) {
 //        return productRepository.listForMerchantsAll(merchantId).stream().map(productMapper::toDto).collect(Collectors.toList());
 //    }
+
+    public static String getDomainName(String url) throws URISyntaxException {
+        URI uri = new URI(url);
+        String domain = uri.getHost();
+        return domain.startsWith("www.") ? domain.substring(4) : domain;
+    }
+
 }
