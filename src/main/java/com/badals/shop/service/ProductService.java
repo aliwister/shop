@@ -235,11 +235,11 @@ public class ProductService {
     }
 
     public Mono<ProductDTO> lookupMono(String sku) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
-        return amazonPricingService.lookup(sku,false).map(productMapper::toDto);
+        return amazonPricingService.lookup(sku,false).map(productMapper::toDto).doOnSuccess(product -> productSearchRepository.save(addProductMapper.fromProductDto(product)));
 
     }
     public Mono<ProductDTO> lookupMono(String sku, Boolean rebuild) throws ExecutionException, InterruptedException, PricingException, NoOfferException {
-        return amazonPricingService.lookup(sku,true).map(productMapper::toDto);
+        return amazonPricingService.lookup(sku,true).map(productMapper::toDto).doOnSuccess(product -> productSearchRepository.save(addProductMapper.fromProductDto(product)));
 
     }
 
