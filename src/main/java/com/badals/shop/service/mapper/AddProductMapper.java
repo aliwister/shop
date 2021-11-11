@@ -36,6 +36,12 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(source="dial.dial", target="dial")
     AddProductDTO toDto(Product product);
 
+    @Mapping(target = "name", source="title")
+    @Mapping(target="availability", source = "hours")
+    @Mapping(target = "gallery", ignore = true)
+    @Mapping(target = "features", ignore = true)
+    AddProductDTO fromProductDto(ProductDTO product);
+
     @Mapping(target="hours", source = "availability")
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "features", ignore = true)
@@ -106,6 +112,29 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
             if(source.getFeatures_ar() != null)
                 target.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
         }
+    }
+    @AfterMapping
+    default void afterMapping(@MappingTarget AddProductDTO target, ProductDTO source) {
+        ArrayList<String> gallery = new ArrayList<String>();
+        if (source.getGallery() != null)
+            for (Gallery g : source.getGallery()) {
+                gallery.add(g.getUrl());
+            }
+
+        gallery.add(0, source.getImage());
+        target.setGallery(gallery);
+
+        //int hours = stock.getAvailability();
+        //target.setAvailability(ProductMapper.processAvailability(source.getHours()).get("en"));
+/*
+        if(source.getFeatures() != null)
+            target.setFeatures(Arrays.asList(source.getFeatures().split(";")));*/
+
+        target.setDescription(source.getDescription());
+        target.setBrowseNode(source.getBrowseNode());
+
+        if (source.getPrice() != null)
+            target.setPrice(BigDecimal.valueOf(Double.parseDouble(source.getPrice())));
     }
 
     @AfterMapping
