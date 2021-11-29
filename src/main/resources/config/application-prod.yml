@@ -16,8 +16,8 @@
 logging:
   level:
     ROOT: INFO
-    com.badals.shop: INFO
-    io.github.jhipster: INFO
+    com.badals.shop: ERROR
+    io.github.jhipster: ERROR
     io.netty.util: ERROR
 
 management:
