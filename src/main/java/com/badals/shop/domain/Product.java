@@ -825,7 +825,7 @@ public class Product implements Serializable, IMerchantProduct {
     }
 
     public BigDecimal getComputedWeight() {
-        if(volumeWeight != null && volumeWeight.compareTo(weight) == 1) {
+        if(volumeWeight != null && weight != null && volumeWeight.compareTo(weight) == 1) {
             return volumeWeight;
         }
         return weight;
