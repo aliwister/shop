@@ -80,6 +80,10 @@ public class Customer implements Serializable {
     @Column(name = "plus_discount")
     private Integer plusDiscount;
 
+    @Getter @Setter
+    @Column(name = "shipper_markup")
+    private Integer shipperMarkup;
+
     @Column(name = "reset_password_token")
     private String resetKey;
 
