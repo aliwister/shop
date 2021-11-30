@@ -9,6 +9,7 @@ type Customer {
     addresses: [Address]
     allowPickup: Boolean
     plusDiscount: Int
+    shipperMarkup: Int
 }
 
 type Address {
