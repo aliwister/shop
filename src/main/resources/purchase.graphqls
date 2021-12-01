@@ -35,6 +35,7 @@ type Purchase {
     createdDate: String
     lastModifiedBy: String
     lastModifiedDate: String
+    length: Int
 }
 
 type PurchaseItem {

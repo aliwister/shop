@@ -117,7 +117,7 @@ public class PurchaseService {
         Page<Purchase> orders = purchaseRepository.findForPurchaseList(/*orderState, */PageRequest.of((int) offset/limit,limit), searchText);
         PurchaseResponse response = new PurchaseResponse();
         response.setTotal(orders.getNumber());
-        response.setItems(orders.getContent().stream().map(purchaseMapper::toDto).collect(Collectors.toList()));
+        response.setItems(orders.getContent().stream().map(purchaseMapper::toDtoList).collect(Collectors.toList()));
         response.setHasMore(orders.hasNext());
         return response;
     }
