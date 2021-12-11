@@ -47,12 +47,14 @@ public class PasLookupParser {
         .brand(i.getBrand())
         .weight(PasUtility.calculateWeight(i.getParsedWeight(), getOverride(overrides, OverrideType.WEIGHT)))
         .volumeWeight(PasUtility.calculateVolWeight(i.getPackageLength(), i.getPackageWidth(), i.getPackageHeight(), i.getItemLengthUnit()))
-        .title(i.getTitle())
+        .title(i.getTitle()!=null?i.getTitle().substring(0,(i.getTitle().length()>250?250:i.getTitle().length())):null)
         .upc(i.getUpc())
         .merchantId(merchantId)
         .gallery(i.gallerizeImages())
         .inStock(true);
         //p.setTenantId()
+
+
         return p;
     }
 
