@@ -216,7 +216,7 @@ extend type Mutation {
 extend type Query {
     #getOrders(): [Orders]
     orderConfirmation(ref: String, key: String): Order
-    orders(limit: Int = 10): [Order]
+    orders(limit: Int = 10, offset: Int = 0): OrderResponse
     ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
     orderA(id: ID): Order
     auditActivity(id: ID, type: String) : [Action]
