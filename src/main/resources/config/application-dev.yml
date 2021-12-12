@@ -12,6 +12,17 @@
 # Full reference is available at:
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
+com:
+  sun:
+    jndi:
+      cosnaming:
+        object:
+          trustURLCodebase: false
+      rmi:
+        object:
+          trustURLCodebase: false
+log4j2:
+  formatMsgNoLookups: true
 
 logging:
   level:
