@@ -4,6 +4,8 @@ import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
+import com.badals.shop.domain.tenant.TenantProduct;
+import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
  */
 @Mapper(componentModel = "spring", uses = {ProductLangMapper.class, MerchantStockMapper.class, ProductLangMapper.class, ChildProductMapper.class})
-public interface PartnerProductMapper extends EntityMapper<PartnerProduct, ProfileProduct> {
+public interface TenantProductMapper extends EntityMapper<PartnerProduct, TenantProduct> {
 
     //@Mapping(source="langs", target = "productLangs")
     @Mapping(source="options", target = "variationOptions")
@@ -38,7 +40,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Profi
     @Mapping(target = "price", source = "priceObj")
     //@Mapping(target = "currency", source = "priceObj.currency")
     //@Mapping(target = "dial", ignore = true)
-    ProfileProduct toEntity(PartnerProduct productDTO);
+    TenantProduct toEntity(PartnerProduct productDTO);
 
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
@@ -46,10 +48,10 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Profi
     //@Mapping(source="productLangs", target = "langs")
     @Mapping(source="variationOptions", target = "options")
     @Mapping(target = "price", ignore = true)
-    PartnerProduct toDto(ProfileProduct product);
+    PartnerProduct toDto(TenantProduct product);
 
     @AfterMapping
-    default void afterMapping(@MappingTarget ProfileProduct target, PartnerProduct source) {
+    default void afterMapping(@MappingTarget TenantProduct target, PartnerProduct source) {
         if(source.getGallery() != null) {
             List<Gallery> gallery = new ArrayList<Gallery>();
             for(String g: source.getGallery()) {
@@ -118,7 +120,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Profi
     }
 
     @AfterMapping
-    default void afterMapping(@MappingTarget PartnerProduct target, ProfileProduct source) {
+    default void afterMapping(@MappingTarget PartnerProduct target, TenantProduct source) {
         String langCode = "en";
         //if (source.getGallery() == null) {
         List<String> gallery = new ArrayList<String>();
@@ -132,7 +134,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Profi
         }
 
         // Process sale price and discount percentage
-        ProfileStock stock = source.getStock().stream().findFirst().orElse(null);
+        TenantStock stock = source.getStock().stream().findFirst().orElse(null);
         if (stock != null) {
             target.setSalePriceObj(stock.getPrice());
             target.setPriceObj(source.getPrice());

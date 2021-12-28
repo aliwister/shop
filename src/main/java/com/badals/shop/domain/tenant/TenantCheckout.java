@@ -1,4 +1,4 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
 
 import com.badals.shop.domain.checkout.helper.AddressPojo;
@@ -16,7 +16,6 @@ import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,8 +27,8 @@ import java.util.List;
 })
 @Entity
 @Data
-@Table(name = "cart", catalog = "profileshop")
-public class ProfileCart implements Serializable {
+@Table(name = "checkout", catalog = "profileshop")
+public class TenantCheckout implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,13 +69,16 @@ public class ProfileCart implements Serializable {
     @Column(name = "carrier")
     private String carrier;
 
+    @Column(name="checked_out")
+    private Boolean checkedOut = false;
+
     private String currency;
 
     @Type(type = "json")
     @Column(name = "checkout_content", columnDefinition = "string")
     List<LineItem> items;
 
-    @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
+/*    @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<ProfileCartItem> cartItems = new ArrayList<ProfileCartItem>();
 
     public List<ProfileCartItem> getCartItems() {
@@ -85,7 +87,7 @@ public class ProfileCart implements Serializable {
 
     public void setCartItems(List<ProfileCartItem> cartItems) {
         this.cartItems = cartItems;
-    }
+    }*/
 
     @Column(name="tenant_id")
     private Long tenantId;
@@ -98,10 +100,10 @@ public class ProfileCart implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ProfileCart)) {
+        if (!(o instanceof TenantCart)) {
             return false;
         }
-        return id != null && id.equals(((ProfileCart) o).id);
+        return id != null && id.equals(((TenantCheckout) o).id);
     }
 
     @Override
@@ -133,10 +135,10 @@ public class ProfileCart implements Serializable {
         return null;
     }
 
-
-    public ProfileCart addCartItem(ProfileCartItem cartItem) {
+/*
+    public ProfileCheckout addCartItem(ProfileCartItem cartItem) {
         this.cartItems.add(cartItem);
         cartItem.setCart(this);
         return this;
-    }
+    }*/
 }

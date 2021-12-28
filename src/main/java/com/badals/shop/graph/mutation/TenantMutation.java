@@ -6,10 +6,12 @@ import com.badals.shop.domain.checkout.helper.Message;
 import com.badals.shop.domain.checkout.helper.PresignedUrl;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.graph.CartResponse;
+import com.badals.shop.graph.CheckoutSessionResponse;
 import com.badals.shop.graph.TenantCartResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
+import com.badals.shop.service.pojo.CheckoutSession;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.pojo.ProductEnvelope;
 import com.badals.shop.service.tenant.TenantCartService;
@@ -124,6 +126,12 @@ public class TenantMutation implements GraphQLMutationResolver {
         response.setSuccess(true);
         response.setMessage("Cart Saved Successfully");
         return response;
+    }
+
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    public CheckoutSession createTenantCheckout(final String secureKey, final List<CartItemDTO> items) {
+        String token = cartService.createCheckout(secureKey, items);
+        return new CheckoutSession("/checkout/" + token + "/address", token);
     }
 }
 

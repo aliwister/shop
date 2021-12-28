@@ -1,13 +1,12 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
+import com.badals.shop.domain.Merchant;
+import com.badals.shop.domain.Tenant;
 import com.badals.shop.domain.converter.StringListConverter;
-import com.badals.shop.domain.enumeration.Api;
 import com.badals.shop.domain.enumeration.Condition;
 import com.badals.shop.domain.enumeration.ProductGroup;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.*;
-import com.badals.shop.xtra.IMerchantProduct;
-import com.badals.shop.xtra.IProductLang;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
@@ -23,7 +22,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * A Product.
@@ -31,7 +29,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "product",  catalog = "profileshop")
 @SelectBeforeUpdate(false)
-public class ProfileProduct implements Serializable {
+public class TenantProduct implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,11 +57,11 @@ public class ProfileProduct implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="parent_id", referencedColumnName = "ref", insertable = false, updatable = false)
-    private ProfileProduct parent;
+    private TenantProduct parent;
 
     @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "parent_id",referencedColumnName = "ref")
-    private Set<ProfileProduct> children = new HashSet<>();;
+    private Set<TenantProduct> children = new HashSet<>();;
 
     @NotNull
     @Column(name = "sku", nullable = false, unique = true)
@@ -126,12 +124,12 @@ public class ProfileProduct implements Serializable {
 
 
 
-    public ProfileProduct stub(boolean b) {
+    public TenantProduct stub(boolean b) {
         stub = b;
         return this;
     }
 
-    public ProfileProduct inStock(Boolean b) {
+    public TenantProduct inStock(Boolean b) {
         inStock = b;
         return this;
     }
@@ -193,16 +191,16 @@ public class ProfileProduct implements Serializable {
     @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true)
     private Set<ProductLang> productLangs = new HashSet<>();*/
 
-    public Set<ProfileStock> getStock() {
+    public Set<TenantStock> getStock() {
         return stock;
     }
 
-    public void setStock(Set<ProfileStock> stock) {
+    public void setStock(Set<TenantStock> stock) {
         this.stock = stock;
     }
 
     @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true)
-    private Set<ProfileStock> stock = new HashSet<>();
+    private Set<TenantStock> stock = new HashSet<>();
 
     @Column(name = "expires")
     private Instant expires;
@@ -301,7 +299,7 @@ public class ProfileProduct implements Serializable {
         return variationDimensions;
     }
 
-    public ProfileProduct merchantId(Long l) {
+    public TenantProduct merchantId(Long l) {
         this.merchantId = l;
         return this;
     }
@@ -347,14 +345,14 @@ public class ProfileProduct implements Serializable {
 
 
 
-    public ProfileProduct ref(String ref) {
+    public TenantProduct ref(String ref) {
         this.ref = ref;
         return this;
     }
 
 
 
-    public ProfileProduct slug(String slug) {
+    public TenantProduct slug(String slug) {
         this.slug = slug;
         return this;
     }
@@ -363,7 +361,7 @@ public class ProfileProduct implements Serializable {
         return sku;
     }
 
-    public ProfileProduct sku(String sku) {
+    public TenantProduct sku(String sku) {
         this.sku = sku;
         return this;
     }
@@ -376,7 +374,7 @@ public class ProfileProduct implements Serializable {
         return upc;
     }
 
-    public ProfileProduct upc(String upc) {
+    public TenantProduct upc(String upc) {
         this.upc = upc;
         return this;
     }
@@ -389,7 +387,7 @@ public class ProfileProduct implements Serializable {
         return image;
     }
 
-    public ProfileProduct image(String image) {
+    public TenantProduct image(String image) {
         this.image = image;
         return this;
     }
@@ -402,7 +400,7 @@ public class ProfileProduct implements Serializable {
         return gallery;
     }
 
-    public ProfileProduct gallery(List<Gallery> gallery) {
+    public TenantProduct gallery(List<Gallery> gallery) {
         this.gallery = gallery;
         return this;
     }
@@ -415,7 +413,7 @@ public class ProfileProduct implements Serializable {
         return releaseDate;
     }
 
-    public ProfileProduct releaseDate(LocalDate releaseDate) {
+    public TenantProduct releaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
         return this;
     }
@@ -428,7 +426,7 @@ public class ProfileProduct implements Serializable {
         return active;
     }
 
-    public ProfileProduct active(Boolean active) {
+    public TenantProduct active(Boolean active) {
         this.active = active;
         return this;
     }
@@ -441,7 +439,7 @@ public class ProfileProduct implements Serializable {
         return similarProducts;
     }
 
-    public ProfileProduct similarProducts(List<String> similarProducts) {
+    public TenantProduct similarProducts(List<String> similarProducts) {
         this.similarProducts = similarProducts;
         return this;
     }
@@ -454,7 +452,7 @@ public class ProfileProduct implements Serializable {
         return title;
     }
 
-    public ProfileProduct title(String title) {
+    public TenantProduct title(String title) {
         this.title = title;
         return this;
     }
@@ -467,7 +465,7 @@ public class ProfileProduct implements Serializable {
         return brand;
     }
 
-    public ProfileProduct brand(String brand) {
+    public TenantProduct brand(String brand) {
         this.brand = brand;
         return this;
     }
@@ -480,7 +478,7 @@ public class ProfileProduct implements Serializable {
         return group;
     }
 
-    public ProfileProduct group(ProductGroup group) {
+    public TenantProduct group(ProductGroup group) {
         this.group = group;
         return this;
     }
@@ -493,7 +491,7 @@ public class ProfileProduct implements Serializable {
         return updated;
     }
 
-    public ProfileProduct updated(Instant updated) {
+    public TenantProduct updated(Instant updated) {
         this.updated = updated;
         return this;
     }
@@ -506,7 +504,7 @@ public class ProfileProduct implements Serializable {
         return created;
     }
 
-    public ProfileProduct created(Instant created) {
+    public TenantProduct created(Instant created) {
         this.created = created;
         return this;
     }
@@ -519,7 +517,7 @@ public class ProfileProduct implements Serializable {
         return condition;
     }
 
-    public ProfileProduct condition(Condition condition) {
+    public TenantProduct condition(Condition condition) {
         this.condition = condition;
         return this;
     }
@@ -536,7 +534,7 @@ public class ProfileProduct implements Serializable {
         this.variationType = variationType;
     }
 
-    public ProfileProduct variationType(VariationType variationType) {
+    public TenantProduct variationType(VariationType variationType) {
         this.variationType = variationType;
         return this;
     }
@@ -545,7 +543,7 @@ public class ProfileProduct implements Serializable {
         return isUsed;
     }
 
-    public ProfileProduct isUsed(Boolean isUsed) {
+    public TenantProduct isUsed(Boolean isUsed) {
         this.isUsed = isUsed;
         return this;
     }
@@ -558,7 +556,7 @@ public class ProfileProduct implements Serializable {
         return availableForOrder;
     }
 
-    public ProfileProduct availableForOrder(Boolean availableForOrder) {
+    public TenantProduct availableForOrder(Boolean availableForOrder) {
         this.availableForOrder = availableForOrder;
         return this;
     }
@@ -571,7 +569,7 @@ public class ProfileProduct implements Serializable {
         return weight;
     }
 
-    public ProfileProduct weight(BigDecimal weight) {
+    public TenantProduct weight(BigDecimal weight) {
         this.weight = weight;
         return this;
     }
@@ -584,7 +582,7 @@ public class ProfileProduct implements Serializable {
         return volumeWeight;
     }
 
-    public ProfileProduct volumeWeight(BigDecimal volumeWeight) {
+    public TenantProduct volumeWeight(BigDecimal volumeWeight) {
         this.volumeWeight = volumeWeight;
         return this;
     }
@@ -602,7 +600,7 @@ public class ProfileProduct implements Serializable {
         return this;
     }*/
 
-    public ProfileProduct addStock(ProfileStock stock) {
+    public TenantProduct addStock(TenantStock stock) {
         this.stock.add(stock);
         stock.setProduct(this);
         return this;
@@ -611,28 +609,28 @@ public class ProfileProduct implements Serializable {
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
 
-    public ProfileProduct getParent() {
+    public TenantProduct getParent() {
         return parent;
     }
 
-    public void setParent(ProfileProduct parent) {
+    public void setParent(TenantProduct parent) {
         this.parent = parent;
     }
 
-    public ProfileProduct parent(ProfileProduct master) {
+    public TenantProduct parent(TenantProduct master) {
         this.parent = parent;
         return this;
     }
 
-    public Set<ProfileProduct> getChildren() {
+    public Set<TenantProduct> getChildren() {
         return children;
     }
 
-    public void setChildren(Set<ProfileProduct> children) {
+    public void setChildren(Set<TenantProduct> children) {
         this.children = children;
     }
 
-    public void addChild(ProfileProduct child) {
+    public void addChild(TenantProduct child) {
         child.setVariationType(VariationType.CHILD);
         child.setMerchantId(this.merchantId);
         this.children.add(child);
@@ -644,10 +642,10 @@ public class ProfileProduct implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ProfileProduct)) {
+        if (!(o instanceof TenantProduct)) {
             return false;
         }
-        return id != null && id.equals(((ProfileProduct) o).id);
+        return id != null && id.equals(((TenantProduct) o).id);
     }
 
     @Override
@@ -666,12 +664,12 @@ public class ProfileProduct implements Serializable {
     }
 
 
-    public ProfileProduct variationAttributes(List<Attribute> value) {
+    public TenantProduct variationAttributes(List<Attribute> value) {
         this.setVariationAttributes(value);
         return this;
     }
 
-    public void removeChild(ProfileProduct child) {
+    public void removeChild(TenantProduct child) {
         this.children.remove(child);
     }
 

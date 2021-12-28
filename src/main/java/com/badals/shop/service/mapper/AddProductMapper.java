@@ -4,6 +4,7 @@ import com.badals.shop.aop.logging.TenantContext;
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Gallery;
+import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
 
@@ -218,5 +219,5 @@ public interface AddProductMapper extends EntityMapper<AddProductDTO, Product> {
     @Mapping(target = "price", ignore = true)
     @Mapping(target = "gallery", ignore = true)
     @Mapping(target = "merchant", ignore = true)
-   AddProductDTO toDto(ProfileProduct master);
+   AddProductDTO toDto(TenantProduct master);
 }
