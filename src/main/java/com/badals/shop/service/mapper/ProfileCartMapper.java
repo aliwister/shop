@@ -1,24 +1,22 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.ProfileCart;
-import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.domain.tenant.TenantCart;
 import com.badals.shop.service.dto.CartDTO;
-import com.badals.shop.service.mapper.EntityMapper;
 import org.mapstruct.Mapper;
 
 
 @Mapper(componentModel = "spring", uses = {ProfileCartItemMapper.class})
-public interface ProfileCartMapper extends EntityMapper<CartDTO, ProfileCart> {
+public interface ProfileCartMapper extends EntityMapper<CartDTO, TenantCart> {
 
-    CartDTO toDto(ProfileCart cart);
+    CartDTO toDto(TenantCart cart);
 
-    ProfileCart toEntity(CartDTO cartDTO);
+    TenantCart toEntity(CartDTO cartDTO);
 
-    default ProfileCart fromId(Long id) {
+    default TenantCart fromId(Long id) {
         if (id == null) {
             return null;
         }
-        ProfileCart cart = new ProfileCart();
+        TenantCart cart = new TenantCart();
         cart.setId(id);
         return cart;
     }

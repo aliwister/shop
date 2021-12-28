@@ -1,4 +1,4 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "cart_item", catalog = "profileshop")
-public class ProfileCartItem implements Serializable {
+public class TenantCartItem implements Serializable {
 
     private static final long serialVersionUID = 22L;
 
@@ -25,7 +25,7 @@ public class ProfileCartItem implements Serializable {
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties("cartItems")
-    private ProfileCart cart;
+    private TenantCart cart;
 
 
     public Long getProductId() {
@@ -36,11 +36,11 @@ public class ProfileCartItem implements Serializable {
         this.productId = productId;
     }
 
-    public ProfileProduct getProduct() {
+    public TenantProduct getProduct() {
         return product;
     }
 
-    public void setProduct(ProfileProduct product) {
+    public void setProduct(TenantProduct product) {
         this.product = product;
     }
 
@@ -49,7 +49,7 @@ public class ProfileCartItem implements Serializable {
 
     @ManyToOne
     @JoinColumn(name="product_id", referencedColumnName = "ref", insertable = false, updatable = false)
-    private ProfileProduct product;
+    private TenantProduct product;
    // @Column(name = "product_id")
    // private Long productId;
 
@@ -74,7 +74,7 @@ public class ProfileCartItem implements Serializable {
         return quantity;
     }
 
-    public ProfileCartItem quantity(Integer quantity) {
+    public TenantCartItem quantity(Integer quantity) {
         this.quantity = quantity;
         return this;
     }
@@ -83,16 +83,16 @@ public class ProfileCartItem implements Serializable {
         this.quantity = quantity;
     }
 
-    public ProfileCart getCart() {
+    public TenantCart getCart() {
         return cart;
     }
 
-    public ProfileCartItem cart(ProfileCart cart) {
+    public TenantCartItem cart(TenantCart cart) {
         this.cart = cart;
         return this;
     }
 
-    public void setCart(ProfileCart cart) {
+    public void setCart(TenantCart cart) {
         this.cart = cart;
     }
 
@@ -101,10 +101,10 @@ public class ProfileCartItem implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ProfileCartItem)) {
+        if (!(o instanceof TenantCartItem)) {
             return false;
         }
-        return id != null && id.equals(((ProfileCartItem) o).id);
+        return id != null && id.equals(((TenantCartItem) o).id);
     }
 
     @Override

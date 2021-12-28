@@ -1,7 +1,7 @@
 package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.CartItem;
-import com.badals.shop.domain.ProfileCartItem;
+import com.badals.shop.domain.tenant.TenantCartItem;
 import com.badals.shop.service.dto.CartItemDTO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
  * Mapper for the entity {@link CartItem} and its DTO {@link CartItemDTO}.
  */
 @Mapper(componentModel = "spring", uses = {ProfileCartMapper.class, ProfileProductMapper.class})
-public interface ProfileCartItemMapper extends EntityMapper<CartItemDTO, ProfileCartItem> {
+public interface ProfileCartItemMapper extends EntityMapper<CartItemDTO, TenantCartItem> {
 
     @Mapping(source = "cart.id", target = "cartId")
     @Mapping(source = "product.ref", target = "productId")
@@ -23,22 +23,22 @@ public interface ProfileCartItemMapper extends EntityMapper<CartItemDTO, Profile
     @Mapping(source = "product.merchantId", target = "merchantId")
     @Mapping(ignore = true, target = "price")
     @Mapping(ignore = true, target = "salePrice")
-    CartItemDTO toDto(ProfileCartItem cartItem);
+    CartItemDTO toDto(TenantCartItem cartItem);
 
     @Mapping(source = "cartId", target = "cart")
     //@Mapping(source = "productId", target = "product.ref")
     @Mapping(source = "productId", target = "productId")
-    ProfileCartItem toEntity(CartItemDTO cartItemDTO);
+    TenantCartItem toEntity(CartItemDTO cartItemDTO);
 
     @AfterMapping
-    default void afterMapping(@MappingTarget ProfileCartItem target, CartItemDTO source) {
+    default void afterMapping(@MappingTarget TenantCartItem target, CartItemDTO source) {
         if (target.getQuantity() == null) {
             target.setQuantity(1);
         }
     }
 
     @AfterMapping
-    default void afterMapping(@MappingTarget CartItemDTO target, ProfileCartItem source) {
+    default void afterMapping(@MappingTarget CartItemDTO target, TenantCartItem source) {
         if (target.getImage() != null && !target.getImage().startsWith("https://"))
             if(target.getMerchantId() == 1)
                 target.setImage("https://m.media-amazon.com/images/I/"+target.getImage());
@@ -54,11 +54,11 @@ public interface ProfileCartItemMapper extends EntityMapper<CartItemDTO, Profile
     }*/
 
 
-    default ProfileCartItem fromId(Long id) {
+    default TenantCartItem fromId(Long id) {
         if (id == null) {
             return null;
         }
-        ProfileCartItem cartItem = new ProfileCartItem();
+        TenantCartItem cartItem = new TenantCartItem();
         cartItem.setId(id);
         return cartItem;
     }
