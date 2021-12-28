@@ -2,8 +2,14 @@ package com.badals.shop.service.tenant;
 
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
+import com.badals.shop.domain.checkout.helper.CheckoutLineItemMapper;
 import com.badals.shop.domain.enumeration.CartState;
+import com.badals.shop.domain.tenant.TenantCart;
+import com.badals.shop.domain.tenant.TenantCartItem;
+import com.badals.shop.domain.tenant.TenantCheckout;
 import com.badals.shop.repository.*;
+import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
@@ -20,7 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Service Implementation for managing {@link ProfileCart}.
+ * Service Implementation for managing {@link TenantCart}.
  */
 @Service
 @Transactional
@@ -28,19 +34,30 @@ public class TenantCartService {
 
     private final Logger log = LoggerFactory.getLogger(TenantCartService.class);
 
-    private final ProfileCartRepository cartRepository;
-    private final ProfileProductRepository productRepository;
+    private final TenantCartRepository cartRepository;
+    private final TenantCheckoutRepository checkoutRepository;
+    private final TenantProductRepository productRepository;
+    private final TenantCustomerRepository customerRepository;
+    private final TenantCartItemRepository cartItemRepository;
 
     private final ProfileCartMapper cartMapper;
     private final UserService userService;
     private final TenantProductService productService;
 
-    public TenantCartService(ProfileCartRepository cartRepository, ProfileProductRepository productRepository, ProfileCartMapper cartMapper, UserService userService, TenantProductService productService) {
+    private final CheckoutLineItemMapper checkoutLineItemMapper;
+    private final CheckoutAddressMapper checkoutAddressMapper;
+
+    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, ProfileCartMapper cartMapper, UserService userService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
+        this.checkoutRepository = checkoutRepository;
         this.productRepository = productRepository;
+        this.customerRepository = customerRepository;
+        this.cartItemRepository = cartItemRepository;
         this.cartMapper = cartMapper;
         this.userService = userService;
         this.productService = productService;
+        this.checkoutLineItemMapper = checkoutLineItemMapper;
+        this.checkoutAddressMapper = checkoutAddressMapper;
     }
 
 
@@ -58,7 +75,7 @@ public class TenantCartService {
      */
     public CartDTO save(CartDTO cartDTO) {
         log.debug("Request to save ProfileCart : {}", cartDTO);
-        ProfileCart cart = cartMapper.toEntity(cartDTO);
+        TenantCart cart = cartMapper.toEntity(cartDTO);
         cart = cartRepository.save(cart);
         return cartMapper.toDto(cart);
     }
@@ -72,7 +89,7 @@ public class TenantCartService {
      */
     public CartDTO save(CartDTO cartDTO, List<CartItemDTO> items) {
         log.debug("Request to save ProfileCart : {}", cartDTO);
-        ProfileCart cart = cartMapper.toEntity(cartDTO);
+        TenantCart cart = cartMapper.toEntity(cartDTO);
         //cart = cartRepository.save(cart);
         return save(cart, items); //cartMapper.toDto(cart);
     }
@@ -115,7 +132,7 @@ public class TenantCartService {
     }
 
     public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge) {
-        ProfileCart cart = null;
+        TenantCart cart = null;
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
         log.info("Logged in user " + loginUser);
         // secureKey always null
@@ -126,7 +143,7 @@ public class TenantCartService {
         // Never get called if user not logged in
         if(loginUser == null) {
             if (cart == null || cart.getCartState() != CartState.UNCLAIMED) {
-                cart = new ProfileCart();
+                cart = new TenantCart();
                 cart.setSecureKey(createUIUD());
             }
             return this.mergeCart(cart, items, isMerge);
@@ -161,13 +178,13 @@ public class TenantCartService {
         //}
     }
 
-    private CartDTO mergeCart(ProfileCart cart, List<CartItemDTO> items, Boolean isMerge) {
-        List<ProfileCartItem> cartItems = cart.getCartItems();
+    private CartDTO mergeCart(TenantCart cart, List<CartItemDTO> items, Boolean isMerge) {
+        List<TenantCartItem> cartItems = cart.getCartItems();
         //isMerge = false;
 
         if(items != null) {
             for (CartItemDTO dto : items) {
-                ProfileCartItem existing = cartItems != null?cartItems.stream().filter(x -> x.getProductId().equals(dto.getProductId())).findAny().orElse(null):null;
+                TenantCartItem existing = cartItems != null?cartItems.stream().filter(x -> x.getProductId().equals(dto.getProductId())).findAny().orElse(null):null;
                 if (existing != null) {
                     if(isMerge)
                         existing.setQuantity(existing.getQuantity() + dto.getQuantity());
@@ -181,8 +198,8 @@ public class TenantCartService {
                 else {
                     // Check product exists
                     //ProfileProduct p = productRepository.findOneByRef(dto.getProductId().toString()).orElse(null);
-                    if (productService.exists(dto.getProductId().toString())) {
-                        ProfileCartItem newCartItem = new ProfileCartItem();
+                    if (dto.getQuantity() > 0 && productService.exists(dto.getProductId().toString()) ) {
+                        TenantCartItem newCartItem = new TenantCartItem();
                         newCartItem.setProductId(dto.getProductId());
                         newCartItem.setQuantity(dto.getQuantity());
                         cart.addCartItem(newCartItem);
@@ -210,17 +227,17 @@ public class TenantCartService {
 
      */
 
-    private CartDTO save(ProfileCart cart, List<CartItemDTO> items) {
+    private CartDTO save(TenantCart cart, List<CartItemDTO> items) {
         this.setItems(cart, items);
         cart = cartRepository.saveAndFlush(cart);
         cartRepository.refresh(cart);
         return cartMapper.toDto(cart);
     }
 
-    private ProfileCart getCartByCustomer(Customer loginUser) {
-        List<ProfileCart> carts = cartRepository.findAll();//cartRepository.findByCustomerAndCartStateOrderByIdDesc(loginUser, CartState.CLAIMED);
+    private TenantCart getCartByCustomer(Customer loginUser) {
+        List<TenantCart> carts = cartRepository.findAll();//cartRepository.findByCustomerAndCartStateOrderByIdDesc(loginUser, CartState.CLAIMED);
         if (carts.size() == 0) {
-            ProfileCart cart = new ProfileCart();
+            TenantCart cart = new TenantCart();
             //cart.setCustomer(loginUser);
             cart.setSecureKey(createUIUD());
             cart.setCartState(CartState.CLAIMED);
@@ -229,9 +246,9 @@ public class TenantCartService {
         return carts.get(0);
     }
 
-    private void setItems(ProfileCart cart, List<CartItemDTO> items) {
+    private void setItems(TenantCart cart, List<CartItemDTO> items) {
         //List<CartItem> cartItems = new ArrayList<>();
-        cart.getItems().clear();
+        cart.getCartItems().clear();
         for(CartItemDTO dto : items) {
             Long ref = dto.getProductId();
 /*            if(ref != null && productService.exists(ref)) {
@@ -242,39 +259,42 @@ public class TenantCartService {
         //cart.setCartItems(cartItems);
     }
 
-/*    public String createCheckout(String secureKey, List<CartItemDTO> items) {
+    public String createCheckout(String secureKey, List<CartItemDTO> items) {
         return this.createCheckoutWithCart(secureKey, items).getSecureKey();
-    }*/
+    }
 
-/*    @Transactional(readOnly = true)
-    public CheckoutCart createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
+    @Transactional(readOnly = true)
+    public TenantCheckout createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
         //ProfileCart cart = cartRepository.findBySecureKey(secureKey).orElse(new ProfileCart()); //cartMapper.toEntity(cartDTO);
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
-        ProfileCart cart = this.getCartByCustomer(loginUser);
+        TenantCart cart = this.getCartByCustomer(loginUser);
 
-*//*        setItems(cart, items); //cartMapper.toDto(cart);
-        cart = cartRepository.save(cart);*//*
-        Customer customer = customerRepository.findByIdJoinAddresses(cart.getCustomer().getId()).get();
+        Customer customer = null;
+
+        if (cart.getCustomer() != null)
+            customer = customerRepository.findByIdJoinAddresses(cart.getCustomer().getId()).orElse(null);
+
         cart = cartRepository.getCartByCustomerJoinAddresses(cart.getId());
         List<CartItemInfo> cartItems = cartItemRepository.findCartItemsWithProductNative(cart.getId());
 
-        //cartItems.stream().filter(x->x.getImage() != null && !x.getImage().startsWith("http")).map()
+        TenantCheckout checkout = checkoutRepository.findBySecureKey(cart.getSecureKey()).orElse(new TenantCheckout());
+        checkout.setSecureKey(cart.getSecureKey());
+        checkout.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
 
+        if (customer != null && customer.getAddresses() != null && customer.getAddresses().size() > 0)
+            checkout.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
 
-        CheckoutCart checkoutCart = checkoutCartRepository.findBySecureKey(cart.getSecureKey()).orElse(new CheckoutCart());
-        checkoutCart.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
-        if (customer.getAddresses() != null && customer.getAddresses().size() > 0)
-            checkoutCart.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
-        checkoutCart.setSecureKey(cart.getSecureKey());
-        checkoutCart.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
-        checkoutCart.setEmail(cart.getCustomer().getEmail());
+        if (customer != null) {
+            checkout.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
+            checkout.setEmail(cart.getCustomer().getEmail());
+        }
 
-        checkoutCart = checkoutCartRepository.save(checkoutCart);
-        return checkoutCart;
-    }*/
+        checkout = checkoutRepository.save(checkout);
+        return checkout;
+    }
 
     public void closeCart(String secureKey) {
-        ProfileCart cart = cartRepository.findBySecureKey(secureKey).orElse(null);
+        TenantCart cart = cartRepository.findBySecureKey(secureKey).orElse(null);
         if(cart == null)
             return;
         cart.setCartState(CartState.CLOSED);

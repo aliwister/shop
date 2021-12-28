@@ -1,5 +1,7 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
+import com.badals.shop.domain.Auditable;
+import com.badals.shop.domain.Tenant;
 import com.badals.shop.domain.pojo.I18String;
 import lombok.Data;
 import org.hibernate.annotations.Type;
@@ -14,7 +16,7 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "hashtag", catalog = "profileshop")
-public class ProfileHashtag extends Auditable implements Serializable {
+public class TenantHashtag extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,11 +36,11 @@ public class ProfileHashtag extends Auditable implements Serializable {
     @JoinColumn(name="tenant_id", insertable = false, updatable = false)
     Tenant tenant;
 
-    public ProfileHashtag icon(String icon) {
+    public TenantHashtag icon(String icon) {
         this.icon = icon;
         return this;
     }
-    public ProfileHashtag position(Integer position) {
+    public TenantHashtag position(Integer position) {
         this.position = position;
         return this;
     }
@@ -50,10 +52,10 @@ public class ProfileHashtag extends Auditable implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ProfileHashtag)) {
+        if (!(o instanceof TenantHashtag)) {
             return false;
         }
-        return id != null && id.equals(((ProfileHashtag) o).id);
+        return id != null && id.equals(((TenantHashtag) o).id);
     }
 
     @Override

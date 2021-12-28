@@ -1,4 +1,4 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
 import com.badals.shop.domain.pojo.Price;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "stock", catalog = "profileshop")
 @SelectBeforeUpdate(false)
-public class ProfileStock implements Serializable {
+public class TenantStock implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ public class ProfileStock implements Serializable {
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties("merchantStocks")
-    private ProfileProduct product;
+    private TenantProduct product;
 
    @Type(type = "json")
    @Column(name = "prices", columnDefinition = "string")
@@ -85,7 +85,7 @@ public class ProfileStock implements Serializable {
         return quantity;
     }
 
-    public ProfileStock quantity(BigDecimal quantity) {
+    public TenantStock quantity(BigDecimal quantity) {
         this.quantity = quantity;
         return this;
     }
@@ -98,7 +98,7 @@ public class ProfileStock implements Serializable {
         return availability;
     }
 
-    public ProfileStock availability(Integer availability) {
+    public TenantStock availability(Integer availability) {
         this.availability = availability;
         return this;
     }
@@ -111,7 +111,7 @@ public class ProfileStock implements Serializable {
         return allow_backorder;
     }
 
-    public ProfileStock allow_backorder(Boolean allow_backorder) {
+    public TenantStock allow_backorder(Boolean allow_backorder) {
         this.allow_backorder = allow_backorder;
         return this;
     }
@@ -124,7 +124,7 @@ public class ProfileStock implements Serializable {
         return backorder_availability;
     }
 
-    public ProfileStock backorder_availability(Integer backorder_availability) {
+    public TenantStock backorder_availability(Integer backorder_availability) {
         this.backorder_availability = backorder_availability;
         return this;
     }
@@ -137,7 +137,7 @@ public class ProfileStock implements Serializable {
         return location;
     }
 
-    public ProfileStock location(String location) {
+    public TenantStock location(String location) {
         this.location = location;
         return this;
     }
@@ -150,7 +150,7 @@ public class ProfileStock implements Serializable {
         return store;
     }
 
-    public ProfileStock store(String store) {
+    public TenantStock store(String store) {
         this.store = store;
         return this;
     }
@@ -163,7 +163,7 @@ public class ProfileStock implements Serializable {
         return cost;
     }
 
-    public ProfileStock cost(Price cost) {
+    public TenantStock cost(Price cost) {
         this.cost = cost;
         return this;
     }
@@ -176,7 +176,7 @@ public class ProfileStock implements Serializable {
         return price;
     }
 
-    public ProfileStock price(Price price) {
+    public TenantStock price(Price price) {
         this.price = price;
         return this;
     }
@@ -198,16 +198,16 @@ public class ProfileStock implements Serializable {
         this.merchant = merchant;
     }
 */
-    public ProfileProduct getProduct() {
+    public TenantProduct getProduct() {
         return product;
     }
 
-    public ProfileStock product(ProfileProduct product) {
+    public TenantStock product(TenantProduct product) {
         this.product = product;
         return this;
     }
 
-    public void setProduct(ProfileProduct product) {
+    public void setProduct(TenantProduct product) {
         this.product = product;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
@@ -217,10 +217,10 @@ public class ProfileStock implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ProfileStock)) {
+        if (!(o instanceof TenantStock)) {
             return false;
         }
-        return id != null && id.equals(((ProfileStock) o).id);
+        return id != null && id.equals(((TenantStock) o).id);
     }
 
     @Override
