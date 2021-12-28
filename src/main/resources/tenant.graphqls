@@ -25,6 +25,7 @@ extend type Mutation {
     deleteProduct(id: Long): Message
 
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, _locale: String = "en-OM"): CartResponse
+    createTenantCheckout(secureKey: String, items: [CartItemInput]): CheckoutSession
 }
 
 type TenantTag {

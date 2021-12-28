@@ -1,10 +1,8 @@
 package com.badals.shop.service.mapper;
 
 import com.badals.shop.aop.logging.LocaleContext;
-import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
-import com.badals.shop.domain.ProductLang;
-import com.badals.shop.domain.ProfileProduct;
+import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.*;
 import com.badals.shop.service.dto.ProductDTO;
@@ -13,13 +11,11 @@ import org.mapstruct.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.badals.shop.service.util.AccessUtil.opt;
-
 /**
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
  */
 @Mapper(componentModel = "spring", uses = {CategoryMapper.class, MerchantStockMapper.class})
-public interface ProfileProductMapper extends EntityMapper<ProductDTO, ProfileProduct> {
+public interface ProfileProductMapper extends EntityMapper<ProductDTO, TenantProduct> {
 
 
     @Mapping(source = "parent.id", target = "parent")
@@ -31,17 +27,17 @@ public interface ProfileProductMapper extends EntityMapper<ProductDTO, ProfilePr
     @Mapping(target = "variationOptions", ignore = true)
     @Mapping(source = "ref", target = "id")
     @Mapping(target = "categories", ignore = true)
-    ProductDTO toDto(ProfileProduct product);
+    ProductDTO toDto(TenantProduct product);
 
     @Mapping(target = "price", ignore = true)
-    ProfileProduct toEntity(ProductDTO product);
+    TenantProduct toEntity(ProductDTO product);
 
 
-    default ProfileProduct fromId(Long id) {
+    default TenantProduct fromId(Long id) {
         if (id == null) {
             return null;
         }
-        ProfileProduct product = new ProfileProduct();
+        TenantProduct product = new TenantProduct();
         product.setId(id);
         return product;
     }
@@ -52,7 +48,7 @@ public interface ProfileProductMapper extends EntityMapper<ProductDTO, ProfilePr
     }
 
     @AfterMapping
-    default void afterMapping(@MappingTarget ProductDTO target, ProfileProduct source) {
+    default void afterMapping(@MappingTarget ProductDTO target, TenantProduct source) {
         target.setCurrency(source.getPrice().getCurrency());
         target.setPrice(source.getPrice().getAmount().toPlainString());
         target.setInStock(true);
@@ -89,7 +85,7 @@ public interface ProfileProductMapper extends EntityMapper<ProductDTO, ProfilePr
     }
 
     @BeforeMapping
-    default void beforeMapping(@MappingTarget ProductDTO target, ProfileProduct source) {
+    default void beforeMapping(@MappingTarget ProductDTO target, TenantProduct source) {
         if (source.getParent() != null) {
             target.setVariations(source.getParent().getVariations());
             List<String> dimensions = source.getVariationAttributes().stream().map(x -> x.getName()).collect(Collectors.toList());

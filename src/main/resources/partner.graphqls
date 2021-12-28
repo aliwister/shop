@@ -1,3 +1,14 @@
+extend type Mutation {
+    savePartnerProduct(product: PartnerProductInput): ProductEnvelope
+    getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
+
+    publishProduct(id: Long): Message
+    unpublishProduct(id: Long): Message
+
+    setOrderState(value: OrderState): Message
+    deleteProduct(id: Long): Message
+}
+
 type Price {
     amount: BigDecimal
     currency: String
@@ -199,15 +210,4 @@ type Tenant {
     monthlyFee: BigDecimal
     skuPrefix: String
     contractStartDate: LocalDate
-}
-
-extend type Mutation {
-    savePartnerProduct(product: PartnerProductInput): ProductEnvelope
-    getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
-
-    publishProduct(id: Long): Message
-    unpublishProduct(id: Long): Message
-
-    setOrderState(value: OrderState): Message
-    deleteProduct(id: Long): Message
 }
