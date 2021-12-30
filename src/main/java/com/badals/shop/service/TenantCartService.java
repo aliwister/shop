@@ -1,19 +1,18 @@
-package com.badals.shop.service.tenant;
+package com.badals.shop.service;
 
 import com.badals.shop.domain.*;
-import com.badals.shop.domain.checkout.CheckoutCart;
-import com.badals.shop.domain.checkout.helper.CheckoutAddressMapper;
-import com.badals.shop.domain.checkout.helper.CheckoutLineItemMapper;
+import com.badals.shop.domain.CheckoutCart;
+import com.badals.shop.service.mapper.CheckoutAddressMapper;
+import com.badals.shop.service.mapper.CheckoutLineItemMapper;
 import com.badals.shop.domain.enumeration.CartState;
-import com.badals.shop.domain.tenant.TenantCart;
-import com.badals.shop.domain.tenant.TenantCartItem;
-import com.badals.shop.domain.tenant.TenantCheckout;
+import com.badals.shop.domain.TenantCart;
+import com.badals.shop.domain.TenantCartItem;
+import com.badals.shop.domain.TenantCheckout;
 import com.badals.shop.repository.*;
 import com.badals.shop.repository.projection.CartItemInfo;
-import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
-import com.badals.shop.service.mapper.ProfileCartMapper;
+import com.badals.shop.service.mapper.TenantCartMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,14 +39,14 @@ public class TenantCartService {
     private final TenantCustomerRepository customerRepository;
     private final TenantCartItemRepository cartItemRepository;
 
-    private final ProfileCartMapper cartMapper;
+    private final TenantCartMapper cartMapper;
     private final UserService userService;
     private final TenantProductService productService;
 
     private final CheckoutLineItemMapper checkoutLineItemMapper;
     private final CheckoutAddressMapper checkoutAddressMapper;
 
-    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, ProfileCartMapper cartMapper, UserService userService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
+    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, UserService userService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
         this.checkoutRepository = checkoutRepository;
         this.productRepository = productRepository;

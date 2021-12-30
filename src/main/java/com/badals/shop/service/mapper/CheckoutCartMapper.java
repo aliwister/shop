@@ -1,7 +1,7 @@
-package com.badals.shop.domain.checkout.helper;
+package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.Cart;
-import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.domain.CheckoutCart;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

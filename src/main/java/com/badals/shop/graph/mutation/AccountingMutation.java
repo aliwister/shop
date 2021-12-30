@@ -1,6 +1,6 @@
 package com.badals.shop.graph.mutation;
 
-import com.badals.shop.domain.checkout.helper.Message;
+import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.CheckoutComService;
 import com.badals.shop.service.OrderService;
 import com.badals.shop.service.PaymentService;

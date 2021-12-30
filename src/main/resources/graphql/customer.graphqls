@@ -64,7 +64,7 @@ extend type Query {
     meTest(id: Long): Customer
     customers: [Customer]
     addresses: AddressList
-    addressDescription(isoCode: String, lang: String): AddressFormat
+    #addressDescription(isoCode: String, lang: String): AddressFormat
 }
 
 type AddressList {

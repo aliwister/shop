@@ -1,7 +1,5 @@
-package com.badals.shop.domain.tenant;
+package com.badals.shop.domain;
 
-import com.badals.shop.domain.Merchant;
-import com.badals.shop.domain.Tenant;
 import com.badals.shop.domain.converter.StringListConverter;
 import com.badals.shop.domain.enumeration.Condition;
 import com.badals.shop.domain.enumeration.ProductGroup;

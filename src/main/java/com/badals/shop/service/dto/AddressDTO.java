@@ -1,5 +1,5 @@
 package com.badals.shop.service.dto;
-import com.badals.shop.domain.checkout.helper.AddressPojo;
+import com.badals.shop.domain.pojo.AddressPojo;
 import lombok.Data;
 
 import java.io.Serializable;

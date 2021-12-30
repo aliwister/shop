@@ -2,7 +2,7 @@ package com.badals.shop.repository;
 
 import com.badals.shop.domain.Cart;
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.domain.enumeration.CartState;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
