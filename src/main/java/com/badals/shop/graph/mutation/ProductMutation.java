@@ -1,7 +1,7 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.checkout.helper.Message;
+import com.badals.shop.service.pojo.Message;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.HashtagDTO;

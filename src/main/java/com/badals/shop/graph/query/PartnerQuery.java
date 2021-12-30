@@ -9,7 +9,7 @@ import com.badals.shop.service.*;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
-import com.badals.shop.service.tenant.TenantProductService;
+import com.badals.shop.service.TenantProductService;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

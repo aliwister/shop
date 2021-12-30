@@ -1,6 +1,6 @@
 package com.badals.shop.graph.mutation;
 
-import com.badals.shop.domain.checkout.helper.PresignedUrl;
+import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.service.*;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.security.access.prepost.PreAuthorize;

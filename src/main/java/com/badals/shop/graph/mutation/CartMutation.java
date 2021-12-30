@@ -1,9 +1,9 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.checkout.CheckoutCart;
-import com.badals.shop.domain.checkout.helper.LineItem;
-import com.badals.shop.domain.checkout.helper.Message;
+import com.badals.shop.domain.CheckoutCart;
+import com.badals.shop.domain.pojo.LineItem;
+import com.badals.shop.service.pojo.Message;
 import com.badals.shop.graph.CartResponse;
 import com.badals.shop.graph.CheckoutSessionResponse;
 import com.badals.shop.repository.CheckoutCartRepository;

@@ -1,12 +1,12 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.tenant.TenantCart;
+import com.badals.shop.domain.TenantCart;
 import com.badals.shop.service.dto.CartDTO;
 import org.mapstruct.Mapper;
 
 
-@Mapper(componentModel = "spring", uses = {ProfileCartItemMapper.class})
-public interface ProfileCartMapper extends EntityMapper<CartDTO, TenantCart> {
+@Mapper(componentModel = "spring", uses = {TenantCartItemMapper.class})
+public interface TenantCartMapper extends EntityMapper<CartDTO, TenantCart> {
 
     CartDTO toDto(TenantCart cart);
 

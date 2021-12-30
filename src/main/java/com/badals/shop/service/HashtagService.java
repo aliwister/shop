@@ -6,7 +6,7 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.HashtagRepository;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.mapper.HashtagMapper;
-import com.badals.shop.service.tenant.TenantProductService;
+import com.badals.shop.service.TenantProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

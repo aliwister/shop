@@ -1,6 +1,5 @@
 package com.badals.shop.domain;
-import com.badals.shop.domain.checkout.CheckoutCart;
-import com.badals.shop.domain.checkout.helper.AddressPojo;
+import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Type;

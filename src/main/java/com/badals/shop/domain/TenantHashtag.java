@@ -1,7 +1,5 @@
-package com.badals.shop.domain.tenant;
+package com.badals.shop.domain;
 
-import com.badals.shop.domain.Auditable;
-import com.badals.shop.domain.Tenant;
 import com.badals.shop.domain.pojo.I18String;
 import lombok.Data;
 import org.hibernate.annotations.Type;

@@ -1,9 +1,5 @@
-package com.badals.shop.domain.tenant;
+package com.badals.shop.domain;
 
-import com.badals.shop.domain.Address;
-import com.badals.shop.domain.Carrier;
-import com.badals.shop.domain.Currency;
-import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.CartState;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
