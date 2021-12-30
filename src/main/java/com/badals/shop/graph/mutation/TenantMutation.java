@@ -1,21 +1,18 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.aop.logging.TenantContext;
-import com.badals.shop.domain.checkout.CheckoutCart;
-import com.badals.shop.domain.checkout.helper.Message;
-import com.badals.shop.domain.checkout.helper.PresignedUrl;
+import com.badals.shop.service.pojo.Message;
+import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.graph.CartResponse;
-import com.badals.shop.graph.CheckoutSessionResponse;
-import com.badals.shop.graph.TenantCartResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.pojo.CheckoutSession;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.pojo.ProductEnvelope;
-import com.badals.shop.service.tenant.TenantCartService;
-import com.badals.shop.service.tenant.TenantProductService;
+import com.badals.shop.service.TenantCartService;
+import com.badals.shop.service.TenantProductService;
 import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;

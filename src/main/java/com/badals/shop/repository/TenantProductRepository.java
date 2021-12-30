@@ -1,7 +1,7 @@
 package com.badals.shop.repository;
 
 import com.badals.shop.domain.Product;
-import com.badals.shop.domain.tenant.TenantProduct;
+import com.badals.shop.domain.TenantProduct;
 import com.badals.shop.domain.enumeration.VariationType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

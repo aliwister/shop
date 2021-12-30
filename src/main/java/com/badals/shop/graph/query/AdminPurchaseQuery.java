@@ -15,13 +15,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class PurchaseQuery extends ShopQuery implements GraphQLQueryResolver {
+public class AdminPurchaseQuery extends ShopQuery implements GraphQLQueryResolver {
 
     private final PurchaseService purchaseService;
 
     private final MerchantService merchantService;
 
-    public PurchaseQuery(PurchaseService purchaseService, MerchantService merchantService) {
+    public AdminPurchaseQuery(PurchaseService purchaseService, MerchantService merchantService) {
         this.purchaseService = purchaseService;
         this.merchantService = merchantService;
     }
