@@ -1,7 +1,7 @@
 package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.CartItem;
-import com.badals.shop.domain.tenant.TenantCartItem;
+import com.badals.shop.domain.TenantCartItem;
 import com.badals.shop.service.dto.CartItemDTO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -11,8 +11,8 @@ import org.mapstruct.MappingTarget;
 /**
  * Mapper for the entity {@link CartItem} and its DTO {@link CartItemDTO}.
  */
-@Mapper(componentModel = "spring", uses = {ProfileCartMapper.class, ProfileProductMapper.class})
-public interface ProfileCartItemMapper extends EntityMapper<CartItemDTO, TenantCartItem> {
+@Mapper(componentModel = "spring", uses = {TenantCartMapper.class, TenantProfileProductMapper.class})
+public interface TenantCartItemMapper extends EntityMapper<CartItemDTO, TenantCartItem> {
 
     @Mapping(source = "cart.id", target = "cartId")
     @Mapping(source = "product.ref", target = "productId")

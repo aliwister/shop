@@ -1,8 +1,8 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.checkout.helper.Message;
-import com.badals.shop.domain.checkout.helper.PresignedUrl;
+import com.badals.shop.service.pojo.Message;
+import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.domain.enumeration.OverrideType;
 import com.badals.shop.repository.CheckoutCartRepository;
 import com.badals.shop.service.*;

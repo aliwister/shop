@@ -1,6 +1,6 @@
 package com.badals.shop.repository;
 
-import com.badals.shop.domain.tenant.TenantHashtag;
+import com.badals.shop.domain.TenantHashtag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

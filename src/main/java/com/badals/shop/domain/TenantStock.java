@@ -1,4 +1,4 @@
-package com.badals.shop.domain.tenant;
+package com.badals.shop.domain;
 
 import com.badals.shop.domain.pojo.Price;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

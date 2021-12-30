@@ -1,6 +1,6 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.checkout.helper.Message;
+import com.badals.shop.service.pojo.Message;
 import com.checkout.APIClient;
 import com.checkout.api.services.charge.response.Refund;
 import com.checkout.api.services.shared.Response;

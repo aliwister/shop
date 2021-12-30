@@ -1,4 +1,4 @@
-package com.badals.shop.domain.checkout.helper;
+package com.badals.shop.domain.pojo;
 
 import lombok.Data;
 

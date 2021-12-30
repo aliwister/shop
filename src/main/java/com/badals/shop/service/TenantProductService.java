@@ -1,4 +1,4 @@
-package com.badals.shop.service.tenant;
+package com.badals.shop.service;
 
 import com.badals.shop.aop.logging.TenantContext;
 import com.badals.shop.domain.*;
@@ -6,17 +6,13 @@ import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.domain.tenant.TenantProduct;
-import com.badals.shop.domain.tenant.TenantStock;
+import com.badals.shop.domain.TenantProduct;
+import com.badals.shop.domain.TenantStock;
 import com.badals.shop.graph.PartnerProductResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.TenantHashtagRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
-import com.badals.shop.service.ProductIndexService;
-import com.badals.shop.service.RecycleService;
-import com.badals.shop.service.SlugService;
-import com.badals.shop.service.TenantService;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;
@@ -55,8 +51,8 @@ public class TenantProductService {
     private final ChildProductMapper childProductMapper;
 
     private final TenantHashtagRepository hashtagRepository;
-    private final ProfileHashtagMapper profileHashtagMapper;
-    private final ProfileProductMapper productMapper;
+    private final TenantHashtagMapper tenantHashtagMapper;
+    private final TenantProfileProductMapper productMapper;
 
     private final ProductLangMapper productLangMapper;
     private final ProductSearchRepository productSearchRepository;
@@ -65,15 +61,15 @@ public class TenantProductService {
     private final SlugService slugService;
     private final ProductIndexService productIndexService;
 
-    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, TenantProductMapper tenantProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, ProfileHashtagMapper profileHashtagMapper, ProfileProductMapper profileProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService) {
+    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, TenantProductMapper tenantProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProfileProductMapper tenantProfileProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
-        this.productMapper = profileProductMapper;
+        this.productMapper = tenantProfileProductMapper;
         this.addProductMapper = addProductMapper;
         this.tenantProductMapper = tenantProductMapper;
         this.childProductMapper = childProductMapper;
         this.hashtagRepository = hashtagRepository;
-        this.profileHashtagMapper = profileHashtagMapper;
+        this.tenantHashtagMapper = tenantHashtagMapper;
         this.productLangMapper = productLangMapper;
         this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
@@ -327,7 +323,7 @@ public class TenantProductService {
     }
 
     public List<ProfileHashtagDTO> getTags(Long tenantId) {
-        return hashtagRepository.findForList(tenantId).stream().map(profileHashtagMapper::toDto).collect(Collectors.toList());
+        return hashtagRepository.findForList(tenantId).stream().map(tenantHashtagMapper::toDto).collect(Collectors.toList());
     }
 
     public ProductDTO findProductBySlug(String slug) throws ProductNotFoundException {

@@ -1,7 +1,6 @@
 package com.badals.shop.repository;
 
-import com.badals.shop.domain.Cart;
-import com.badals.shop.domain.tenant.TenantCart;
+import com.badals.shop.domain.TenantCart;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

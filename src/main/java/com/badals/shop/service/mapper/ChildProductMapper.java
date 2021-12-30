@@ -5,8 +5,8 @@ import com.badals.shop.domain.Product;
 
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.domain.tenant.TenantProduct;
-import com.badals.shop.domain.tenant.TenantStock;
+import com.badals.shop.domain.TenantProduct;
+import com.badals.shop.domain.TenantStock;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.ChildProduct;
 import org.mapstruct.AfterMapping;

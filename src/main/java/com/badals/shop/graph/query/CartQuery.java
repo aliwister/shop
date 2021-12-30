@@ -1,10 +1,9 @@
 package com.badals.shop.graph.query;
 
-import com.badals.shop.domain.checkout.CheckoutCart;
+import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.service.CartService;
 import com.badals.shop.service.RewardService;
-import com.badals.shop.service.dto.CartDTO;
-import com.badals.shop.service.dto.CartItemDTO;
+
 import com.badals.shop.service.dto.RewardDTO;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.context.i18n.LocaleContextHolder;
