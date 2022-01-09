@@ -2,8 +2,11 @@ package com.badals.shop.repository;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
 import com.badals.shop.domain.enumeration.OrderState;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Repository;
 
 
@@ -19,7 +22,10 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
    Optional<Order> findOrderByReferenceAndConfirmationKey(String reference, String confirmationKey);
-   List<Order> findOrdersByCustomerOrderByCreatedDateDesc(Customer customer);
+
+
+   List<Order> findOrdersByCustomerOrderByCreatedDateDesc(Customer customer, Pageable of);
+
    List<Order> findAllByOrderStateInOrderByCreatedDateDesc(List<OrderState> orderStates, Pageable page);
    List<Order> findAllByOrderByCreatedDateDesc(Pageable page);
 
@@ -39,4 +45,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    @Query("select count(u) from Order u where u.orderState in ?1")
    Integer countForState(List<OrderState> orderState);
 
+   @Query("select count(u) from Order u where u.customer in ?1")
+   Integer countForCustomer(Customer loginUser);
 }
