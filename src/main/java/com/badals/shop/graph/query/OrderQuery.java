@@ -1,5 +1,6 @@
 package com.badals.shop.graph.query;
 
+import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.service.OrderService;
 import com.badals.shop.service.PaymentService;
 import com.badals.shop.service.ProductService;
@@ -32,8 +33,8 @@ public class OrderQuery extends ShopQuery implements GraphQLQueryResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    public List<OrderDTO> orders(int limit) throws OrderNotFoundException {
-        List<OrderDTO> orders = orderService.getCustomerOrders();
+    public OrderResponse orders(int limit, int offset) throws OrderNotFoundException {
+        OrderResponse orders = orderService.getCustomerOrders(limit, offset);
 
         return orders;
     }
