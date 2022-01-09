@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -161,11 +162,15 @@ public class OrderService {
         return dto;
     }
 
-    public List<OrderDTO> getCustomerOrders() {
+    public OrderResponse getCustomerOrders(Integer limit, Integer offset) {
         Customer loginUser = userService.getUserWithAuthorities().orElse(null);
-        return orderRepository.findOrdersByCustomerOrderByCreatedDateDesc(loginUser).stream()
-                .map(orderMapper::toDto)
-                .collect(Collectors.toCollection(LinkedList::new));
+        List<Order> orders = orderRepository.findOrdersByCustomerOrderByCreatedDateDesc(loginUser, PageRequest.of((int) offset/limit,limit));
+        OrderResponse response = new OrderResponse();
+        response.setTotal(orders.size());
+        response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
+        Integer total = orderRepository.countForCustomer(loginUser);
+        response.setHasMore((limit+offset) < total);
+        return response;
 
     }
 
