@@ -59,7 +59,7 @@ public interface KeepaMapper {
       if (source.getImagesCSV() != null)
          target.setGallery(Arrays.stream(source.getImagesCSV().split(",")).filter(x->x!=null).collect(Collectors.toList()));
 
-      if (target.getGallery() != null)
+      if (target.getGallery() != null && !target.getGallery().isEmpty())
          target.setImage(target.getGallery().get(0));
 
       // starRating

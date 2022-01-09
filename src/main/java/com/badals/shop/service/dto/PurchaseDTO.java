@@ -68,6 +68,8 @@ public class PurchaseDTO implements Serializable {
 
     private Date lastModifiedDate;
 
+    private Integer length;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
