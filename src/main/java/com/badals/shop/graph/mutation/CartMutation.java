@@ -1,9 +1,7 @@
 package com.badals.shop.graph.mutation;
 
-import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.domain.pojo.LineItem;
-import com.badals.shop.service.pojo.Message;
 import com.badals.shop.graph.CartResponse;
 import com.badals.shop.graph.CheckoutSessionResponse;
 import com.badals.shop.repository.CheckoutCartRepository;
@@ -14,11 +12,9 @@ import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.pojo.CheckoutSession;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

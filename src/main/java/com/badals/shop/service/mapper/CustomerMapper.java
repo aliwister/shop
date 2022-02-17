@@ -1,12 +1,8 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.*;
-
-import com.badals.shop.service.dto.CartDTO;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.service.dto.CustomerDTO;
 import org.mapstruct.*;
-
-import java.util.stream.Collectors;
 
 /**
  * Mapper for the entity {@link Customer} and its DTO {@link CustomerDTO}.

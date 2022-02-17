@@ -147,6 +147,8 @@ type Product implements LocalizedObject {
     variations: [Variation]
     price: String
     salePrice: String
+    listPrice: String
+    currency: String
     discountInPercent: Float
     slug: String
     categories: [Category]

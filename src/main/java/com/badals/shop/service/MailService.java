@@ -1,8 +1,6 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.Order;
-import com.badals.shop.domain.User;
 
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;

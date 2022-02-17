@@ -1,11 +1,14 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
+import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.pojo.Price;
+import com.badals.shop.domain.pojo.PriceMap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.SelectBeforeUpdate;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -17,7 +20,9 @@ import java.util.List;
 @Entity
 @Table(name = "stock", catalog = "profileshop")
 @SelectBeforeUpdate(false)
-public class TenantStock implements Serializable {
+@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+public class TenantStock implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,7 +30,20 @@ public class TenantStock implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //@NotNull
+
+   @Column(name="tenant_id")
+   private String tenantId;
+
+   public String getTenantId() {
+      return tenantId;
+   }
+
+   @Override
+   public void setTenantId(String tenantId) {
+      this.tenantId = tenantId;
+   }
+
+   //@NotNull
     @Column(name = "quantity", precision = 21, scale = 2, nullable = false)
     private BigDecimal quantity;
 
@@ -51,26 +69,10 @@ public class TenantStock implements Serializable {
     @Column(name = "cost", columnDefinition = "string")
     private Price cost;
 
-    @Type(type = "json")
-    @Column(name = "price", columnDefinition = "string")
-    private Price price;
-
     @ManyToOne(optional = false)
     @NotNull
     @JsonIgnoreProperties("merchantStocks")
     private TenantProduct product;
-
-   @Type(type = "json")
-   @Column(name = "prices", columnDefinition = "string")
-   List<Price> prices;
-
-   public List<Price> getPrices() {
-      return prices;
-   }
-
-   public void setPrices(List<Price> prices) {
-      this.prices = prices;
-   }
 
    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -172,19 +174,6 @@ public class TenantStock implements Serializable {
         this.cost = cost;
     }
 
-    public Price getPrice() {
-        return price;
-    }
-
-    public TenantStock price(Price price) {
-        this.price = price;
-        return this;
-    }
-
-    public void setPrice(Price price) {
-        this.price = price;
-    }
-
  /*   public Merchant getMerchant() {
         return merchant;
     }
@@ -239,7 +228,6 @@ public class TenantStock implements Serializable {
             ", location='" + getLocation() + "'" +
             ", store='" + getStore() + "'" +
             ", cost='" + getCost() + "'" +
-            ", price='" + getPrice() + "'" +
             "}";
     }
 }

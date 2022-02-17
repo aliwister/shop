@@ -15,16 +15,10 @@ import com.badals.shop.xtra.ebay.EbayLookup;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.support.RequestContextUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 @Component
@@ -162,4 +156,5 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    public ProductResponse hashtagProducts(String tenant, String tag ) {
       return hashtagService.hashtagProducts(tenant, tag);
    }
+
 }

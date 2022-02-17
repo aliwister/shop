@@ -1,12 +1,13 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
 
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.domain.TenantProduct;
-import com.badals.shop.domain.TenantStock;
+import com.badals.shop.domain.pojo.PriceList;
+import com.badals.shop.domain.pojo.PriceMap;
+import com.badals.shop.domain.tenant.TenantProduct;
+import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.ChildProduct;
 import org.mapstruct.AfterMapping;
@@ -14,7 +15,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,16 +28,21 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, TenantPro
     //@Mapping(target = "removeProductLang", ignore = true)
     //@Mapping(target = "merchantStock", ignore = true)
     @Mapping(target = "gallery", ignore = true)
-    @Mapping(target = "merchant", ignore = true)
+    //@Mapping(target = "merchant", ignore = true)
     @Mapping(target = "title", source = "name")
-    @Mapping(target = "price", source = "priceObj")
+    //@Mapping(target = "price", source = "priceObj")
+
+    @Mapping(target = "price", source = "priceObj", qualifiedByName = "pricelistToMap")
+    @Mapping(target = "listPrice", source = "listPriceObj", qualifiedByName = "pricelistToMap")
     //@Mapping(target = "currency", source = "priceObj.currency")
     TenantProduct toEntity(ChildProduct productDTO);
 
-    @Mapping(source = "price", target = "priceObj")
+    //@Mapping(source = "price", target = "priceObj")
     //@Mapping(source = "currency", target = "priceObj.currency")
     @Mapping(target = "gallery", ignore = true)
-    @Mapping(target = "merchant", ignore = true)
+    //@Mapping(target = "merchant", ignore = true)
+    @Mapping(target = "listPriceObj", source="listPrice", qualifiedByName = "priceMapToList")
+    @Mapping(target = "priceObj", source="price", qualifiedByName = "priceMapToList")
     @Mapping(target = "price", ignore = true)
     ChildProduct toDto(TenantProduct product);
 
@@ -51,19 +56,24 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, TenantPro
             target.setGallery(gallery);
         }
 
-        Price price = source.priceObj;
-        assert(price != null);
+        PriceList prices = source.priceObj;
+        assert(prices != null);
 
-        if(price != null) {
-            Double dPrice = price.getAmount().doubleValue();
+        if(prices != null) {
+/*            PriceMap priceMap = new PriceMap();
+            prices.getPriceList().stream().forEach(x -> priceMap.push(x.getCurrency(), x.getAmount()));
+            priceMap.setBase(prices.getBaseCurrency());*/
             Price cost = source.costObj;
-            Double salePrice = price.getAmount().doubleValue();
-            if (source.getSalePrice() != null ) {
+/*            Double dPrice = price.getAmount().doubleValue();
+
+            Double salePrice = price.getAmount().doubleValue();*/
+/*            if (source.getSalePrice() != null ) {
                 salePrice = source.getSalePrice().doubleValue();
             }
             int discount = 100 * (int)((dPrice-salePrice)/dPrice);
+            */
             target.getStock().add(new TenantStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(cost).allow_backorder(false)
-                    .price(price).product(target));
+                    /*.price(price)*/.product(target));
         }
 
 
@@ -85,8 +95,8 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, TenantPro
         // Process sale price and discount percentage
         TenantStock stock = source.getStock().stream().findFirst().orElse(null);
         if (stock != null) {
-            target.setSalePriceObj(stock.getPrice());
-            target.setPriceObj(source.getPrice());
+            //target.setSalePriceObj(stock.getPrice());
+            //target.setPriceObj(source.getPrice());
             target.setDiscountInPercent(0);
             target.setCostObj(stock.getCost());
             target.setQuantity(stock.getQuantity());

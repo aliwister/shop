@@ -57,15 +57,15 @@ spring:
       hibernate.generate_statistics: false
   data:
     jest:
-      uri: https://search-face-elastic-f5y3tcdz6idtcrgutxug4y4il4.eu-central-1.es.amazonaws.com
-      username:
-      password:
+      uri: https://my-deployment-c52568.es.us-east4.gcp.elastic-cloud.com:9243
+      username: elastic
+      password: mC7xMcREKO1G8vRcD8hGUikw
   # see https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-nosql.html#boot-features-connecting-to-elasticsearch-jest
   elasticsearch:
     rest:
-      uris: https://search-face-elastic-f5y3tcdz6idtcrgutxug4y4il4.eu-central-1.es.amazonaws.com
-      username:
-      password:
+      uris: https://my-deployment-c52568.es.us-east4.gcp.elastic-cloud.com:9243
+      username: elastic
+      password: mC7xMcREKO1G8vRcD8hGUikw
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     contexts: prod
@@ -194,6 +194,13 @@ badals:
   cdnUrl: https://d4gk56dg16f6k.cloudfront.net
   s3bucket: face-content-test
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
+
+profileshop:
+  checkout-app: http://127.0.0.1:8081/checkout/start
+  cdnUrl: https://d2cdg7qq9ciilp.cloudfront.net
+  s3bucket: profileshop
+  sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
+
 ebay:
   app-id: BadalTra-5d42-45de-b09b-586ff14be57f
 

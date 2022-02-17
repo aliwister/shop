@@ -1,4 +1,4 @@
-package com.badals.shop.aop.logging;
+package com.badals.shop.aop.tenant;
 
 public class TenantContext {
    private static ThreadLocal<String> currentTenant = new InheritableThreadLocal<>();
@@ -7,6 +7,7 @@ public class TenantContext {
    private static ThreadLocal<Long> currentTenantId = new InheritableThreadLocal<>();
    private static ThreadLocal<Long> currentMerchantId = new InheritableThreadLocal<>();
 
+   // Used for profile-shop purposes based on graphql endpoint, or X-TenantID (for rest calls)
    private static ThreadLocal<String> currentProfile = new InheritableThreadLocal<>();
    private static ThreadLocal<Long> currentProfileId = new InheritableThreadLocal<>();
 
@@ -63,5 +64,9 @@ public class TenantContext {
       currentTenantId.set(null);
       currentMerchantId.set(null);
       currentProfile.set(null);
+   }
+
+   static {
+      clear();
    }
 }
