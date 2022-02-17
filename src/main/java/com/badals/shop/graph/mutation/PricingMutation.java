@@ -2,7 +2,6 @@ package com.badals.shop.graph.mutation;
 
 import com.badals.shop.domain.Customer;
 import com.badals.shop.service.pojo.Message;
-import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.domain.enumeration.OverrideType;
 import com.badals.shop.repository.CheckoutCartRepository;
 import com.badals.shop.service.*;
@@ -19,9 +18,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component

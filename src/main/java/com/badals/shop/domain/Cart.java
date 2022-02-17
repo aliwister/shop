@@ -6,9 +6,7 @@ import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.badals.shop.domain.enumeration.CartState;
 
@@ -55,9 +53,9 @@ public class Cart implements Serializable {
     @JsonIgnoreProperties("carts")
     private Customer customer;
 
-    @ManyToOne
+/*    @ManyToOne
     @JsonIgnoreProperties("carts")
-    private Currency currency;
+    private Currency currency;*/
 
     @ManyToOne
     @JsonIgnoreProperties("carts")
@@ -174,6 +172,7 @@ public class Cart implements Serializable {
         this.customer = customer;
     }
 
+/*
     public Currency getCurrency() {
         return currency;
     }
@@ -186,6 +185,7 @@ public class Cart implements Serializable {
     public void setCurrency(Currency currency) {
         this.currency = currency;
     }
+*/
 
     public Carrier getCarrier() {
         return carrier;

@@ -1,5 +1,6 @@
 package com.badals.shop.web.rest;
 
+import com.badals.shop.domain.PointCustomer;
 import com.badals.shop.service.PointCustomerService;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
 import com.badals.shop.service.dto.PointCustomerDTO;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * REST controller for managing {@link com.badals.shop.domain.PointCustomer}.
+ * REST controller for managing {@link PointCustomer}.
  */
 @RestController
 @RequestMapping("/api")

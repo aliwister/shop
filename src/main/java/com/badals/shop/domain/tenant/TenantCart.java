@@ -1,7 +1,13 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
+import com.badals.shop.aop.tenant.TenantSupport;
+import com.badals.shop.domain.Address;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.CartState;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,7 +20,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "cart", catalog = "profileshop")
-public class TenantCart implements Serializable {
+@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+public class TenantCart implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,17 +60,22 @@ public class TenantCart implements Serializable {
     @JsonIgnoreProperties("carts")
     private Customer customer;
 
-
+/*
     @ManyToOne
     @JsonIgnoreProperties("carts")
     private Currency currency;
 
-    @ManyToOne
+  @ManyToOne
     @JsonIgnoreProperties("carts")
-    private Carrier carrier;
+    private Carrier carrier;*/
 
     @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<TenantCartItem> cartItems = new ArrayList<TenantCartItem>();
+
+    @Column(name="tenant_id")
+    private String tenantId;
+
+
 
     public List<TenantCartItem> getCartItems() {
         return cartItems;
@@ -172,6 +185,7 @@ public class TenantCart implements Serializable {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+/*
 
     public Currency getCurrency() {
         return currency;
@@ -198,6 +212,7 @@ public class TenantCart implements Serializable {
     public void setCarrier(Carrier carrier) {
         this.carrier = carrier;
     }
+*/
 
     public void resetCartItems() {
         this.cartItems = null;
@@ -244,5 +259,13 @@ public class TenantCart implements Serializable {
             ", giftMessage='" + getGiftMessage() + "'" +
             ", cartState='" + getCartState() + "'" +
             "}";
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 }

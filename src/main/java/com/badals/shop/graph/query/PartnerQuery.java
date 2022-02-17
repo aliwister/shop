@@ -2,12 +2,10 @@ package com.badals.shop.graph.query;
 
 import com.badals.shop.domain.enumeration.Currency;
 import com.badals.shop.domain.pojo.I18String;
-import com.badals.shop.graph.MerchantProductResponse;
 import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.graph.PartnerProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.HashtagDTO;
-import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.TenantProductService;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
@@ -24,7 +22,7 @@ import static com.badals.shop.domain.enumeration.Currency.*;
 @Component
 public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
 
-   private final TenantProductService partnerService;
+   private final TenantAdminProductService productService;
    private final HashtagService hashtagService;
 
    private final CategoryService categoryService;
@@ -33,8 +31,8 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
    private final UserService userService;
    private final TenantService tenantService;
 
-   public PartnerQuery(TenantProductService partnerService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
-      this.partnerService = partnerService;
+   public PartnerQuery(TenantAdminProductService productService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
+      this.productService = productService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
@@ -43,11 +41,11 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PartnerProduct partnerProduct(Long id) {
-       return partnerService.getPartnerProduct(id);
+       return productService.getPartnerProduct(id);
     }
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
    public PartnerProductResponse partnerProducts(String search, Integer limit, Integer offset, Boolean active) {
-      return partnerService.findPartnerProducts(search, limit, offset, active);
+      return productService.findPartnerProducts(search, limit, offset, active);
    }
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
    public VariationOption variationOptions(String name) {
@@ -101,10 +99,10 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
          add(QAR);
       }};
    }
-
+/*
    public TenantDTO tenantByName(String name) {
       return tenantService.findOneByName(name);
-   }
+   }*/
 
    //partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
    //partnerOrder(id: ID): Order

@@ -1,11 +1,13 @@
 package com.badals.shop.service.dto;
+import com.badals.shop.domain.PointCustomer;
+
 import java.time.LocalDate;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link com.badals.shop.domain.PointCustomer} entity.
+ * A DTO for the {@link PointCustomer} entity.
  */
 public class PointCustomerDTO implements Serializable {
 

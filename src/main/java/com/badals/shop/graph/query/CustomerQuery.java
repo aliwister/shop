@@ -12,7 +12,6 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /*

@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import com.badals.shop.domain.enumeration.CartState;
+import lombok.Data;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.Cart} entity.
  */
+@Data
 public class CartDTO implements Serializable {
 
     private Long id;
@@ -22,14 +24,6 @@ public class CartDTO implements Serializable {
 
     private List<CartItemDTO> cartItems = new ArrayList<>();
 
-    public List<CartItemDTO> getCartItems() {
-        return cartItems;
-    }
-
-    public void setCartItems(List<CartItemDTO> cartItems) {
-        this.cartItems = cartItems;
-    }
-
     //@NotNull
     private CartState cartState;
 
@@ -40,89 +34,9 @@ public class CartDTO implements Serializable {
 
     private Long customerId;
 
-    private Long currencyId;
-
     private Long carrierId;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSecureKey() {
-        return secureKey;
-    }
-
-    public void setSecureKey(String secureKey) {
-        this.secureKey = secureKey;
-    }
-
-    public Boolean isGift() {
-        return gift;
-    }
-
-    public void setGift(Boolean gift) {
-        this.gift = gift;
-    }
-
-    public String getGiftMessage() {
-        return giftMessage;
-    }
-
-    public void setGiftMessage(String giftMessage) {
-        this.giftMessage = giftMessage;
-    }
-
-    public CartState getCartState() {
-        return cartState;
-    }
-
-    public void setCartState(CartState cartState) {
-        this.cartState = cartState;
-    }
-
-    public Long getDeliveryAddressId() {
-        return deliveryAddressId;
-    }
-
-    public void setDeliveryAddressId(Long addressId) {
-        this.deliveryAddressId = addressId;
-    }
-
-    public Long getInvoiceAddressId() {
-        return invoiceAddressId;
-    }
-
-    public void setInvoiceAddressId(Long addressId) {
-        this.invoiceAddressId = addressId;
-    }
-
-    public Long getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
-    }
-
-    public Long getCurrencyId() {
-        return currencyId;
-    }
-
-    public void setCurrencyId(Long currencyId) {
-        this.currencyId = currencyId;
-    }
-
-    public Long getCarrierId() {
-        return carrierId;
-    }
-
-    public void setCarrierId(Long carrierId) {
-        this.carrierId = carrierId;
-    }
+    private String currency;
 
     @Override
     public boolean equals(Object o) {
@@ -150,13 +64,12 @@ public class CartDTO implements Serializable {
         return "CartDTO{" +
             "id=" + getId() +
             ", secureKey='" + getSecureKey() + "'" +
-            ", gift='" + isGift() + "'" +
             ", giftMessage='" + getGiftMessage() + "'" +
             ", cartState='" + getCartState() + "'" +
             ", deliveryAddress=" + getDeliveryAddressId() +
             ", invoiceAddress=" + getInvoiceAddressId() +
             ", customer=" + getCustomerId() +
-            ", currency=" + getCurrencyId() +
+            ", currency=" + getCurrency() +
             ", carrier=" + getCarrierId() +
             "}";
     }

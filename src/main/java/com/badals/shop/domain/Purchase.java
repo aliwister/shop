@@ -3,7 +3,6 @@ import com.badals.shop.domain.enumeration.OrderState;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

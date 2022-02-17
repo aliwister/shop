@@ -1,17 +1,11 @@
 package com.badals.shop.aop.logging;
 
-import com.badals.shop.domain.Action;
-import com.badals.shop.repository.ActionRepository;
+import com.badals.shop.aop.tenant.TenantContext;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.CodeSignature;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import java.sql.Timestamp;
-import java.util.Optional;
 
 @Aspect
 @Component
@@ -19,8 +13,8 @@ public class LocaleAspect {
 
     @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..)) || "+
             "execution(* com.badals.shop.graph.query.ProductQuery.getProductBySku(..)) || " +
-            "execution(* com.badals.shop.graph.query.TenantQuery.*(..)) || " +
-            "execution(* com.badals.shop.graph.mutation.TenantMutation.*(..)) || " +
+            //"execution(* com.badals.shop.graph.query.TenantQuery.*(..)) || " +
+            //"execution(* com.badals.shop.graph.mutation.TenantMutation.*(..)) || " +
             "execution(* com.badals.shop.*.product(..)))")
     public Object beforeWebMethodExecution1(ProceedingJoinPoint joinPoint) throws Throwable {
         setLocale(joinPoint);

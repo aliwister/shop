@@ -1,5 +1,6 @@
 package com.badals.shop.web.rest;
 
+import com.badals.shop.domain.Customer;
 import com.badals.shop.service.CustomerService;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * REST controller for managing {@link com.badals.shop.domain.Customer}.
+ * REST controller for managing {@link Customer}.
  */
 @RestController
 @RequestMapping("/api")

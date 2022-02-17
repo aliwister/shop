@@ -23,6 +23,8 @@ public class CartItemDTO implements Serializable {
     private Long merchantId;
 
     private String price;
+    private String listPrice;
+    private String currency;
 
     private String salePrice;
     private String image;

@@ -1,9 +1,7 @@
 package com.badals.shop.security;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.User;
 import com.badals.shop.repository.UserRepository;
-import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;

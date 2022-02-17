@@ -1,6 +1,6 @@
 package com.badals.shop.graph.mutation;
 
-import com.badals.shop.aop.logging.TenantContext;
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.service.*;
@@ -27,8 +27,8 @@ import java.util.List;
 
 
 @Component
-public class MerchantMutation implements GraphQLMutationResolver {
-    private final Logger log = LoggerFactory.getLogger(MerchantMutation.class);
+public class TenantAdminMutation implements GraphQLMutationResolver {
+    private final Logger log = LoggerFactory.getLogger(TenantAdminMutation.class);
 
     private final ProductService productService;
 
@@ -44,12 +44,12 @@ public class MerchantMutation implements GraphQLMutationResolver {
 
     private final UserService userService;
 
-    @Value("${badals.cdnUrl}")
+    @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
     private final ProductIndexService productIndexService;
 
 
-    public MerchantMutation(ProductService productService, Pas5Service pasService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, ProductIndexService productIndexService) {
+    public TenantAdminMutation(ProductService productService, Pas5Service pasService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, ProductIndexService productIndexService) {
         this.productService = productService;
         this.pasService = pasService;
         this.awsService = awsService;
@@ -86,13 +86,14 @@ public class MerchantMutation implements GraphQLMutationResolver {
         return new Message("success");
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    //@PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {
         String t =  TenantContext.getCurrentTenant();
         String m = TenantContext.getCurrentMerchant();
         String fileKey = ChecksumUtil.getChecksum(filename + LocalDate.now());
-        String objectKey = "_m/" + m + "/" + fileKey;
+        String objectKey = "_t/" + m + "/" + fileKey;
         URL url = awsService.presignPutUrl(objectKey, contentType);
+
         return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey, "200");
 /*        try {
             S3Presigner presigner = S3Presigner.builder().region(region).build();
