@@ -1,170 +1,178 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.*;
+import com.badals.shop.aop.logging.LocaleContext;
+import com.badals.shop.domain.Product;
+import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.enumeration.VariationType;
-import com.badals.shop.domain.pojo.Gallery;
-import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.domain.TenantProduct;
-import com.badals.shop.domain.TenantStock;
+import com.badals.shop.domain.pojo.*;
+import com.badals.shop.service.CurrencyService;
 import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.service.pojo.AddProductDTO;
-import com.badals.shop.service.pojo.PartnerProduct;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.badals.shop.service.CurrencyService.BASE_CURRENCY_KEY;
 
 /**
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
  */
-@Mapper(componentModel = "spring", uses = {ProductLangMapper.class, MerchantStockMapper.class, ProductLangMapper.class, ChildProductMapper.class})
-public interface TenantProductMapper extends EntityMapper<PartnerProduct, TenantProduct> {
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class, MerchantStockMapper.class})
+public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProduct> {
 
-    //@Mapping(source="langs", target = "productLangs")
-    @Mapping(source="options", target = "variationOptions")
-    //@Mapping(target = "removeProductLang", ignore = true)
-    //@Mapping(target = "merchantStock", ignore = true)
-    @Mapping(target = "gallery", ignore = true)
-    @Mapping(target = "merchant", ignore = true)
-    @Mapping(target = "children", ignore = true)
 
-    @Mapping(target = "title", source = "name")
-    @Mapping(target = "price", source = "priceObj")
-    //@Mapping(target = "currency", source = "priceObj.currency")
-    //@Mapping(target = "dial", ignore = true)
-    TenantProduct toEntity(PartnerProduct productDTO);
+    @Mapping(source = "parent.id", target = "parent")
+    @Mapping(target = "title", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "variations", ignore = true)
+    @Mapping(target = "variationOptions", ignore = true)
+    @Mapping(source = "ref", target = "id")
+    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withCurrencyConversion")
+    @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversion")
+    ProductDTO toDto(TenantProduct product);
 
-    @Mapping(target = "gallery", ignore = true)
-    @Mapping(target = "merchant", ignore = true)
-    //@Mapping(source="dial.dial", target="dial")
-    //@Mapping(source="productLangs", target = "langs")
-    @Mapping(source="variationOptions", target = "options")
+    @Mapping(target = "listPrice", ignore = true)
     @Mapping(target = "price", ignore = true)
-    PartnerProduct toDto(TenantProduct product);
+    TenantProduct toEntity(ProductDTO product);
 
-    @AfterMapping
-    default void afterMapping(@MappingTarget TenantProduct target, PartnerProduct source) {
-        if(source.getGallery() != null) {
-            List<Gallery> gallery = new ArrayList<Gallery>();
-            for(String g: source.getGallery()) {
-                gallery.add(new Gallery(g));
-            }
-            target.setGallery(gallery);
+    @Named("withCurrencyConversion")
+    public static String withCurrencyConversion(PriceMap priceMap) {
+        Locale locale = LocaleContextHolder.getLocale();
+        String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
+        String price = priceMap.getPriceForCurrency(targetCurrency);
+        if(price == null) {
+            String baseCurrency = priceMap.getBase();
+            price = priceMap.getPriceForCurrency(baseCurrency);
+            price = CurrencyService.convert(price, baseCurrency, targetCurrency);
         }
-
-        if(source.getVariationType() == null)
-            target.setVariationType(VariationType.SIMPLE);
-        else
-            target.setVariationType(VariationType.valueOf(source.getVariationType()));
-
-
-        //target(name);
-/*
-        ProductLang langAr = new ProductLang().lang("ar").description(source.getDescription_ar()).title(source.getName_ar()).brand(source.getBrand_ar()).browseNode(source.getBrowseNode());
-        if(source.getFeatures_ar() != null)
-            langAr.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
-
-        ProductLang langEn = new ProductLang().lang("en").description(source.getDescription()).title(source.getName()).brand(source.getBrand()).browseNode(source.getBrowseNode());
-        if(source.getFeatures() != null)
-            langEn.setFeatures(Arrays.asList(source.getFeatures().split(";")));
-        target.getProductLangs().add(langAr.product(target));
-        target.getProductLangs().add(langEn.product(target));
-
-        target.setActive(true);
-        target.getMerchantStock().clear();
-        target.getMerchantStock().add(new MerchantStock().quantity(source.getQuantity()).availability(source.getAvailability()).cost(source.getCost()).allow_backorder(false)
-                .price(source.getSalePrice()).discount(source.getDiscountInPercent()).product(target).merchantId(source.getMerchantId()));*/
-
+        return price;
     }
 
-    @AfterMapping
-    default void afterMapping(@MappingTarget ProductDTO target, AddProductDTO source) {
-        ArrayList<Gallery> gallery = new ArrayList<Gallery>();
-        if (source.getGallery() != null)
-            for (String g : source.getGallery()) {
-                gallery.add(new Gallery(g));
-            }
-
-        gallery.add(0, new Gallery(source.getImage()));
-        target.setGallery(gallery);
-
-        //int hours = stock.getAvailability();
-        target.setAvailability(ProductMapper.processAvailability(target.getHours()).get("en"));
-
-        if(source.getFeatures() != null)
-            target.setFeatures(Arrays.asList(source.getFeatures().split(";")));
-
-        target.setDescription(source.getDescription());
-        target.setBrowseNode(source.getBrowseNode());
-
-        if (source.getSalePrice() != null)
-            target.setPrice(source.getSalePrice().setScale(2, RoundingMode.HALF_UP).toString());
-
-        if(LocaleContextHolder.getLocale().toString().equals("ar")) {
-            ///target.setLang("ar");
-            target.setTitle(source.getName_ar());
-            target.setBrowseNode(source.getBrowseNode_ar());
-            target.setDescription(source.getDescription_ar());
-            target.setBrand(source.getBrand_ar());
-            if(source.getFeatures_ar() != null)
-                target.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
-        }
-    }
-
-    @AfterMapping
-    default void afterMapping(@MappingTarget PartnerProduct target, TenantProduct source) {
-        String langCode = "en";
-        //if (source.getGallery() == null) {
-        List<String> gallery = new ArrayList<String>();
-        //}
-        //target.getGallery().add(0, source.getImage());
-        if(source.getGallery() != null) {
-            for (Gallery g : source.getGallery()) {
-                gallery.add(g.getUrl());
-            }
-            target.setGallery(gallery);
-        }
-
-        // Process sale price and discount percentage
-        TenantStock stock = source.getStock().stream().findFirst().orElse(null);
-        if (stock != null) {
-            target.setSalePriceObj(stock.getPrice());
-            target.setPriceObj(source.getPrice());
-            target.setDiscountInPercent(0);
-            target.setCostObj(stock.getCost());
-            target.setQuantity(stock.getQuantity());
-
-/*            if(stock.getDiscount() != null) {
-                int discount = stock.getDiscount();
-                target.setDiscountInPercent(discount);
-                //target.setPrice(new BigDecimal((int)(10*stock.getPrice().doubleValue()/(1.0-discount*.01))/10.0 ));
-            }*/
-            int hours = stock.getAvailability();
-            /*
-            @Todo
-            Move to language files
-             */
-            target.setAvailability(hours);
-        }
-        String name = source.getLangs().stream().filter(x -> x != null && x.getLang().equals("en")).findFirst().get().getName();
-        target.setName(name);
-    }
-
-    default Product fromId(Long id) {
+    default TenantProduct fromId(Long id) {
         if (id == null) {
             return null;
         }
-        Product purchase = new Product();
-        purchase.setId(id);
-        return purchase;
+        TenantProduct product = new TenantProduct();
+        product.setId(id);
+        return product;
     }
 
+    @Named("doubleToString")
+    public static String doubleToString(double amount) {
+        return String.valueOf(amount);
+    }
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget ProductDTO target, TenantProduct source) {
+        Locale locale = LocaleContextHolder.getLocale();
+        String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
+        String langCode = locale.getLanguage();
+        target.setCurrency(targetCurrency);
+        target.setInStock(true);
+
+        TenantProductLang lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(null);
+
+        if(lang == null) {
+            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().get();
+        }
+
+        TenantProductLang parentLang = lang;
+
+        if(source.getVariationType() == VariationType.CHILD) {
+            parentLang = lang;
+            if(source.getParent().getLangs() != null)
+                parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(lang);
+        }
+
+        if(lang == null && !langCode.equals("en")) {
+            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(null);
+            parentLang = lang;
+            if(source.getVariationType() == VariationType.CHILD)
+                parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(lang);
+        }
+
+        if(lang != null) {
+            target.setTitle(lang.getName());
+            target.setFeatures(parentLang.getFeatures());
+            target.setDescription(parentLang.getDescription());
+        }
+    }
+
+    @BeforeMapping
+    default void beforeMapping(@MappingTarget ProductDTO target, TenantProduct source) {
+        if (source.getParent() != null) {
+            target.setVariations(source.getParent().getVariations());
+            List<String> dimensions = source.getVariationAttributes().stream().map(x -> x.getName()).collect(Collectors.toList());
+            List<VariationOption> variationOptions = new ArrayList<>();
+            for(String dim: dimensions) {
+                VariationOption o = new VariationOption();
+                o.setLabel(dim);
+                o.setName(dim);
+                o.setValues(new ArrayList<>());
+                variationOptions.add(o);
+                //List<String> values = source.getParent().getVariations().stream().filter(x -> (x.getVariationAttributes().stream().filter(y -> y.getName().toLowerCase().startsWith(dim.toLowerCase())).findFirst().get())
+            }
+            // Generate variation list on the fly
+
+            for (Variation v : source.getParent().getVariations()) {
+                for(Attribute attribute: v.getVariationAttributes()) {
+                    try {
+                        variationOptions.stream().filter(y -> attribute.getName().toLowerCase().startsWith(y.getName().toLowerCase())).findFirst().get().getValues().add(attribute.getValue());
+                    }
+                    catch (NoSuchElementException e) {
+                        target.setStub(true);
+                    }
+                }
+
+            }
+            variationOptions.forEach(o -> o.setValues(new ArrayList<>(new HashSet<>(o.getValues()))));
+            target.setVariationOptions(variationOptions);
+        }
+        else {
+            target.setVariations(source.getVariations());
+            target.setVariationOptions(source.getVariationOptions());
+        }
+    }
+
+    public static Map<String, String> processAvailability (int hours) {
+        //messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale());
+        Map<String, String> availability = new HashMap<>();
+        if(hours < 3) {
+            //return "stock.availability.immediate";
+            availability.put("en","Immediate");
+            availability.put("ar","متوفر حالا");
+        }
+        else if(hours <= 48) {
+            availability.put("en", "2 - 3 Days");
+            availability.put("ar", "خلال يومين الى 3");
+        }
+        else if(hours < 5*24) {
+            availability.put("en", "5 to 7 working days");
+            availability.put("ar", "5 الى 7 أيام عمل");
+        }
+        else if(hours < 8*24) {
+            availability.put("en", "7 to 10 working days");
+            availability.put("ar", "7 الى 10 أيام عمل");
+        }
+        else if(hours < 8*24) {
+            availability.put("en", "2 to 3 weeks");
+            availability.put("ar", "2 - 3 أسابيع");
+        }
+        else if(hours < 13*24) {
+            availability.put("en", "3 to 5 weeks");
+            availability.put("ar", "3 - 5 أسابيع");
+        }
+        else if(hours < 16*24) {
+            availability.put("en", "1 to 2 months");
+            availability.put("ar", "1 - 2 شهر");
+        }
+        else if(hours < 60*24) {
+            availability.put("en", "2 to 3 months");
+            availability.put("ar", "2 - 3 أشهر");
+        }
+        return availability;
+    }
 }

@@ -1,11 +1,9 @@
 package com.badals.shop.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * A Address.

@@ -1,3 +1,17 @@
+extend type Mutation {
+    createMerchantProduct(product: AddProductInput) : Message
+    getImageUploadUrl(filename: String, contentType: String): PresignedUrl
+    getUploadUrl(filename: String, contentType: String): PresignedUrl
+
+    importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
+    createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long) : MerchantProduct
+
+    createStub(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long) : MerchantProduct
+    getAdminImageUploadUrl(filename: String, merchant: String, contentType: String): PresignedUrl
+    getAdminFile(filename: String, contentType: String): PresignedUrl
+}
+
+
 type PresignedUrl {
     uploadUrl: String
     imageUrl: String
@@ -76,28 +90,3 @@ input AddProductInput {
       dial: String
 }
 
-extend type Query {
-    merchantProducts(
-            text: String = ""
-            type: String = ""
-            offset: Int = 0
-            limit: Int = 10
-            lang: Int = 1
-            imported: Boolean = true
-    ): MerchantProductResponse
-
-}
-
-extend type Mutation {
-    createMerchantProduct(product: AddProductInput) : Message
-
-    getImageUploadUrl(filename: String, contentType: String): PresignedUrl
-    getUploadUrl(filename: String, contentType: String): PresignedUrl
-
-    importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
-    createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long) : MerchantProduct
-
-    createStub(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long) : MerchantProduct
-    getAdminImageUploadUrl(filename: String, merchant: String, contentType: String): PresignedUrl
-    getAdminFile(filename: String, contentType: String): PresignedUrl
-}

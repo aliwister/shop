@@ -23,14 +23,12 @@ public interface CartMapper extends EntityMapper<CartDTO, Cart> {
     @Mapping(source = "deliveryAddress.id", target = "deliveryAddressId")
     @Mapping(source = "invoiceAddress.id", target = "invoiceAddressId")
     @Mapping(source = "customer.id", target = "customerId")
-    @Mapping(source = "currency.id", target = "currencyId")
     @Mapping(source = "carrier.id", target = "carrierId")
     CartDTO toDto(Cart cart);
 
     @Mapping(source = "deliveryAddressId", target = "deliveryAddress")
     @Mapping(source = "invoiceAddressId", target = "invoiceAddress")
     @Mapping(source = "customerId", target = "customer")
-    @Mapping(source = "currencyId", target = "currency")
     @Mapping(source = "carrierId", target = "carrier")
     @Mapping(target = "cartItems", ignore = true)
     @Mapping(target = "removeCartItem", ignore = true)

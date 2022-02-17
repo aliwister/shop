@@ -1,16 +1,18 @@
 extend type Query {
-    partnerProduct(id: ID, _locale: String = "en-OM"): PartnerProduct
-    tenantProduct(slug: String, _locale: String): Product
-    partnerProducts( search: String,  limit: Int,  offset: Int,  active: Boolean, _locale: String = "en-OM"): PartnerProductResponse
-    variationOptions (name: String, _locale: String = "en-OM"): VariationOption
-    variations (_locale: String = "en-OM"): [VariationOption]
-    tenantTags(tenantId: Long, _locale: String = "en-OM"): [TenantTag]
-    tenantTagProducts(hashtag: String, tenantId: Long, _locale: String = "en-OM"): ProductResponse
-    brands(_locale: String = "en-OM"): [I18String]
-    collections(_locale: String = "en-OM"): [I18String]
-    currencies(_locale: String = "en-OM"): [Currency]
-    tenantByName (name: String, _locale: String = "en-OM"): Tenant
-    cart(secureKey: String, _locale: String = "en-OM"): Cart
+    #partnerProduct(id: ID): PartnerProduct
+    tenantProduct(slug: String ): Product
+    #partnerProducts( search: String,  limit: Int,  offset: Int,  active: Boolean): PartnerProductResponse
+    variationOptions (name: String): VariationOption
+    variations: [VariationOption]
+    tenantTags: [TenantTag]
+    tenantTagProducts(hashtag: String): ProductResponse
+    brands: [I18String]
+    collections: [I18String]
+    currencies: [Currency]
+    tenantByName (name: String): Tenant
+    cart(secureKey: String): Cart
+    orderSummary(ref: String, confirmationKey: String): Order
+
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
 }
@@ -24,7 +26,7 @@ extend type Mutation {
     setOrderState(value: OrderState): Message
     deleteProduct(id: Long): Message
 
-    updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, _locale: String = "en-OM"): CartResponse
+    updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse
     createTenantCheckout(secureKey: String, items: [CartItemInput]): CheckoutSession
 }
 
@@ -41,6 +43,15 @@ type Price {
 input PriceInput {
     amount: BigDecimal
     currency: String
+}
+input PriceListInput {
+    priceList: [PriceInput]
+    baseCurrency: String
+}
+
+type PriceList {
+    priceList: [Price]
+    baseCurrency: String
 }
 
 
@@ -96,9 +107,9 @@ type PartnerProduct {
       brand: String    # The English value
       name: String    # The English value
       image: String    # Main image
-      priceObj: Price
+    listPriceObj: PriceList # null For Parent
+    priceObj: PriceList # null For Parent
       costObj: Price
-	  salePriceObj: Price
       weight: BigDecimal
 	  variationType: String     # SIMPLE, CHILD, PARENT
       slug: String
@@ -128,9 +139,10 @@ type ChildProduct {
 
       isDirty: Boolean # Always false on the type
 
-      priceObj: Price # null For Parent
+      listPriceObj: PriceList # null For Parent
+      priceObj: PriceList # null For Parent
+
       costObj:  Price # null For Parent
-      salePriceObj: Price # null For Parent
 
       weight: BigDecimal
       availability: Int  # In hours
@@ -156,9 +168,9 @@ input PartnerProductInput {
       brand: String    # The English value
       name: String    # The English value
       image: String    # Main image
-      priceObj: PriceInput # null For Parent
+    priceObj: PriceListInput
+    listPriceObj: PriceListInput
       costObj:  PriceInput # null For Parent
-      salePriceObj: PriceInput # null For Parent
       weight: BigDecimal # KG
       variationType: String     # SIMPLE, CHILD, PARENT
       slug: String #readonly
@@ -184,9 +196,10 @@ input ChildProductInput {
 	  
       isDirty: Boolean     # For new product doesn't matter
 
-      priceObj: PriceInput
+      priceObj: PriceListInput
+      listPriceObj: PriceListInput
+
       costObj: PriceInput
-      salePriceObj: PriceInput
 
       weight: BigDecimal
       availability: Int  # In hours

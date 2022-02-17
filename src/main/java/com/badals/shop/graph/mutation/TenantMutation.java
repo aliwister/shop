@@ -1,6 +1,6 @@
 package com.badals.shop.graph.mutation;
 
-import com.badals.shop.aop.logging.TenantContext;
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.domain.enumeration.OrderState;
@@ -34,7 +34,7 @@ import java.util.Locale;
 public class TenantMutation implements GraphQLMutationResolver {
     private final Logger log = LoggerFactory.getLogger(TenantMutation.class);
 
-    private final TenantProductService productService;
+    private final TenantAdminProductService productService;
     private final TenantCartService cartService;
 
     private final ProductLangService productLangService;
@@ -47,11 +47,11 @@ public class TenantMutation implements GraphQLMutationResolver {
 
     private final AwsService awsService;
 
-    @Value("${badals.cdnUrl}")
+    @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
 
 
-    public TenantMutation(TenantProductService productService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
+    public TenantMutation(TenantAdminProductService productService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
         this.productService = productService;
         this.cartService = cartService;
         this.productLangService = productLangService;
@@ -84,14 +84,15 @@ public class TenantMutation implements GraphQLMutationResolver {
         return new ProductEnvelope(p, message.toString(), code);
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    //@PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType) {
         String t = TenantContext.getCurrentTenant();
-        String m = TenantContext.getCurrentMerchant();
+        String m = "mayaseen";// TenantContext.getCurrentMerchant();
         String fileKey = ChecksumUtil.getChecksum(filename + LocalDate.now())+filename.substring(filename.length() - 4);
         String objectKey = "_m/" + m + "/" + fileKey;
 
         URL url = awsService.presignPutUrl(objectKey, contentType);
+        productService.logUploadRequest(objectKey, cdnUrl.toString());
         return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey,m+"/"+fileKey, "200");
     }
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
@@ -115,7 +116,7 @@ public class TenantMutation implements GraphQLMutationResolver {
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
-    public CartResponse updateTenantCart(final String secureKey, final List<CartItemDTO> items, boolean isMerge, String _locale) {
+    public CartResponse updateTenantCart(final String secureKey, final List<CartItemDTO> items, boolean isMerge) {
         Locale l = LocaleContextHolder.getLocale();
         CartDTO cart = this.cartService.updateCart(secureKey, items, isMerge);
         CartResponse response = new CartResponse();

@@ -1,6 +1,7 @@
 package com.badals.shop.config;
 
-import com.badals.shop.aop.logging.CookieFilter;
+import com.badals.shop.aop.logging.RequestInterceptor;
+import com.badals.shop.aop.tenant.TenantRequestFilter;
 import io.github.jhipster.config.JHipsterProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,6 @@ import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerF
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
 import org.springframework.http.MediaType;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -79,7 +79,12 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         return new CorsFilter(source);
     }
     @Bean
-    public CookieFilter cookieFilter() {
-        return new CookieFilter();
+    public TenantRequestFilter cookieFilter() {
+        return new TenantRequestFilter();
+    }
+
+    @Bean
+    public RequestInterceptor requestInterceptor() {
+        return new RequestInterceptor();
     }
 }

@@ -1,5 +1,6 @@
 package com.badals.shop.web.rest;
 
+import com.badals.shop.domain.Address;
 import com.badals.shop.service.AddressService;
 import com.badals.shop.service.dto.AddressDTO;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * REST controller for managing {@link com.badals.shop.domain.Address}.
+ * REST controller for managing {@link Address}.
  */
 @RestController
 @RequestMapping("/api")

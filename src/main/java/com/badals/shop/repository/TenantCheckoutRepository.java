@@ -1,6 +1,6 @@
 package com.badals.shop.repository;
 
-import com.badals.shop.domain.TenantCheckout;
+import com.badals.shop.domain.tenant.TenantCheckout;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,21 +1,19 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
-
+import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.pojo.PaymentMethod;
-import com.badals.shop.domain.enumeration.CartState;
-import com.badals.shop.service.dto.CartDTO;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Data;
-import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -27,8 +25,10 @@ import java.util.List;
 })
 @Entity
 @Data
-@Table(name = "checkout", catalog = "profileshop")
-public class TenantCheckout implements Serializable {
+@Table(catalog = "profileshop", name = "checkout")
+@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+public class TenantCheckout implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
 
@@ -42,12 +42,21 @@ public class TenantCheckout implements Serializable {
     private String phone;
     private String email;
 
+    @Column(name="_lock")
+    private Boolean lock;
+
+    @Column(name="guest")
+    private Boolean guest;
+
     @Column(name="secure_key")
     private String secureKey;
 
     @Type(type = "json")
     @Column(name = "delivery_address", columnDefinition = "string")
     private AddressPojo deliveryAddress;
+
+    @Column(name = "delivery_address_id", columnDefinition = "string")
+    private Long deliveryAddressId;
 
     @Type(type = "json")
     @Column(name = "invoice_address", columnDefinition = "string")
@@ -64,8 +73,10 @@ public class TenantCheckout implements Serializable {
     @Column(name = "carrier")
     private String carrier;
 
-    @Column(name="checked_out")
-    private Boolean checkedOut = false;
+    @Column(name = "cart_weight")
+    private BigDecimal cartWeight;
+
+    private String payment;
 
     private String currency;
 
@@ -73,19 +84,14 @@ public class TenantCheckout implements Serializable {
     @Column(name = "checkout_content", columnDefinition = "string")
     List<LineItem> items;
 
-/*    @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<ProfileCartItem> cartItems = new ArrayList<ProfileCartItem>();
-
-    public List<ProfileCartItem> getCartItems() {
-        return cartItems;
-    }
-
-    public void setCartItems(List<ProfileCartItem> cartItems) {
-        this.cartItems = cartItems;
-    }*/
-
     @Column(name="tenant_id")
-    private Long tenantId;
+    private String tenantId;
+
+    @Column(name="payment_token")
+    private String paymentToken;
+
+    @Column(name="checked_out")
+    private Boolean checkedOut;
 
     @Column(name="allow_pickup")
     private Boolean allowPickup;
@@ -95,7 +101,7 @@ public class TenantCheckout implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TenantCart)) {
+        if (!(o instanceof TenantCheckout)) {
             return false;
         }
         return id != null && id.equals(((TenantCheckout) o).id);
@@ -108,7 +114,7 @@ public class TenantCheckout implements Serializable {
 
     @Override
     public String toString() {
-        return "Cart{" +
+        return "Checkout{" +
                 "id=" + id +
                 ", ref='" + ref + '\'' +
                 ", name='" + name + '\'' +
@@ -123,17 +129,7 @@ public class TenantCheckout implements Serializable {
                 ", currency='" + currency + '\'' +
                 ", items=" + items +
                 ", tenantId=" + tenantId +
+                ", guest=" + guest +
                 '}';
     }
-
-    public CartDTO getCustomer() {
-        return null;
-    }
-
-/*
-    public ProfileCheckout addCartItem(ProfileCartItem cartItem) {
-        this.cartItems.add(cartItem);
-        cartItem.setCart(this);
-        return this;
-    }*/
 }

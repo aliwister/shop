@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public class Price {
     BigDecimal amount;
     String currency;
+    Boolean isBase;
 
     public Price() {
     }

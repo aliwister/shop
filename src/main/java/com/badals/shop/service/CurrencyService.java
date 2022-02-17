@@ -1,19 +1,28 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.Currency;
-import com.badals.shop.repository.CurrencyRepository;
-import com.badals.shop.service.dto.CurrencyDTO;
-import com.badals.shop.service.mapper.CurrencyMapper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.NumberFormat;
+import java.util.*;
 import java.util.stream.Collectors;
+import org.apache.commons.collections4.map.*;
 
 /**
  * Service Implementation for managing {@link Currency}.
@@ -22,64 +31,40 @@ import java.util.stream.Collectors;
 @Transactional
 public class CurrencyService {
 
-    private final Logger log = LoggerFactory.getLogger(CurrencyService.class);
+   public static final String BASE_CURRENCY_KEY = "base";
+   private static final Map<String, String> expiringMap = new PassiveExpiringMap<>(2000000);
 
-    private final CurrencyRepository currencyRepository;
+   private final Logger log = LoggerFactory.getLogger(CurrencyService.class);
 
-    private final CurrencyMapper currencyMapper;
+   public static String convert(String amount, String from, String to) {
+      String rate = expiringMap.get(from+to);
+      if(rate == null) {
+         rate = getRate(from, to);
+         expiringMap.put(from+to, rate);
+      }
+      Locale locale = LocaleContextHolder.getLocale();
+      Currency currency = Currency.getInstance(locale);
+      NumberFormat format = NumberFormat.getNumberInstance();
+      format.setMaximumFractionDigits(2);
+      double price = Double.parseDouble(amount)*Double.parseDouble(rate);
+      String sPrice = format.format(price);
+      return sPrice;
+   }
 
-    public CurrencyService(CurrencyRepository currencyRepository, CurrencyMapper currencyMapper) {
-        this.currencyRepository = currencyRepository;
-        this.currencyMapper = currencyMapper;
+   @SneakyThrows
+    public static String getRate(String from, String to) {
+        String url_str = "https://api.exchangerate.host/convert?from="+from+"&to="+to;
+
+        URL url = new URL(url_str);
+        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+        request.connect();
+
+        JsonParser jp = new JsonParser();
+        JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent()));
+        JsonObject jsonobj = root.getAsJsonObject();
+
+        return jsonobj.get("result").getAsString();
     }
 
-    /**
-     * Save a currency.
-     *
-     * @param currencyDTO the entity to save.
-     * @return the persisted entity.
-     */
-    public CurrencyDTO save(CurrencyDTO currencyDTO) {
-        log.debug("Request to save Currency : {}", currencyDTO);
-        Currency currency = currencyMapper.toEntity(currencyDTO);
-        currency = currencyRepository.save(currency);
-        return currencyMapper.toDto(currency);
-    }
 
-    /**
-     * Get all the currencies.
-     *
-     * @return the list of entities.
-     */
-    @Transactional(readOnly = true)
-    public List<CurrencyDTO> findAll() {
-        log.debug("Request to get all Currencies");
-        return currencyRepository.findAll().stream()
-            .map(currencyMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
-    }
-
-
-    /**
-     * Get one currency by id.
-     *
-     * @param id the id of the entity.
-     * @return the entity.
-     */
-    @Transactional(readOnly = true)
-    public Optional<CurrencyDTO> findOne(Long id) {
-        log.debug("Request to get Currency : {}", id);
-        return currencyRepository.findById(id)
-            .map(currencyMapper::toDto);
-    }
-
-    /**
-     * Delete the currency by id.
-     *
-     * @param id the id of the entity.
-     */
-    public void delete(Long id) {
-        log.debug("Request to delete Currency : {}", id);
-        currencyRepository.deleteById(id);
-    }
 }

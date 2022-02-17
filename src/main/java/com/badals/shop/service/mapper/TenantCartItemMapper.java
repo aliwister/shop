@@ -1,17 +1,24 @@
 package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.CartItem;
-import com.badals.shop.domain.TenantCartItem;
+import com.badals.shop.domain.tenant.TenantCartItem;
+import com.badals.shop.service.CurrencyService;
 import com.badals.shop.service.dto.CartItemDTO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import java.util.Currency;
+import java.util.Locale;
+
+import static com.badals.shop.service.CurrencyService.BASE_CURRENCY_KEY;
 
 /**
  * Mapper for the entity {@link CartItem} and its DTO {@link CartItemDTO}.
  */
-@Mapper(componentModel = "spring", uses = {TenantCartMapper.class, TenantProfileProductMapper.class})
+@Mapper(componentModel = "spring", uses = {TenantCartMapper.class, TenantProductMapper.class})
 public interface TenantCartItemMapper extends EntityMapper<CartItemDTO, TenantCartItem> {
 
     @Mapping(source = "cart.id", target = "cartId")
@@ -21,14 +28,9 @@ public interface TenantCartItemMapper extends EntityMapper<CartItemDTO, TenantCa
     @Mapping(source = "product.slug", target = "slug")
     @Mapping(source = "product.image", target = "image")
     @Mapping(source = "product.merchantId", target = "merchantId")
-    @Mapping(ignore = true, target = "price")
-    @Mapping(ignore = true, target = "salePrice")
+    @Mapping(source = "product.listPrice", target = "listPrice", qualifiedByName = "withCurrencyConversion")
+    @Mapping(source = "product.price", target = "price", qualifiedByName = "withCurrencyConversion")
     CartItemDTO toDto(TenantCartItem cartItem);
-
-    @Mapping(source = "cartId", target = "cart")
-    //@Mapping(source = "productId", target = "product.ref")
-    @Mapping(source = "productId", target = "productId")
-    TenantCartItem toEntity(CartItemDTO cartItemDTO);
 
     @AfterMapping
     default void afterMapping(@MappingTarget TenantCartItem target, CartItemDTO source) {
@@ -39,12 +41,9 @@ public interface TenantCartItemMapper extends EntityMapper<CartItemDTO, TenantCa
 
     @AfterMapping
     default void afterMapping(@MappingTarget CartItemDTO target, TenantCartItem source) {
-        if (target.getImage() != null && !target.getImage().startsWith("https://"))
-            if(target.getMerchantId() == 1)
-                target.setImage("https://m.media-amazon.com/images/I/"+target.getImage());
-
-        target.setPrice(source.getProduct().getPrice().getAmount().toString());
-        target.setSalePrice(source.getProduct().getPrice().getAmount().toString());
+        Locale locale = LocaleContextHolder.getLocale();
+        String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
+        target.setCurrency(targetCurrency);
     }
 
 /*    @AfterMapping

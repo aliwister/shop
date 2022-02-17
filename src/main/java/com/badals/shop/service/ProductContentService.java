@@ -1,6 +1,6 @@
 package com.badals.shop.service;
 
-import com.badals.shop.aop.logging.TenantContext;
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Product;
 import org.imgscalr.Scalr;
 import org.slf4j.Logger;

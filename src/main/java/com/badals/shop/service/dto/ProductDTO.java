@@ -44,6 +44,8 @@ public class ProductDTO implements Serializable {
 */
     private String price;
 
+    private String listPrice;
+
     private String salePrice;
 
     private float discountInPercent = 0;

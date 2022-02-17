@@ -1,6 +1,10 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
+import com.badals.shop.aop.tenant.TenantSupport;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,7 +15,9 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "cart_item", catalog = "profileshop")
-public class TenantCartItem implements Serializable {
+@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+public class TenantCartItem implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 22L;
 
@@ -50,7 +56,22 @@ public class TenantCartItem implements Serializable {
     @ManyToOne
     @JoinColumn(name="product_id", referencedColumnName = "ref", insertable = false, updatable = false)
     private TenantProduct product;
-   // @Column(name = "product_id")
+
+    @Column(name="tenant_id")
+    private String tenantId;
+
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    @Override
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+
+    // @Column(name = "product_id")
    // private Long productId;
 
     //public Long getProductId() {

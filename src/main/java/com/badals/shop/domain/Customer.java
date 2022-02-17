@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -20,6 +23,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "ps_customer", catalog = "prestashop7")
+@FilterDef(name = "TENANT_FILTER", parameters = {@ParamDef(name = "tenantId", type = "string")})
+@Filter(name = "TENANT_FILTER", condition = "tenant_id = :tenantId")
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -92,6 +97,17 @@ public class Customer implements Serializable {
 
     @Column
     private String mobile;
+
+    @Column(name="tenant_id")
+    private String tenantId;
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
     @OneToOne(optional = true)
     @JoinColumn(name="id_customer", referencedColumnName = "customer_id")

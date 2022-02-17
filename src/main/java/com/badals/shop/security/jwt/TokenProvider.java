@@ -5,6 +5,7 @@ import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -75,6 +76,7 @@ public class TokenProvider implements InitializingBean {
 
         return Jwts.builder()
             .setSubject(authentication.getName())
+            .setAudience(TenantContext.getCurrentProfile())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)

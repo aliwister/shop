@@ -1,12 +1,12 @@
 package com.badals.shop.service.dto;
 import com.badals.shop.domain.pojo.AddressPojo;
+import com.badals.shop.domain.Address;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
- * A DTO for the {@link com.badals.shop.domain.Address} entity.
+ * A DTO for the {@link Address} entity.
  */
 @Data
 public class AddressDTO implements Serializable {

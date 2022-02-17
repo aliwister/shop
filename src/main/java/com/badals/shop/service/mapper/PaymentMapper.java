@@ -2,10 +2,8 @@ package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Payment;
-import com.badals.shop.domain.Product;
 import com.badals.shop.service.dto.PaymentDTO;
 
-import com.badals.shop.service.pojo.AddProductDTO;
 import org.mapstruct.*;
 
 /**

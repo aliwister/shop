@@ -4,10 +4,8 @@ import com.badals.shop.config.Constants;
 
 import com.badals.shop.domain.Authority;
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.User;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 import javax.validation.constraints.*;
 import java.time.Instant;
