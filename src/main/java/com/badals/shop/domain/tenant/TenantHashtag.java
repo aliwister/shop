@@ -1,7 +1,13 @@
-package com.badals.shop.domain;
+package com.badals.shop.domain.tenant;
 
+import com.badals.shop.aop.tenant.TenantSupport;
+import com.badals.shop.domain.Auditable;
+import com.badals.shop.domain.Tenant;
 import com.badals.shop.domain.pojo.I18String;
 import lombok.Data;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -14,7 +20,9 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "hashtag", catalog = "profileshop")
-public class TenantHashtag extends Auditable implements Serializable {
+@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+public class TenantHashtag extends Auditable implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
 
@@ -30,9 +38,9 @@ public class TenantHashtag extends Auditable implements Serializable {
 
     private Integer position;
 
-    @ManyToOne
-    @JoinColumn(name="tenant_id", insertable = false, updatable = false)
-    Tenant tenant;
+/*    @ManyToOne
+    @JoinColumn(name="tenant_id", referencedColumnName = "name", insertable = false, updatable = false)
+    Tenant tenant;*/
 
     public TenantHashtag icon(String icon) {
         this.icon = icon;
@@ -43,7 +51,16 @@ public class TenantHashtag extends Auditable implements Serializable {
         return this;
     }
 
+    @Column(name="tenant_id")
+    private String tenantId;
 
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
 
     @Override
     public boolean equals(Object o) {

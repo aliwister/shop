@@ -24,7 +24,7 @@ public class AwsService {
    }
 
 
-   @Value("${badals.s3bucket}")
+   @Value("${profileshop.s3bucket}")
    private String bucketName;
 
    public AwsService(S3Client s3Client) {

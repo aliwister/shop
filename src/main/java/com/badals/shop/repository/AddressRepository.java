@@ -1,7 +1,6 @@
 package com.badals.shop.repository;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
-import com.badals.shop.service.dto.AddressDTO;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;

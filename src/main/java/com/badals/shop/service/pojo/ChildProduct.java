@@ -2,6 +2,7 @@ package com.badals.shop.service.pojo;
 
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Price;
+import com.badals.shop.domain.pojo.PriceList;
 import lombok.Data;
 
 import java.util.List;
@@ -20,8 +21,8 @@ public class ChildProduct extends AddProductDTO {
    }
 
    List<Attribute> variationAttributes;
-   public Price priceObj = new Price();
-   public Price salePriceObj = new Price();
+   public PriceList priceObj = new PriceList();
+   public PriceList listPriceObj = new PriceList();
    public Price costObj = new Price();
 
    public Boolean isDirty;

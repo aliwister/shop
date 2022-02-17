@@ -1,12 +1,8 @@
 package com.badals.shop.service.pojo;
 
-import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.domain.pojo.TenantProductLang;
-import com.badals.shop.domain.pojo.VariationOption;
-import com.badals.shop.service.dto.ProductLangDTO;
+import com.badals.shop.domain.pojo.*;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -24,8 +20,9 @@ public class PartnerProduct extends AddProductDTO {
 
 
    List<ChildProduct> children;
-   public Price priceObj = new Price();
-   public Price salePriceObj = new Price();
+   public PriceList listPriceObj = new PriceList();
+   public PriceList priceObj = new PriceList();
+
    public Price costObj= new Price();
 
    String model;

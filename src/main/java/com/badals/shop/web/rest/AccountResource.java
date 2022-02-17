@@ -2,9 +2,7 @@ package com.badals.shop.web.rest;
 
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.User;
 import com.badals.shop.repository.UserRepository;
-import com.badals.shop.security.SecurityUtils;
 import com.badals.shop.service.MailService;
 import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.PasswordChangeDTO;

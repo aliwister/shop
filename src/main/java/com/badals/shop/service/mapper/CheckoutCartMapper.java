@@ -15,6 +15,5 @@ public interface CheckoutCartMapper {
    @Mapping(source = "customer.addresses", target = "addresses")
    @Mapping(source = "customer.firstname", target = "name")
    @Mapping(source = "customer.email", target = "email")
-   @Mapping(source = "currency.code", target = "currency")
    CheckoutCart cartToCheckoutCart(Cart cart);
 }

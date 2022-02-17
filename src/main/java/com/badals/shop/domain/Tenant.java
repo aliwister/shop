@@ -26,6 +26,17 @@ public class Tenant implements Serializable {
     @Column(name = "name")
     private String name;
 
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    @Column(name = "tenant_id")
+    private String tenantId;
+
     @Column(name = "max_products")
     private Long maxProducts;
 

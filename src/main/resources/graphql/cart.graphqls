@@ -25,6 +25,7 @@ type Cart {
     giftMessage: String,
     #customer: Customer,
     cartItems: [CartItem]
+    currency: String
 }
 
 type CartResponse {
@@ -57,6 +58,8 @@ type CartItem {
     title: String
     price: String
     salePrice: String
+    listPrice: String
+    currency: String
     slug: String
     unit: String
 }

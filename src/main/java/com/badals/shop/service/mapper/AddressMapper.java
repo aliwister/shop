@@ -1,7 +1,6 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.*;
-
+import com.badals.shop.domain.Address;
 import com.badals.shop.service.dto.AddressDTO;
 import org.mapstruct.*;
 

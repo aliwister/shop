@@ -1,4 +1,5 @@
 package com.badals.shop.service.dto;
+import com.badals.shop.domain.Customer;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -7,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link com.badals.shop.domain.Customer} entity.
+ * A DTO for the {@link Customer} entity.
  */
 @Data
 public class CustomerDTO implements Serializable {
