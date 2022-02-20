@@ -60,6 +60,7 @@ public class TenantAdminAspect {
    private Object assignTenant(ProceedingJoinPoint proceedingJoinPoint, String tenant) throws Throwable {
       try {
          TenantContext.setCurrentTenant(tenant);
+         TenantContext.setCurrentProfile(tenant);
       } finally {
          Object retVal;
          retVal = proceedingJoinPoint.proceed();
