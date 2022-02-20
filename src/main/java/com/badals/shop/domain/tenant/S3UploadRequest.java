@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Entity
 @Data
-@Table(name = "profileshop", catalog = "profileshop")
+@Table(name = "s3_upload_request", catalog = "profileshop")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class S3UploadRequest extends Auditable implements Serializable, TenantSupport {
@@ -29,6 +29,7 @@ public class S3UploadRequest extends Auditable implements Serializable, TenantSu
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name="object_key")
     private String key;
 
     private String url;
