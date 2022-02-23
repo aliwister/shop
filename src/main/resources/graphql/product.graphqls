@@ -44,6 +44,7 @@ enum VariationType {
     PARENT
 }
 
+
 enum ProductGroup {
     BAGS
     ART
@@ -168,6 +169,7 @@ type Product implements LocalizedObject {
     rating: String
     _locale: String
     stub: Boolean
+    stock: String
 }
 
 
@@ -176,6 +178,7 @@ type ProductResponse {
   items: [Product!]!
   total: Int!
   hasMore: Boolean!
+  timestamp: LocalDateTime
 }
 
 

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -180,9 +181,9 @@ public class TenantOrderService {
             return searchOrders(orderState, offset, limit, searchText, balance);
 */
 
-        List<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
+        Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();
-        response.setTotal(orders.size());
+        response.setTotal(orders.getSize());
         response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
         Integer total = orderRepository.countForState(orderState);
         response.setHasMore((limit+offset) < total);

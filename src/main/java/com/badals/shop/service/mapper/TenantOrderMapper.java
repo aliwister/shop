@@ -43,7 +43,7 @@ public interface TenantOrderMapper extends EntityMapper<OrderDTO, TenantOrder> {
         BigDecimal balance = target.getTotal();
         if(target.getPayments() != null) {
             for (PaymentDTO p: target.getPayments())
-                if(!p.getVoided())
+                if(p.getVoided()!= null && !p.getVoided())
                     balance = balance.subtract(p.getAmount());
             target.setBalance(balance);
         }

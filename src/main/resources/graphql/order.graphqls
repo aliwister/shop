@@ -35,19 +35,20 @@ type OrderItem {
     productId: Long
     productMerchantId: Long
     po: Long
+    isModifier: Boolean
 }
 
 type Order {
-    id: ID!,
-    reference: String,
-    orderState: OrderState,
-    invoiceDate: LocalDate,
-    deliveryDate: LocalDate,
-    customer: Customer!,
-    cartId: Long,
-    currency: String,
-    deliveryAddress: Address!,
-    invoiceAddress: Address!
+    id: ID!
+    reference: String
+    orderState: OrderState
+    invoiceDate: LocalDate
+    deliveryDate: LocalDate
+    customer: Customer
+    cartId: Long
+    currency: String
+    deliveryAddress: Address
+    invoiceAddress: Address
     orderItems: [OrderItem]
     total: BigDecimal
     deliveryTotal: BigDecimal
@@ -60,6 +61,14 @@ type Order {
     payments: [Payment]
     balance: BigDecimal
     cartSecureKey: String
+    channel: OrderChannel
+    email: String
+}
+
+enum OrderChannel {
+    POS
+    WEB
+    FACEBOOK
 }
 type Merchant {
     id: ID
@@ -151,6 +160,7 @@ type LineItem {
     cost: Float
     subTotal: Float
     url: String
+    isModifier: Boolean
 }
 type CheckoutCart {
     id: ID!
@@ -162,6 +172,7 @@ type CheckoutCart {
     carrier: String
     currency: String
     items: [LineItem]
+
     #tenantId: Long
 }
 input LineItemInput {
@@ -175,6 +186,8 @@ input LineItemInput {
     subTotal: Float
     url: String
     ref: String
+    isModifier: Boolean
+
 }
 
 input AddressPojo {

@@ -7,9 +7,12 @@ import com.badals.shop.domain.tenant.TenantCart;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.web.rest.AuditResource;
 import io.micrometer.core.instrument.config.MeterFilter;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -22,10 +25,6 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> {
-
-    //Optional<TenantOrder> findBySecureKey(String secureKey);
-
-    //List<ProfileCart> findByCustomerAndCartStateOrderByIdDesc(Customer loginUser, CartState claimed);
 
     void refresh(TenantOrder cart);
 
@@ -40,19 +39,49 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
     @Query("select count(u) from TenantOrder u where u.customer in ?1")
     Integer countForCustomer(Customer loginUser);
 
-    List<TenantOrder> findAllByOrderStateInOrderByCreatedDateDesc(List<OrderState> orderState, PageRequest of);
+    Page<TenantOrder> findAllByOrderStateInOrderByCreatedDateDesc(List<OrderState> orderState, Pageable page);
 
     @Query("select count(u) from TenantOrder u where u.orderState in ?1")
     Integer countForState(List<OrderState> orderState);
 
-    //Optional<TenantOrder> findJoinCustomerJoinAddress(Long id);
-
-
     Optional<TenantOrder> findByReference(String id);
 
-    @Query("select o from TenantOrder o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress left join fetch o.cart where o.id = ?1 or o.reference= ?2 order by oi.sequence")
+    @Query("select o from TenantOrder o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress left join fetch o.payments left join fetch o.cart where o.id = ?1 or o.reference= ?2 order by oi.sequence")
     Optional<TenantOrder> findForOrderDetails(Long id, String valueOf);
 
     @Query("select o from TenantOrder o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress where o.id = ?1 and oi.id in ?2")
     Optional<TenantOrder> getOrderWithSomeOrderItems(Long orderId, ArrayList<Long> orderItems);
+
+
+
+    @Query(value="select t.id " +
+            "from  (select :s0 as id " +
+            "union all select :s1 " +
+            "union all select :s2 " +
+            "union all select :s3 " +
+            "union all select :s4 " +
+            "union all select :s5 " +
+            "union all select :s6 " +
+            "union all select :s7 " +
+            "union all select :s8 " +
+            "union all select :s9 " +
+            ") as t  " +
+            "where not exists ( " +
+            "select 1 from  " +
+            "jhi_order o " +
+            "where o.reference = t.id " +
+            ")  " +
+            "limit 1 ", nativeQuery = true)
+    String getFirstUnused(
+            @Param("s0") String option0,
+            @Param("s1") String option1,
+            @Param("s2") String option2,
+            @Param("s3") String option3,
+            @Param("s4") String option4,
+            @Param("s5") String option5,
+            @Param("s6") String option6,
+            @Param("s7") String option7,
+            @Param("s8") String option8,
+            @Param("s9") String option9);
 }
+

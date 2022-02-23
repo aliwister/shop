@@ -3,29 +3,60 @@ package com.badals.shop.service.pojo;
 import com.badals.shop.domain.pojo.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class PartnerProduct extends AddProductDTO {
-   public PartnerProduct() {
-   }
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "product")
+public class PartnerProduct {
+   Long id;
+   String sku;
+   String upc;
+   Long ref;
+   String slug;
+   String image;
+   String name;
+   BigDecimal weight;
+   String type;
+   String unit;
+   Integer availability;
+   BigDecimal quantity;
 
-   public PartnerProduct(Long id, String sku, String name, String name_ar, List<String> shops) {
-      this.id = id;
-      this.sku = sku;
-      this.name = name;
-      this.name_ar = name_ar;
-      this.gallery = shops;
-   }
+   Boolean active;
+
+   List<String> gallery;
+
+   Integer discountInPercent;
+
+   List<String> shops;
+
+   List<Long> shopIds;
+
+   String variationType;
+   Boolean imported;
+   Boolean indexed;
+   Boolean isPos;
+   String tenant;
+   String merchant;
+
+   Long merchantId;
+
+   String url;
+
+
+   Boolean inStock;
+   List<String> hashtags;
+   String title;
 
 
    List<ChildProduct> children;
-   public PriceList listPriceObj = new PriceList();
-   public PriceList priceObj = new PriceList();
+   public PriceList listPrice = new PriceList();
+   public PriceList price = new PriceList();
 
-   public Price costObj= new Price();
+   public Price cost= new Price();
 
    String model;
+   String brand;
 
    List<TenantProductLang> langs;
    List<VariationOption> options;

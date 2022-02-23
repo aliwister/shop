@@ -1,15 +1,21 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Address;
+import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
+import com.badals.shop.domain.enumeration.OrderChannel;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.AddressPojo;
+import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
+import com.badals.shop.domain.tenant.TenantPayment;
+import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.repository.TenantOrderRepository;
+import com.badals.shop.repository.TenantPaymentRepository;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
@@ -21,6 +27,7 @@ import org.hibernate.envers.AuditReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +40,14 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import static com.badals.shop.service.CartService.createUIUD;
 
 /**
  * Service Implementation for managing {@link Order}.
@@ -44,9 +56,11 @@ import java.util.stream.Collectors;
 @Transactional
 public class TenantAdminOrderService {
 
+    private static double ORDER_REF_SIZE = 7;
     private final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final TenantOrderRepository orderRepository;
+    private final TenantPaymentRepository paymentRepository;
     //private final OrderSearchRepository orderSearchRepository;
 
     private final TenantOrderMapper orderMapper;
@@ -60,8 +74,9 @@ public class TenantAdminOrderService {
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
 
-    public TenantAdminOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService) {
+    public TenantAdminOrderService(TenantOrderRepository orderRepository, TenantPaymentRepository paymentRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService) {
         this.orderRepository = orderRepository;
+        this.paymentRepository = paymentRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
         this.customerService = customerService;
@@ -123,6 +138,111 @@ public class TenantAdminOrderService {
         orderRepository.deleteById(id);
     }
 
+    private String generateRandomNumber() {
+        //Random generator = new Random();
+        //int num = generator. nextInt(8999999) + 1000000;
+        long min = (long) Math.pow(10, ORDER_REF_SIZE - 1);
+        Long rand = ThreadLocalRandom.current().nextLong(min, min * 10);
+        return String.valueOf(rand);
+    }
+
+    public String generateOrderId(int attempt) {
+        String ret =  orderRepository.getFirstUnused(generateRandomNumber(),generateRandomNumber(),generateRandomNumber(),generateRandomNumber(),generateRandomNumber(),generateRandomNumber(),generateRandomNumber(),generateRandomNumber(),generateRandomNumber(),generateRandomNumber());
+        if (ret == null) {
+            log.error("ORDER ID is null");
+            if(attempt > 3) {
+                ORDER_REF_SIZE++;
+            }
+            return generateOrderId(++attempt);
+        }
+        return ret;
+    }
+
+    public BigDecimal calculateSubtotal(CheckoutCart checkout) {
+        BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        return sum;
+    }
+
+    public BigDecimal calculateTotal(CheckoutCart checkout) {
+        BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        //sum = sum.add(checkout.getCarrierRate());
+        return sum;
+    }
+
+    @Transactional
+    public TenantOrder createPosOrder(CheckoutCart cart, String paymentMethod) {
+        TenantOrder order = new TenantOrder();
+        order.setChannel(OrderChannel.POS);
+        order.setCurrency(cart.getCurrency());
+        order.setCreatedDate(new Date());
+        order.setInvoiceDate(LocalDate.now());
+        //order.setCustomerId(cart.get);
+        //order.setInvoiceAddress(cart.getInvoiceAddress());
+        //order.setDeliveryAddressId(cart.getDeliveryAddressId());
+        //order.setDeliveryAddress(cart.getDeliveryAddress());
+        order.setEmail(cart.getEmail());
+        order.setOrderState(OrderState.DELIVERED);
+        
+        String orderRef = generateOrderId(1);
+        String uiud = createUIUD();
+
+        order.setReference(orderRef);
+        //order.setConfirmationKey(cart.getSecureKey()+"."+uiud);
+        order.setSubtotal(calculateSubtotal(cart));
+        order.setTotal(calculateTotal(cart));
+        //order.setCart(cart);
+        //order.setCarrier(cart.getCarrier());
+        order.setDeliveryTotal(BigDecimal.ZERO);
+        order.setPaymentMethod(paymentMethod);
+
+        //order.s
+
+        int i = 1;
+        for(LineItem item : cart.getItems()) {
+            TenantOrderItem orderItem = new TenantOrderItem();
+            orderItem.setPrice(item.getPrice());
+            orderItem.setProductName(item.getName());
+            orderItem.setQuantity(BigDecimal.valueOf(item.getQuantity()));
+            orderItem.sequence(i++);
+            orderItem.setImage(item.getImage());
+            orderItem.setWeight(item.getWeight());
+            orderItem.setUnit(item.getUnit());
+            orderItem.setLineTotal(item.getPrice().multiply(orderItem.getQuantity()));
+            orderItem.setSku(item.getSku());
+            if(item.getProductId() != null)
+                orderItem.setProduct(new TenantProduct().ref(item.getProductId().toString()));
+            orderItem.setIsModifier(item.isModifier());
+            if(item.getCost() != null)
+                orderItem.setCost(item.getCost());
+            order.addOrderItem(orderItem);
+
+        }
+
+
+        return order;
+    }
+    
+    
+    @Transactional
+    public OrderDTO createPosOrder(CheckoutCart cart, String paymentMethod, String paymentAmount, String authCode) {
+        TenantOrder order = createPosOrder(cart, paymentMethod);
+        orderRepository.save(order);
+        //if(p.prePay) {
+            TenantPayment payment = new TenantPayment();
+            payment.setAmount(new BigDecimal(paymentAmount));
+            payment.setOrder(order);
+            //payment.setCreated_date(Instant.now());
+            payment.setPaymentMethod(paymentMethod);
+            payment.setTransactionId(authCode);
+            //payment.setCreated_date(Instant.now());
+            payment.setTrackId(cart.getId());
+            payment.setCurrency(cart.getCurrency());
+            paymentRepository.save(payment);
+        //}
+        orderRepository.refresh(order);
+        return orderMapper.toDto(order);
+    }
+
     @Transactional
     public OrderDTO getOrderConfirmation(String reference, String confirmationKey) throws OrderNotFoundException {
         log.info("reference + confirmation key = ", reference, confirmationKey);
@@ -174,9 +294,9 @@ public class TenantAdminOrderService {
             return searchOrders(orderState, offset, limit, searchText, balance);
 */
 
-        List<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
+        Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();
-        response.setTotal(orders.size());
+        response.setTotal(orders.getSize());
         response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
         Integer total = orderRepository.countForState(orderState);
         response.setHasMore((limit+offset) < total);
