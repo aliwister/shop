@@ -3,6 +3,7 @@ package com.badals.shop.repository;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.enumeration.VariationType;
+import com.badals.shop.web.rest.AuditResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -41,6 +42,9 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
 
     @Query("from TenantProduct u left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.id = ?1 ")
     Optional<TenantProduct> findByIdJoinChildren(Long id);
+
+    @Query("from TenantProduct u left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.ref = ?1 ")
+    Optional<TenantProduct> findByRefJoinChildren(String id);
 
 
 

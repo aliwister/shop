@@ -29,21 +29,19 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, TenantPro
     //@Mapping(target = "merchantStock", ignore = true)
     @Mapping(target = "gallery", ignore = true)
     //@Mapping(target = "merchant", ignore = true)
-    @Mapping(target = "title", source = "name")
+    @Mapping(target = "title", source = "title")
     //@Mapping(target = "price", source = "priceObj")
 
-    @Mapping(target = "price", source = "priceObj", qualifiedByName = "pricelistToMap")
-    @Mapping(target = "listPrice", source = "listPriceObj", qualifiedByName = "pricelistToMap")
+    @Mapping(target = "price", source = "price", qualifiedByName = "pricelistToMap")
+    @Mapping(target = "listPrice", source = "listPrice", qualifiedByName = "pricelistToMap")
     //@Mapping(target = "currency", source = "priceObj.currency")
     TenantProduct toEntity(ChildProduct productDTO);
 
-    //@Mapping(source = "price", target = "priceObj")
-    //@Mapping(source = "currency", target = "priceObj.currency")
+
     @Mapping(target = "gallery", ignore = true)
     //@Mapping(target = "merchant", ignore = true)
-    @Mapping(target = "listPriceObj", source="listPrice", qualifiedByName = "priceMapToList")
-    @Mapping(target = "priceObj", source="price", qualifiedByName = "priceMapToList")
-    @Mapping(target = "price", ignore = true)
+    @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "priceMapToList")
+    @Mapping(target = "price", source="price", qualifiedByName = "priceMapToList")
     ChildProduct toDto(TenantProduct product);
 
     @AfterMapping
@@ -56,14 +54,14 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, TenantPro
             target.setGallery(gallery);
         }
 
-        PriceList prices = source.priceObj;
+        PriceList prices = source.price;
         assert(prices != null);
 
         if(prices != null) {
 /*            PriceMap priceMap = new PriceMap();
             prices.getPriceList().stream().forEach(x -> priceMap.push(x.getCurrency(), x.getAmount()));
             priceMap.setBase(prices.getBaseCurrency());*/
-            Price cost = source.costObj;
+            Price cost = source.cost;
 /*            Double dPrice = price.getAmount().doubleValue();
 
             Double salePrice = price.getAmount().doubleValue();*/
@@ -97,8 +95,8 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, TenantPro
         if (stock != null) {
             //target.setSalePriceObj(stock.getPrice());
             //target.setPriceObj(source.getPrice());
-            target.setDiscountInPercent(0);
-            target.setCostObj(stock.getCost());
+            ///target.setDiscountInPercent(0);
+            target.setCost(stock.getCost());
             target.setQuantity(stock.getQuantity());
 
 /*            if(stock.getDiscount() != null) {

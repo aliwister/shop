@@ -14,11 +14,10 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantHashtagRepository;
 import com.badals.shop.repository.TenantProductRepository;
-import com.badals.shop.repository.search.ProductSearchRepository;
+import com.badals.shop.repository.search.PartnerProductSearchRepository;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;
-import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.util.ChecksumUtil;
@@ -57,7 +56,8 @@ public class TenantAdminProductService {
     private final TenantProductMapper productMapper;
 
     private final ProductLangMapper productLangMapper;
-    private final ProductSearchRepository productSearchRepository;
+    private final PartnerProductSearchRepository partnerProductSearchRepository;
+
     private final TenantService tenantService;
     private final RecycleService recycleService;
     private final SlugService slugService;
@@ -67,7 +67,7 @@ public class TenantAdminProductService {
     private final S3UploadRequestRepository s3UploadRequestRepository;
 
 
-    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository) {
+    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
         this.productMapper = tenantProductMapper;
@@ -77,7 +77,7 @@ public class TenantAdminProductService {
         this.hashtagRepository = hashtagRepository;
         this.tenantHashtagMapper = tenantHashtagMapper;
         this.productLangMapper = productLangMapper;
-        this.productSearchRepository = productSearchRepository;
+        this.partnerProductSearchRepository = partnerProductSearchRepository;
         this.tenantService = tenantService;
         this.recycleService = recycleService;
         this.slugService = slugService;
@@ -86,8 +86,23 @@ public class TenantAdminProductService {
         this.s3UploadRequestRepository = s3UploadRequestRepository;
     }
 
-    public PartnerProduct getPartnerProduct(Long id) {
-        TenantProduct product = productRepository.findByIdJoinChildren(id).get();
+    public ProductResponse adminSearchTenantProducts(String upc, String title) {
+        //PartnerProduct p = partnerProductSearchRepository.findBySlug(upc);
+
+        //log.info(p.getSlug());
+
+        List <PartnerProduct> products = partnerProductSearchRepository.findByTenantEqualsAndUpcEquals(TenantContext.getCurrentTenant(), upc);
+        //List <PartnerProduct> products = partnerProductSearchRepository.findByTenantEquals(TenantContext.getCurrentTenant());
+        Integer total = products.size();
+        ProductResponse response = new ProductResponse();
+        response.setTotal(total);
+        response.setHasMore(false);
+        response.setItems(products.stream().map(partnerProductMapper::toProductDto).collect(Collectors.toList()));
+        return response;
+    }
+
+    public PartnerProduct getPartnerProduct(String id) {
+        TenantProduct product = productRepository.findByRefJoinChildren(id).get();
         return partnerProductMapper.toDto(product);
     }
 
@@ -152,18 +167,18 @@ public class TenantAdminProductService {
         }
 
         if(update.getChildren() == null || update.getVariationType().equals(VariationType.SIMPLE)) {
-            assert(dto.getPriceObj() != null);
+            assert(dto.getPrice() != null);
             master.setVariationType(VariationType.SIMPLE);
             TenantStock stock  = null;
             if(master.getStock() != null) {
                 stock = master.getStock().stream().findFirst().orElse(new TenantStock());
-                stock = setStock(stock, master,/* dto.getPriceObj(), dto.getSalePriceObj()==null?dto.getPriceObj():dto.getSalePriceObj(),*/ dto.getCostObj(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
+                stock = setStock(stock, master,/* dto.getPriceObj(), dto.getSalePriceObj()==null?dto.getPriceObj():dto.getSalePriceObj(),*/ dto.getCost(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
             }
             if(stock != null && stock.getId() == null)
                 master.addStock(stock);
         }
         else { // PARENT    //if(product.getVariationType().equals(VariationType.PARENT)) {
-            assert(dto.getPriceObj() == null);
+            assert(dto.getPrice() == null);
             master.setVariationType(VariationType.PARENT);
             saveChildren(master, update, dto, currentMerchantId, _new);
         }
@@ -175,9 +190,9 @@ public class TenantAdminProductService {
         master.setMerchantId(currentMerchantId);
         productRepository.save(master);
 
-        AddProductDTO esDto = addProductMapper.toDto(master);
-/*        if(isSaveES)
-            productIndexService.saveToElastic(esDto);*/
+        PartnerProduct esDto = partnerProductMapper.toDto(master);
+        if(isSaveES)
+            partnerProductSearchRepository.save(esDto);
         return partnerProductMapper.toDto(master);
     }
 
@@ -229,7 +244,7 @@ public class TenantAdminProductService {
             pl.setGallery(c.getGallery());
             pl.sku(c.getSku()).image(c.getImage()).upc(c.getUpc()).weight(c.getWeight()).gallery(c.getGallery());
             TenantStock stock = pl.getStock().stream().findFirst().orElse(new TenantStock());
-            stock = setStock(stock, master, /*dto2.getPriceObj(), dto2.getSalePriceObj(),*/ dto2.getCostObj(), dto2.getQuantity(), dto2.getAvailability(), currentMerchantId);
+            stock = setStock(stock, master, /*dto2.getPriceObj(), dto2.getSalePriceObj(),*/ dto2.getCost(), dto2.getQuantity(), dto2.getAvailability(), currentMerchantId);
             if(stock.getId() == null)
                 pl.addStock(stock);
 
@@ -291,7 +306,7 @@ public class TenantAdminProductService {
                 /*.price(salePriceObj)*/.product(master);
     }
 
-    public PartnerProductResponse findPartnerProducts(String text, Integer limit, Integer offset, Boolean active) {
+    public ProductResponse findPartnerProducts(String text, Integer limit, Integer offset, Boolean active) {
         //List<AddProductDTO> result = search("tenant:"+currentTenant + " AND imported:" + imported.toString() + ((text != null)?" AND "+text:""));
         String profile = TenantContext.getCurrentProfile();
         String like = null;
@@ -300,10 +315,10 @@ public class TenantAdminProductService {
 
         Integer total = productRepository.countForTenant(like, VariationType.CHILD);
         List<TenantProduct> result = productRepository.listForTenantAll(like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
-        PartnerProductResponse response = new PartnerProductResponse();
+        ProductResponse response = new ProductResponse();
         response.setTotal(total);
         response.setHasMore((limit + offset) < total);
-        response.setItems(result.stream().map(partnerProductMapper::toDto).collect(Collectors.toList()));
+        response.setItems(result.stream().map(productMapper::toPartnerListDto).collect(Collectors.toList()));
         return response;
     }
 
@@ -313,8 +328,9 @@ public class TenantAdminProductService {
         productRepository.delete(true, id);
     }
 
+    @Transactional
    public void setProductPublished(Long id, Boolean value) throws ProductNotFoundException {
-       final TenantProduct product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+       final TenantProduct product = productRepository.findOneByRef(id.toString()).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
        verifyOwnership(product);
 
        product.setActive(value);

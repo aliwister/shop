@@ -1,6 +1,8 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.aop.tenant.TenantContext;
+import com.badals.shop.domain.CheckoutCart;
+import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.service.*;
@@ -31,6 +33,7 @@ public class TenantAdminMutation implements GraphQLMutationResolver {
     private final Logger log = LoggerFactory.getLogger(TenantAdminMutation.class);
 
     private final ProductService productService;
+    private final TenantAdminOrderService tenantAdminOrderService;
 
     private final Pas5Service pasService;
 
@@ -49,8 +52,9 @@ public class TenantAdminMutation implements GraphQLMutationResolver {
     private final ProductIndexService productIndexService;
 
 
-    public TenantAdminMutation(ProductService productService, Pas5Service pasService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, ProductIndexService productIndexService) {
+    public TenantAdminMutation(ProductService productService, TenantAdminOrderService tenantAdminOrderService, Pas5Service pasService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, ProductIndexService productIndexService) {
         this.productService = productService;
+        this.tenantAdminOrderService = tenantAdminOrderService;
         this.pasService = pasService;
         this.awsService = awsService;
         this.productLangService = productLangService;
@@ -70,6 +74,11 @@ public class TenantAdminMutation implements GraphQLMutationResolver {
         return new Message("New Draft Product created successfully");
     }
 
+
+    public OrderDTO createPosOrder(CheckoutCart cart, String paymentMethod, String paymentAmount, String ref) {
+        return tenantAdminOrderService.createPosOrder(cart, paymentMethod, paymentAmount, ref);
+
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {

@@ -1,31 +1,15 @@
 extend type Query {
-    #partnerProduct(id: ID): PartnerProduct
     tenantProduct(slug: String ): Product
-    #partnerProducts( search: String,  limit: Int,  offset: Int,  active: Boolean): PartnerProductResponse
     variationOptions (name: String): VariationOption
-    variations: [VariationOption]
     tenantTags: [TenantTag]
     tenantTagProducts(hashtag: String): ProductResponse
-    brands: [I18String]
-    collections: [I18String]
-    currencies: [Currency]
     tenantByName (name: String): Tenant
     cart(secureKey: String): Cart
     orderSummary(ref: String, confirmationKey: String): Order
-
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
 }
 extend type Mutation {
-    savePartnerProduct(product: PartnerProductInput): ProductEnvelope
-    getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
-
-    publishProduct(id: Long): Message
-    unpublishProduct(id: Long): Message
-
-    setOrderState(value: OrderState): Message
-    deleteProduct(id: Long): Message
-
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse
     createTenantCheckout(secureKey: String, items: [CartItemInput]): CheckoutSession
 }
@@ -36,194 +20,6 @@ type TenantTag {
     position: Int
 }
 
-type Price {
-    amount: BigDecimal
-    currency: String
-}
-input PriceInput {
-    amount: BigDecimal
-    currency: String
-}
-input PriceListInput {
-    priceList: [PriceInput]
-    baseCurrency: String
-}
-
-type PriceList {
-    priceList: [Price]
-    baseCurrency: String
-}
-
-
-type ProductI18n {
-    name: String
-    description: String
-    model: String
-    features: [String]
-    brand: String
-    lang: String #ar #en
-}
-
-input ProductI18nInput {
-    name: String
-    description: String
-    model: String
-    features: [String]
-    brand: String
-    lang: String
-}
-
-type Attribute {
-    name: String
-    value: String
-}
-
-type VariationOption {
-    label: String
-    name: String
-    values: [String]
-}
-
-input VariationOptionInput {
-    label: String
-    name: String
-    values: [String] #Ordered
-}
-
-type Variation {
-    ref: ID!
-    variationAttributes: [Attribute]
-}
-
-type PartnerProduct {
-      id: ID           # Auto generated
-      active: Boolean
-      sku: String
-      upc: String
-	  model: String
-      hashtags: [String]  #Hashtags
-      ref: String      # Auto generated
-      slug: String     # Must be Unique
-      brand: String    # The English value
-      name: String    # The English value
-      image: String    # Main image
-    listPriceObj: PriceList # null For Parent
-    priceObj: PriceList # null For Parent
-      costObj: Price
-      weight: BigDecimal
-	  variationType: String     # SIMPLE, CHILD, PARENT
-      slug: String
-      unit: String     #
-      availability: Int  # In hours
-      quantity: BigDecimal
-      discountInPercent: Int
-      options: [VariationOption]
-      langs: [ProductI18n]
-      gallery: [String]   # Ordered
-      children: [ChildProduct]
-}
-
-type PartnerProductResponse {
-        items: [PartnerProduct]
-        total: Int!
-        hasMore: Boolean!
-}
-
-type ChildProduct {
-      id: ID
-      slug: String     # Must be Unique
-      image: String    # Main image
-
-	  sku: String
-      upc: String
-
-      isDirty: Boolean # Always false on the type
-
-      listPriceObj: PriceList # null For Parent
-      priceObj: PriceList # null For Parent
-
-      costObj:  Price # null For Parent
-
-      weight: BigDecimal
-      availability: Int  # In hours
-
-      quantity: BigDecimal
-      discountInPercent: Int
-
-      gallery: [String]   # Ordered
-      variationAttributes: [Attribute]
-
-      active: Boolean
-}
-
-
-input PartnerProductInput {
-      id: ID           # Auto generated
-      sku: String
-      upc: String
-      model: String
-      hashtags: [String]  #Hashtags
-      ref: String  #Ignored since read only
-      slug: String     # Must be Unique
-      brand: String    # The English value
-      name: String    # The English value
-      image: String    # Main image
-    priceObj: PriceListInput
-    listPriceObj: PriceListInput
-      costObj:  PriceInput # null For Parent
-      weight: BigDecimal # KG
-      variationType: String     # SIMPLE, CHILD, PARENT
-      slug: String #readonly
-      unit: String
-      availability: Int  # In hours
-      quantity: BigDecimal
-      discountInPercent: Int
-	  options: [VariationOptionInput]
-	  langs: [ProductI18nInput]
-      gallery: [String]   # Ordered
-      children: [ChildProductInput]
-      
-      
-}
-
-input ChildProductInput {
-      id: ID
-	  slug: String     # Must be Unique
-	  image: String    # Main image
-	  
-	  sku: String
-      upc: String
-	  
-      isDirty: Boolean     # For new product doesn't matter
-
-      priceObj: PriceListInput
-      listPriceObj: PriceListInput
-
-      costObj: PriceInput
-
-      weight: BigDecimal
-      availability: Int  # In hours
-
-      quantity: BigDecimal
-	  discountInPercent: Int
-
-      gallery: [String]   # Ordered
-      variationAttributes: [AttributeInput]
-
-      active: Boolean
-}
-
-type ProductEnvelope {
-    message: String
-    product: PartnerProduct
-    code: Int
-}
-
-
-type I18String {
-    lang: String
-    value: String
-}
 
 type Tenant {
     id: Long

@@ -23,6 +23,16 @@ public class LineItem implements Serializable {
     String url;
     Integer availability;
 
+    public Boolean getModifier() {
+        return isModifier;
+    }
+
+    public void setModifier(Boolean modifier) {
+        isModifier = modifier;
+    }
+
+    Boolean isModifier;
+
 
     public Long getProductId() {
         return productId;

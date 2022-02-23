@@ -1,10 +1,7 @@
 package com.badals.shop.service;
 
-import com.badals.shop.config.Constants;
-
 import com.badals.shop.ShopApp;
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.User;
 import io.github.jhipster.config.JHipsterProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,8 +27,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

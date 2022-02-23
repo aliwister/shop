@@ -11,4 +11,11 @@ import java.util.List;
 public class PriceList implements Serializable {
     List<Price> priceList = new ArrayList<>();
     String baseCurrency;
+
+    public String getPriceForCurrency(String targetCurrency) {
+        Price p = priceList.stream().filter(x -> x.getCurrency().equals(targetCurrency)).findFirst().orElse(null);
+        if (p != null)
+            return p.getAmount().toString();
+        return null;
+    }
 }
