@@ -39,6 +39,8 @@ public class ProductDTO implements Serializable {
 
     private String upc;
 
+    private String stock;
+
 /*
     @NotNull
 */

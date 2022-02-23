@@ -28,8 +28,8 @@ public interface TenantCartItemMapper extends EntityMapper<CartItemDTO, TenantCa
     @Mapping(source = "product.slug", target = "slug")
     @Mapping(source = "product.image", target = "image")
     @Mapping(source = "product.merchantId", target = "merchantId")
-    @Mapping(source = "product.listPrice", target = "listPrice", qualifiedByName = "withCurrencyConversion")
-    @Mapping(source = "product.price", target = "price", qualifiedByName = "withCurrencyConversion")
+    @Mapping(source = "product.listPrice", target = "listPrice", qualifiedByName = "withCurrencyConversionMap")
+    @Mapping(source = "product.price", target = "price", qualifiedByName = "withCurrencyConversionMap")
     CartItemDTO toDto(TenantCartItem cartItem);
 
     @AfterMapping

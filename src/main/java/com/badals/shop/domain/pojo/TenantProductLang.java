@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 public class TenantProductLang implements Serializable {
-    String name;
+    String title;
     String brand;
     String group;
     String model;

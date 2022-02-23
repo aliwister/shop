@@ -1,13 +1,16 @@
 package com.badals.shop.graph.query;
 
 import com.badals.shop.domain.enumeration.Currency;
+import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.I18String;
 import com.badals.shop.domain.pojo.VariationOption;
-import com.badals.shop.graph.PartnerProductResponse;
+import com.badals.shop.graph.OrderResponse;
+import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.HashtagDTO;
+import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
-import com.badals.shop.service.TenantProductService;
+import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,7 @@ import static com.badals.shop.domain.enumeration.Currency.*;
 public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final TenantAdminProductService productService;
+   private final TenantAdminOrderService orderService;
    private final HashtagService hashtagService;
 
    private final CategoryService categoryService;
@@ -31,8 +35,9 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
    private final UserService userService;
    private final TenantService tenantService;
 
-   public PartnerQuery(TenantAdminProductService productService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
+   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
       this.productService = productService;
+      this.orderService = orderService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
@@ -40,11 +45,12 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
    }
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
-    public PartnerProduct partnerProduct(Long id) {
+    public PartnerProduct partnerProduct(String id) {
        return productService.getPartnerProduct(id);
     }
-   @PreAuthorize("hasRole('ROLE_MERCHANT')")
-   public PartnerProductResponse partnerProducts(String search, Integer limit, Integer offset, Boolean active) {
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+   public ProductResponse partnerProducts(String search, Integer limit, Integer offset, Boolean active) {
       return productService.findPartnerProducts(search, limit, offset, active);
    }
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
@@ -106,6 +112,17 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
 
    //partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
    //partnerOrder(id: ID): Order
+   //@PreAuthorize("hasRole('ROLE_MERCHANT')")
+   public OrderResponse partnerOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) throws OrderNotFoundException {
+      return orderService.getOrders(orderState, offset, limit, searchText, balance);
+      //return orders;
+   }
 
+   //@PreAuthorize("hasRole('ROLE_ADMIN')")
+   public OrderDTO partnerOrder(Long id) throws OrderNotFoundException {
+      OrderDTO o = orderService.getOrderWithOrderItems(id).orElse(null);
+      if(o == null) throw new OrderNotFoundException("No order found with this name");
+      return o;
+   }
 }
 

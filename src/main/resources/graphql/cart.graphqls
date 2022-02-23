@@ -111,15 +111,4 @@ type CheckoutCart {
     items: [LineItem]
     #tenantId: Long
 }
-input LineItemInput {
-    productId: Long
-    sku: String
-    image: String
-    name: String
-    quantity: Float
-    price: Float
-    cost: Float
-    subTotal: Float
-    url: String
-    ref: String
-}
+

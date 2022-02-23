@@ -2,12 +2,10 @@ package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
-import com.badals.shop.domain.pojo.Gallery;
-import com.badals.shop.domain.pojo.Price;
-import com.badals.shop.domain.pojo.PriceList;
-import com.badals.shop.domain.pojo.PriceMap;
+import com.badals.shop.domain.pojo.*;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.tenant.TenantStock;
+import com.badals.shop.service.CurrencyService;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -18,7 +16,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
@@ -33,23 +34,33 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
     @Mapping(target = "gallery", ignore = true)
     ////@Mapping(target = "merchant", ignore = true)
     @Mapping(target = "children", ignore = true)
-
-    @Mapping(target = "title", source = "name")
-    @Mapping(target = "price", source = "priceObj", qualifiedByName = "pricelistToMap")
-    @Mapping(target = "listPrice", source = "listPriceObj", qualifiedByName = "pricelistToMap")
+    @Mapping(target = "price", source = "price", qualifiedByName = "pricelistToMap")
+    @Mapping(target = "listPrice", source = "listPrice", qualifiedByName = "pricelistToMap")
     //@Mapping(target = "currency", source = "priceObj.currency")
     //@Mapping(target = "dial", ignore = true)
     TenantProduct toEntity(PartnerProduct productDTO);
+
+    @Mapping(target = "title", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "variations", ignore = true)
+    @Mapping(target = "variationOptions", ignore = true)
+    @Mapping(source = "ref", target = "id")
+    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withCurrencyConversionList")
+    @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversionList")
+    @Mapping(target = "gallery", source="gallery", qualifiedByName = "buildGallery")
+    ProductDTO toProductDto(PartnerProduct product);
 
     @Mapping(target = "gallery", ignore = true)
     //@Mapping(target = "merchant", ignore = true)
     //@Mapping(source="dial.dial", target="dial")
     //@Mapping(source="productLangs", target = "langs")
     @Mapping(source="variationOptions", target = "options")
-    @Mapping(target = "listPriceObj", source="listPrice", qualifiedByName = "priceMapToList")
-    @Mapping(target = "priceObj", source="price", qualifiedByName = "priceMapToList")
-    @Mapping(target = "price", ignore = true)
+    @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "priceMapToList")
+    @Mapping(target = "price", source="price", qualifiedByName = "priceMapToList")
+    @Mapping(target = "tenant", source="tenantId")
     PartnerProduct toDto(TenantProduct product);
+
 
     @Named("pricelistToMap")
     public static PriceMap pricelistToMap(PriceList list) {
@@ -60,6 +71,10 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
             priceMap.setBase(list.getPriceList().get(0).getCurrency());
         return priceMap;
     }
+    @Named("buildGallery")
+    public static List<Gallery> gallery(List<String> gallery) {
+        return gallery.stream().map(x -> new Gallery(x)).collect(Collectors.toList());
+    }
 
     @Named("priceMapToList")
     public static PriceList priceMapToList(PriceMap map) {
@@ -69,6 +84,20 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
         return priceList;
     }
 
+
+    @Named("withCurrencyConversionList")
+    public static String withCurrencyConversionList(PriceList list) {
+        Locale locale = LocaleContextHolder.getLocale();
+        String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
+        String price = list.getPriceForCurrency(targetCurrency);
+        if(price == null) {
+            String baseCurrency = list.getBaseCurrency();
+            price = list.getPriceForCurrency(baseCurrency);
+            if (price == null) return "";
+            price = CurrencyService.convert(price.toString(), baseCurrency, targetCurrency);
+        }
+        return price;
+    }
 
     @AfterMapping
     default void afterMapping(@MappingTarget TenantProduct target, PartnerProduct source) {
@@ -106,40 +135,6 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
     }
 
     @AfterMapping
-    default void afterMapping(@MappingTarget ProductDTO target, AddProductDTO source) {
-        ArrayList<Gallery> gallery = new ArrayList<Gallery>();
-        if (source.getGallery() != null)
-            for (String g : source.getGallery()) {
-                gallery.add(new Gallery(g));
-            }
-
-        gallery.add(0, new Gallery(source.getImage()));
-        target.setGallery(gallery);
-
-        //int hours = stock.getAvailability();
-        target.setAvailability(ProductMapper.processAvailability(target.getHours()).get("en"));
-
-        if(source.getFeatures() != null)
-            target.setFeatures(Arrays.asList(source.getFeatures().split(";")));
-
-        target.setDescription(source.getDescription());
-        target.setBrowseNode(source.getBrowseNode());
-
-        if (source.getSalePrice() != null)
-            target.setPrice(source.getSalePrice().setScale(2, RoundingMode.HALF_UP).toString());
-
-        if(LocaleContextHolder.getLocale().getLanguage().equals("ar")) {
-            ///target.setLang("ar");
-            target.setTitle(source.getName_ar());
-            target.setBrowseNode(source.getBrowseNode_ar());
-            target.setDescription(source.getDescription_ar());
-            target.setBrand(source.getBrand_ar());
-            if(source.getFeatures_ar() != null)
-                target.setFeatures(Arrays.asList(source.getFeatures_ar().split(";")));
-        }
-    }
-
-    @AfterMapping
     default void afterMapping(@MappingTarget PartnerProduct target, TenantProduct source) {
         String langCode = "en";
         //if (source.getGallery() == null) {
@@ -159,7 +154,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
 /*            target.setSalePriceObj(stock.getPrice());
             target.setPriceObj(source.getPrice());*/
             target.setDiscountInPercent(0);
-            target.setCostObj(stock.getCost());
+            target.setCost(stock.getCost());
             target.setQuantity(stock.getQuantity());
 
 /*            if(stock.getDiscount() != null) {
@@ -174,8 +169,44 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
              */
             target.setAvailability(hours);
         }
-        String name = source.getLangs().stream().filter(x -> x != null && x.getLang().equals("en")).findFirst().get().getName();
-        target.setName(name);
+        //String name = source.getLangs().stream().filter(x -> x != null && x.getLang().equals("en")).findFirst().get().getName();
+        //target.setTi(name);
+    }
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget ProductDTO target, PartnerProduct source) {
+        Locale locale = LocaleContextHolder.getLocale();
+        String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
+        String langCode = locale.getLanguage();
+        target.setCurrency(targetCurrency);
+        target.setInStock(true);
+
+        TenantProductLang lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(null);
+
+        if(lang == null) {
+            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().get();
+        }
+
+        TenantProductLang parentLang = lang;
+
+/*        if(source.getVariationType() == VariationType.CHILD) {
+            parentLang = lang;
+            if(source.getParent().getLangs() != null)
+                parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(lang);
+        }
+
+        if(lang == null && !langCode.equals("en")) {
+            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(null);
+            parentLang = lang;
+            if(source.getVariationType() == VariationType.CHILD)
+                parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(lang);
+        }*/
+
+        if(lang != null) {
+            target.setTitle(lang.getTitle());
+            target.setFeatures(parentLang.getFeatures());
+            target.setDescription(parentLang.getDescription());
+        }
     }
 
     default Product fromId(Long id) {

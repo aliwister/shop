@@ -13,6 +13,7 @@ import com.badals.shop.service.mapper.AddProductMapper;
 import com.badals.shop.service.mapper.AlgoliaProductMapper;
 import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.TenantService;
+import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;
