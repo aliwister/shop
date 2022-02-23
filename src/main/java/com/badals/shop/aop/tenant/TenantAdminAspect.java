@@ -34,8 +34,8 @@ public class TenantAdminAspect {
    public Object assignForController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
       Object userObj =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
       if (userObj == null|| userObj.equals("anonymousUser")) {
-         return assignTenant(proceedingJoinPoint, "mayaseen");
-         //throw new IllegalAccessException("Not Authorized");
+         //return assignTenant(proceedingJoinPoint, "mayaseen");
+         throw new IllegalAccessException("Not Authorized");
       }
       User user = (User) userObj;
       List<Tenant> tenantList = tenantRepository.findTenantAndMerchantByCustomer(user.getUsername());
