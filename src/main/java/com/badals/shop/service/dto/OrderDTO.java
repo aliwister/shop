@@ -1,4 +1,5 @@
 package com.badals.shop.service.dto;
+import com.badals.shop.domain.enumeration.OrderChannel;
 import com.badals.shop.domain.enumeration.OrderState;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -22,6 +23,7 @@ public class OrderDTO implements Serializable {
     private Long id;
 
     private String reference;
+    private String email;
 
     private LocalDate invoiceDate;
 
@@ -62,6 +64,8 @@ public class OrderDTO implements Serializable {
 
 
     private String carrier;
+
+    private OrderChannel channel;
 
 
     private String paymentMethod;

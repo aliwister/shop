@@ -74,6 +74,9 @@ public class TenantOrderItem implements Serializable, TenantSupport {
     @Column(name="line_total")
     private BigDecimal lineTotal;
 
+    @Column(name="is_modifier")
+    private Boolean isModifier;
+
     public void setOrder(TenantOrder order) {
         this.order = order;
     }

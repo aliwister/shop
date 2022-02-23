@@ -3,8 +3,11 @@ package com.badals.shop.domain.tenant;
 import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.Payment;
+import com.badals.shop.domain.enumeration.OrderChannel;
 import com.badals.shop.domain.enumeration.OrderState;
 
+import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.AddressPojo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -108,6 +111,9 @@ public class TenantOrder implements Serializable, TenantSupport {
     @Column(name="tenant_id")
     private String tenantId;
 
+    @NotAudited
+    @OneToMany(mappedBy = "order")
+    private Set<TenantPayment> payments = new HashSet<>();
 
     @Column
     private String email;
@@ -139,10 +145,13 @@ public class TenantOrder implements Serializable, TenantSupport {
     @Column
     private String carrier;
 
-    @Column
+    @Column(name="payment_method")
     private String paymentMethod;
 
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "channel")
+    private OrderChannel channel;
 
     /*@ManyToOne
         @JsonIgnoreProperties("orders")

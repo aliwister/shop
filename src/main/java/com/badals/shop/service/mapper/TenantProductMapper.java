@@ -5,12 +5,14 @@ import com.badals.shop.domain.Product;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.*;
+import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.service.CurrencyService;
 import com.badals.shop.service.dto.ProductDTO;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,16 +32,31 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
     @Mapping(target = "variationOptions", ignore = true)
     @Mapping(source = "ref", target = "id")
     @Mapping(target = "categories", ignore = true)
-    @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withCurrencyConversion")
-    @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversion")
+    @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withCurrencyConversionMap")
+    @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversionMap")
+    @Mapping(target = "stock", source="stock", qualifiedByName = "withCountStock")
     ProductDTO toDto(TenantProduct product);
+
+    @Named("mapWithBaseCurrency")
+    @Mapping(source = "parent.id", target = "parent")
+    @Mapping(target = "title", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "variations", ignore = true)
+    @Mapping(target = "variationOptions", ignore = true)
+    @Mapping(source = "ref", target = "id")
+    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withBaseCurrencyMap")
+    @Mapping(target = "price", source="price", qualifiedByName = "withBaseCurrencyMap")
+    @Mapping(target = "stock", source="stock", qualifiedByName = "withCountStock")
+    ProductDTO toPartnerListDto(TenantProduct product);
 
     @Mapping(target = "listPrice", ignore = true)
     @Mapping(target = "price", ignore = true)
+    @Mapping(target = "stock", ignore = true)
     TenantProduct toEntity(ProductDTO product);
 
-    @Named("withCurrencyConversion")
-    public static String withCurrencyConversion(PriceMap priceMap) {
+    @Named("withCurrencyConversionMap")
+    public static String withCurrencyConversionMap(PriceMap priceMap) {
         Locale locale = LocaleContextHolder.getLocale();
         String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
         String price = priceMap.getPriceForCurrency(targetCurrency);
@@ -50,6 +67,22 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
         }
         return price;
     }
+    @Named("withCountStock")
+    public static String withCountStock(Set<TenantStock> stock) {
+        if(stock == null || stock.isEmpty())
+            return "0";
+
+        BigDecimal value = stock.stream().map(x -> x.getQuantity()).reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
+        return value.toString();
+    }
+
+    @Named("withBaseCurrencyMap")
+    public static String withBaseCurrencyMap(PriceMap priceMap) {
+        String baseCurrency = priceMap.getBase();
+        String price = priceMap.getPriceForCurrency(baseCurrency);
+        return price;
+    }
+
 
     default TenantProduct fromId(Long id) {
         if (id == null) {
@@ -95,7 +128,7 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
         }
 
         if(lang != null) {
-            target.setTitle(lang.getName());
+            target.setTitle(lang.getTitle());
             target.setFeatures(parentLang.getFeatures());
             target.setDescription(parentLang.getDescription());
         }

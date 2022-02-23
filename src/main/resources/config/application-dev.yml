@@ -29,6 +29,7 @@ logging:
     ROOT: DEBUG
     io.github.jhipster: DEBUG
     com.badals.shop: DEBUG
+    org.springframework.data.elasticsearch.core: DEBUG
     io.netty.util: ERROR
 
 spring:

@@ -50,6 +50,8 @@ public class OrderItemDTO implements Serializable {
     private String productId;
     private Long productMerchantId;
 
+    private Boolean isModifier;
+
     private String __typename;
 
 

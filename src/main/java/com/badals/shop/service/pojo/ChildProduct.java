@@ -5,26 +5,30 @@ import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.PriceList;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class ChildProduct extends AddProductDTO {
-   public ChildProduct() {
-   }
-
-   public ChildProduct(Long id, String sku, String name, String name_ar, List<String> shops) {
-      this.id = id;
-      this.sku = sku;
-      this.name = name;
-      this.name_ar = name_ar;
-      this.gallery = shops;
-   }
-
+public class ChildProduct {
+   Long id;
+   String sku;
+   String upc;
+   Long ref;
+   String slug;
+   String image;
+   String name;
+   BigDecimal weight;
    List<Attribute> variationAttributes;
-   public PriceList priceObj = new PriceList();
-   public PriceList listPriceObj = new PriceList();
-   public Price costObj = new Price();
+   public PriceList price = new PriceList();
+   public PriceList listPrice = new PriceList();
+   public Price cost = new Price();
+   List<String> gallery;
 
    public Boolean isDirty;
    public Boolean active;
+   Integer availability;
+   BigDecimal quantity;
+
+   String title;
+
 }
