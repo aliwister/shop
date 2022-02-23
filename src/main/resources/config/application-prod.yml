@@ -134,7 +134,7 @@ jhipster:
       time-to-live-seconds: 600 # By default objects stay 1 hour in the cache
       max-entries: 1000 # Number of objects in each cache entry
   cors:
-    allowed-origins: 'https://www.badals.com,https://badals.com,https://partner.badals.com,https://face-admin.herokuapp.com,https://trust-admin001-212.badals.com'
+    allowed-origins: 'https://www.badals.com,https://badals.com,https://partner.badals.com,https://face-admin.herokuapp.com,https://trust-admin001-212.badals.com,https://face-partner-prod.vercel.app'
     allowed-methods: 'GET,PUT,POST,DELETE,OPTIONS'
     allowed-headers: 'Authorization,Content-Type,x-requested-with,origin'
     exposed-headers: 'Authorization,Link,X-Total-Count'
@@ -193,7 +193,7 @@ pas:
     region: eu-west-1
 
 aws:
-  s3bucket: face-content
+  s3bucket: profile-shop
 
 mws:
   key: ***REMOVED***
@@ -206,6 +206,11 @@ badals:
   cdnUrl: https://cdn.badals.com
   s3bucket: face-content
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
+
+profileshop:
+  checkout-app: http://127.0.0.1:8081/checkout/start
+  cdnUrl: https://d2lcp3ge4tmvcl.cloudfront.net
+  s3bucket: profile-shop
 
 ebay:
   app-id: v^1.1#i^1#r^0#p^1#f^0#I^3#t^H4sIAAAAAAAAAOVYbWwURRju9YtUPjSi0FQ0xyKiNHu3X3e9XXpnrr3WXunH4R21JRAyuzvbrt3bPXbmuDsNeFYkIWKIEKRNDKkaImn8jEgiViH+AhMD+INg9AcQMCTGRIyi+L17Pcq1EkDuYpp4yeYy77zzzvM8874zs0tlq2uWb23b+vNcx6zy0SyVLXc46NlUTXVV/byK8rqqMqrAwTGafTBbOVRxsRGBuJYQHocoYegIOtNxTUdCzugnkqYuGACpSNBBHCIBS0I02NkhMC5KSJgGNiRDI5zhkJ+ADTRFN7CK1ydChvP4LKt+NWbM8BMNtI/hASUyCgVZXpatfoSSMKwjDHTsJxiKoUmaImk6RlMCxwo052I5eg3h7IEmUg3dcnFRRCAHV8iNNQuw3hgqQAia2ApCBMLB1mh3MBxq6Yo1ugtiBfI6RDHASTS11WzI0NkDtCS88TQo5y1Ek5IEESLcgYkZpgYVglfB3Ab8nNQiz0qs1yd7Gd7DUBJXEilbDTMO8I1x2BZVJpWcqwB1rOLMzRS11BCfhBLOt7qsEOGQ0/5blQSaqqjQ9BMtTcG+YCRCBJqADLSYCUiPzDEk55EhKVK8SHp8XkWhORF6GpT8JBOR8hJPm6XZ0GXVFgw5uwzcBC3EcLoubIEullO33m0GFWyjKfRjrurHetbYCzqxgkk8oNtrCuOWCM5c8+bqT47G2FTFJIaTEaZ35OTxEyCRUGViemcuD/Opk0Z+YgDjhOB2p1IpV4p1GWa/m6Eo2t3b2RGVBmAcEHlfu9bTSL35AFLNUZGgNRKpAs4kLCxpK08tAHo/EeB9VqHnZZ+KKjDd+g9DAWX31GIoVXEwQOGAV/SyNKQ9rLehFMURyOen28YBRZAh48AchDihAQmSkpVmyTg0VVlgPQrD+hRIyl5eITleUUjRI3tJWoGQglAUJd73f6mRW83yKJRMiEuW5iVJ8UxSDvVLDV2ZYFeoLc34Vm8AUkea64y0oNURBvhEFG2KcisHHwuG/bdaCdcl36ypljIxa/6SCmDXetEitBkIQ7koelHJSMCIoalSZmYtMGvKEWDiTBRqmmUoimQwkQiXbpsuCb1/sUXcHufSHk3//bF0XVLIztaZRcoej6wAIKG67IPHJRlxtwGsC4dtWm8jtmsdFsVbte6qM4q1RXKCrSpPXDJdOcoutFFymRAZSdO6X7u67XtXzBiEunWUYdPQNGj20EWXcjyexEDU4Eyr6eLzWwUz7JilvSzLcz6e54riJeUO0fUzbUMq5SacN1Ryt3KRdk99ow+U5X70kOMDasjxXrnDQbmppfQSanF1xerKijl1SMXQpQLFhdR+3XpRNaFrEGYSQDXLqx2phYf2fVzwDWF0HVU7+RWhpoKeXfBJgVp0raeKvnPhXIamKdp6OJbm1lBLrvVW0gsq71n25YpLs3ftuevlE8efPnv2zWdbf+29SM2ddHI4qsoqhxxlO17/fuP8OeEVazsbg994T9YeWHn3oYfH5i8Kd/v+eJU5P/LTLCK+avjMwitPrO1bCsafOx/y3b+JP3zvM2/Eunf8MHaGWc5guXYYOb/dsG93Ve377ccuLOsbf+FI/fjwnx92qPXpvedaxLr9i66MXhjJfPTIQ9ryxNKvv9h9ef+Yp+2A/Cm58ih7PMge23/0r3jIv/PFvZfae8/xjz5/8Me3wpE92WPr0OIT8478NvLVZ+8cXnDfUye2nR7vjMYPvb1ld/vWc++Opfa+tG1o8+mK7fNH6nBL42sDx2tQJLzJdzA7cgf4JPZ7bEvvdyd3Nfdc2Xnq883t9cHh3i6pNRV8pe/CvBWXf9n5wKnyieX7G/gOivDdEQAA
