@@ -55,6 +55,8 @@ public class TenantPayment extends Auditable implements Serializable, TenantSupp
     @Column(name = "track_id")
     private Long trackId;
 
+    @Column(name = "void")
+    private Boolean voided = false;
 
     @ManyToOne
     @JsonIgnoreProperties("orderPayments")

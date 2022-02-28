@@ -79,6 +79,10 @@ public class TenantAdminMutation implements GraphQLMutationResolver {
         return tenantAdminOrderService.createPosOrder(cart, paymentMethod, paymentAmount, ref);
 
     }
+    public Message voidOrder(Long id) {
+        return tenantAdminOrderService.voidOrder(id);
+
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {
