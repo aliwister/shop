@@ -530,7 +530,7 @@ public class TenantAdminOrderService {
         order.setTotal(BigDecimal.ZERO);
         OrderDTO dto = save(order);
         paymentRepository.voidOrderPayments(id);
-        order
+        
         return new Message("success");
     }
 
