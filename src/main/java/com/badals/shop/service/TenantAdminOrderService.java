@@ -21,6 +21,7 @@ import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.service.mapper.TenantOrderMapper;
+import com.badals.shop.service.pojo.Message;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import org.hibernate.envers.AuditReader;
@@ -519,6 +520,20 @@ public class TenantAdminOrderService {
         OrderDTO dto = save(order);
         return dto;
     }
+
+    @Transactional
+    public Message voidOrder(Long id) {
+        //this.cancel(id, "");
+        TenantOrder order = orderRepository.getOne(id);
+
+        order.setOrderState(OrderState.CANCELLED);
+        order.setTotal(BigDecimal.ZERO);
+        OrderDTO dto = save(order);
+        paymentRepository.voidOrderPayments(id);
+        order
+        return new Message("success");
+    }
+
 
 /*    public void reIndex(Long from, Long to) {
         List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toDto).collect(Collectors.toList());
