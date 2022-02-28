@@ -21,6 +21,10 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Repository
 public interface TenantPaymentRepository extends JpaRepository<TenantPayment, Long> {
+   @Query("from TenantPayment p where p.order.id = ?1")
+   List<TenantPayment> findAllByOrderId(Long orderId);
 
-
+   @Modifying
+   @Query("update TenantPayment p set p.voided = true where p.order.id = ?1")
+   void voidOrderPayments(Long orderId);
 }
