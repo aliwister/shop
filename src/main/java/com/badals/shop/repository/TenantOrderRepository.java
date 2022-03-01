@@ -1,12 +1,10 @@
 package com.badals.shop.repository;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.Order;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.repository.projection.AggOrderEntry;
 import com.badals.shop.domain.tenant.TenantCart;
 import com.badals.shop.domain.tenant.TenantOrder;
-import com.badals.shop.web.rest.AuditResource;
-import io.micrometer.core.instrument.config.MeterFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +50,11 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
     @Query("select o from TenantOrder o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress where o.id = ?1 and oi.id in ?2")
     Optional<TenantOrder> getOrderWithSomeOrderItems(Long orderId, ArrayList<Long> orderItems);
 
+    @Query("SELECT function('DATE_FORMAT',function('CONVERT_TZ', o.createdDate, '+00:00', '+4:00'), '%Y-%m-%d %H:00:00') as period, COUNT(o) as count, sum(o.total) as total FROM TenantOrder o group by function('DATE_FORMAT',function('CONVERT_TZ', o.createdDate, '+00:00', '+4:00'), '%Y-%m-%d %H:00:00')")
+    List<AggOrderEntry> aggOrderReport();
 
+/*    @Query(nativeQuery = true, value="SELECT DATE_FORMAT(CONVERT_TZ(o.created_date,'+00:00', '+4:00'), '%Y-%m-%d %H:00:00') as `period`, COUNT(1) as `count`, sum(o.total) as `total` FROM profileshop.jhi_order o group by DATE_FORMAT(CONVERT_TZ(o.created_date,'+00:00', '+4:00'), '%Y-%m-%d %H')")
+    List<AggregateOrderReport> aggOrderNativeReport();*/
 
     @Query(value="select t.id " +
             "from  (select :s0 as id " +
