@@ -50,8 +50,8 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
     @Query("select o from TenantOrder o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress where o.id = ?1 and oi.id in ?2")
     Optional<TenantOrder> getOrderWithSomeOrderItems(Long orderId, ArrayList<Long> orderItems);
 
-    @Query("SELECT function('DATE_FORMAT',function('CONVERT_TZ', o.createdDate, '+00:00', '+4:00'), '%Y-%m-%d %H:00:00') as period, COUNT(o) as count, sum(o.total) as total FROM TenantOrder o group by function('DATE_FORMAT',function('CONVERT_TZ', o.createdDate, '+00:00', '+4:00'), '%Y-%m-%d %H:00:00')")
-    List<AggOrderEntry> aggOrderReport();
+    @Query("SELECT function('DATE_FORMAT',function('CONVERT_TZ', o.createdDate, '+00:00', ?2), ?1) as period, COUNT(o) as count, sum(o.total) as total FROM TenantOrder o group by function('DATE_FORMAT',function('CONVERT_TZ', o.createdDate, '+00:00', ?2), ?1)")
+    List<AggOrderEntry> aggOrderReport(String period, String timezone);
 
 /*    @Query(nativeQuery = true, value="SELECT DATE_FORMAT(CONVERT_TZ(o.created_date,'+00:00', '+4:00'), '%Y-%m-%d %H:00:00') as `period`, COUNT(1) as `count`, sum(o.total) as `total` FROM profileshop.jhi_order o group by DATE_FORMAT(CONVERT_TZ(o.created_date,'+00:00', '+4:00'), '%Y-%m-%d %H')")
     List<AggregateOrderReport> aggOrderNativeReport();*/
