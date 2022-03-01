@@ -7,6 +7,7 @@ import com.badals.shop.domain.Order;
 import com.badals.shop.domain.enumeration.OrderChannel;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.AddressPojo;
+import com.badals.shop.repository.projection.AggOrderEntry;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
@@ -41,9 +42,7 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -521,6 +520,15 @@ public class TenantAdminOrderService {
         return dto;
     }
 
+    public List<AggOrderEntry> aggOrderReport() {
+        List<AggOrderEntry> report =  orderRepository.aggOrderReport();
+        return report;
+    }
+/*    public List<AggregateOrderReport> aggOrderReportNative() {
+        List<AggregateOrderReport> report =  orderRepository.aggOrderNativeReport();
+        return report;
+    }*/
+
     @Transactional
     public Message voidOrder(Long id) {
         //this.cancel(id, "");
@@ -530,9 +538,10 @@ public class TenantAdminOrderService {
         order.setTotal(BigDecimal.ZERO);
         OrderDTO dto = save(order);
         paymentRepository.voidOrderPayments(id);
-        
+
         return new Message("success");
     }
+
 
 
 /*    public void reIndex(Long from, Long to) {

@@ -1,0 +1,10 @@
+extend type Query {
+    aggOrderReport: [OrderSummary]
+}
+
+
+type OrderSummary {
+    period: String
+    count: Int
+    total: BigDecimal
+}
