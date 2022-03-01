@@ -521,7 +521,9 @@ public class TenantAdminOrderService {
     }
 
     public List<AggOrderEntry> aggOrderReport() {
-        List<AggOrderEntry> report =  orderRepository.aggOrderReport();
+        String hour = "%Y-%m-%d %H:00:00";
+        String day = "%Y-%m-%d";
+        List<AggOrderEntry> report =  orderRepository.aggOrderReport(day,"+4:00");
         return report;
     }
 /*    public List<AggregateOrderReport> aggOrderReportNative() {
