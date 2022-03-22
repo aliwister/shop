@@ -11,7 +11,7 @@ import java.util.Date;
  * A Address.
  */
 @Entity
-@Table(catalog="prestashop7", name = "ps_address")
+@Table(catalog="profileshop", name = "ps_address")
 public class Address implements Serializable {
 
     private static final long serialVersionUID = 1L;
