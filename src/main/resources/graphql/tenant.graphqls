@@ -31,5 +31,12 @@ type Tenant {
     monthlyFee: BigDecimal
     skuPrefix: String
     contractStartDate: LocalDate
+    publicPaymentProfile: [PaymentDef]
+}
+
+type PaymentDef {
+    name: String
+    pk: String
+    code: String
 }
 

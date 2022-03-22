@@ -1,11 +1,10 @@
 package com.badals.shop.web.rest;
 
 import com.badals.shop.config.Constants;
-import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.User;
 import com.badals.shop.repository.UserRepository;
 import com.badals.shop.security.AuthoritiesConstants;
-import com.badals.shop.service.MailService;
+import com.badals.shop.service.util.MailService;
 import com.badals.shop.service.UserService;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
 import com.badals.shop.web.rest.errors.EmailAlreadyUsedException;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URISyntaxException;
-import java.util.*;
 
 /**
  * REST controller for managing users.
@@ -149,11 +147,11 @@ public class UserResource {
      * Gets a list of all roles.
      * @return a string list of all roles.
      */
-    @GetMapping("/users/authorities")
+/*    @GetMapping("/users/authorities")
     @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<String> getAuthorities() {
         return userService.getAuthorities();
-    }
+    }*/
 
     /**
      * {@code GET /users/:login} : get the "login" user.
@@ -169,13 +167,13 @@ public class UserResource {
                 .map(CustomerDTO::new));
     }
 */
-    @GetMapping("/users/current")//{login:" + Constants.LOGIN_REGEX + "}")
-    public Customer getUser() {
+/*    @GetMapping("/users/current")//{login:" + Constants.LOGIN_REGEX + "}")
+    public User getUser() {
 
         return //ResponseUtil.wrapOrNotFound(
             userService.getUserWithAuthorities().orElse(null);//(login).get();
         //.map(CustomerDTO::new));
-    }
+    }*/
     /**
      * {@code DELETE /users/:login} : delete the "login" User.
      *

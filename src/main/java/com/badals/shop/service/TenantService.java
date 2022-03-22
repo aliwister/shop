@@ -1,6 +1,6 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.Tenant;
+import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.repository.TenantRepository;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.mapper.TenantMapper;
@@ -56,7 +56,7 @@ public class TenantService {
     @Transactional(readOnly = true)
     public List<TenantDTO> findAll() {
         log.debug("Request to get all Tenants");
-        return tenantRepository.findAllWithEagerRelationships().stream()
+        return tenantRepository.findAll().stream()
             .map(tenantMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }
@@ -66,9 +66,9 @@ public class TenantService {
      *
      * @return the list of entities.
      */
-    public Page<TenantDTO> findAllWithEagerRelationships(Pageable pageable) {
+/*    public Page<TenantDTO> findAllWithEagerRelationships(Pageable pageable) {
         return tenantRepository.findAllWithEagerRelationships(pageable).map(tenantMapper::toDto);
-    }
+    }*/
     
 
     /**
@@ -77,13 +77,18 @@ public class TenantService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    @Transactional(readOnly = true)
+/*    @Transactional(readOnly = true)
     public Optional<TenantDTO> findOne(Long id) {
         log.debug("Request to get Tenant : {}", id);
         return tenantRepository.findOneWithEagerRelationships(id)
             .map(tenantMapper::toDto);
+    }*/
+    @Transactional(readOnly = true)
+    public Optional<TenantDTO> findOne(Long id) {
+        log.debug("Request to get Tenant : {}", id);
+        return tenantRepository.findById(id)
+                .map(tenantMapper::toDto);
     }
-
     /**
      * Delete the tenant by id.
      *

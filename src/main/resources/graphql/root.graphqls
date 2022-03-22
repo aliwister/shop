@@ -23,10 +23,6 @@ type Message {
     value: String
 }
 
-interface LocalizedObject {
-    _locale: String
-}
-
 type Action {
     id: Long
     action: String

@@ -24,11 +24,11 @@ public interface TenantOrderItemMapper extends EntityMapper<OrderItemDTO, Tenant
     @Mapping(source = "orderId", target = "order")
     TenantOrderItem toEntity(OrderItemDTO orderItemDTO);
 
-    default OrderItem fromId(Long id) {
+    default TenantOrderItem fromId(Long id) {
         if (id == null) {
             return null;
         }
-        OrderItem orderItem = new OrderItem();
+        TenantOrderItem orderItem = new TenantOrderItem();
         orderItem.setId(id);
         return orderItem;
     }

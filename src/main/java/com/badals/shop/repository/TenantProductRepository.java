@@ -72,7 +72,7 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
     @Query("update TenantProduct u set u.deleted = ?1, u.active = 0 where u.id in ?2")
     void delete(Boolean delete, Long id);
 
-    @Query(value="select * from profileshop.product u where :tag MEMBER OF(u.hashtags) and u.tenant_id = :tenantId", nativeQuery=true)
+    @Query(value="select * from profileshop.product u where :tag MEMBER OF(u.hashtags) and u.tenant_id = :tenantId and u.active = 1", nativeQuery=true)
     List<TenantProduct> findActiveTagProductsForTenant(@Param(value = "tag") String tag, @Param(value = "tenantId") String tenantId);
 
 }

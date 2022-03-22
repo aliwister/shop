@@ -1,15 +1,6 @@
 package com.badals.shop.service.pojo;
 
-import com.badals.shop.domain.MerchantStock;
-import com.badals.shop.domain.ProductLang;
-import com.badals.shop.domain.pojo.Gallery;
-import com.badals.shop.service.MerchantService;
-import com.badals.shop.service.dto.MerchantStockDTO;
-import com.badals.shop.service.dto.ProductLangDTO;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.math.BigDecimal;
 import java.util.List;

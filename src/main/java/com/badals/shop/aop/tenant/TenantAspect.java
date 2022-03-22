@@ -35,13 +35,13 @@ public class TenantAspect {
      * Filter users based on which tenant the user is associated with.
      * Skip filter if user has no tenant
      */
-    @Before("execution(* com.badals.shop.service.UserService.*(..)) || execution(* com.badals.shop.security.DomainUserDetailsService.*(..))")
+    @Before("execution(* com.badals.shop.service.CustomerService.*(..)) || execution(* com.badals.shop.security.DomainCustomerDetailsService.*(..))")
     public void beforeExecution() throws Throwable {
-       if (TenantContext.getCurrentProfile() != null) {
+       //if (TenantContext.getCurrentProfile() != null) {
          Filter filter = entityManager.unwrap(Session.class).enableFilter("TENANT_FILTER");
          filter.setParameter("tenantId", TenantContext.getCurrentProfile());
          filter.validate();
-		}
+		//}
     }
 
     @Before("execution(* com.badals.shop.service.TenantProductService.*(..)) || execution(* com.badals.shop.service.TenantCartService.*(..))")

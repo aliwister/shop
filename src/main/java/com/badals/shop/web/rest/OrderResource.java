@@ -78,6 +78,7 @@ public class OrderResource {
             .body(result);
     }
 
+/*
     @PostMapping("/orders/reindex")
     public ResponseEntity<String> reindex(@RequestParam("_from") Long from, @RequestParam("_to") Long to) throws URISyntaxException {
         log.debug("REST request to update Order : {} ", from);
@@ -89,6 +90,7 @@ public class OrderResource {
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, from+"-"+to))
             .body("Fuck yeah");
     }
+*/
 
     /**
      * {@code GET  /orders} : get all the orders.

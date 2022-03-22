@@ -1,9 +1,6 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.Address;
-import com.badals.shop.domain.CheckoutCart;
-import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.Order;
+import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.OrderChannel;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.AddressPojo;
@@ -12,17 +9,18 @@ import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.badals.shop.domain.tenant.TenantPayment;
-import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.repository.TenantOrderRepository;
 import com.badals.shop.repository.TenantPaymentRepository;
+import com.badals.shop.repository.search.OrderSearchRepository;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.service.mapper.TenantOrderMapper;
 import com.badals.shop.service.pojo.Message;
+import com.badals.shop.service.util.MailService;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import org.hibernate.envers.AuditReader;
@@ -61,7 +59,7 @@ public class TenantAdminOrderService {
 
     private final TenantOrderRepository orderRepository;
     private final TenantPaymentRepository paymentRepository;
-    //private final OrderSearchRepository orderSearchRepository;
+    private final OrderSearchRepository orderSearchRepository;
 
     private final TenantOrderMapper orderMapper;
     private UserService userService;
@@ -74,9 +72,10 @@ public class TenantAdminOrderService {
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
 
-    public TenantAdminOrderService(TenantOrderRepository orderRepository, TenantPaymentRepository paymentRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService) {
+    public TenantAdminOrderService(TenantOrderRepository orderRepository, TenantPaymentRepository paymentRepository, OrderSearchRepository orderSearchRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
+        this.orderSearchRepository = orderSearchRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
         this.customerService = customerService;
@@ -190,6 +189,7 @@ public class TenantAdminOrderService {
         //order.setConfirmationKey(cart.getSecureKey()+"."+uiud);
         order.setSubtotal(calculateSubtotal(cart));
         order.setTotal(calculateTotal(cart));
+        order.setOrderAdjustments(cart.getOrderAdjustments());
         //order.setCart(cart);
         //order.setCarrier(cart.getCarrier());
         order.setDeliveryTotal(BigDecimal.ZERO);
@@ -209,9 +209,8 @@ public class TenantAdminOrderService {
             orderItem.setUnit(item.getUnit());
             orderItem.setLineTotal(item.getPrice().multiply(orderItem.getQuantity()));
             orderItem.setSku(item.getSku());
-            if(item.getProductId() != null)
-                orderItem.setProduct(new TenantProduct().ref(item.getProductId().toString()));
-            orderItem.setIsModifier(item.isModifier());
+            //if(item.getProductId() != null)
+            orderItem.setRef(item.getProductId().toString());
             if(item.getCost() != null)
                 orderItem.setCost(item.getCost());
             order.addOrderItem(orderItem);
@@ -226,7 +225,7 @@ public class TenantAdminOrderService {
     @Transactional
     public OrderDTO createPosOrder(CheckoutCart cart, String paymentMethod, String paymentAmount, String authCode) {
         TenantOrder order = createPosOrder(cart, paymentMethod);
-        orderRepository.save(order);
+        saveOrder(order);
         //if(p.prePay) {
             TenantPayment payment = new TenantPayment();
             payment.setAmount(new BigDecimal(paymentAmount));
@@ -241,6 +240,14 @@ public class TenantAdminOrderService {
         //}
         orderRepository.refresh(order);
         return orderMapper.toDto(order);
+    }
+
+    private void saveOrder(TenantOrder order) {
+        orderRepository.save(order);
+        orderRepository.refresh(order);
+        OrderDTO orderDTO = orderMapper.toDto(order);
+        orderSearchRepository.save(orderDTO);
+        //orderDTO.getOrderItems().stream().forEach(x -> orderItemSearchRepository.save(x));
     }
 
     @Transactional
@@ -276,17 +283,7 @@ public class TenantAdminOrderService {
         return dto;
     }
 
-    public OrderResponse getCustomerOrders(Integer limit, Integer offset) {
-        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
-        List<TenantOrder> orders = orderRepository.findOrdersByCustomerOrderByCreatedDateDesc(loginUser, PageRequest.of((int) offset/limit,limit));
-        OrderResponse response = new OrderResponse();
-        response.setTotal(orders.size());
-        response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
-        Integer total = orderRepository.countForCustomer(loginUser);
-        response.setHasMore((limit+offset) < total);
-        return response;
 
-    }
 
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) {
 /*
@@ -546,8 +543,12 @@ public class TenantAdminOrderService {
 
 
 
-/*    public void reIndex(Long from, Long to) {
+    public void reIndex(Long from, Long to) {
         List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toDto).collect(Collectors.toList());
+        if(dtos.isEmpty())
+            return;
+        //dtos.stream().forEach(x -> orderSearchRepository.index(x));
         orderSearchRepository.saveAll(dtos);
-    }*/
+        //dtos.forEach(dto -> orderItemSearchRepository.saveAll(dto.getOrderItems()));
+    }
 }

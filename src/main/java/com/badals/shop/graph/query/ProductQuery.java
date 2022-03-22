@@ -34,15 +34,17 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
    private static final Logger log = LoggerFactory.getLogger(ProductQuery.class);
 
    private final UserService userService;
+   private final CustomerService customerService;
 
 
-   public ProductQuery(ProductService productService, ProductIndexService productIndexService, HashtagService hashtagService, EbayLookup ebayLookup, CategoryService categoryService, UserService userService) {
+   public ProductQuery(ProductService productService, ProductIndexService productIndexService, HashtagService hashtagService, EbayLookup ebayLookup, CategoryService categoryService, UserService userService, CustomerService customerService) {
       this.productService = productService;
       this.productIndexService = productIndexService;
       this.hashtagService = hashtagService;
       this.ebayLookup = ebayLookup;
       this.categoryService = categoryService;
       this.userService = userService;
+      this.customerService = customerService;
    }
 
    public List<ProductDTO> products(final int count) {
@@ -53,7 +55,7 @@ public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
 
 
       ProductDTO dto = this.productService.getProductBySlug(slug);
-      Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+      Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
       //CompletableFuture.supplyAsync(() -> productService.log(loginUser, slug, cookie))
 
 

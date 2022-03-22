@@ -1,6 +1,6 @@
 package com.badals.shop.aop.tenant;
 
-import com.badals.shop.domain.Tenant;
+import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.repository.TenantRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -13,6 +13,7 @@ import java.util.Set;
  * A DTO for the {@link com.badals.shop.domain.OrderItem} entity.
  */
 @Data
+//@org.springframework.data.elasticsearch.annotations.Document(indexName = "order_item")
 public class OrderItemDTO implements Serializable {
 
     private Long id;
@@ -30,16 +31,9 @@ public class OrderItemDTO implements Serializable {
     private String shippingInstructions;
 
     private String image;
-
-
     private BigDecimal weight;
-
-
     private String unit;
-
-
     private BigDecimal lineTotal;
-
 
     private Long orderId;
     private Long purchaseItemId;
@@ -49,11 +43,7 @@ public class OrderItemDTO implements Serializable {
     private String productSku;
     private String productId;
     private Long productMerchantId;
-
-    private Boolean isModifier;
-
-    private String __typename;
-
+    private String tenantId;
 
     @Override
     public boolean equals(Object o) {

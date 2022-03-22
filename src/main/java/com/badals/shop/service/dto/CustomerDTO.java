@@ -37,7 +37,7 @@ public class CustomerDTO implements Serializable {
 
     private String salt;
 
-    private Integer active;
+    private Boolean active;
     private Boolean allowPickup;
     private Integer plusDiscount;
     private Integer shipperMarkup;
