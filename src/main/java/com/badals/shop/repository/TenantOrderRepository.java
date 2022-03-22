@@ -26,7 +26,7 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
 
     void refresh(TenantOrder cart);
 
-    @Query("from TenantCart c left join fetch c.customer cc left join fetch cc.addresses where id = ?1")
+    @Query("from TenantCart c left join fetch c.customer cc left join fetch cc.addresses where c.customer.id = ?1")
     TenantCart getCartByCustomerJoinAddresses(Long id);
 
 
@@ -36,6 +36,9 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
 
     @Query("select count(u) from TenantOrder u where u.customer in ?1")
     Integer countForCustomer(Customer loginUser);
+
+    @Query("select count(u) from TenantOrder u")
+    long count();
 
     Page<TenantOrder> findAllByOrderStateInOrderByCreatedDateDesc(List<OrderState> orderState, Pageable page);
 
@@ -85,5 +88,7 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
             @Param("s7") String option7,
             @Param("s8") String option8,
             @Param("s9") String option9);
+
+    List<TenantOrder> findByIdBetween(Long from, Long to);
 }
 

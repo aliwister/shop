@@ -1,5 +1,6 @@
 package com.badals.shop.domain;
 
+import com.badals.shop.aop.tenant.TenantSupport;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -25,7 +26,7 @@ import java.util.Set;
 @Table(name = "ps_customer", catalog = "prestashop7")
 @FilterDef(name = "TENANT_FILTER", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "TENANT_FILTER", condition = "tenant_id = :tenantId")
-public class Customer implements Serializable {
+public class Customer extends UserBase implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,8 +42,6 @@ public class Customer implements Serializable {
     @Column(name = "id_customer")
     private Long id;
 
-
-
     @Column(name = "company")
     private String company;
 
@@ -52,30 +51,12 @@ public class Customer implements Serializable {
     @Column(name = "ape")
     private String ape;
 
-    @NotNull
-    @Column(name = "firstname", nullable = false)
-    private String firstname;
-
-    @NotNull
-    @Column(name = "lastname", nullable = false)
-    private String lastname;
-
-    @NotNull
-    @Column(name = "email", nullable = false)
-    private String email;
-
-    @NotNull
-    @Column(name = "passwd", nullable = false)
-    private String password;
-
     @Column(name = "secure_key")
     private String secureKey;
 
     @Column(name = "oc_salt")
     private String salt;
 
-    @Column(name = "active")
-    private Integer active;
 
     @Getter @Setter
     @Column(name = "allow_pickup")
@@ -224,57 +205,18 @@ public class Customer implements Serializable {
         this.ape = ape;
     }
 
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public Customer firstname(String firstname) {
-        this.firstname = firstname;
-        return this;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public Customer lastname(String lastname) {
-        this.lastname = lastname;
-        return this;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
     public Customer email(String email) {
-        this.email = email;
+        this.setEmail(email);
         return this;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public Customer passwd(String passwd) {
-        this.password = passwd;
+    public Customer password(String passwd) {
+        this.setPassword(passwd);
         return this;
     }
 
-    public void setPassword(String passwd) {
-        this.password = passwd;
-    }
+
 
     public String getSecureKey() {
         return secureKey;
@@ -303,17 +245,9 @@ public class Customer implements Serializable {
     }
 
 
-    public Customer active(Integer active) {
-        this.active = active;
+    public Customer active(Boolean active) {
+        this.setActive(active);
         return this;
-    }
-
-    public Integer getActive() {
-        return active;
-    }
-
-    public void setActive(Integer active) {
-        this.active = active;
     }
 
     @Override
@@ -345,11 +279,8 @@ public class Customer implements Serializable {
             ", passwd='" + getPassword() + "'" +
             ", secureKey='" + getSecureKey() + "'" +
             ", salt='" + getSalt() + "'" +
-            ", active=" + getActive() +
+            ", active=" + isActive() +
             "}";
     }
 
-    public boolean isActive() {
-        return active == 1;
-    }
 }

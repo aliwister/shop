@@ -43,15 +43,15 @@ public class UserMapper {
         } else {
             User user = new User();
             user.setId(userDTO.getId());
-            user.setLogin(userDTO.getLogin());
-            user.setFirstName(userDTO.getFirstName());
-            user.setLastName(userDTO.getLastName());
+            //user.setLogin(userDTO.getLogin());
+            user.setFirstname(userDTO.getFirstName());
+            user.setLastname(userDTO.getLastName());
             user.setEmail(userDTO.getEmail());
-            user.setImageUrl(userDTO.getImageUrl());
-            user.setActivated(userDTO.isActivated());
-            user.setLangKey(userDTO.getLangKey());
+            //user.setImageUrl(userDTO.getImageUrl());
+            user.setActive(userDTO.isActivated());
+            //user.setLangKey(userDTO.getLangKey());
             Set<Authority> authorities = this.authoritiesFromStrings(userDTO.getAuthorities());
-            user.setAuthorities(authorities);
+            //user.setAuthorities(authorities);
             return user;
         }
     }

@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.badals.shop.domain.MerchantStock} entity.
  */
-public class MerchantStockDTO implements Serializable {
+public class StockDTO implements Serializable {
 
     private Long id;
 
@@ -142,11 +142,11 @@ public class MerchantStockDTO implements Serializable {
             return false;
         }
 
-        MerchantStockDTO merchantStockDTO = (MerchantStockDTO) o;
-        if (merchantStockDTO.getId() == null || getId() == null) {
+        StockDTO stockDTO = (StockDTO) o;
+        if (stockDTO.getId() == null || getId() == null) {
             return false;
         }
-        return Objects.equals(getId(), merchantStockDTO.getId());
+        return Objects.equals(getId(), stockDTO.getId());
     }
 
     @Override

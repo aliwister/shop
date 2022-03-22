@@ -1,7 +1,7 @@
 package com.badals.shop.web.rest;
 
 import com.badals.shop.service.MerchantStockService;
-import com.badals.shop.service.dto.MerchantStockDTO;
+import com.badals.shop.service.dto.StockDTO;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -42,17 +42,17 @@ public class MerchantStockResource {
     /**
      * {@code POST  /merchant-stocks} : Create a new merchantStock.
      *
-     * @param merchantStockDTO the merchantStockDTO to create.
+     * @param stockDTO the merchantStockDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new merchantStockDTO, or with status {@code 400 (Bad Request)} if the merchantStock has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/merchant-stocks")
-    public ResponseEntity<MerchantStockDTO> createMerchantStock(@Valid @RequestBody MerchantStockDTO merchantStockDTO) throws URISyntaxException {
-        log.debug("REST request to save MerchantStock : {}", merchantStockDTO);
-        if (merchantStockDTO.getId() != null) {
+    public ResponseEntity<StockDTO> createMerchantStock(@Valid @RequestBody StockDTO stockDTO) throws URISyntaxException {
+        log.debug("REST request to save MerchantStock : {}", stockDTO);
+        if (stockDTO.getId() != null) {
             throw new BadRequestAlertException("A new merchantStock cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        MerchantStockDTO result = merchantStockService.save(merchantStockDTO);
+        StockDTO result = merchantStockService.save(stockDTO);
         return ResponseEntity.created(new URI("/api/merchant-stocks/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -61,21 +61,21 @@ public class MerchantStockResource {
     /**
      * {@code PUT  /merchant-stocks} : Updates an existing merchantStock.
      *
-     * @param merchantStockDTO the merchantStockDTO to update.
+     * @param stockDTO the merchantStockDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated merchantStockDTO,
      * or with status {@code 400 (Bad Request)} if the merchantStockDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the merchantStockDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/merchant-stocks")
-    public ResponseEntity<MerchantStockDTO> updateMerchantStock(@Valid @RequestBody MerchantStockDTO merchantStockDTO) throws URISyntaxException {
-        log.debug("REST request to update MerchantStock : {}", merchantStockDTO);
-        if (merchantStockDTO.getId() == null) {
+    public ResponseEntity<StockDTO> updateMerchantStock(@Valid @RequestBody StockDTO stockDTO) throws URISyntaxException {
+        log.debug("REST request to update MerchantStock : {}", stockDTO);
+        if (stockDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        MerchantStockDTO result = merchantStockService.save(merchantStockDTO);
+        StockDTO result = merchantStockService.save(stockDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, merchantStockDTO.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, stockDTO.getId().toString()))
             .body(result);
     }
 
@@ -85,7 +85,7 @@ public class MerchantStockResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of merchantStocks in body.
      */
     @GetMapping("/merchant-stocks")
-    public List<MerchantStockDTO> getAllMerchantStocks() {
+    public List<StockDTO> getAllMerchantStocks() {
         log.debug("REST request to get all MerchantStocks");
         return merchantStockService.findAll();
     }
@@ -97,9 +97,9 @@ public class MerchantStockResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the merchantStockDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/merchant-stocks/{id}")
-    public ResponseEntity<MerchantStockDTO> getMerchantStock(@PathVariable Long id) {
+    public ResponseEntity<StockDTO> getMerchantStock(@PathVariable Long id) {
         log.debug("REST request to get MerchantStock : {}", id);
-        Optional<MerchantStockDTO> merchantStockDTO = merchantStockService.findOne(id);
+        Optional<StockDTO> merchantStockDTO = merchantStockService.findOne(id);
         return ResponseUtil.wrapOrNotFound(merchantStockDTO);
     }
 

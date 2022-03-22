@@ -1,5 +1,6 @@
-package com.badals.shop.web.rest;
+package com.badals.shop.controller;
 
+import com.badals.shop.repository.TenantRepository;
 import com.badals.shop.security.jwt.JWTFilter;
 import com.badals.shop.security.jwt.TokenProvider;
 import com.badals.shop.web.rest.vm.LoginVM;
@@ -20,8 +21,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -32,14 +32,16 @@ import java.util.stream.Collectors;
 public class UserJWTController {
 
     private final TokenProvider tokenProvider;
-
+    private final TenantRepository tenantRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public UserJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public UserJWTController(TokenProvider tokenProvider, TenantRepository tenantRepository, AuthenticationManagerBuilder authenticationManagerBuilder) {
         this.tokenProvider = tokenProvider;
+        this.tenantRepository = tenantRepository;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
+    // This authenticates customers of a given tenant
     @PostMapping("/authenticate")
     public ResponseEntity<JwtAuthenticationResponse> authorize(@Valid @RequestBody LoginVM loginVM) {
         LocaleContextHolder.getLocale();
@@ -54,6 +56,27 @@ public class UserJWTController {
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         return new ResponseEntity<>(new JwtAuthenticationResponse(jwt, authentication.getPrincipal()), httpHeaders, HttpStatus.OK);
     }
+
+
+    // This loads the authenticates a tenant/user. Tenant user can have accesst to multiple tenant admin side.
+/*    @PostMapping("/authenticateUser")
+    public ResponseEntity<JwtPartnerAuthenticationResponse> authorizeUser(@Valid @RequestBody LoginVM loginVM) {
+        LocaleContextHolder.getLocale();
+        UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
+
+        List<Tenant> tenantList = tenantRepository.findTenantAndMerchantByCustomer(loginVM.getUsername());
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        boolean rememberMe = (loginVM.getRememberMe() == null) ? false : loginVM.getRememberMe();
+        String jwt = tokenProvider.createToken(authentication, rememberMe);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        return new ResponseEntity<>(new JwtPartnerAuthenticationResponse(jwt, authentication.getPrincipal(), tenantList), httpHeaders, HttpStatus.OK);
+    }*/
+
+
 
     /**
      * Object to return as body in JWT Authentication.
@@ -93,4 +116,6 @@ public class UserJWTController {
             this.authorities = String.join(",",userP.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()));
         }
     }
+
+
 }

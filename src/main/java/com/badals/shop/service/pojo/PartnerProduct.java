@@ -36,7 +36,7 @@ public class PartnerProduct {
    Boolean imported;
    Boolean indexed;
    Boolean isPos;
-   String tenant;
+   String tenantId;
    String merchant;
 
    Long merchantId;
