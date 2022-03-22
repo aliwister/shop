@@ -7,7 +7,7 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import java.util.List;
 
 public interface PartnerProductSearchRepository extends ElasticsearchRepository<PartnerProduct, Long> {
-   List<PartnerProduct> findByTenantEqualsAndUpcEquals(String tenant, String upc);
-   List<PartnerProduct> findByTenantEquals(String tenant);
+   List<PartnerProduct> findByTenantIdEqualsAndUpcEquals(String tenant, String upc);
+   List<PartnerProduct> findByTenantIdEquals(String tenant);
    PartnerProduct findBySlug(String slug);
 }

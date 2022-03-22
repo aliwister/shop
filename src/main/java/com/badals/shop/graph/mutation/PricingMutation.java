@@ -9,6 +9,7 @@ import com.badals.shop.service.dto.PricingRequestDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProductOverrideDTO;
 import com.badals.shop.service.dto.SpeedDialDTO;
+import com.badals.shop.service.util.MailService;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.badals.shop.xtra.amazon.NoOfferException;
 import com.badals.shop.xtra.amazon.Pas5Service;

@@ -91,7 +91,7 @@ public class TenantAdminProductService {
 
         //log.info(p.getSlug());
 
-        List <PartnerProduct> products = partnerProductSearchRepository.findByTenantEqualsAndUpcEquals(TenantContext.getCurrentTenant(), upc);
+        List <PartnerProduct> products = partnerProductSearchRepository.findByTenantIdEqualsAndUpcEquals(TenantContext.getCurrentTenant(), upc);
         //List <PartnerProduct> products = partnerProductSearchRepository.findByTenantEquals(TenantContext.getCurrentTenant());
         Integer total = products.size();
         ProductResponse response = new ProductResponse();

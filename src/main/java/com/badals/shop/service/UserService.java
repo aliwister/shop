@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+/*    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
 
@@ -49,13 +49,13 @@ public class UserService {
         this.cacheManager = cacheManager;
     }
 
-    public Optional<Customer> activateRegistration(String key, String email) {
+    public Optional<User> activateRegistration(String key, String email) {
         log.debug("Activating user for activation key {}", key);
-        return userRepository.findOneBySecureKeyAndEmail(key, email)
+        return userRepository.findOneByActivationKeyAndEmail(key, email)
             .map(user -> {
                 // activate given user for the registration key.
-                user.setActive(1);
-                user.setSecureKey(null);
+                user.setActive(true);
+                user.setActivationKey(null);
                 //this.clearUserCaches(user);
                 log.debug("Activated user: {}", user);
                 return user;
@@ -63,7 +63,7 @@ public class UserService {
     }
 
 
-    public Optional<Customer> completePasswordReset(String newPassword, String key) {
+    public Optional<User> completePasswordReset(String newPassword, String key) {
         log.debug("Reset user password for reset key {}", key);
         return userRepository.findOneByResetKey(key)
             .filter(user -> user.getResetDate().isAfter(Instant.now().minusSeconds(86400)))
@@ -76,7 +76,7 @@ public class UserService {
             });
     }
 
-    public Optional<Customer> requestPasswordReset(String mail) {
+    public Optional<User> requestPasswordReset(String mail) {
         return userRepository.findOneByEmailIgnoreCase(mail)
             //.filter(Customer::isActive)
             .map(user -> {
@@ -87,13 +87,13 @@ public class UserService {
             });
     }
 
-    public Customer registerUser(UserDTO userDTO, String password) {
-        /*userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).ifPresent(existingUser -> {
+    public User registerUser(UserDTO userDTO, String password) {
+        *//*userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).ifPresent(existingUser -> {
             boolean removed = removeNonActivatedUser(existingUser);
             if (!removed) {
                 throw new LoginAlreadyUsedException();
             }
-        });*/
+        });*//*
         userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).ifPresent(existingUser -> {
             boolean removed = false; //removeNonActivatedUser(existingUser);
             if (!removed) {
@@ -115,15 +115,15 @@ public class UserService {
         // new user gets registration key
 
 
-        Customer newUser = new Customer();
+        User newUser = new User();
         newUser.setPassword(encryptedPassword);
         newUser.setFirstname(userDTO.getFirstName());
         newUser.setLastname(userDTO.getLastName());
         newUser.setEmail(userDTO.getEmail().toLowerCase());
         newUser.setMobile(userDTO.getMobile());
-        newUser.setActive(0);
+        newUser.setActive(false);
 
-        newUser.setSecureKey(RandomUtil.generateActivationKey());
+        newUser.setActivationKey(RandomUtil.generateActivationKey());
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
         newUser.setAuthorities(authorities);
@@ -135,15 +135,15 @@ public class UserService {
     }
 
     private boolean removeNonActivatedUser(User existingUser){
-        /*if (existingUser.getActivated()) {
+        *//*if (existingUser.getActivated()) {
              return false;
         }
         userRepository.delete(existingUser);
         userRepository.flush();
-        this.clearUserCaches(existingUser);*/
+        this.clearUserCaches(existingUser);*//*
         return true;
     }
-/*
+*//*
     public User createUser(UserDTO userDTO) {
         User user = new User();
         user.setLogin(userDTO.getLogin().toLowerCase());
@@ -174,8 +174,8 @@ public class UserService {
         log.debug("Created Information for User: {}", user);
         return user;
     }
-*/
-    /**
+*//*
+    *//**
      * Update basic information (first name, last name, email, language) for the current user.
      *
      * @param firstName first name of user.
@@ -183,9 +183,9 @@ public class UserService {
      * @param email     email id of user.
      * @param langKey   language key.
      * @param imageUrl  image URL of user.
-     */
+     *//*
 
- /*
+ *//*
     public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
         SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
@@ -200,14 +200,14 @@ public class UserService {
             });
     }
 
-  */
-    /**
+  *//*
+    *//**
      * Update all information for a specific user, and return the modified user.
      *
      * @param userDTO user to update.
      * @return updated user.
-     */
-    /*
+     *//*
+    *//*
     public Optional<UserDTO> updateUser(UserDTO userDTO) {
         return Optional.of(userRepository
             .findById(userDTO.getId()))
@@ -263,29 +263,29 @@ public class UserService {
     public Page<UserDTO> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAllByLoginNot(pageable, Constants.ANONYMOUS_USER).map(UserDTO::new);
     }
-*/
+*//*
     @Transactional(readOnly = true)
-    public Optional<Customer> getUserWithAuthoritiesByEmail(String login) {
+    public Optional<User> getUserWithAuthoritiesByEmail(String login) {
         return userRepository.findOneWithAuthoritiesByEmail(login);
     }
 
     @Transactional(readOnly = true)
-    public Optional<Customer> getUserWithAuthorities(Long id) {
+    public Optional<User> getUserWithAuthorities(Long id) {
         return userRepository.findOneWithAuthoritiesById(id);
     }
 
     @Transactional(readOnly = true)
-    public Optional<Customer> getUserWithAuthorities() {
+    public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByEmail);
     }
 
-    /**
+    *//**
      * Not activated users should be automatically deleted after 3 days.
      * <p>
      * This is scheduled to get fired everyday, at 01:00 (am).
-     */
+     *//*
 
-    /*
+    *//*
     @Scheduled(cron = "0 0 1 * * ?")
     public void removeNotActivatedUsers() {
         userRepository
@@ -296,16 +296,16 @@ public class UserService {
                 this.clearUserCaches(user);
             });
     }
-*/
-    /**
+*//*
+    *//**
      * Gets a list of all the authorities.
      * @return a list of all the authorities.
-     */
+     *//*
 
 
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
-    }  /*
+    }  *//*
 
     private void clearUserCaches(User user) {
         Objects.requireNonNull(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE)).evict(user.getLogin());

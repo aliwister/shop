@@ -56,8 +56,11 @@ public class TenantOrderItem implements Serializable, TenantSupport {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @NotFound(action = NotFoundAction.IGNORE)
-    @JoinColumn(name = "product_id", referencedColumnName = "ref")
+    @JoinColumn(name = "product_id", referencedColumnName = "ref", updatable=false, insertable=false)
     private TenantProduct product;
+
+
+    @Column(name="product_id") String ref;
 
     @Column
     private String image;
@@ -74,8 +77,6 @@ public class TenantOrderItem implements Serializable, TenantSupport {
     @Column(name="line_total")
     private BigDecimal lineTotal;
 
-    @Column(name="is_modifier")
-    private Boolean isModifier;
 
     public void setOrder(TenantOrder order) {
         this.order = order;

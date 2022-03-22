@@ -40,12 +40,13 @@ public class TenantCartService {
 
     private final TenantCartMapper cartMapper;
     private final UserService userService;
+    private final CustomerService customerService;
     private final TenantProductService productService;
 
     private final CheckoutLineItemMapper checkoutLineItemMapper;
     private final CheckoutAddressMapper checkoutAddressMapper;
 
-    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, UserService userService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
+    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, UserService userService, CustomerService customerService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
         this.checkoutRepository = checkoutRepository;
         this.productRepository = productRepository;
@@ -53,6 +54,7 @@ public class TenantCartService {
         this.cartItemRepository = cartItemRepository;
         this.cartMapper = cartMapper;
         this.userService = userService;
+        this.customerService = customerService;
         this.productService = productService;
         this.checkoutLineItemMapper = checkoutLineItemMapper;
         this.checkoutAddressMapper = checkoutAddressMapper;
@@ -132,7 +134,7 @@ public class TenantCartService {
     @Transactional
     public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge) {
         TenantCart cart = null;
-        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
         log.info("Logged in user " + loginUser);
         // secureKey always null
         if(secureKey != null) {
@@ -270,7 +272,7 @@ public class TenantCartService {
         Locale locale = LocaleContextHolder.getLocale();
         String currency = Currency.getInstance(locale).getCurrencyCode();
 
-        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
         TenantCart cart = null;
         Customer customer = null;
 

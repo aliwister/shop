@@ -3,7 +3,6 @@ package com.badals.shop.service;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.Order;
-import com.badals.shop.domain.OrderItem;
 import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
@@ -16,6 +15,7 @@ import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.mapper.TenantOrderMapper;
+import com.badals.shop.service.util.MailService;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import org.hibernate.envers.AuditReader;
@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,9 +39,6 @@ import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 /**
  * Service Implementation for managing {@link Order}.
@@ -157,14 +153,14 @@ public class TenantOrderService {
         String secureKey = confirmationKey.split("\\.")[0];
         cartService.closeCart(secureKey);
 
-        order.setConfirmationKey(order.getConfirmationKey()+order.getId());
+        //order.setConfirmationKey(order.getConfirmationKey()+order.getId());
         OrderDTO dto = save(order);
         sendConfirmationEmail(dto);
         return dto;
     }
 
     public OrderResponse getCustomerOrders(Integer limit, Integer offset) {
-        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
         List<TenantOrder> orders = orderRepository.findOrdersByCustomerOrderByCreatedDateDesc(loginUser, PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();
         response.setTotal(orders.size());

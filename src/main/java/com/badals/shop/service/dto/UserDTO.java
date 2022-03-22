@@ -4,6 +4,7 @@ import com.badals.shop.config.Constants;
 
 import com.badals.shop.domain.Authority;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.User;
 
 import javax.validation.constraints.Email;
 
@@ -65,7 +66,7 @@ public class UserDTO {
         this.firstName = user.getFirstname();
         this.lastName = user.getLastname();
         this.email = user.getEmail();
-        this.activated = user.getActive().equals(1);
+        this.activated = user.isActive();
         //this.imageUrl = user.getImageUrl();
         //this.langKey = user.getLangKey();
         //this.createdBy = user.getCreatedBy();
@@ -75,6 +76,24 @@ public class UserDTO {
         this.authorities = user.getAuthorities().stream()
             .map(Authority::getName)
             .collect(Collectors.toSet());
+    }
+
+    public UserDTO(User user) {
+        this.id = user.getId();
+        //this.login = user.getLogin();
+        this.firstName = user.getFirstname();
+        this.lastName = user.getLastname();
+        this.email = user.getEmail();
+        this.activated = user.isActive();
+        //this.imageUrl = user.getImageUrl();
+        //this.langKey = user.getLangKey();
+        //this.createdBy = user.getCreatedBy();
+        //this.createdDate = user.getCreatedDate();
+        //this.lastModifiedBy = user.getLastModifiedBy();
+        //this.lastModifiedDate = user.getLastModifiedDate();
+/*        this.authorities = user.getAuthorities().stream()
+                .map(Authority::getName)
+                .collect(Collectors.toSet());*/
     }
 
     public Long getId() {

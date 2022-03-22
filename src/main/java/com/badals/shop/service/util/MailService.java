@@ -1,7 +1,9 @@
-package com.badals.shop.service;
+package com.badals.shop.service.util;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Customer;
 
+import com.badals.shop.domain.UserBase;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.PaymentDTO;
@@ -16,6 +18,7 @@ import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -69,7 +72,7 @@ public class MailService {
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, StandardCharsets.UTF_8.name());
             message.setTo(to);
-            message.setFrom(jHipsterProperties.getMail().getFrom(), "Badals.com");
+            message.setFrom(jHipsterProperties.getMail().getFrom(), TenantContext.getCurrentProfile());
             message.setSubject(subject);
             message.setText(content, isHtml);
             javaMailSender.send(mimeMessage);
@@ -84,36 +87,40 @@ public class MailService {
     }
 
     @Async
-    public void sendEmailFromTemplate(Customer user, String templateName, String titleKey) {
-        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+    public void sendEmailFromTemplate(UserBase user, String templateName, String titleKey) {
+        Locale locale = LocaleContextHolder.getLocale();//user.getLangKey());
         Context context = new Context(locale);
         context.setVariable(USER, user);
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
         String content = templateEngine.process(templateName, context);
-        String subject = messageSource.getMessage(titleKey, null, locale);
+        String subject = messageSource.getMessage(titleKey, new String[] {TenantContext.getCurrentProfile()}, locale);
         sendEmail(user.getEmail(), subject, content, false, true);
     }
 
+    private String buildProfileBaseUrl(String currentProfile) {
+        return "https://"+currentProfile+".profile.shop";
+    }
+
     @Async
-    public void sendEmailFromTemplate(Customer user, List<PricingRequestDTO> dtos, String templateName, String titleKey) {
-        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+    public void sendEmailFromTemplate(UserBase user, List<PricingRequestDTO> dtos, String templateName, String titleKey) {
+        Locale locale = LocaleContextHolder.getLocale();//user.getLangKey());
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(PRICINGREQUESTS, dtos);
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
         String content = templateEngine.process(templateName, context);
-        String subject = messageSource.getMessage(titleKey, null, locale);
+        String subject = messageSource.getMessage(titleKey, new String[] {TenantContext.getCurrentProfile()}, locale);
         sendEmail(user.getEmail(), subject, content, false, true);
     }
 
     @Async
     public void sendEmailFromTemplate(CustomerDTO user, OrderDTO order, String templateName, String titleKey) {
-        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+        Locale locale = LocaleContextHolder.getLocale();//user.getLangKey());
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(ORDER, order);
-        context.setVariable(ITEMS, order.getOrderItems());
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable(ITEMS, order.getItems());
+        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
         String content = templateEngine.process(templateName, context);
         final String[] params = new String[]{order.getReference()};
         String subject = messageSource.getMessage(titleKey, params, locale);
@@ -122,13 +129,13 @@ public class MailService {
 
     @Async
     public void sendEmailFromTemplate(CustomerDTO user, OrderDTO order, String reason, String templateName, String titleKey) {
-        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+        Locale locale = LocaleContextHolder.getLocale();
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(ORDER, order);
-        context.setVariable(ITEMS, order.getOrderItems());
+        context.setVariable(ITEMS, order.getItems());
         context.setVariable(REASON, reason);
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
         String content = templateEngine.process(templateName, context);
         final String[] params = new String[]{order.getReference()};
         String subject = messageSource.getMessage(titleKey, params, locale);
@@ -137,11 +144,11 @@ public class MailService {
 
     @Async
     public void sendEmailFromTemplate(CustomerDTO user, PaymentDTO payment, String templateName, String titleKey) {
-        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
+        Locale locale = LocaleContextHolder.getLocale(); //user.getLangKey());
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(PAYMENT, payment);
-        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
         String content = templateEngine.process(templateName, context);
         final String[] params = new String[]{payment.getOrderReference()};
         String subject = messageSource.getMessage(titleKey, params, locale);
@@ -149,19 +156,19 @@ public class MailService {
     }
 
     @Async
-    public void sendActivationEmail(Customer user) {
+    public void sendActivationEmail(UserBase user) {
         log.debug("Sending activation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "mail/activationEmail", "email.activation.title");
     }
 
     @Async
-    public void sendCreationEmail(Customer user) {
+    public void sendCreationEmail(UserBase user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "mail/creationEmail", "email.activation.title");
     }
 
     @Async
-    public void sendPasswordResetMail(Customer user) {
+    public void sendPasswordResetMail(UserBase user) {
         log.debug("Sending password reset email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "mail/passwordResetEmail", "email.reset.title");
     }

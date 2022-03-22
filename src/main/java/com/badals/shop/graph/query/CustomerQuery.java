@@ -68,13 +68,13 @@ public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
 
     @PreAuthorize("hasRole('ROLE_USER')")
     public CustomerDTO me() {
-       CustomerDTO customerDTO = userService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
+       CustomerDTO customerDTO = customerService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
        return customerDTO;
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     public CustomerDTO mePlus() {
-       Customer customer = userService.getUserWithAuthorities().orElse(null);
+       Customer customer = customerService.getUserWithAuthorities().orElse(null);
        if(customer != null)
           return customerService.findOne(customer.getId()).orElse(null);
        return null;
@@ -82,7 +82,7 @@ public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
 
     @PreAuthorize("hasRole('ROLE_NONE')")
     public CustomerDTO meTest(Long id) {
-        return userService.getUserWithAuthorities(id).map(customerMapper::toDto).orElse(null);
+        return customerService.getUserWithAuthorities(id).map(customerMapper::toDto).orElse(null);
     }
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -94,7 +94,7 @@ public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
 
 
     public AddressList addresses () {
-       Customer loginUser = userService.getUserWithAuthorities().orElse(new Customer(1L));
+       Customer loginUser = customerService.getUserWithAuthorities().orElse(new Customer(1L));
        return new AddressList(addressService.customerAddresses(loginUser), "({alias}){firstName}{lastName}_{line1}_{line2}_{state}_{mobile}");
     }
 

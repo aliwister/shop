@@ -25,6 +25,7 @@ public interface TenantOrderMapper extends EntityMapper<OrderDTO, TenantOrder> {
     @Mapping(target="cart", ignore = true)
     @Mapping(source = "cart.id", target="cartId")
     @Mapping(source = "cart.secureKey", target="cartSecureKey")
+    @Mapping(source = "orderItems", target="items")
     OrderDTO toDto(TenantOrder order);
 
     default TenantOrder fromId(Long id) {

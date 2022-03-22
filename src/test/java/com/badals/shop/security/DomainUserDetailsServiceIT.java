@@ -8,6 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -36,6 +37,7 @@ public class DomainUserDetailsServiceIT {
     @Autowired
     private UserRepository userRepository;
 
+    @Qualifier("userDetailsService")
     @Autowired
     private UserDetailsService domainUserDetailsService;
 
@@ -46,33 +48,33 @@ public class DomainUserDetailsServiceIT {
     @BeforeEach
     public void init() {
         userOne = new User();
-        userOne.setLogin(USER_ONE_LOGIN);
+        //userOne.setLogin(USER_ONE_LOGIN);
         userOne.setPassword(RandomStringUtils.random(60));
-        userOne.setActivated(true);
+        userOne.setActive(true);
         userOne.setEmail(USER_ONE_EMAIL);
-        userOne.setFirstName("userOne");
-        userOne.setLastName("doe");
-        userOne.setLangKey("en");
+        userOne.setFirstname("userOne");
+        userOne.setLastname("doe");
+        //userOne.setLangKey("en");
         //userRepository.save(userOne);
 
         userTwo = new User();
-        userTwo.setLogin(USER_TWO_LOGIN);
+        //userTwo.setLogin(USER_TWO_LOGIN);
         userTwo.setPassword(RandomStringUtils.random(60));
-        userTwo.setActivated(true);
+        userTwo.setActive(true);
         userTwo.setEmail(USER_TWO_EMAIL);
-        userTwo.setFirstName("userTwo");
-        userTwo.setLastName("doe");
-        userTwo.setLangKey("en");
+        userTwo.setFirstname("userTwo");
+        userTwo.setLastname("doe");
+        //userTwo.setLangKey("en");
         //userRepository.save(userTwo);
 
         userThree = new User();
-        userThree.setLogin(USER_THREE_LOGIN);
+        //userThree.setLogin(USER_THREE_LOGIN);
         userThree.setPassword(RandomStringUtils.random(60));
-        userThree.setActivated(false);
+        userThree.setActive(false);
         userThree.setEmail(USER_THREE_EMAIL);
-        userThree.setFirstName("userThree");
-        userThree.setLastName("doe");
-        userThree.setLangKey("en");
+        userThree.setFirstname("userThree");
+        userThree.setLastname("doe");
+        //userThree.setLangKey("en");
         //userRepository.save(userThree);
     }
 

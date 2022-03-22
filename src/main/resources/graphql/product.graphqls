@@ -121,7 +121,7 @@ type Meta {
 }
 
 
-type Product implements LocalizedObject {
+type Product {
     id: ID!
     ref: Long
     parent: Int
@@ -147,7 +147,7 @@ type Product implements LocalizedObject {
     variationAttributes: [Attribute]
     variations: [Variation]
     price: String
-    salePrice: String
+    #salePrice: String
     listPrice: String
     currency: String
     discountInPercent: Float
@@ -158,7 +158,7 @@ type Product implements LocalizedObject {
     unit: String
     description: String
     meta: Meta
-    merchantStock: [MerchantStock]
+    merchantStock: [Stock]
     hours: Int
     availability: String
     features: [String]
@@ -188,7 +188,7 @@ type LocalizedValue {
     value: String
 }
 
-type MerchantStock {
+type Stock {
     quantity: BigDecimal
     availability: Int
     allow_backorder: Boolean
@@ -197,7 +197,7 @@ type MerchantStock {
     price: BigDecimal
 }
 
-input MerchantStockInput {
+input StockInput {
     quantity: BigDecimal
     availability: Int
     allow_backorder: Boolean

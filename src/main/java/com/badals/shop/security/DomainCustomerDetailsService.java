@@ -1,10 +1,12 @@
 package com.badals.shop.security;
 
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.User;
+import com.badals.shop.repository.CustomerRepository;
 import com.badals.shop.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,28 +15,23 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * Authenticate a user from the database.
  */
-@Component("userDetailsService")
-public class DomainUserDetailsService implements UserDetailsService {
+@Component("customerDetailsService")
+public class DomainCustomerDetailsService implements UserDetailsService {
 
-    private final Logger log = LoggerFactory.getLogger(DomainUserDetailsService.class);
+    private final Logger log = LoggerFactory.getLogger(DomainCustomerDetailsService.class);
 
-    private final UserRepository userRepository;
+    private final CustomerRepository userRepository;
 
-    public DomainUserDetailsService(UserRepository userRepository) {
+    public DomainCustomerDetailsService(CustomerRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return null;
-    }
-/*
     @Override
     @Transactional
     public UserDetails loadUserByUsername(final String login) {
@@ -46,17 +43,17 @@ public class DomainUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + login + " was not found in the database"));
        // }
 
-        *//*String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
+        /*String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
         return userRepository.findOneWithAuthoritiesByLogin(lowercaseLogin)
             .map(user -> createSpringSecurityUser(lowercaseLogin, user))
             .orElseThrow(() -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database"));
-        *//*
+        */
     }
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, User user) {
-*//*        if (user.getActive() == 0) {
+    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, Customer user) {
+/*        if (user.getActive() == 0) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
-        }*//*
+        }*/
         List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
             .map(authority -> new SimpleGrantedAuthority(authority.getName()))
             .collect(Collectors.toList());
@@ -67,5 +64,5 @@ public class DomainUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getEmail(),
             user.getPassword(),
             grantedAuthorities);
-    }*/
+    }
 }

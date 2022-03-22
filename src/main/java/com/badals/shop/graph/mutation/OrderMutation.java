@@ -2,7 +2,7 @@ package com.badals.shop.graph.mutation;
 
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.domain.enumeration.OrderState;
-import com.badals.shop.service.MailService;
+import com.badals.shop.service.util.MailService;
 import com.badals.shop.service.OrderService;
 import com.badals.shop.service.PaymentService;
 import com.badals.shop.service.PurchaseService;

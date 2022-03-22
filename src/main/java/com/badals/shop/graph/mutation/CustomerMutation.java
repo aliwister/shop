@@ -3,6 +3,7 @@ package com.badals.shop.graph.mutation;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.graph.AddressResponse;
 import com.badals.shop.service.AddressService;
+import com.badals.shop.service.CustomerService;
 import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.AddressDTO;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
@@ -28,10 +29,12 @@ public class CustomerMutation implements GraphQLMutationResolver {
 
     private final AddressService addressService;
     private final UserService userService;
+    private final CustomerService customerService;
 
-    public CustomerMutation(AddressService addressService, UserService userService) {
+    public CustomerMutation(AddressService addressService, UserService userService, CustomerService customerService) {
         this.addressService = addressService;
         this.userService = userService;
+        this.customerService = customerService;
     }
 
     public String resetPassword(final String  password) {
@@ -51,7 +54,7 @@ public class CustomerMutation implements GraphQLMutationResolver {
         address.setCountry(l.getCountry());
         address.setActive(true);
         address.setDeleted(false);
-        Customer loginUser = userService.getUserWithAuthorities().orElse(new Customer(1L));
+        Customer loginUser = customerService.getUserWithAuthorities().orElse(new Customer(1L));
 
         address.setCustomerId(loginUser.getId());
         AddressDTO ret = addressService.save(address);

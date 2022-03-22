@@ -45,7 +45,7 @@ public class CartService {
     private final CheckoutCartRepository checkoutCartRepository;
     private final CheckoutAddressMapper checkoutAddressMapper;
 
-    private final UserService userService;
+    private final CustomerService userService;
     private final ProductService productService;
 
     public static String createUIUD() {
@@ -54,7 +54,7 @@ public class CartService {
         return uuid.toString();
     }
 
-    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, CustomerRepository customerRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, UserService userService, ProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, CustomerRepository customerRepository, CartMapper cartMapper, CartItemMapper cartItemMapper, CheckoutCartRepository checkoutCartRepository, CheckoutCartMapper checkoutCartMapper, CustomerService userService, ProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.customerRepository = customerRepository;

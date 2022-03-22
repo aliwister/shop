@@ -58,7 +58,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
     @Mapping(source="variationOptions", target = "options")
     @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "priceMapToList")
     @Mapping(target = "price", source="price", qualifiedByName = "priceMapToList")
-    @Mapping(target = "tenant", source="tenantId")
+    //@Mapping(target = "tenant", source="tenantId")
     PartnerProduct toDto(TenantProduct product);
 
 

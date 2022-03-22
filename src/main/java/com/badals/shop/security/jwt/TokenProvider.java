@@ -83,6 +83,29 @@ public class TokenProvider implements InitializingBean {
             .compact();
     }
 
+    public String createPartnerToken(Authentication authentication, boolean rememberMe, String tenantId,Collection<? extends GrantedAuthority> authoritiesList ) {
+        String authorities = authoritiesList.stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date validity;
+        if (rememberMe) {
+            validity = new Date(now + this.tokenValidityInMillisecondsForRememberMe);
+        } else {
+            validity = new Date(now + this.tokenValidityInMilliseconds);
+        }
+
+        return Jwts.builder()
+            .setSubject(authentication.getName())
+            .setAudience(TenantContext.getCurrentProfile())
+            .setId(tenantId)
+            .claim(AUTHORITIES_KEY, authorities)
+            .signWith(key, SignatureAlgorithm.HS512)
+            .setExpiration(validity)
+            .compact();
+    }
+
     public Authentication getAuthentication(String token) {
         log.info("JWT Token: " + token);
         Claims claims = Jwts.parser()
@@ -102,7 +125,9 @@ public class TokenProvider implements InitializingBean {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
+        ProfileUser principal = new ProfileUser(claims.getSubject(), "", authorities);
+        principal.setProfile(claims.getAudience());
+        principal.setTenantId(claims.getId());
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }

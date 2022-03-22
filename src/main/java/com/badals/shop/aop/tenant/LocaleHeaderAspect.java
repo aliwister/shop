@@ -23,6 +23,8 @@ public class LocaleHeaderAspect {
 
    @Before("execution(* com.badals.shop.service.*.*(..))")
    public void beforeExecution() throws Throwable {
+      if (RequestContextHolder.getRequestAttributes() == null) return;
+
       HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
       String localeHeader = request.getHeader("Accept-Language");
       if(localeHeader != null && !localeHeader.equals("undefined")) {
