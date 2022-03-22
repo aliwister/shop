@@ -1,15 +1,18 @@
 package com.badals.shop.service.dto;
+import com.badals.shop.domain.pojo.PaymentDef;
+import com.badals.shop.domain.pojo.PaymentProfile;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link com.badals.shop.domain.Tenant} entity.
+ * A DTO for the {@link com.badals.shop.domain.tenant.Tenant} entity.
  */
 @Data
 public class TenantDTO implements Serializable {
@@ -32,6 +35,7 @@ public class TenantDTO implements Serializable {
 
     private LocalDate contractStartDate;
 
+    private List<PaymentDef> publicPaymentProfile;
 
     private Set<MerchantDTO> merchants = new HashSet<>();
 

@@ -4,15 +4,24 @@ import com.badals.shop.aop.tenant.TenantRequestFilter;
 import com.badals.shop.security.*;
 import com.badals.shop.security.jwt.*;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
@@ -24,83 +33,116 @@ import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 @Import(SecurityProblemSupport.class)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final TokenProvider tokenProvider;
+    @Configuration
+    @Order(1)
+    public static class CustomerWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final CorsFilter corsFilter;
-    private final SecurityProblemSupport problemSupport;
+        private final TokenProvider tokenProvider;
 
-    private final TenantRequestFilter tenantRequestFilter;
+        private final CorsFilter corsFilter;
+        private final SecurityProblemSupport problemSupport;
 
-    public SecurityConfiguration(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport, TenantRequestFilter tenantRequestFilter) {
-        this.tokenProvider = tokenProvider;
-        this.corsFilter = corsFilter;
-        this.problemSupport = problemSupport;
-        this.tenantRequestFilter = tenantRequestFilter;
-    }
+        private final TenantRequestFilter tenantRequestFilter;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new CustomPasswordEncoder();
-    }
+        private final UserDetailsService userDetailsService;
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-            .antMatchers(HttpMethod.OPTIONS, "/**")
-            .antMatchers("/swagger-ui/index.html")
-            .antMatchers("/test/**");
-    }
+        public CustomerWebSecurityConfig(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport, TenantRequestFilter tenantRequestFilter, @Qualifier("customerDetailsService") UserDetailsService userDetailsService) {
+            this.tokenProvider = tokenProvider;
+            this.corsFilter = corsFilter;
+            this.problemSupport = problemSupport;
+            this.tenantRequestFilter = tenantRequestFilter;
+            this.userDetailsService = userDetailsService;
+        }
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        // @formatter:off
-        http
-            .csrf()
-            .disable()
-            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling()
-            .authenticationEntryPoint(problemSupport)
-            .accessDeniedHandler(problemSupport)
-        .and()
-            .headers()
-            .contentSecurityPolicy("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' ; img-src 'self' data:")
-        .and()
-            .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-        .and()
-            .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
-        .and()
-            .frameOptions()
-            .deny()
-        .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-            .authorizeRequests()
-            .antMatchers("/api/authenticate").permitAll()
-            .antMatchers("/api/register").permitAll()
-            .antMatchers("/api/activate").permitAll()
-            .antMatchers("/api/product/**").permitAll()
-            .antMatchers("/pricing/**").permitAll()
-            .antMatchers("/graphql").permitAll()
-            .antMatchers("/**/graphql").permitAll()
-            .antMatchers("/detrack").permitAll()
-            .antMatchers("/checkout1432u102398019238092183").permitAll()
-            .antMatchers("/api/users/current").permitAll()
-            .antMatchers("/api/account/reset-password/init").permitAll()
-            .antMatchers("/api/account/reset-password/finish").permitAll()
-            .antMatchers("/api/**").hasAuthority(AuthoritiesConstants.ADMIN)
-            .antMatchers("/management/health").permitAll()
-            .antMatchers("/management/info").permitAll()
-            .antMatchers("/management/prometheus").permitAll()
-            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
-        .and()
-            .httpBasic()
-        .and()
-            .apply(securityConfigurerAdapter());
-        // @formatter:on
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new CustomPasswordEncoder();
+        }
 
-    private JWTConfigurer securityConfigurerAdapter() {
-        return new JWTConfigurer(tokenProvider);
+        @Override
+        public void configure(WebSecurity web) throws Exception {
+            web.ignoring()
+                    .antMatchers(HttpMethod.OPTIONS, "/**")
+                    .antMatchers("/swagger-ui/index.html")
+                    .antMatchers("/test/**");
+        }
+
+        @Override
+        public void configure(HttpSecurity http) throws Exception {
+            // @formatter:off
+            http
+                    .csrf()
+                    .disable()
+                    .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                    .exceptionHandling()
+                    .authenticationEntryPoint(problemSupport)
+                    .accessDeniedHandler(problemSupport)
+                    .and()
+                    .headers()
+                    .contentSecurityPolicy("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' ; img-src 'self' data:")
+                    .and()
+                    .referrerPolicy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                    .and()
+                    .featurePolicy("geolocation 'none'; midi 'none'; sync-xhr 'none'; microphone 'none'; camera 'none'; magnetometer 'none'; gyroscope 'none'; speaker 'none'; fullscreen 'self'; payment 'none'")
+                    .and()
+                    .frameOptions()
+                    .deny()
+                    .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .authorizeRequests()
+                    .antMatchers("/api/authenticate").permitAll()
+                    .antMatchers("/api/authenticatePartner").permitAll()
+                    .antMatchers("/api/register").permitAll()
+                    .antMatchers("/api/activate").permitAll()
+                    .antMatchers("/api/product/**").permitAll()
+                    .antMatchers("/api/report/**").permitAll()
+                    .antMatchers("/pricing/**").permitAll()
+                    .antMatchers("/graphql").permitAll()
+                    .antMatchers("/**/graphql").permitAll()
+                    .antMatchers("/detrack").permitAll()
+                    .antMatchers("/checkout1432u102398019238092183").permitAll()
+                    .antMatchers("/api/users/current").permitAll()
+                    .antMatchers("/api/account/reset-password/init").permitAll()
+                    .antMatchers("/api/account/reset-password/finish").permitAll()
+                    .antMatchers("/api/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .antMatchers("/management/health").permitAll()
+                    .antMatchers("/management/info").permitAll()
+                    .antMatchers("/management/prometheus").permitAll()
+                    .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .and()
+                    .httpBasic()
+                    .and()
+                    .apply(securityConfigurerAdapter());
+            // @formatter:on
+        }
+
+        @Override
+        @Bean
+        @Primary
+        public AuthenticationManager authenticationManagerBean() throws Exception {
+            return super.authenticationManagerBean();
+        }
+
+
+        @Bean(name = "emAuthenticationProvider")
+        public AuthenticationProvider emAuthenticationProvider() {
+            DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+            provider.setPasswordEncoder(passwordEncoder());
+            provider.setUserDetailsService(userDetailsService);
+            return provider;
+        }
+
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.userDetailsService(userDetailsService);
+            auth.authenticationProvider(emAuthenticationProvider());
+        }
+
+        private JWTConfigurer securityConfigurerAdapter() {
+            return new JWTConfigurer(tokenProvider);
+        }
     }
 }

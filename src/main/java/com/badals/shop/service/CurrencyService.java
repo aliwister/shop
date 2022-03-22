@@ -37,6 +37,7 @@ public class CurrencyService {
    private final Logger log = LoggerFactory.getLogger(CurrencyService.class);
 
    public static String convert(String amount, String from, String to) {
+      if(amount == null) return null;
       String rate = expiringMap.get(from+to);
       if(rate == null) {
          rate = getRate(from, to);

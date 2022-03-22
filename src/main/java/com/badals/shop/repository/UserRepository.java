@@ -2,6 +2,7 @@ package com.badals.shop.repository;
 
 import com.badals.shop.domain.Customer;
 
+import com.badals.shop.domain.User;
 import org.springframework.cache.annotation.Cacheable;
 
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -14,33 +15,33 @@ import java.util.Optional;
  * Spring Data JPA repository for the {@link User} entity.
  */
 @Repository
-public interface UserRepository extends JpaRepository<Customer, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
     String USERS_BY_LOGIN_CACHE = "usersByLogin";
 
     String USERS_BY_EMAIL_CACHE = "usersByEmail";
-    Optional<Customer> findByEmail(String email);
-    Optional<Customer> findById(Long id);
+    Optional<User> findByEmail(String email);
+    Optional<User> findById(Long id);
     boolean existsByEmail(String email);
 
-    Optional<Customer> findOneBySecureKey(String activationKey);
+    //Optional<User> findOneByActivationKey(String activationKey);
 
-    Optional<Customer> findOneBySecureKeyAndEmail(String activationKey, String email);
+    //Optional<User> findOneByActivationKeyAndEmail(String activationKey, String email);
     //List<User> findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant dateTime);
 
 
-    Optional<Customer> findOneByResetKey(String resetKey);
+    //Optional<User> findOneByResetKey(String resetKey);
 
-    Optional<Customer> findOneByEmailIgnoreCase(String email);
+    Optional<User> findOneByEmailIgnoreCase(String email);
 
     //Optional<User> findOneByLogin(String login);
 
-    @EntityGraph(attributePaths = "authorities")
-    Optional<Customer> findOneWithAuthoritiesById(Long id);
+/*    @EntityGraph(attributePaths = "authorities")
+    Optional<User> findOneWithAuthoritiesById(Long id);
 
     @EntityGraph(attributePaths = "authorities")
     @Cacheable(cacheNames = USERS_BY_LOGIN_CACHE)
-    Optional<Customer> findOneWithAuthoritiesByEmail(String login);
+    Optional<User> findOneWithAuthoritiesByEmail(String login);*/
 
     //@EntityGraph(attributePaths = "authorities")
     //@Cacheable(cacheNames = USERS_BY_EMAIL_CACHE)

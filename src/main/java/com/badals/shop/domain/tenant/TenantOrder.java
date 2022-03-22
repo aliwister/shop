@@ -9,6 +9,7 @@ import com.badals.shop.domain.enumeration.OrderState;
 
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.AddressPojo;
+import com.badals.shop.domain.pojo.OrderAdjustment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.hibernate.annotations.Filter;
@@ -24,6 +25,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -130,6 +132,11 @@ public class TenantOrder implements Serializable, TenantSupport {
     @Type(type = "json")
     @Column(name = "delivery_address", columnDefinition = "string")
     private AddressPojo deliveryAddressPojo;
+
+    @NotAudited
+    @Type(type = "json")
+    @Column(name = "adjustments", columnDefinition = "string")
+    private List<OrderAdjustment> orderAdjustments;
 
 
     public AddressPojo getDeliveryAddressPojo() {

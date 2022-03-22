@@ -6,11 +6,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import javax.persistence.Lob;
 
-import com.badals.shop.domain.ProductLang;
 import com.badals.shop.domain.enumeration.Condition;
 import com.badals.shop.domain.enumeration.ProductGroup;
 //import com.badals.shop.domain.enumeration.ProductType;
-import com.badals.shop.domain.enumeration.ProductType;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.*;
 import com.badals.shop.service.pojo.Meta;
@@ -123,7 +121,7 @@ public class ProductDTO implements Serializable {
     List<Variation> variations;
     List<Attribute> variationAttributes;
 
-    List<MerchantStockDTO> merchantStock;
+    List<StockDTO> merchantStock;
 
     VariationType variationType;
 

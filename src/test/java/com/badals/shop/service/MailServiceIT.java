@@ -2,6 +2,7 @@ package com.badals.shop.service;
 
 import com.badals.shop.ShopApp;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.service.util.MailService;
 import io.github.jhipster.config.JHipsterProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

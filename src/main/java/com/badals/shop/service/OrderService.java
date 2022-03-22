@@ -15,6 +15,7 @@ import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.mapper.OrderMapper;
+import com.badals.shop.service.util.MailService;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import org.hibernate.envers.AuditReader;
@@ -55,7 +56,7 @@ public class OrderService {
     private final OrderSearchRepository orderSearchRepository;
 
     private final OrderMapper orderMapper;
-    private UserService userService;
+    private CustomerService userService;
 
     private final CustomerService customerService;
     private final MessageSource messageSource;
@@ -65,7 +66,7 @@ public class OrderService {
     private final AddressRepository addressRepository;
     private final CartService cartService;
 
-    public OrderService(OrderRepository orderRepository, OrderSearchRepository orderSearchRepository, OrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, CartService cartService) {
+    public OrderService(OrderRepository orderRepository, OrderSearchRepository orderSearchRepository, OrderMapper orderMapper, CustomerService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, CartService cartService) {
         this.orderRepository = orderRepository;
         this.orderSearchRepository = orderSearchRepository;
         this.orderMapper = orderMapper;

@@ -2,7 +2,7 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.repository.MerchantStockRepository;
-import com.badals.shop.service.dto.MerchantStockDTO;
+import com.badals.shop.service.dto.StockDTO;
 import com.badals.shop.service.mapper.MerchantStockMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +36,12 @@ public class MerchantStockService {
     /**
      * Save a merchantStock.
      *
-     * @param merchantStockDTO the entity to save.
+     * @param stockDTO the entity to save.
      * @return the persisted entity.
      */
-    public MerchantStockDTO save(MerchantStockDTO merchantStockDTO) {
-        log.debug("Request to save MerchantStock : {}", merchantStockDTO);
-        MerchantStock merchantStock = merchantStockMapper.toEntity(merchantStockDTO);
+    public StockDTO save(StockDTO stockDTO) {
+        log.debug("Request to save MerchantStock : {}", stockDTO);
+        MerchantStock merchantStock = merchantStockMapper.toEntity(stockDTO);
         merchantStock = merchantStockRepository.save(merchantStock);
         return merchantStockMapper.toDto(merchantStock);
     }
@@ -52,7 +52,7 @@ public class MerchantStockService {
      * @return the list of entities.
      */
     @Transactional(readOnly = true)
-    public List<MerchantStockDTO> findAll() {
+    public List<StockDTO> findAll() {
         log.debug("Request to get all MerchantStocks");
         return merchantStockRepository.findAll().stream()
             .map(merchantStockMapper::toDto)
@@ -67,7 +67,7 @@ public class MerchantStockService {
      * @return the entity.
      */
     @Transactional(readOnly = true)
-    public Optional<MerchantStockDTO> findOne(Long id) {
+    public Optional<StockDTO> findOne(Long id) {
         log.debug("Request to get MerchantStock : {}", id);
         return merchantStockRepository.findById(id)
             .map(merchantStockMapper::toDto);

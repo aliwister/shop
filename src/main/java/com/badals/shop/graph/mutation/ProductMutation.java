@@ -39,10 +39,10 @@ public class ProductMutation implements GraphQLMutationResolver {
 
     private final MessageSource messageSource;
 
-    private final UserService userService;
+    private final CustomerService customerService;
 
 
-    public ProductMutation(ProductService productService, ProductIndexService productIndexService, Pas5Service pasService, HashtagService hashtagService, SpeedDialService speedDialService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService) {
+    public ProductMutation(ProductService productService, ProductIndexService productIndexService, Pas5Service pasService, HashtagService hashtagService, SpeedDialService speedDialService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService) {
         this.productService = productService;
         this.productIndexService = productIndexService;
         this.pasService = pasService;
@@ -51,7 +51,7 @@ public class ProductMutation implements GraphQLMutationResolver {
         this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
-        this.userService = userService;
+        this.customerService = customerService;
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -87,7 +87,7 @@ public class ProductMutation implements GraphQLMutationResolver {
     //@PreAuthorize("isAuthenticated()")
     @PreAuthorize("hasRole('ROLE_USER')")
     public Message addToPricingQ(String asin) {
-        Customer loginUser = userService.getUserWithAuthorities().orElse(null);
+        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
         if(loginUser == null)
             return new Message("You have to be logged in to request a price");
 
