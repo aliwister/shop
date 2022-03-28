@@ -14,6 +14,7 @@ import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.repository.TenantOrderRepository;
 import com.badals.shop.repository.TenantPaymentRepository;
 import com.badals.shop.repository.search.OrderSearchRepository;
+
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
@@ -540,8 +541,6 @@ public class TenantAdminOrderService {
 
         return new Message("success");
     }
-
-
 
     public void reIndex(Long from, Long to) {
         List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toDto).collect(Collectors.toList());

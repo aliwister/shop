@@ -9,7 +9,7 @@ import java.io.Serializable;
  * A Address.
  */
 @Entity
-@Table(catalog="prestashop7", name = "ps_country")
+@Table(catalog="profileshop", name = "ps_country")
 public class Country implements Serializable {
 
     private static final long serialVersionUID = 1L;
