@@ -23,7 +23,7 @@ import java.util.Set;
  * A Customer.
  */
 @Entity
-@Table(name = "ps_customer", catalog = "prestashop7")
+@Table(name = "ps_customer", catalog = "profileshop")
 @FilterDef(name = "TENANT_FILTER", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "TENANT_FILTER", condition = "tenant_id = :tenantId")
 public class Customer extends UserBase implements Serializable, TenantSupport {
