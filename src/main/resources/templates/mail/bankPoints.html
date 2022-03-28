@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title th:text="#{email.points.title}">JHipster activation</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
+    </head>
+    <body>
+        <p th:text="#{email.points.greeting(${user.firstname})}">
+            Dear
+        </p>
+        <p th:text="#{email.points.text1}">
+            Congratulations!
+        </p>
+        <p th:text="#{email.points.text2}">
+            You have earned ${points} Points for your order # ${ref}.
+            <br/>
+            You now have ${balance} Points in total.
+        </p>
+        <p th:text="#{email.points.text3}">
+            To check your points balance and issue rewards, visit:<br/>
+
+            <a href="http://www.badals.com/module/gamifications/loyality">Rewards Page</a>
+        </p>
+        <p>
+            <a th:with="url=(@{|${baseUrl}/activate?key=${user.secureKey}&email=${user.email}|})" th:href="${url}"
+            th:text="${url}">Activation link</a>
+        </p>
+        <p>
+            <span th:text="#{email.points.text2}">Regards, </span>
+            <br/>
+            <em th:text="#{email.signature}">JHipster.</em>
+        </p>
+    </body>
+</html>

@@ -95,10 +95,10 @@ spring:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
-  redis:
-    host: redis-15021.c135.eu-central-1-1.ec2.cloud.redislabs.com
-    port: 15021
-    password: Vl0wz1HVcaskE4Z9b3D8MIbBQefLOXkT
+#  redis:
+#    host: redis-15021.c135.eu-central-1-1.ec2.cloud.redislabs.com
+#    port: 15021
+#    password: Vl0wz1HVcaskE4Z9b3D8MIbBQefLOXkT
   cache:
     type: redis
 server:

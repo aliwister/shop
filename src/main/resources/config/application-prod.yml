@@ -88,10 +88,10 @@ spring:
     password: ***REMOVED***
   thymeleaf:
     cache: true
-  redis:
-    host: redis-15021.c135.eu-central-1-1.ec2.cloud.redislabs.com
-    port: 15021
-    password: Vl0wz1HVcaskE4Z9b3D8MIbBQefLOXkT
+#  redis:
+#    host: redis-15021.c135.eu-central-1-1.ec2.cloud.redislabs.com
+#    port: 15021
+#    password: Vl0wz1HVcaskE4Z9b3D8MIbBQefLOXkT
 
 # ===================================================================
 # To enable TLS in production, generate a certificate using:
