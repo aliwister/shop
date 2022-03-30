@@ -59,7 +59,7 @@ public class PartnerJWTController {
         }
         User user = (User) userObj;
         String tenantId = tenantAttribute.getValue();
-        com.badals.shop.domain.User dbUser = userRepository.findOneByEmailIgnoreCase(user.getUsername()).get();
+        com.badals.shop.domain.User dbUser = userRepository.findOneByEmailIgnoreCaseAndTenantId(user.getUsername(), com.badals.shop.domain.User.tenantFilter).get();
         //Tenant tenant = tenantRepository.getIsTenantForCustomer(user.getUsername(), tenantId).orElse(null);
 
 
@@ -85,7 +85,7 @@ public class PartnerJWTController {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
 
-        com.badals.shop.domain.User dbUser = userRepository.findOneByEmailIgnoreCase(loginVM.getUsername()).get();
+        com.badals.shop.domain.User dbUser = userRepository.findOneByEmailIgnoreCaseAndTenantId(loginVM.getUsername(), com.badals.shop.domain.User.tenantFilter).get();
         List<Tenant> tenantList = tenantRepository.findTenantsForUser(dbUser.getId());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
