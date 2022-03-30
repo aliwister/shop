@@ -1,5 +1,6 @@
 package com.badals.shop.domain;
 
+import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.config.Constants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,6 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -25,12 +29,12 @@ import java.util.Set;
  */
 @Data
 @Entity
-@Table(name = "ps_customer", catalog = "prestashop7")
+@Table(name = "ps_customer", catalog = "profileshop")
 public class User extends UserBase implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static String tenantFilter = "profileshop";
+    public static String tenantFilter = "profileshop";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,4 +56,8 @@ public class User extends UserBase implements Serializable {
             ", activated='" + isActive() + '\'' +
             "}";
     }
+
+    @Getter @Setter
+    @Column(name="tenant_id")
+    private String tenantId;
 }

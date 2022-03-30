@@ -32,7 +32,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     //Optional<User> findOneByResetKey(String resetKey);
 
-    Optional<User> findOneByEmailIgnoreCase(String email);
+    Optional<User> findOneByEmailIgnoreCaseAndTenantId(String email, String tenantId);
 
     //Optional<User> findOneByLogin(String login);
 
