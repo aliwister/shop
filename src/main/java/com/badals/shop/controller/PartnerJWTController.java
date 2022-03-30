@@ -79,7 +79,7 @@ public class PartnerJWTController {
     }
 
     // This loads the authorities of a user for a particular tenant
-    @PostMapping("/authenticatePartner")
+    @PostMapping("/authenticate2")
     public ResponseEntity<PartnerJWTController.JwtPartnerAuthenticationResponse> authorizePartner(@Valid @RequestBody LoginVM loginVM) {
         LocaleContextHolder.getLocale();
         UsernamePasswordAuthenticationToken authenticationToken =
