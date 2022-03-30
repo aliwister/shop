@@ -136,8 +136,8 @@ jhipster:
   cors:
     allowed-origins: 'https://www.badals.com,https://badals.com,https://partner.badals.com,https://face-admin.herokuapp.com,https://trust-admin001-212.badals.com,https://face-partner-prod.vercel.app,https://pro-partner.vercel.app'
     allowed-methods: 'GET,PUT,POST,DELETE,OPTIONS'
-    allowed-headers: 'Authorization,Content-Type,x-requested-with,origin,x-tenantid,X-TenantID'
-    exposed-headers: 'Authorization,Link,X-Total-Count'
+    allowed-headers: 'Authorization,Content-Type,x-requested-with,origin,X-TenantID'
+    exposed-headers: 'Authorization,Link,X-Total-Count,X-TenantID'
     allow-credentials: true
     max-age: 1800
   security:
