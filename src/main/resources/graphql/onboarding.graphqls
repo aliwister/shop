@@ -1,0 +1,4 @@
+extend type Mutation {
+    createTenant(tenantId: String): Message
+    assignRole(email: String, tenantId: String, role: String): Message
+}
