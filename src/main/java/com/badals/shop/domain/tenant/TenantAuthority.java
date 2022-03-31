@@ -20,10 +20,8 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "jhi_tenant_authority", catalog = "profileshop")
 @SelectBeforeUpdate(false)
-@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
-@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
-public class TenantAuthority implements Serializable, TenantSupport {
+public class TenantAuthority implements Serializable {
    private static final long serialVersionUID = 1L;
 
    @Id
