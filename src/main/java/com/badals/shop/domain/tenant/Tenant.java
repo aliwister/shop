@@ -7,6 +7,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -34,6 +35,9 @@ public class Tenant implements Serializable {
 
    @Column(name = "customDomain")
    private String domain;
+
+   @Column(name = "subdomain")
+   private String subdomain;
 
    @Column(name = "plan")
    private String plan;
@@ -71,6 +75,7 @@ public class Tenant implements Serializable {
    @Column(name = "max_products")
    private Long maxProducts;
 
+   @CreatedDate
    @Column(name = "created_date")
    private LocalDate createdDate;
 

@@ -23,11 +23,11 @@ import java.util.Date;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class UserBase implements Serializable  {
-   @CreatedBy
+   //@CreatedBy
    @Size(max = 50)
    private String firstname;
 
-   @CreatedDate
+   //@CreatedDate
    @Size(max = 50)
    private String lastname;
 
