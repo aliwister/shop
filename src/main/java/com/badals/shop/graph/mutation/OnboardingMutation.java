@@ -64,6 +64,7 @@ public class OnboardingMutation implements GraphQLMutationResolver {
     public Message createTenant(String tenantId) throws ProductNotFoundException {
         Tenant tenant = new Tenant();
         tenant.setTenantId(tenantId);
+        tenant.setName(tenantId);
         tenant.setSubdomain(tenantId);
         tenant.setActive(true);
         tenant.setCreatedDate(LocalDate.now());
