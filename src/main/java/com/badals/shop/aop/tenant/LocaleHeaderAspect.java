@@ -21,6 +21,11 @@ public class LocaleHeaderAspect {
 
    private final Logger log = LoggerFactory.getLogger(LocaleHeaderAspect.class);
 
+   /**
+    * Reads the Accept-Language header and sets the locale to that value for the current request.
+    * @throws Throwable
+    */
+
    @Before("execution(* com.badals.shop.service.*.*(..))")
    public void beforeExecution() throws Throwable {
       if (RequestContextHolder.getRequestAttributes() == null) return;

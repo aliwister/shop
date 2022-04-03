@@ -24,8 +24,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "ps_customer", catalog = "profileshop")
-@FilterDef(name = "TENANT_FILTER", parameters = {@ParamDef(name = "tenantId", type = "string")})
-@Filter(name = "TENANT_FILTER", condition = "tenant_id = :tenantId")
+@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class Customer extends UserBase implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
