@@ -306,6 +306,7 @@ public class TenantAdminProductService {
                 /*.price(salePriceObj)*/.product(master);
     }
 
+    @Transactional
     public ProductResponse findPartnerProducts(String text, Integer limit, Integer offset, Boolean active) {
         //List<AddProductDTO> result = search("tenant:"+currentTenant + " AND imported:" + imported.toString() + ((text != null)?" AND "+text:""));
         String profile = TenantContext.getCurrentProfile();
