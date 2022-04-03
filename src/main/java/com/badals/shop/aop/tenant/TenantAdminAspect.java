@@ -5,6 +5,7 @@ import com.badals.shop.security.jwt.ProfileUser;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,20 +29,24 @@ public class TenantAdminAspect {
       this.tenantRepository = tenantRepository;
    }
 
-   @Around(value = "execution(* com.badals.shop.service.TenantAdminProductService.*(..)) || execution(* com.badals.shop.service.TenantAdminOrderService.*(..)) .*(..))")
+   /**
+    * Ensures the current user has sufficient access to the tenant.
+    * @param proceedingJoinPoint
+    * @return
+    * @throws Throwable
+    */
+   @Around(value = "execution(* com.badals.shop.service.TenantAdminProductService.*(..)) || execution(* com.badals.shop.service.TenantAdminOrderService.*(..))")
    public Object assignForController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       ProfileUser userObj =  (ProfileUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
       if (userObj == null|| userObj.equals("anonymousUser")) {
-         //return assignTenant(proceedingJoinPoint, "mayaseen");
          throw new IllegalAccessException("Not Authorized");
       }
-      //User user = (User) userObj;
-      //List<Tenant> tenantList = tenantRepository.findTenantAndMerchantByCustomer(user.getUsername());
+      // Get the tenant the user is logged in for (done using select-store)
       String tenant = userObj.getTenantId();
 
       if (tenant != null) {
-         Filter filter = entityManager.unwrap(Session.class).enableFilter("TENANT_FILTER");
+         Filter filter = entityManager.unwrap(Session.class).enableFilter("tenantFilter");
          filter.setParameter("tenantId", tenant);
          filter.validate();
       } else {

@@ -285,7 +285,7 @@ public class TenantAdminOrderService {
     }
 
 
-
+    @Transactional
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) {
 /*
         if(searchText != null && searchText.trim().length() > 1 || balance)

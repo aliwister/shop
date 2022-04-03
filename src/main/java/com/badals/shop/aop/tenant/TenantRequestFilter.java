@@ -20,6 +20,16 @@ public class TenantRequestFilter extends OncePerRequestFilter {
    @Autowired
    private TenantRepository tenantRepository;
 
+   /**
+    * Capture the X-TenantID for rest requests
+    * Capture the tenantId from the graphql URL for GraphQL requests
+    * @param req
+    * @param res
+    * @param chain
+    * @throws ServletException
+    * @throws IOException
+    */
+
    @Override
    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
       String name = req.getRequestURI().startsWith("/graphql/")?req.getRequestURI().substring(9):null;
@@ -40,27 +50,6 @@ public class TenantRequestFilter extends OncePerRequestFilter {
       TenantContext.setCurrentProfile(name);
       TenantContext.setCurrentProfileId(profileId);
 
-/*      Cookie[] cookies = req.getCookies();
-      //log.info("---------------------COOOOOOOOOOKIIIIIIIIIIIIIIIIIIIIIIEEEEEEEEEEEEEEE");
-      //log.info(((HttpServletRequest) request).getRequestURI());
-      if (cookies != null) {
-         for (Cookie ck : cookies) {
-           *//* if ("nameOfMyCookie".equals(ck.getName())) {
-               // read the cookie etc, etc
-               // ....
-               // set an object in the current request
-               request.setAttribute("myCoolObject", myObject)
-            }*//*
-            //log.info(ck.getName() + " " + ck.getValue());
-         }
-      }
-      Cookie c = new Cookie("_temp", "_temp");
-      c.setPath("/");
-      c.setMaxAge(-1);
-      res.addCookie(c);*/
       chain.doFilter(req, res);
-
    }
-
-   // other methods
 }
