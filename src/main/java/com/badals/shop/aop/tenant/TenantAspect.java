@@ -38,7 +38,7 @@ public class TenantAspect {
     @Before("execution(* com.badals.shop.service.CustomerService.*(..)) || execution(* com.badals.shop.security.DomainCustomerDetailsService.*(..))")
     public void beforeExecution() throws Throwable {
        //if (TenantContext.getCurrentProfile() != null) {
-         Filter filter = entityManager.unwrap(Session.class).enableFilter("TENANT_FILTER");
+         Filter filter = entityManager.unwrap(Session.class).enableFilter("tenantFilter");
          filter.setParameter("tenantId", TenantContext.getCurrentProfile());
          filter.validate();
 		//}
