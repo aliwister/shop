@@ -43,6 +43,8 @@ public class TenantDTO implements Serializable {
 
     private String logo;
 
+    private String tenantId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
