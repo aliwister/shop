@@ -35,7 +35,7 @@ public class TenantAdminAspect {
     * @return
     * @throws Throwable
     */
-   @Around(value = "execution(* com.badals.shop.service.TenantAdminProductService.*(..)) || execution(* com.badals.shop.service.TenantAdminOrderService.*(..))")
+   @Around(value = "execution(* com.badals.shop.service.TenantAdminProductService.*(..)) || execution(* com.badals.shop.service.TenantAdminOrderService.*(..)) || execution(* com.badals.shop.service.TenantSetupService.*(..))")
    public Object assignForController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       ProfileUser userObj =  (ProfileUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -54,6 +54,20 @@ public class TenantAdminAspect {
       }
       return assignTenant(proceedingJoinPoint, tenant);
    }
+/*
+
+   @Around(value = "execution(* com.badals.shop.graph.mutation.TenantMutation.*(..)) ")
+   public Object assignForController2(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      ProfileUser userObj =  (ProfileUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      if (userObj == null|| userObj.equals("anonymousUser")) {
+         throw new IllegalAccessException("Not Authorized");
+      }
+      // Get the tenant the user is logged in for (done using select-store)
+      String tenant = userObj.getTenantId();
+      return assignTenant(proceedingJoinPoint, tenant);
+   }
+*/
 
    private Object assignTenant(ProceedingJoinPoint proceedingJoinPoint, String tenant) throws Throwable {
       try {

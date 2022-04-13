@@ -2,14 +2,15 @@ package com.badals.shop.service;
 
 import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Product;
+import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.tenant.S3UploadRequest;
+import com.badals.shop.domain.tenant.TenantHashtag;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.tenant.TenantStock;
-import com.badals.shop.graph.PartnerProductResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantHashtagRepository;
@@ -20,10 +21,12 @@ import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
+import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +69,11 @@ public class TenantAdminProductService {
 
     private final ProductService productService;
     private final S3UploadRequestRepository s3UploadRequestRepository;
+    private final AwsService awsService;
 
 
-    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository) {
+
+    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
         this.productMapper = tenantProductMapper;
@@ -84,6 +90,7 @@ public class TenantAdminProductService {
         this.productIndexService = productIndexService;
         this.productService = productService;
         this.s3UploadRequestRepository = s3UploadRequestRepository;
+        this.awsService = awsService;
     }
 
     public ProductResponse adminSearchTenantProducts(String upc, String title) {
@@ -113,11 +120,13 @@ public class TenantAdminProductService {
     }
 
     @Transactional
-    public void logUploadRequest(String key, String url) {
+    public Long logUploadRequest(String key, String url, AssetType assetType) {
         S3UploadRequest request = new S3UploadRequest();
         request.setKey(key);
         request.setUrl(url);
-        s3UploadRequestRepository.save(request);
+        request.setAssetType(assetType);
+        S3UploadRequest req = s3UploadRequestRepository.save(request);
+        return req.getId();
     }
 
     public PartnerProduct savePartnerProduct(PartnerProduct dto, boolean isSaveES) throws ProductNotFoundException, ValidationException {
@@ -402,5 +411,29 @@ public class TenantAdminProductService {
             return true;
 
         return false;
+    }
+
+    public S3UploadRequest findUploadRequest(Long fileHandle) {
+        return s3UploadRequestRepository.findById(fileHandle).get();
+    }
+
+    public ProfileHashtagDTO saveTag(ProfileHashtagDTO dto) {
+        TenantHashtag tag = tenantHashtagMapper.toEntity(dto);
+        tag.setTenantId(TenantContext.getCurrentTenant());
+        tag = hashtagRepository.save(tag);
+        return tenantHashtagMapper.toDto(tag);
+    }
+
+    @Value("${profileshop.cdnUrl}")
+    private String cdnUrl;
+
+    public PresignedUrl getS3UploadUrl(String filename, String contentType, AssetType assetType) {
+        String m = TenantContext.getCurrentTenant();
+        String fileKey = m + "/" + assetType + "/" + filename;
+        String objectKey = "_m/" + fileKey;
+
+        URL url = awsService.presignPutUrl(objectKey, contentType);
+        Long req = logUploadRequest(fileKey, cdnUrl, assetType);
+        return new PresignedUrl(req, url.toString(), cdnUrl + "/" + fileKey, fileKey, "200");
     }
 }

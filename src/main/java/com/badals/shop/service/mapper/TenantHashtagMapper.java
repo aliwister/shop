@@ -14,11 +14,11 @@ public interface TenantHashtagMapper extends EntityMapper<ProfileHashtagDTO, Ten
 
 
 
-    default Hashtag fromId(Long id) {
+    default TenantHashtag fromId(Long id) {
         if (id == null) {
             return null;
         }
-        Hashtag hashtag = new Hashtag();
+        TenantHashtag hashtag = new TenantHashtag();
         hashtag.setId(id);
         return hashtag;
     }

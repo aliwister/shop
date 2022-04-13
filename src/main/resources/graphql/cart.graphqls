@@ -1,17 +1,3 @@
-extend type Query {
-    rewards: [Reward]
-    plusCart(secureKey: String): CheckoutCart
-}
-
-extend type Mutation {
-    updateCart(secureKey: String, items: [CartItemInput]): CartResponse
-    createCheckoutSession(secureKey: String, items: [CartItemInput]): CheckoutSession
-    createCheckout(secureKey: String): CheckoutSessionResponse  #For app
-
-    createCart(cart: CheckoutCartInput): CheckoutCart
-    createPlusCart(secureKey: String, items: [LineItemInput]): CheckoutCart
-}
-
 enum CartState {
     UNCLAIMED
     CLAIMED

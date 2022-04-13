@@ -4,6 +4,7 @@ extend type Query {
     tenantTags: [TenantTag]
     tenantTagProducts(hashtag: String): ProductResponse
     tenantByName (name: String): Tenant
+    currentTenant: Tenant
     cart(secureKey: String): Cart
     orderSummary(ref: String, confirmationKey: String): Order
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
@@ -15,14 +16,27 @@ extend type Mutation {
 }
 
 type TenantTag {
+    id: Long
     langs: [I18String]
     icon: String
     position: Int
 }
 
+input TenantTagInput {
+    id: Long
+    langs: [I18StringInput]
+    icon: String
+    position: Int
+}
+
+input I18StringInput {
+    lang: String
+    value: String
+}
 
 type Tenant {
     id: Long
+    logo: String
     name: String
     maxProducts: Int
     planName: String
