@@ -134,7 +134,7 @@ jhipster:
       time-to-live-seconds: 600 # By default objects stay 1 hour in the cache
       max-entries: 1000 # Number of objects in each cache entry
   cors:
-    allowed-origins: 'https://www.badals.com,https://badals.com,https://partner.badals.com,https://face-admin.herokuapp.com,https://trust-admin001-212.badals.com,https://face-partner-prod.vercel.app,https://pro-partner.vercel.app'
+    allowed-origins: '*'
     allowed-methods: 'GET,PUT,POST,DELETE,OPTIONS'
     allowed-headers: '*'
     exposed-headers: 'Authorization,Link,X-Total-Count,X-TenantID'

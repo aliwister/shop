@@ -41,7 +41,7 @@ public class TenantDTO implements Serializable {
 
     private Set<CustomerDTO> customers = new HashSet<>();
 
-
+    private String logo;
 
     @Override
     public boolean equals(Object o) {
