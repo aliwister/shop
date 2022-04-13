@@ -46,6 +46,7 @@ type Tenant {
     skuPrefix: String
     contractStartDate: LocalDate
     publicPaymentProfile: [PaymentDef]
+    tenantId: String
 }
 
 type PaymentDef {
