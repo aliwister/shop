@@ -2,7 +2,6 @@ package com.badals.shop.controller;
 
 import com.badals.shop.domain.Action;
 import com.badals.shop.repository.ActionRepository;
-import com.badals.shop.repository.CartRepository;
 import com.badals.shop.repository.CheckoutCartRepository;
 import com.badals.shop.repository.PaymentRepository;
 import com.badals.shop.service.OrderService;

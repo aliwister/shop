@@ -30,6 +30,7 @@ public interface TenantMapper extends EntityMapper<TenantDTO, Tenant> {
 
     @Named("unBoxPayments")
     public static List<PaymentDef> unBoxPayments(PaymentProfile paymentProfile) {
+        if (paymentProfile == null) return null;
         return paymentProfile.getPayments();
     }
 

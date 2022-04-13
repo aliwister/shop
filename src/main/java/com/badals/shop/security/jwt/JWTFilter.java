@@ -1,6 +1,5 @@
 package com.badals.shop.security.jwt;
 
-import com.badals.shop.service.CartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;

@@ -64,9 +64,8 @@ public class OrderService {
     private final AuditReader auditReader;
     private final CheckoutAddressMapper checkoutAddressMapper;
     private final AddressRepository addressRepository;
-    private final CartService cartService;
 
-    public OrderService(OrderRepository orderRepository, OrderSearchRepository orderSearchRepository, OrderMapper orderMapper, CustomerService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, CartService cartService) {
+    public OrderService(OrderRepository orderRepository, OrderSearchRepository orderSearchRepository, OrderMapper orderMapper, CustomerService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository) {
         this.orderRepository = orderRepository;
         this.orderSearchRepository = orderSearchRepository;
         this.orderMapper = orderMapper;
@@ -77,7 +76,6 @@ public class OrderService {
         this.auditReader = auditReader;
         this.checkoutAddressMapper = checkoutAddressMapper;
         this.addressRepository = addressRepository;
-        this.cartService = cartService;
     }
 
     /**
@@ -154,7 +152,7 @@ public class OrderService {
 
         }
         String secureKey = confirmationKey.split("\\.")[0];
-        cartService.closeCart(secureKey);
+        //cartService.closeCart(secureKey);
 
         order.setConfirmationKey(order.getConfirmationKey()+order.getId());
         OrderDTO dto = save(order);

@@ -1,6 +1,10 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.aop.tenant.TenantContext;
+import com.badals.shop.domain.enumeration.AssetType;
+import com.badals.shop.domain.tenant.S3UploadRequest;
+import com.badals.shop.domain.tenant.TenantHashtag;
+import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.domain.enumeration.OrderState;
@@ -12,8 +16,6 @@ import com.badals.shop.service.pojo.CheckoutSession;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.pojo.ProductEnvelope;
 import com.badals.shop.service.TenantCartService;
-import com.badals.shop.service.TenantProductService;
-import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.slf4j.Logger;
@@ -25,7 +27,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,6 +36,7 @@ public class TenantMutation implements GraphQLMutationResolver {
     private final Logger log = LoggerFactory.getLogger(TenantMutation.class);
 
     private final TenantAdminProductService productService;
+    private final TenantSetupService tenantSetupService;
     private final TenantCartService cartService;
 
     private final ProductLangService productLangService;
@@ -51,8 +53,9 @@ public class TenantMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public TenantMutation(TenantAdminProductService productService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
+    public TenantMutation(TenantAdminProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
         this.productService = productService;
+        this.tenantSetupService = tenantSetupService;
         this.cartService = cartService;
         this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
@@ -85,16 +88,24 @@ public class TenantMutation implements GraphQLMutationResolver {
     }
 
     //@PreAuthorize("hasRole('ROLE_MERCHANT')")
-    public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType) {
-        String t = TenantContext.getCurrentTenant();
-        String m = "mayaseen";// TenantContext.getCurrentMerchant();
-        String fileKey = ChecksumUtil.getChecksum(filename + LocalDate.now())+filename.substring(filename.length() - 4);
-        String objectKey = "_m/" + m + "/" + fileKey;
-
-        URL url = awsService.presignPutUrl(objectKey, contentType);
-        productService.logUploadRequest(objectKey, cdnUrl.toString());
-        return new PresignedUrl(url.toString(), cdnUrl + "/" + m + "/" + fileKey,m+"/"+fileKey, "200");
+    public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType, AssetType assetType) {
+        return productService.getS3UploadUrl(filename, contentType, assetType);
     }
+
+    public Message completeUpload(Long fileHandle) {
+        S3UploadRequest request = productService.findUploadRequest(fileHandle);
+        if (request.getAssetType() == AssetType.LOGO)
+            tenantSetupService.updateLogo(request);
+
+        tenantSetupService.addMedia(request);
+
+        return new Message("success", "200");
+    }
+
+    public ProfileHashtagDTO saveTenantTag (ProfileHashtagDTO hashtag) {
+        return productService.saveTag(hashtag);
+    }
+
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public Message publishProduct(Long id) throws ProductNotFoundException {
         productService.setProductPublished(id, true);
