@@ -1,7 +1,5 @@
 package com.badals.shop.graph.query;
 
-import com.badals.shop.graph.MerchantProductResponse;
-import com.badals.shop.graph.PartnerProductResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.*;
@@ -28,16 +26,18 @@ public class TenantQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final UserService userService;
    private final TenantService tenantService;
+   private final TenantSetupService tenantSetupService;
    private final TenantAdminProductService tenantAdminProductService;
    private final TenantCartService cartService;
    private final TenantOrderService orderService;
 
-   public TenantQuery(TenantProductService productService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService) {
+   public TenantQuery(TenantProductService productService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService, TenantSetupService tenantSetupService, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService) {
       this.productService = productService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
       this.tenantService = tenantService;
+      this.tenantSetupService = tenantSetupService;
       this.tenantAdminProductService = tenantAdminProductService;
       this.cartService = cartService;
       this.orderService = orderService;
@@ -45,6 +45,10 @@ public class TenantQuery extends ShopQuery implements GraphQLQueryResolver {
 
    public TenantDTO tenantByName(String name) {
       return tenantService.findOneByName(name);
+   }
+   public TenantDTO currentTenant() {
+      //TenantContext.getCurrentProfile();
+      return tenantSetupService.findAll().get(0);
    }
 
    public ProductResponse adminSearchTenantProducts(String upc, String title) {

@@ -1,8 +1,6 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.CartItem;
 import com.badals.shop.domain.tenant.TenantCartItem;
-import com.badals.shop.service.CurrencyService;
 import com.badals.shop.service.dto.CartItemDTO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -16,7 +14,7 @@ import java.util.Locale;
 import static com.badals.shop.service.CurrencyService.BASE_CURRENCY_KEY;
 
 /**
- * Mapper for the entity {@link CartItem} and its DTO {@link CartItemDTO}.
+ * Mapper for the entity {@link TenantCartItem} and its DTO {@link CartItemDTO}.
  */
 @Mapper(componentModel = "spring", uses = {TenantCartMapper.class, TenantProductMapper.class})
 public interface TenantCartItemMapper extends EntityMapper<CartItemDTO, TenantCartItem> {

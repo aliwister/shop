@@ -17,15 +17,25 @@ extend type Query {
 
 extend type Mutation {
     savePartnerProduct(product: PartnerProductInput): ProductEnvelope
-    getPartnerImageUploadUrl(filename: String, contentType: String): PresignedUrl
-
+    getPartnerImageUploadUrl(filename: String, contentType: String, assetType: AssetType): PresignedUrl
+    completeUpload(fileHandle: Long): Message
     publishProduct(id: Long): Message
     unpublishProduct(id: Long): Message
+
+    saveTenantTag(hashtag: TenantTagInput): TenantTag
 
     setOrderState(value: OrderState): Message
     deleteProduct(id: Long): Message
     voidOrder(id: Long): Message
     createPosOrder(cart: CheckoutCartInput, paymentMethod: String, paymentAmount: String, ref: String): Order
+}
+
+enum AssetType {
+    LOGO
+    PRODUCT
+    SLIDER
+    HASHTAG
+    BRAND
 }
 
 type PartnerProduct {

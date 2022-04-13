@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import static com.badals.shop.service.CartService.createUIUD;
+import static com.badals.shop.service.TenantCartService.createUIUD;
 
 /**
  * Service Implementation for managing {@link Order}.

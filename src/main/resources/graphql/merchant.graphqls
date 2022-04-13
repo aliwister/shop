@@ -17,6 +17,7 @@ type PresignedUrl {
     imageUrl: String
     saveUrl: String
     status: String
+    fileHandle: Long
 }
 
 type MerchantProduct {
