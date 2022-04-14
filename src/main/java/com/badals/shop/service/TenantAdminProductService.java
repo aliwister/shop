@@ -433,7 +433,7 @@ public class TenantAdminProductService {
         String objectKey = "_m/" + fileKey;
 
         URL url = awsService.presignPutUrl(objectKey, contentType);
-        Long req = logUploadRequest(fileKey, cdnUrl, assetType);
+        Long req = logUploadRequest(fileKey, cdnUrl + "/" + fileKey, assetType);
         return new PresignedUrl(req, url.toString(), cdnUrl + "/" + fileKey, fileKey, "200");
     }
 }
