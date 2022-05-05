@@ -429,7 +429,7 @@ public class TenantAdminProductService {
 
     public PresignedUrl getS3UploadUrl(String filename, String contentType, AssetType assetType) {
         String m = TenantContext.getCurrentTenant();
-        String fileKey = m + "/" + assetType + "/" + filename;
+        String fileKey = m + "/" + assetType.toString().toLowerCase() + "/" + filename;
         String objectKey = "_m/" + fileKey;
 
         URL url = awsService.presignPutUrl(objectKey, contentType);
