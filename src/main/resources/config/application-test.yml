@@ -34,7 +34,7 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://face-dev-test.cuwthznxutju.eu-central-1.rds.amazonaws.com/shop?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://shop-test.cty9ms5ebupw.us-east-1.rds.amazonaws.com/shop?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull
     username: face
     password: misoNIPo
     hikari:
