@@ -165,8 +165,10 @@ public class TenantAdminOrderService {
 
     public BigDecimal calculateTotal(CheckoutCart checkout) {
         BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
+        BigDecimal adjustments = BigDecimal.valueOf(checkout.getOrderAdjustments().stream().mapToDouble(x -> x.getValue().doubleValue() * x.getQuantity().doubleValue()).sum());
+
         //sum = sum.add(checkout.getCarrierRate());
-        return sum;
+        return sum.add(adjustments);
     }
 
     @Transactional
