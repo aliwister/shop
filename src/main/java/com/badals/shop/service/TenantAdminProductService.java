@@ -136,11 +136,18 @@ public class TenantAdminProductService {
         final TenantProduct master;
         boolean _new = dto.getId() == null;
 
-        if(!_new)
-            master = productRepository.findByIdJoinChildren(dto.getId()).orElseThrow( () ->  new ProductNotFoundException("No Product found for ID"));
+        validatePartnerProduct(dto, _new);
+
+        if(!_new) {
+            master = productRepository.findByIdJoinChildren(dto.getId()).orElseThrow(() -> new ProductNotFoundException("No Product found for ID"));
+        }
         else {
+            assert(dto.getRef() == null) : "Shouldn't define ref of a new product";
             master = partnerProductMapper.toEntity(dto);
         }
+
+        // Shouldn't ever pass in ref
+        // If parent is new, children should be new as well
 
         if(_new) {
 
@@ -205,6 +212,44 @@ public class TenantAdminProductService {
         return partnerProductMapper.toDto(master);
     }
 
+    private void validatePartnerProduct(PartnerProduct dto, boolean isNew) {
+        if(dto.getRef() != null)
+            throw new ValidationException("Should never pass ref");
+
+        if(dto.getVariationType() == null)
+            throw new ValidationException("Variation type must be PARENT or SIMPLE");
+
+        if(dto.getVariationType().equals(VariationType.SIMPLE)) {
+            if(!dto.getChildren().isEmpty())
+                throw new ValidationException("Simple cannot have children");
+            if(dto.getPrice().getPriceList().isEmpty())
+                throw new ValidationException("Must have price");
+            if(dto.getCost().getCurrency().isEmpty())
+                throw new ValidationException("Must have cost currency");
+            if(dto.getCost().getAmount() == null)
+                throw new ValidationException("Must have cost");
+            if(dto.getSku().isEmpty())
+                throw new ValidationException("Must have sku");
+
+        }
+
+        if(dto.getVariationType().equals(VariationType.PARENT)) {
+            if(dto.getChildren().isEmpty())
+                throw new ValidationException("At least 1 child must be defined");
+            if(!dto.getPrice().getPriceList().isEmpty())
+                throw new ValidationException("Cannot include prices");
+            if(!dto.getCost().getCurrency().isEmpty())
+                throw new ValidationException("Cannot have cost currency");
+            if(dto.getCost().getAmount() != null)
+                throw new ValidationException("Cannot have cost");
+            if(isNew && dto.getChildren().stream().anyMatch(x -> x.getId() != null))
+                throw new ValidationException("Cannot have existing child in new product");
+            if(dto.getSku().isEmpty())
+                throw new ValidationException("Must have sku");
+        }
+
+    }
+
     private void saveChildren(TenantProduct master, TenantProduct update, PartnerProduct dto, Long currentMerchantId, boolean _new) {
         Set<TenantProduct> masterChildren = master.getChildren();
         Set<TenantProduct> updateChildren = update.getChildren();
@@ -213,6 +258,7 @@ public class TenantAdminProductService {
         if(_new) {
             if(masterChildren != null)
                 masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(String.valueOf(slugService.generateRef(x.getSku(), currentMerchantId))).merchantId(currentMerchantId).ref(x.getSlug()).title(master.getTitle()).parent(master));
+            master.setChildren(masterChildren);
             return;
         }
         // Delete removed
@@ -230,7 +276,7 @@ public class TenantAdminProductService {
         for (TenantProduct c: updateChildren) {
 
             if (c == null || c.getId() == null) {
-                String ref = currentMerchantId.toString() + String.valueOf(ChecksumUtil.getChecksum(c.getSku()));
+                String ref = String.valueOf(ChecksumUtil.getChecksum(c.getSku()));
                 c.setRef(ref);
                 c.setSlug(ref);
                 c.setActive(true);
@@ -241,6 +287,8 @@ public class TenantAdminProductService {
                 continue;
             }
             TenantProduct pl = masterChildren.stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
+            if(pl == null)
+                throw new ValidationException("Inexistant child. Cannot update it!");
             ChildProduct dto2 = dto.getChildren().stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
 /*            if(!dto2.isDirty)
                 continue;*/
@@ -435,5 +483,10 @@ public class TenantAdminProductService {
         URL url = awsService.presignPutUrl(objectKey, contentType);
         Long req = logUploadRequest(fileKey, cdnUrl + "/" + fileKey, assetType);
         return new PresignedUrl(req, url.toString(), cdnUrl + "/" + fileKey, fileKey, "200");
+    }
+
+    public void reIndex(Long from, Long to) {
+        List<PartnerProduct> products = productRepository.findAll().stream().map(partnerProductMapper::toDto).collect(Collectors.toList());
+        partnerProductSearchRepository.saveAll(products);
     }
 }

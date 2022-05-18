@@ -1,6 +1,7 @@
 package com.badals.shop.service.pojo;
 
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.AttributesLang;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.PriceList;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class ChildProduct {
    String name;
    BigDecimal weight;
    List<Attribute> variationAttributes;
+   List<AttributesLang> attributes;
    public PriceList price = new PriceList();
    public PriceList listPrice = new PriceList();
    public Price cost = new Price();

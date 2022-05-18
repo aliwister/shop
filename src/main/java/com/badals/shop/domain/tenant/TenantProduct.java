@@ -184,6 +184,9 @@ public class TenantProduct implements Serializable, TenantSupport {
     @Getter @Setter @Column(name = "description", columnDefinition = "string")
     List<TenantProductLang> langs;
 
+    @Type(type = "json")
+    @Getter @Setter @Column(name = "attributes", columnDefinition = "string")
+    List<AttributesLang> attributes;
 
     @Type(type = "json")
     @Column(name = "list_price")
@@ -346,7 +349,7 @@ public class TenantProduct implements Serializable, TenantSupport {
     }
 
     public TenantProduct parent(TenantProduct master) {
-        this.parent = parent;
+        this.parent = master;
         return this;
     }
 
