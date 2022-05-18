@@ -33,7 +33,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
     //@Mapping(target = "merchantStock", ignore = true)
     @Mapping(target = "gallery", ignore = true)
     ////@Mapping(target = "merchant", ignore = true)
-    @Mapping(target = "children", ignore = true)
+    //@Mapping(target = "children", ignore = true)
     @Mapping(target = "price", source = "price", qualifiedByName = "pricelistToMap")
     @Mapping(target = "listPrice", source = "listPrice", qualifiedByName = "pricelistToMap")
     //@Mapping(target = "currency", source = "priceObj.currency")
@@ -153,7 +153,6 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
         if (stock != null) {
 /*            target.setSalePriceObj(stock.getPrice());
             target.setPriceObj(source.getPrice());*/
-            target.setDiscountInPercent(0);
             target.setCost(stock.getCost());
             target.setQuantity(stock.getQuantity());
 

@@ -26,8 +26,6 @@ public class PartnerProduct {
 
    List<String> gallery;
 
-   Integer discountInPercent;
-
    List<String> shops;
 
    List<Long> shopIds;
@@ -59,6 +57,7 @@ public class PartnerProduct {
    String brand;
 
    List<TenantProductLang> langs;
+   List<AttributesLang> attributes;
    List<VariationOption> options;
 
 }

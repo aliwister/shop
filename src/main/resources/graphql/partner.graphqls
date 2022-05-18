@@ -63,6 +63,7 @@ type PartnerProduct {
     langs: [ProductI18n]
     gallery: [String]   # Ordered
     children: [ChildProduct]
+    attributes: [AttributeI18n]
 }
 type PartnerProductResponse {
     items: [PartnerProduct]
@@ -92,19 +93,19 @@ type ChildProduct {
 
     gallery: [String]   # Ordered
     variationAttributes: [Attribute]
-
+    attributes: [AttributeI18n]
     active: Boolean
 }
 
 
 input PartnerProductInput {
     id: ID           # Auto generated
-    sku: String
+    sku: String!
     upc: String
     model: String
     hashtags: [String]  #Hashtags
-    ref: String  #Ignored since read only
-    slug: String     # Must be Unique
+    #ref: String  #Ignored since read only
+    slug: String!     # Must be Unique
     brand: String    # The English value
     title: String    # The English value
     image: String    # Main image
@@ -112,17 +113,17 @@ input PartnerProductInput {
     listPrice: PriceListInput
     cost:  PriceInput # null For Parent
     weight: BigDecimal # KG
-    variationType: String     # SIMPLE, CHILD, PARENT
+    variationType: String!     # SIMPLE, CHILD, PARENT
     slug: String #readonly
     unit: String
     availability: Int  # In hours
     quantity: BigDecimal
-    discountInPercent: Int
+    #discountInPercent: Int
     options: [VariationOptionInput]
     langs: [ProductI18nInput]
     gallery: [String]   # Ordered
     children: [ChildProductInput]
-
+    attributes: [AttributeI18nInput]
 
 }
 
@@ -131,7 +132,7 @@ input ChildProductInput {
     slug: String     # Must be Unique
     image: String    # Main image
 
-    sku: String
+    sku: String!
     upc: String
 
     isDirty: Boolean     # For new product doesn't matter
@@ -149,7 +150,7 @@ input ChildProductInput {
 
     gallery: [String]   # Ordered
     variationAttributes: [AttributeInput]
-
+    attributes: [AttributeI18nInput]
     active: Boolean
 }
 
@@ -162,12 +163,22 @@ type ProductI18n {
     lang: String #ar #en
 }
 
+type AttributeI18n {
+    attributeList: [Attribute]
+    lang: String
+}
+
 input ProductI18nInput {
     title: String
     description: String
     model: String
     features: [String]
     brand: String
+    lang: String
+
+}
+input AttributeI18nInput {
+    attributeList: [AttributeInput]
     lang: String
 }
 
