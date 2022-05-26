@@ -28,7 +28,7 @@ public class CybersourcePaymentController {
       this.paymentRepository = paymentRepository;
    }
 
-   @PostMapping("/process")
+/*   @PostMapping("/process")
    public String capture(@RequestBody CaptureResponse json) throws IOException, URISyntaxException, ParseException {
       log.info("checkout.com CHARGE-------------------------------------------------------------------------------------------");
       String cartId = json.message.trackId;
@@ -41,7 +41,8 @@ public class CybersourcePaymentController {
       log.info("checkout.com CHARGE-------------------------------------------------------------------------------------------2");
       //  _emailService.sendMail("sales@badals.com", "ali@badals.com", "Post detrack", confirmation.getAddress());
       return "";
-   }
+   }*/
+/*
 
    private void addAuditEvent(String cartId, String className, String methodName, com.checkout.api.services.charge.response.Void state) {
       Gson gson = new Gson();
@@ -55,9 +56,10 @@ public class CybersourcePaymentController {
       action.setObjectId(cartId);
       actionRepository.save(action);
    }
+*/
 
    @PostMapping("/charge")
-   public String charge(@RequestBody CaptureResponse json) throws IOException, URISyntaxException, ParseException {
+   public String charge(/*@RequestBody CaptureResponse json*/) throws IOException, URISyntaxException, ParseException {
       log.info("checkout.com-------------------------------------------------------------------------------------------");
 
       log.info("checkout.com-------------------------------------------------------------------------------------------2");
