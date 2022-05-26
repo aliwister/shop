@@ -7,9 +7,9 @@ import com.badals.shop.repository.PaymentRepository;
 import com.badals.shop.service.OrderService;
 import com.badals.shop.service.ShipmentDocService;
 import com.badals.shop.service.ShipmentService;
-import com.checkout.api.services.charge.response.Capture;
+/*import com.checkout.api.services.charge.response.Capture;
 import com.checkout.api.services.charge.response.Charge;
-import com.checkout.api.services.charge.response.Refund;
+import com.checkout.api.services.charge.response.Refund;*/
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,35 +34,35 @@ public class CheckoutPaymentController {
    }
 
    @PostMapping("/capture")
-   public String capture(@RequestBody CaptureResponse json) throws IOException, URISyntaxException, ParseException {
+   public String capture(/*@RequestBody CaptureResponse json*/) throws IOException, URISyntaxException, ParseException {
       log.info("checkout.com CHARGE-------------------------------------------------------------------------------------------");
-      String cartId = json.message.trackId;
-      String captureId = json.message.id;
+      //String cartId = json.message.trackId;
+      //String captureId = json.message.id;
       //String amount = json.message.
 
       //paymentRepository.updateCaptureId(cartId, captureId, amount);
-      addAuditEvent(cartId, "payment", "capture", json.message);
+      //addAuditEvent(cartId, "payment", "capture", json.message);
 
       log.info("checkout.com CHARGE-------------------------------------------------------------------------------------------2");
       //  _emailService.sendMail("sales@badals.com", "ali@badals.com", "Post detrack", confirmation.getAddress());
       return "";
    }
 
-   private void addAuditEvent(String cartId, String className, String methodName, com.checkout.api.services.charge.response.Void state) {
+   private void addAuditEvent(String cartId, String className, String methodName /* , com.checkout.api.services.charge.response.Void state*/) {
       Gson gson = new Gson();
-      String json = gson.toJson(state);
+      //String json = gson.toJson(state);
       Timestamp timestamp = new Timestamp(new java.util.Date().getTime());
       Action action = new Action();
       action.setAction(methodName);
       action.setObject(className);
-      action.setState(json);
+      //action.setState(json);
       action.setCreatedDate(timestamp);
       action.setObjectId(cartId);
       actionRepository.save(action);
    }
 
    @PostMapping("/charge")
-   public String charge(@RequestBody CaptureResponse json) throws IOException, URISyntaxException, ParseException {
+   public String charge(/*@RequestBody CaptureResponse json*/) throws IOException, URISyntaxException, ParseException {
       log.info("checkout.com-------------------------------------------------------------------------------------------");
 
       log.info("checkout.com-------------------------------------------------------------------------------------------2");
@@ -72,6 +72,7 @@ public class CheckoutPaymentController {
    }
 }
 
+/*
 enum EVENT {
    AUTHORIZED("charge.succeeded"),
    CAPTURED("charge.captured"),
@@ -97,4 +98,4 @@ class RefundResponse {
 class VoidResponse {
    String eventType;
    com.checkout.api.services.charge.response.Void message;
-}
+}*/

@@ -1,6 +1,5 @@
 package com.badals.shop.service.mapper;
 
-import com.amazon.paapi5.v1.VariationAttribute;
 import com.badals.shop.aop.logging.LocaleContext;
 import com.badals.shop.domain.*;
 
