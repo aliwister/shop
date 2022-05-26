@@ -1,6 +1,5 @@
 package com.badals.shop.service.mapper;
 
-import com.amazon.paapi5.v1.Item;
 import com.badals.shop.domain.MerchantStock;
 import com.badals.shop.domain.Product;
 import com.badals.shop.domain.AlgoliaProduct;
