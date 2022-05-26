@@ -9,7 +9,6 @@ import com.badals.shop.service.*;
 import com.badals.shop.service.pojo.AddProductDTO;
 
 import com.badals.shop.service.util.ChecksumUtil;
-import com.badals.shop.xtra.amazon.Pas5Service;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,6 @@ public class TenantAdminMutation implements GraphQLMutationResolver {
     private final ProductService productService;
     private final TenantAdminOrderService tenantAdminOrderService;
 
-    private final Pas5Service pasService;
 
     private final AwsService awsService;
 
@@ -52,10 +50,9 @@ public class TenantAdminMutation implements GraphQLMutationResolver {
     private final ProductIndexService productIndexService;
 
 
-    public TenantAdminMutation(ProductService productService, TenantAdminOrderService tenantAdminOrderService, Pas5Service pasService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, ProductIndexService productIndexService) {
+    public TenantAdminMutation(ProductService productService, TenantAdminOrderService tenantAdminOrderService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, ProductIndexService productIndexService) {
         this.productService = productService;
         this.tenantAdminOrderService = tenantAdminOrderService;
-        this.pasService = pasService;
         this.awsService = awsService;
         this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;

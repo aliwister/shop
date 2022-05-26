@@ -15,13 +15,13 @@ extend type Query {
     productAdmin(id: ID):Product
 
     getProductBySku(sku: String, isParent: Boolean = false, _locale: String):Product
-    getProductByDial(dial: String):Product
+    #getProductByDial(dial: String):Product
 
     relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
-    findByKeyword(keyword: String): ProductResponse
+    #findByKeyword(keyword: String): ProductResponse
 
 
-    findByKeywordIndex(keyword: String): ProductResponse
+    #findByKeywordIndex(keyword: String): ProductResponse
 }
 
 extend type Mutation {

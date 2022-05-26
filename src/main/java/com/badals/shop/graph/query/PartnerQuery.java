@@ -9,6 +9,7 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.OrderDTO;
+import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
@@ -73,9 +74,11 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
          add(new VariationOption("packsize", "Pack Size", new ArrayList<String>(){{add("Single"); add("Bag"); add("Big Box");}}));
       }};
    }
-   public List<HashtagDTO> hashtagList() {
-      return hashtagService.findAll();
+
+   public List<ProfileHashtagDTO> partnerTenantTags () {
+      return productService.tenantTags();
    }
+
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
    public List<I18String> brands() {
