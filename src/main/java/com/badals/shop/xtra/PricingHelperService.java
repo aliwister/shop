@@ -11,15 +11,7 @@ import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.repository.ProductOverrideRepository;
 import com.badals.shop.repository.ProductRepository;
 import com.badals.shop.service.SlugService;
-import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.xtra.amazon.NoOfferException;
-import com.badals.shop.xtra.amazon.PasItemNode;
-import com.badals.shop.xtra.amazon.PasUtility;
-import com.badals.shop.xtra.amazon.PricingException;
-import com.badals.shop.xtra.amazon.mws.MwsItemNode;
-import com.badals.shop.xtra.amazon.mws.MwsLookup;
-import com.badals.shop.xtra.amazon.mws.MwsLookupParser;
-import com.badals.shop.xtra.amazon.paapi5.PasLookupParser;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -37,13 +29,11 @@ public class PricingHelperService {
    private final ProductRepository productRepo;
    private final ProductOverrideRepository productOverrideRepository;
 
-   private final MwsLookup mwsLookup;
    private final SlugService slugService;
 
-   public PricingHelperService(ProductRepository productRepo, ProductOverrideRepository productOverrideRepository, MwsLookup mwsLookup, SlugService slugService) {
+   public PricingHelperService(ProductRepository productRepo, ProductOverrideRepository productOverrideRepository,  SlugService slugService) {
       this.productRepo = productRepo;
       this.productOverrideRepository = productOverrideRepository;
-      this.mwsLookup = mwsLookup;
       this.slugService = slugService;
    }
 
@@ -53,47 +43,6 @@ public class PricingHelperService {
       return productOverrideRepository.findBySkuIn(Arrays.asList(new String[]{asin, parent}));
    }
 
-   public Product initProduct(Product product, PasItemNode item, boolean isParent, List<ProductOverride> overrides) {
-      BigDecimal currentWeight = product.getWeight();
-      product = (Product) PasLookupParser.parseProduct(product, item, isParent, overrides, 1L, "", "");
-      product.setOversize(item.isOverSize());
-      if(item.getStarRating() != null && !item.getStarRating().isEmpty())
-         product.setRating(item.getStarRating());
-
-      if(product.getWeight() == null)
-         product.setWeight(currentWeight);
-      if((product.getWeight() == null || product.getWeight().doubleValue() < PasUtility.MINWEIGHT) && !isParent) {
-         BigDecimal weight = productRepo.lookupWeight(product.getSku());
-         product.setWeight(weight);
-      }
-      ProductLang lang = getLang(product);
-
-      lang = (ProductLang) PasLookupParser.parseProductI18n(lang, item, "en");
-      lang.setAttributes(item.parseAttributes());
-      if(lang.getId() == null) {
-         product.addProductLang(lang);
-      }
-
-
-
-      //if(item.get() == null || (!item.isSuperSaver() && !item.isPrime()))
-      //  return product;
-      if(isParent)
-         return product;
-
-      MerchantStock stock = this.getMerchantStock(product);
-      try {
-         product = setMerchantStock(product, PasLookupParser.parseStock(product, stock, item, overrides),BigDecimal.valueOf(99L));
-      } catch (PricingException e) {
-         //e.printStackTrace();//@Todo set stock quantity to 0
-         System.out.println(e.getMessage());
-      } catch (NoOfferException e) {
-         //e.printStackTrace();
-         System.out.println(e.getMessage());
-      }
-      product.setStub(false);
-      return product;
-   }
 
    ProductLang getLang(Product product) {
       if(product.getProductLangs() == null)
@@ -135,30 +84,6 @@ public class PricingHelperService {
       return product;
    }
 
-
-   public Product priceMws(Product p, List<ProductOverride> overrides) throws NoOfferException {
-      if(overrides != null && !overrides.isEmpty()) {
-         p.setWeight(PasUtility.calculateWeight(p.getWeight(),PasLookupParser.getOverride(overrides, OverrideType.WEIGHT)));
-      }
-
-      if (p.getWeight() == null || p.getWeight().doubleValue() < PasUtility.MINWEIGHT) return p;
-      boolean oversize = false;
-
-
-      MwsItemNode n = mwsLookup.fetch(p.getSku());
-      Product product = p;
-      try {
-         product = setMerchantStock(p, MwsLookupParser.parseStock(getMerchantStock(p),n, p.getComputedWeight(), overrides, p.getOversize()), BigDecimal.valueOf(99L));
-         product.inStock(true);
-      } catch (PricingException e) {
-         product.setPrice((BigDecimal) null);
-         //e.printStackTrace();
-      } catch (NoOfferException e) {
-         //product = setMerchantStock(p, getMerchantStock(p),BigDecimal.ZERO);
-         product.inStock(false);
-      }
-      return product;
-   }
 
    public Product initStub(String key, List<Attribute> value, Long merchantId) {
       Product p = new Product();

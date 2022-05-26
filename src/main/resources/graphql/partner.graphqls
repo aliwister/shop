@@ -3,7 +3,7 @@ extend type Query {
     partnerProducts(search: String,  limit: Int,  offset: Int,  active: Boolean): ProductResponse
     variationOptions (name: String): VariationOption
     variations: [VariationOption]
-    hashtagList: [Hashtag]
+    partnerTenantTags: [TenantTag]
     brands: [I18String]
     collections: [I18String]
     currencies: [Currency]

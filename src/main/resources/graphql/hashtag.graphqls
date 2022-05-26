@@ -34,5 +34,5 @@ extend type Query {
 extend type Mutation {
     createHashtag(hashtag: HashtagInput): Message
     setHashtags(hashtags: [String], ref: Long): Message
-    setDial(dial: String, ref: Long): Message
+    #setDial(dial: String, ref: Long): Message
 }

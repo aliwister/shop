@@ -15,8 +15,7 @@ import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.TenantService;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import com.badals.shop.xtra.amazon.NoOfferException;
-import com.badals.shop.xtra.amazon.Pas5Service;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -44,10 +43,10 @@ public class ProductIndexService {
     private final ProductContentService productContentService;
     private final AlgoliaProductMapper algoliaProductMapper;
     private final SearchIndex<AlgoliaProduct> index;
-    private final Pas5Service pas5Service;
 
 
-    public ProductIndexService(ProductSearchRepository productSearchRepository, ProductRepository productRepository, AddProductMapper addProductMapper, TenantService tenantService, ProductContentService productContentService, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index, Pas5Service pas5Service) {
+
+    public ProductIndexService(ProductSearchRepository productSearchRepository, ProductRepository productRepository, AddProductMapper addProductMapper, TenantService tenantService, ProductContentService productContentService, AlgoliaProductMapper algoliaProductMapper, SearchIndex<AlgoliaProduct> index) {
         this.productSearchRepository = productSearchRepository;
         this.productRepository = productRepository;
         this.addProductMapper = addProductMapper;
@@ -55,7 +54,6 @@ public class ProductIndexService {
         this.productContentService = productContentService;
         this.algoliaProductMapper = algoliaProductMapper;
         this.index = index;
-        this.pas5Service = pas5Service;
     }
 /*    private final TenantService tenantService;
     private final SpeedDialService speedDialService;*/
@@ -209,7 +207,7 @@ public class ProductIndexService {
         }
     }
 
-    public ProductResponse findFromPas(String keyword) throws NoOfferException {
+/*    public ProductResponse findFromPas(String keyword) throws NoOfferException {
         return pas5Service.searchItems(keyword);
-    }
+    }*/
 }
