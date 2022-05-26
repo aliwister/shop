@@ -21,6 +21,7 @@ public class TenantProductLang implements Serializable {
     String lang;
     List<String> features;
     String description;
+
     List<Attribute> attributes;
 
 /*    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException

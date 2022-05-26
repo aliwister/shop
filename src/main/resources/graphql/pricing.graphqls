@@ -1,10 +1,10 @@
 extend type Query {
     pricingRequests:[PricingRequest]
     parentOf(sku: String): String
-    mws(sku: String):Product
+    #mws(sku: String):Product
     #pas(sku: String):Product
     #pasUk(sku: String):Product
-    ebay(id: String):Product
+    #ebay(id: String):Product
 }
 
 extend type Mutation {
