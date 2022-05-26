@@ -8,9 +8,7 @@ import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.ProductDTO;
 
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import com.badals.shop.xtra.amazon.NoOfferException;
-import com.badals.shop.xtra.amazon.Pas5Service;
-import com.badals.shop.xtra.amazon.PricingException;
+
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -27,7 +25,6 @@ public class ProductMutation implements GraphQLMutationResolver {
     private final ProductService productService;
     private final ProductIndexService productIndexService;
 
-    private final Pas5Service pasService;
 
     private final HashtagService hashtagService;
 
@@ -42,10 +39,10 @@ public class ProductMutation implements GraphQLMutationResolver {
     private final CustomerService customerService;
 
 
-    public ProductMutation(ProductService productService, ProductIndexService productIndexService, Pas5Service pasService, HashtagService hashtagService, SpeedDialService speedDialService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService) {
+    public ProductMutation(ProductService productService, ProductIndexService productIndexService, HashtagService hashtagService, SpeedDialService speedDialService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService) {
         this.productService = productService;
         this.productIndexService = productIndexService;
-        this.pasService = pasService;
+
         this.hashtagService = hashtagService;
         this.speedDialService = speedDialService;
         this.productLangService = productLangService;
@@ -79,7 +76,7 @@ public class ProductMutation implements GraphQLMutationResolver {
 */
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO pasLookup(String asin) throws ProductNotFoundException, PricingException, NoOfferException {
+    public ProductDTO pasLookup(String asin)  {
         return null;
         //return this.productService.lookupPas(asin, false, false);
     }
@@ -94,7 +91,7 @@ public class ProductMutation implements GraphQLMutationResolver {
         try {
             pricingRequestService.push(asin, loginUser.getEmail());
         }
-        catch(PricingException e) {
+        catch(RuntimeException e) {
             return new Message(messageSource.getMessage("pricing.request.exists", null, LocaleContextHolder.getLocale()));
         }
         return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));

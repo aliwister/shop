@@ -11,9 +11,7 @@ import com.badals.shop.service.dto.ProductOverrideDTO;
 import com.badals.shop.service.dto.SpeedDialDTO;
 import com.badals.shop.service.util.MailService;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
-import com.badals.shop.xtra.amazon.NoOfferException;
-import com.badals.shop.xtra.amazon.Pas5Service;
-import com.badals.shop.xtra.amazon.PricingException;
+
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +23,7 @@ import java.util.List;
 @Component
 public class PricingMutation implements GraphQLMutationResolver {
     private final ProductService productService;
-    private final Pas5Service pasService;
+
     private final ProductLangService productLangService;
     private final PricingRequestService pricingRequestService;
     private final UserService userService;
@@ -41,9 +39,8 @@ public class PricingMutation implements GraphQLMutationResolver {
     private final MessageSource messageSource;
     private final CheckoutCartRepository checkoutCartRepository;
 
-    public PricingMutation(ProductService productService, Pas5Service pasService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, AwsService awsService, SpeedDialService speedDialService, CheckoutCartRepository checkoutCartRepository) {
+    public PricingMutation(ProductService productService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, AwsService awsService, SpeedDialService speedDialService, CheckoutCartRepository checkoutCartRepository) {
         this.productService = productService;
-        this.pasService = pasService;
         this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
@@ -62,7 +59,7 @@ public class PricingMutation implements GraphQLMutationResolver {
 
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws PricingException, NoOfferException, ProductNotFoundException {
+    public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws ProductNotFoundException {
         if(override != null && !override.trim().isEmpty()) {
             ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
             productOverrideService.saveOrUpdate(dto);
@@ -78,8 +75,8 @@ public class PricingMutation implements GraphQLMutationResolver {
             productDTO = productService.lookupForcePas(sku, false, false, false);
         else if(merchantId == 0L)
             productDTO = productService.lookupPas(sku, true, false);
-        else */if(merchantId == 2L)
-            productDTO = productService.lookupEbay(sku);
+        else *//*if(merchantId == 2L)
+            productDTO = productService.lookupEbay(sku);*/
 
 
         if(dial != null && !dial.trim().isEmpty()) {
@@ -91,7 +88,7 @@ public class PricingMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Message completePricingRequestAndEmail(Long id) throws PricingException, NoOfferException, ProductNotFoundException {
+    public Message completePricingRequestAndEmail(Long id) throws ProductNotFoundException {
         PricingRequestDTO dto = pricingRequestService.complete(id);
         // Get all overrides for this customer
         // Send email
