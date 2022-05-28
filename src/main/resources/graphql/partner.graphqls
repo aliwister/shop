@@ -4,6 +4,7 @@ extend type Query {
     variationOptions (name: String): VariationOption
     variations: [VariationOption]
     partnerTenantTags: [TenantTag]
+    deliveryProfiles: [Attribute]
     brands: [I18String]
     collections: [I18String]
     currencies: [Currency]
@@ -64,6 +65,7 @@ type PartnerProduct {
     gallery: [String]   # Ordered
     children: [ChildProduct]
     attributes: [AttributeI18n]
+    deliveryProfiles: [Attribute]
 }
 type PartnerProductResponse {
     items: [PartnerProduct]
@@ -124,7 +126,7 @@ input PartnerProductInput {
     gallery: [String]   # Ordered
     children: [ChildProductInput]
     attributes: [AttributeI18nInput]
-
+    deliveryProfiles: [AttributeInput]
 }
 
 input ChildProductInput {

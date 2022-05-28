@@ -18,8 +18,7 @@ import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.util.ValidationUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 
-import com.google.cloud.translate.Translate;
-import com.google.cloud.translate.Translation;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +60,11 @@ public class ProductService {
     private final ProductContentService productContentService;
 
     private final ProductLangRepository productLangRepository;
-    private final Translate translateService;
+    //private final Translate translateService;
 
     public static final long DEFAULT_WINDOW = 14400;
 
-    public ProductService(ProductRepository productRepository, MerchantService merchantService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository, Translate translateService) {
+    public ProductService(ProductRepository productRepository, MerchantService merchantService, ProductMapper productMapper, AddProductMapper addProductMapper, ProductSearchRepository productSearchRepository, SpeedDialService speedDialService, ProductIndexService productIndexService, ProductContentService productContentService, ProductLangRepository productLangRepository/*, Translate translateService*/) {
         this.productRepository = productRepository;
 
         this.merchantService = merchantService;
@@ -76,7 +75,7 @@ public class ProductService {
         this.productIndexService = productIndexService;
         this.productContentService = productContentService;
         this.productLangRepository = productLangRepository;
-        this.translateService = translateService;
+        //this.translateService = translateService;
     }
 
     /**
@@ -256,9 +255,9 @@ public class ProductService {
         ProductLang childEn = product.getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
         if(childLang == null && childEn != null) {
             ProductLang target = new ProductLang();
-            target = translateChild(childEn, target, langCode);
-            if(product.getVariationType() == VariationType.SIMPLE)
-                target = translateParent(childEn, target, langCode);
+            //target = translateChild(childEn, target, langCode);
+            //if(product.getVariationType() == VariationType.SIMPLE)
+                //target = translateParent(childEn, target, langCode);
             product.addProductLang(target);
             product = productRepository.save(product);
         }
@@ -274,7 +273,7 @@ public class ProductService {
         ProductLang parentEn = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
         if(parentLang == null && parentEn != null) {
             ProductLang target = new ProductLang();
-            target = translateParent(parentEn, target, langCode);
+            //target = translateParent(parentEn, target, langCode);
             Product parent = product.getParent();
             parent.addProductLang(target);
             parent = productRepository.save(parent);
@@ -283,6 +282,7 @@ public class ProductService {
         return product;
     }
 
+/*
     private ProductLang translateParent(ProductLang en, ProductLang target, String lang) {
         Translate.TranslateOption o = Translate.TranslateOption.targetLanguage(lang);
         if(en.getFeatures() != null)
@@ -298,6 +298,7 @@ public class ProductService {
         target.setLang(lang);
         return target;
     }
+*/
 
     //public static final String LATEST = "LATEST";
    //@Cacheable(cacheNames = LATEST)

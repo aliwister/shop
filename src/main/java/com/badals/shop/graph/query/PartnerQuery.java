@@ -2,6 +2,7 @@ package com.badals.shop.graph.query;
 
 import com.badals.shop.domain.enumeration.Currency;
 import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.I18String;
 import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.graph.OrderResponse;
@@ -79,6 +80,9 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
       return productService.tenantTags();
    }
 
+   public List<Attribute> deliveryProfiles () {
+      return List.of(new Attribute("deliveryProfile", "default"), new Attribute("deliveryProfile", "nol+dhl"), new Attribute("deliveryProfile", "pickup"));
+   }
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
    public List<I18String> brands() {
