@@ -178,7 +178,7 @@ public class TenantAdminProductService {
             master.setUnit(update.getUnit());
             master.setGallery(update.getGallery());
             master.setVariationOptions(update.getVariationOptions());
-
+            master.setDeliveryProfiles(update.getDeliveryProfiles());
             //saveLang(master, update);
         }
 

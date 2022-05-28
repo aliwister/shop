@@ -60,4 +60,6 @@ public class PartnerProduct {
    List<AttributesLang> attributes;
    List<VariationOption> options;
 
+   List<Attribute> deliveryProfiles;
+
 }

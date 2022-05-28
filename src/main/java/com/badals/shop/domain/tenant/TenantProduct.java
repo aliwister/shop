@@ -189,6 +189,10 @@ public class TenantProduct implements Serializable, TenantSupport {
     List<AttributesLang> attributes;
 
     @Type(type = "json")
+    @Getter @Setter @Column(name = "delivery_profiles", columnDefinition = "string")
+    List<Attribute> deliveryProfiles;
+
+    @Type(type = "json")
     @Column(name = "list_price")
     PriceMap listPrice;
 
