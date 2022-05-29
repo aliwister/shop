@@ -49,7 +49,7 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/shop?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://localhost:3306/profileshop?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull
     username: root
     password: root!
     hikari:
@@ -184,8 +184,9 @@ badals:
 
 profileshop:
   checkout-app: http://127.0.0.1:8081/checkout/start
-  cdnUrl: https://d2cdg7qq9ciilp.cloudfront.net
-  s3bucket: profileshop
+  cdnUrl: https://profileshop-test.s3.us-east-1.amazonaws.com/_m
+  s3bucket: profileshop-test
+  s3region: us-east-1
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
 
 ebay:
