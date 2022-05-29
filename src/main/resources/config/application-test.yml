@@ -180,9 +180,6 @@ pas:
     host: webservices.amazon.co.uk
     region: eu-west-1
 
-aws:
-  s3bucket: face-content-test
-
 mws:
   key: AKIAIOAQ437ZZB7K4O2A
   secret: 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
@@ -192,13 +189,14 @@ mws:
 badals:
   checkout-app: https://face-checkout-test.herokuapp.com/checkout/start
   cdnUrl: https://d4gk56dg16f6k.cloudfront.net
-  s3bucket: face-content-test
+  s3bucket: profileshop-test
+  s3region: us-east-1
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
 
 profileshop:
   checkout-app: http://127.0.0.1:8081/checkout/start
-  cdnUrl: https://d2cdg7qq9ciilp.cloudfront.net
-  s3bucket: profileshop
+  cdnUrl: https://profileshop-test.s3.us-east-1.amazonaws.com/_m
+  s3bucket: profileshop-test
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
 
 ebay:
