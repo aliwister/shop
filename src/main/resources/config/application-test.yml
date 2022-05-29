@@ -197,6 +197,7 @@ profileshop:
   checkout-app: http://127.0.0.1:8081/checkout/start
   cdnUrl: https://profileshop-test.s3.us-east-1.amazonaws.com/_m
   s3bucket: profileshop-test
+  s3region: us-east-1
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
 
 ebay:
