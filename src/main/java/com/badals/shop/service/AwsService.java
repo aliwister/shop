@@ -27,6 +27,9 @@ public class AwsService {
    @Value("${profileshop.s3bucket}")
    private String bucketName;
 
+   @Value("${profileshop.s3region}")
+   private String regionValue;
+
    public AwsService(S3Client s3Client) {
       this.s3Client = s3Client;
    }
@@ -34,7 +37,7 @@ public class AwsService {
 
 
    public URL presignPutUrl( String objectKey, String  contentType) {
-      Region region = Region.EU_CENTRAL_1;
+      Region region =  Region.of(regionValue);
          S3Presigner presigner = S3Presigner.builder().region(region).build();
 
          PresignedPutObjectRequest presignedRequest =
@@ -45,7 +48,7 @@ public class AwsService {
    }
 
    public URL presignGetUrl( String objectKey, String contentType) {
-      Region region = Region.EU_CENTRAL_1;
+      Region region = Region.of(regionValue);
       S3Presigner presigner = S3Presigner.builder().region(region).build();
 
       PresignedGetObjectRequest presignedRequest =
