@@ -1,5 +1,8 @@
 package com.badals.shop.graph.query;
 
+import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.*;
@@ -30,8 +33,9 @@ public class TenantQuery extends ShopQuery implements GraphQLQueryResolver {
    private final TenantAdminProductService tenantAdminProductService;
    private final TenantCartService cartService;
    private final TenantOrderService orderService;
+   private final TenantAccountService accountService;
 
-   public TenantQuery(TenantProductService productService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService, TenantSetupService tenantSetupService, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService) {
+   public TenantQuery(TenantProductService productService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService, TenantSetupService tenantSetupService, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService) {
       this.productService = productService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
@@ -41,6 +45,7 @@ public class TenantQuery extends ShopQuery implements GraphQLQueryResolver {
       this.tenantAdminProductService = tenantAdminProductService;
       this.cartService = cartService;
       this.orderService = orderService;
+      this.accountService = accountService;
    }
 
    public TenantDTO tenantByName(String name) {
@@ -57,6 +62,14 @@ public class TenantQuery extends ShopQuery implements GraphQLQueryResolver {
 
    public ProductResponse tenantTagProducts(String hashtag) {
       return productService.findByHashtag(hashtag);
+   }
+
+   public OrderResponse tenantOrders(List<OrderState> orderState, Integer limit, Integer offset) {
+      return accountService.orders(orderState, limit, offset);
+   }
+
+   public OrderDTO tenantOrder(String ref) throws OrderNotFoundException {
+      return accountService.findOrderByRef(ref);
    }
 
    public ProductDTO tenantProduct(String slug) throws ProductNotFoundException {
@@ -79,6 +92,13 @@ public class TenantQuery extends ShopQuery implements GraphQLQueryResolver {
       OrderDTO o = orderService.getOrderConfirmation(ref, confirmationKey);
       if(o == null) throw new OrderNotFoundException("No order found with this name");
       return o;
+   }
+
+   public List<Attribute> getSliders(String locale) {
+      return tenantSetupService.getSliders(locale);
+   }
+  public List<Attribute> tenantSliders(String locale) {
+      return productService.getSliders(locale);
    }
 
 }

@@ -12,6 +12,8 @@ extend type Query {
 
     partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
     partnerOrder(id: ID): Order
+
+    sliders(locale: String): [Attribute]
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
 }
@@ -22,7 +24,7 @@ extend type Mutation {
     completeUpload(fileHandle: Long): Message
     publishProduct(id: Long): Message
     unpublishProduct(id: Long): Message
-
+    setSliderList(locale: String, images: [String]):Message
     saveTenantTag(hashtag: TenantTagInput): TenantTag
 
     setOrderState(value: OrderState): Message

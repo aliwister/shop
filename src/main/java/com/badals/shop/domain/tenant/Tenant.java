@@ -2,6 +2,7 @@ package com.badals.shop.domain.tenant;
 
 import com.badals.shop.domain.pojo.CarrierProfile;
 import com.badals.shop.domain.pojo.PaymentProfile;
+import com.badals.shop.domain.pojo.SliderConfig;
 import lombok.Data;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
@@ -87,6 +88,12 @@ public class Tenant implements Serializable {
    @Column(name = "carrier_profile", columnDefinition = "string")
    private CarrierProfile carrierProfile;
 
+   @Type(type = "json")
+   @Column(name = "sliders", columnDefinition = "string")
+   private SliderConfig sliders;
+
+   @Column(name="default_locale")
+   String defaultLocale;
 
    @Override
    public boolean equals(Object o) {
