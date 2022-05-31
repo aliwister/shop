@@ -1,10 +1,12 @@
 package com.badals.shop.repository;
 
+import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.domain.tenant.TenantCart;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,7 +18,7 @@ public interface TenantCartRepository extends JpaRepository<TenantCart, Long> {
 
     Optional<TenantCart> findBySecureKey(String secureKey);
 
-    //List<ProfileCart> findByCustomerAndCartStateOrderByIdDesc(Customer loginUser, CartState claimed);
+    List<TenantCart> findByCustomerIdAndCartStateOrderByIdDesc(Long id, CartState claimed);
 
     void refresh(TenantCart cart);
 

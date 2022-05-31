@@ -35,7 +35,9 @@ import java.util.Set;
 @Data
 @Table(catalog="profileshop", name = "jhi_order")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
+@FilterDef(name = "userFilter", parameters = {@ParamDef(name = "username", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
+@Filter(name = "userFilter", condition = "email = :username")
 public class TenantOrder implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
