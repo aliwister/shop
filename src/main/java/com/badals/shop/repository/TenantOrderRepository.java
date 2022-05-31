@@ -90,5 +90,6 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
             @Param("s9") String option9);
 
     List<TenantOrder> findByIdBetween(Long from, Long to);
+
 }
 

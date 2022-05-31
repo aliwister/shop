@@ -1,8 +1,8 @@
 package com.badals.shop.aop.tenant;
 
-import com.badals.shop.domain.User;
 import com.badals.shop.repository.UserRepository;
 import com.badals.shop.security.SecurityUtils;
+import com.badals.shop.security.jwt.ProfileUser;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.hibernate.Filter;
@@ -10,6 +10,9 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
@@ -57,5 +60,21 @@ public class TenantAspect {
          filter.setParameter("tenantId", TenantContext.getCurrentProfile());
          filter.validate();
 		}
+    }
+
+    @Before("execution(* com.badals.shop.service.TenantAccountService.*(..))")
+    public void beforeGraphQLExecution2() throws Throwable {
+       if (TenantContext.getCurrentProfile() != null) {
+         Filter filter = entityManager.unwrap(Session.class).enableFilter("tenantFilter");
+         filter.setParameter("tenantId", TenantContext.getCurrentProfile());
+         filter.validate();
+		}
+       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       User userObj =  (User) authentication.getPrincipal();
+       if(userObj != null && userObj.getUsername() != null) {
+          Filter filter = entityManager.unwrap(Session.class).enableFilter("userFilter");
+          filter.setParameter("username", userObj.getUsername());
+          filter.validate();
+       }
     }
 }

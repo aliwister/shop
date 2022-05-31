@@ -159,23 +159,19 @@ public class TenantCartService {
                 return this.mergeCart(cart, items, false);
         }
 
-        //Not reachable
         if (cart.getCartState() == CartState.CLAIMED) {
-            if( loginUser.getId() == cart.getCustomer().getId() )
-                return this.mergeCart(cart, items, false);
+            if( loginUser.getId().longValue() == cart.getCustomerId() )
+                return this.mergeCart(cart, items, isMerge);
 
             cart = this.getCartByCustomer(loginUser);
-        /*    if (isMerge)*/
-                return this.mergeCart(cart, items, false);
-            /*else
-                return this.save(cart, items);*/
+            if (isMerge)
+                return this.mergeCart(cart, items, isMerge);
+            else
+                return this.save(cart, items);
         }
         //if (cart.getCartState() == CartState.CLOSED) {
         cart = this.getCartByCustomer(loginUser);
-        if (isMerge)
-            return this.mergeCart(cart, items, false);
-        else
-            return this.mergeCart(cart, items, false);
+        return this.mergeCart(cart, items, isMerge);
         //}
     }
 
@@ -210,6 +206,9 @@ public class TenantCartService {
             }
             //cart.setTenantId(TenantContext.getCurrentProfile());
             //cart.setCartItems(cartItems);
+            Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
+            if(loginUser != null)
+                cart.setCustomer(loginUser);
             cart = cartRepository.saveAndFlush(cart);
             cartRepository.refresh(cart);
         }
@@ -237,7 +236,7 @@ public class TenantCartService {
     }
 
     private TenantCart getCartByCustomer(Customer loginUser) {
-        List<TenantCart> carts = cartRepository.findAll();//cartRepository.findByCustomerAndCartStateOrderByIdDesc(loginUser, CartState.CLAIMED);
+        List<TenantCart> carts = cartRepository.findByCustomerIdAndCartStateOrderByIdDesc(loginUser.getId(), CartState.CLAIMED);
         if (carts.size() == 0) {
             TenantCart cart = new TenantCart();
             //cart.setCustomer(loginUser);
@@ -251,13 +250,14 @@ public class TenantCartService {
     private void setItems(TenantCart cart, List<CartItemDTO> items) {
         //List<CartItem> cartItems = new ArrayList<>();
         cart.getCartItems().clear();
-        for(CartItemDTO dto : items) {
-            Long ref = dto.getProductId();
-/*            if(ref != null && productService.exists(ref)) {
-                CartItem item = cartItemMapper.toEntity(dto);
-                cart.addCartItem(item);
-            }*/
-        }
+        if(items != null)
+            for(CartItemDTO dto : items) {
+                Long ref = dto.getProductId();
+    /*            if(ref != null && productService.exists(ref)) {
+                    CartItem item = cartItemMapper.toEntity(dto);
+                    cart.addCartItem(item);
+                }*/
+            }
         //cart.setCartItems(cartItems);
     }
 
@@ -272,14 +272,14 @@ public class TenantCartService {
         Locale locale = LocaleContextHolder.getLocale();
         String currency = Currency.getInstance(locale).getCurrencyCode();
 
-        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
+        Customer customer = customerService.getUserWithAuthorities().orElse(null);
         TenantCart cart = null;
-        Customer customer = null;
 
-        if (loginUser != null) {
-            customer = customerRepository.findByIdJoinAddresses(cart.getCustomer().getId()).orElse(null);
-            cart = this.getCartByCustomer(loginUser);
-            cart = cartRepository.getCartByCustomerJoinAddresses(cart.getId());
+        if (customer != null) {
+            //customer = customerRepository.findByIdJoinAddresses(cart.getCustomer().getId()).orElse(null);
+            cart = this.getCartByCustomer(customer);
+            //cart = cartRepository.getCartByCustomerJoinAddresses(cart.getId());
+            //cart = cartRepository.getCartByCustomerJoinAddresses(customer.getId());
         }
         else {
             cart = cartRepository.findBySecureKey(secureKey).get();

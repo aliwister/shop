@@ -1,5 +1,7 @@
 package com.badals.shop.service;
 
+import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.SliderConfig;
 import com.badals.shop.domain.tenant.Media;
 import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.domain.tenant.Tenant;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -116,5 +119,26 @@ public class TenantSetupService {
         media.setKey(request.getKey());
         media.setUrl(request.getUrl());
         mediaRepository.save(media);
+    }
+
+    public List<Attribute> getSliders(String locale) {
+        Tenant tenant = tenantRepository.findAll().get(0);
+        if (tenant.getSliders() != null) {
+            List<String> images = tenant.getSliders().getMap().get(locale);
+            if(images != null )
+                return images.stream().map(y->new Attribute("slider", y)).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+    @Transactional
+    public void setSliders(String locale, List<String> images) {
+        Tenant tenant = tenantRepository.findAll().get(0);
+        SliderConfig config = tenant.getSliders();
+        if (config == null)
+            config = new SliderConfig();
+
+        config.getMap().put(locale, images);
+        tenant.setSliders(config);
+        tenantRepository.save(tenant);
     }
 }

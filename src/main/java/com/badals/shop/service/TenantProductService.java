@@ -7,35 +7,31 @@ import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.tenant.S3UploadRequest;
+import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.tenant.TenantStock;
-import com.badals.shop.graph.PartnerProductResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantHashtagRepository;
 import com.badals.shop.repository.TenantProductRepository;
+import com.badals.shop.repository.TenantRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;
-import com.badals.shop.service.pojo.AddProductDTO;
-import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
-import com.badals.shop.service.util.ChecksumUtil;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -65,9 +61,10 @@ public class TenantProductService {
 
     private final ProductService productService;
     private final S3UploadRequestRepository s3UploadRequestRepository;
+    private final TenantRepository tenantRepository;
 
 
-    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository) {
+    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository, TenantRepository tenantRepository) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
         this.productMapper = tenantProductMapper;
@@ -84,6 +81,7 @@ public class TenantProductService {
         this.productIndexService = productIndexService;
         this.productService = productService;
         this.s3UploadRequestRepository = s3UploadRequestRepository;
+        this.tenantRepository = tenantRepository;
     }
 
     public PartnerProduct getPartnerProduct(Long id) {
@@ -228,5 +226,15 @@ public class TenantProductService {
             return true;
 
         return false;
+    }
+
+    public List<Attribute> getSliders(String locale) {
+        Tenant tenant = tenantRepository.findAll().get(0);
+        if (tenant.getSliders() != null) {
+            List<String> images = tenant.getSliders().getMap().get(locale);
+            if(images != null )
+                return images.stream().map(y->new Attribute("slider", y)).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }

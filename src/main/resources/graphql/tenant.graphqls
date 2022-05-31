@@ -3,10 +3,13 @@ extend type Query {
     variationOptions (name: String): VariationOption
     tenantTags: [TenantTag]
     tenantTagProducts(hashtag: String): ProductResponse
+    tenantOrders(state: [OrderState], limit: Int = 10, offset: Int = 0): OrderResponse
+    tenantOrder(ref: String): Order
     tenantByName (name: String): Tenant
     currentTenant: Tenant
     cart(secureKey: String): Cart
     orderSummary(ref: String, confirmationKey: String): Order
+    tenantSliders(locale: String): [Attribute]
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
 }
