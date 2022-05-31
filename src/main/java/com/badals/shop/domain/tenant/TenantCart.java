@@ -5,6 +5,8 @@ import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.CartState;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -45,20 +47,27 @@ public class TenantCart implements Serializable, TenantSupport {
     @Column(name = "cart_state", nullable = false)
     private CartState cartState = CartState.UNCLAIMED;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties("carts")
     @JoinColumn(name = "delivery_address_id")
     private Address deliveryAddress;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties("carts")
     @JoinColumn(name = "invoice_address_id")
     private Address invoiceAddress;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties("carts")
     private Customer customer;
+
+
+    @Getter
+    @Setter
+    @Column(name = "customer_id", updatable = false, insertable = false)
+    private Long customerId;
+
 
 /*
     @ManyToOne

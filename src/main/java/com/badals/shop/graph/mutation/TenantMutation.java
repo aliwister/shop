@@ -106,6 +106,13 @@ public class TenantMutation implements GraphQLMutationResolver {
         return productService.saveTag(hashtag);
     }
 
+    public Message setSliderList(String locale, List<String> images) {
+        tenantSetupService.setSliders(locale, images);
+        return new Message("success");
+    }
+
+
+
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public Message publishProduct(Long id) throws ProductNotFoundException {
         productService.setProductPublished(id, true);
