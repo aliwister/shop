@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class ActionQuery extends ShopQuery implements GraphQLQueryResolver {
+public class ActionQuery extends BaseQuery implements GraphQLQueryResolver {
 
     private final ActionService actionService;
 

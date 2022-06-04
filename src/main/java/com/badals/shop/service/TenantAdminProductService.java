@@ -8,12 +8,10 @@ import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.tenant.S3UploadRequest;
-import com.badals.shop.domain.tenant.TenantHashtag;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.S3UploadRequestRepository;
-import com.badals.shop.repository.TenantHashtagRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.search.PartnerProductSearchRepository;
 import com.badals.shop.service.dto.ProductDTO;
@@ -55,8 +53,6 @@ public class TenantAdminProductService {
     private final PartnerProductMapper partnerProductMapper;
     private final ChildProductMapper childProductMapper;
 
-    private final TenantHashtagRepository hashtagRepository;
-    private final TenantHashtagMapper tenantHashtagMapper;
     private final TenantProductMapper productMapper;
 
     private final ProductLangMapper productLangMapper;
@@ -71,17 +67,13 @@ public class TenantAdminProductService {
     private final S3UploadRequestRepository s3UploadRequestRepository;
     private final AwsService awsService;
 
-
-
-    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService) {
+    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, ProductLangMapper productLangMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
-        this.productMapper = tenantProductMapper;
         this.addProductMapper = addProductMapper;
         this.partnerProductMapper = partnerProductMapper;
         this.childProductMapper = childProductMapper;
-        this.hashtagRepository = hashtagRepository;
-        this.tenantHashtagMapper = tenantHashtagMapper;
+        this.productMapper = productMapper;
         this.productLangMapper = productLangMapper;
         this.partnerProductSearchRepository = partnerProductSearchRepository;
         this.tenantService = tenantService;
@@ -92,6 +84,7 @@ public class TenantAdminProductService {
         this.s3UploadRequestRepository = s3UploadRequestRepository;
         this.awsService = awsService;
     }
+
 
     public ProductResponse adminSearchTenantProducts(String upc, String title) {
         //PartnerProduct p = partnerProductSearchRepository.findBySlug(upc);
@@ -414,12 +407,6 @@ public class TenantAdminProductService {
         response.setHasMore(false);
         return response;
     }
-
-    public List<ProfileHashtagDTO> tenantTags() {
-        String profile = TenantContext.getCurrentProfile();
-        return hashtagRepository.findForList(profile).stream().map(tenantHashtagMapper::toDto).collect(Collectors.toList());
-    }
-
     public ProductDTO findProductBySlug(String slug) throws ProductNotFoundException {
         //String profile = TenantContext.getCurrentProfile();
         TenantProduct product = productRepository.findBySlug(slug).get();
@@ -465,12 +452,6 @@ public class TenantAdminProductService {
         return s3UploadRequestRepository.findById(fileHandle).get();
     }
 
-    public ProfileHashtagDTO saveTag(ProfileHashtagDTO dto) {
-        TenantHashtag tag = tenantHashtagMapper.toEntity(dto);
-        tag.setTenantId(TenantContext.getCurrentTenant());
-        tag = hashtagRepository.save(tag);
-        return tenantHashtagMapper.toDto(tag);
-    }
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;

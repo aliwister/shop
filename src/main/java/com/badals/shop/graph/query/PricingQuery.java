@@ -4,7 +4,6 @@ package com.badals.shop.graph.query;
 import com.badals.shop.service.PricingRequestService;
 import com.badals.shop.service.ProductService;
 import com.badals.shop.service.dto.PricingRequestDTO;
-import com.badals.shop.service.dto.ProductDTO;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class PricingQuery extends ShopQuery implements GraphQLQueryResolver {
+public class PricingQuery extends BaseQuery implements GraphQLQueryResolver {
 
     @Autowired
     private PricingRequestService pricingRequestService;

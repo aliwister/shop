@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class AccountingQuery extends ShopQuery implements GraphQLQueryResolver {
+public class AccountingQuery extends BaseQuery implements GraphQLQueryResolver {
 
     private final PaymentService paymentService;
 

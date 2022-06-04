@@ -1,4 +1,5 @@
 package com.badals.shop.service.dto;
+import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.PaymentDef;
 import com.badals.shop.domain.pojo.PaymentProfile;
 import lombok.Data;
@@ -21,6 +22,11 @@ public class TenantDTO implements Serializable {
 
     private String name;
 
+    private String description;
+    private String title;
+    private String customDomain;
+    private String subdomain;
+
     private Long maxProducts;
 
     private String planName;
@@ -42,8 +48,12 @@ public class TenantDTO implements Serializable {
     private Set<CustomerDTO> customers = new HashSet<>();
 
     private String logo;
+    private String mobileLogo;
 
     private String tenantId;
+    private String defaultLocale;
+
+    private List<Attribute> socialList;
 
     @Override
     public boolean equals(Object o) {

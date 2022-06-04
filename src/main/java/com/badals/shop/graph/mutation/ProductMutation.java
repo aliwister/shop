@@ -1,6 +1,8 @@
 package com.badals.shop.graph.mutation;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.service.*;
@@ -61,7 +63,22 @@ public class ProductMutation implements GraphQLMutationResolver {
         return this.productService.createNewProduct(product);
     }
 */
-
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public Message
+    createMerchantProduct(AddProductDTO dto){
+        String t =  TenantContext.getCurrentTenant();
+        productService.createMerchantProduct(dto, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(), TenantContext.getCurrentTenant());
+        //return productService.createMerchantProduct(dto, 11L, "Mayaseen", 11L);
+        return new Message("New Draft Product created successfully");
+    }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {
+        return productService.createProduct(dto, isSaveES, currentMerchantId);
+    }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public AddProductDTO createStub(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) throws Exception {
+        return productService.createStub(dto, isSaveES, currentMerchantId);
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Attribute indexProduct(final long id) {
