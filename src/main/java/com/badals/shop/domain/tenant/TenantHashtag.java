@@ -34,6 +34,7 @@ public class TenantHashtag extends Auditable implements Serializable, TenantSupp
     private List<I18String> langs;
 
     private String icon;
+    private String name;
 
     private Integer position;
 
@@ -43,6 +44,11 @@ public class TenantHashtag extends Auditable implements Serializable, TenantSupp
 
     public TenantHashtag icon(String icon) {
         this.icon = icon;
+        return this;
+    }
+
+    public TenantHashtag name(String name) {
+        this.name = name;
         return this;
     }
     public TenantHashtag position(Integer position) {
