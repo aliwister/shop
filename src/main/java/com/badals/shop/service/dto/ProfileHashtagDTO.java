@@ -18,6 +18,7 @@ public class ProfileHashtagDTO implements Serializable {
     private List<I18String> langs;
 
     private String icon;
+    private String name;
 
     private Integer position;
 

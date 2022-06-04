@@ -2,13 +2,17 @@ package com.badals.shop.graph.mutation;
 
 import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.CheckoutCart;
+import com.badals.shop.domain.enumeration.AssetType;
+import com.badals.shop.domain.enumeration.OrderState;
+import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.service.dto.OrderDTO;
-import com.badals.shop.service.pojo.Message;
-import com.badals.shop.service.pojo.PresignedUrl;
+import com.badals.shop.service.dto.ProfileHashtagDTO;
+import com.badals.shop.service.pojo.*;
 import com.badals.shop.service.*;
-import com.badals.shop.service.pojo.AddProductDTO;
 
 import com.badals.shop.service.util.ChecksumUtil;
+import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,68 +32,43 @@ import java.util.List;
 
 
 @Component
-public class TenantAdminMutation implements GraphQLMutationResolver {
-    private final Logger log = LoggerFactory.getLogger(TenantAdminMutation.class);
+public class PartnerMutation implements GraphQLMutationResolver {
+    private final Logger log = LoggerFactory.getLogger(PartnerMutation.class);
 
-    private final ProductService productService;
-    private final TenantAdminOrderService tenantAdminOrderService;
-
-
+    private final TenantAdminProductService productService;
+    private final TenantAdminOrderService orderService;
     private final AwsService awsService;
-
-    private final ProductLangService productLangService;
-
-    private final PricingRequestService pricingRequestService;
-
     private final MessageSource messageSource;
 
     private final UserService userService;
+    private final TenantSetupService setupService;
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
     private final ProductIndexService productIndexService;
 
-
-    public TenantAdminMutation(ProductService productService, TenantAdminOrderService tenantAdminOrderService, AwsService awsService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, ProductIndexService productIndexService) {
+    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, ProductIndexService productIndexService) {
         this.productService = productService;
-        this.tenantAdminOrderService = tenantAdminOrderService;
+        this.orderService = orderService;
         this.awsService = awsService;
-        this.productLangService = productLangService;
-        this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.userService = userService;
+        this.setupService = setupService;
         this.productIndexService = productIndexService;
     }
+/*
 
-
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
-    public Message createMerchantProduct(AddProductDTO dto){
-        String t =  TenantContext.getCurrentTenant();
-        log.info("Tenant: " + t);
-        productService.createMerchantProduct(dto, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(), TenantContext.getCurrentTenant());
-        //return productService.createMerchantProduct(dto, 11L, "Mayaseen", 11L);
-        return new Message("New Draft Product created successfully");
-    }
+*/
 
 
     public OrderDTO createPosOrder(CheckoutCart cart, String paymentMethod, String paymentAmount, String ref) {
-        return tenantAdminOrderService.createPosOrder(cart, paymentMethod, paymentAmount, ref);
+        return orderService.createPosOrder(cart, paymentMethod, paymentAmount, ref);
 
     }
     public Message voidOrder(Long id) {
-        return tenantAdminOrderService.voidOrder(id);
+        return orderService.voidOrder(id);
 
     }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public AddProductDTO createProduct(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) {
-        return productService.createProduct(dto, isSaveES, currentMerchantId);
-    }
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public AddProductDTO createStub(AddProductDTO dto, boolean isSaveES, Long currentMerchantId) throws Exception {
-        return productService.createStub(dto, isSaveES, currentMerchantId);
-    }
-
     public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
         String t =  TenantContext.getCurrentTenant();
         productIndexService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(),TenantContext.getCurrentTenant(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
@@ -166,6 +145,84 @@ public class TenantAdminMutation implements GraphQLMutationResolver {
         } catch (S3Exception  e) {
             e.getStackTrace();
         }
+    }
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public ProductEnvelope savePartnerProduct(PartnerProduct product) throws ProductNotFoundException {
+        PartnerProduct p = null;
+        StringBuilder message = new StringBuilder();
+        Integer code = 202;
+
+        try {
+            p = productService.savePartnerProduct(product, true);
+            message.append("Success");
+        }
+        catch(Throwable e) {
+            e.printStackTrace();
+            while (e != null) {
+                message.append(e.getMessage());
+                e = e.getCause();
+            }
+
+            code = 400;
+        }
+        log.error(message.toString());
+        return new ProductEnvelope(p, message.toString(), code);
+    }
+
+    //@PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType, AssetType assetType) {
+        return productService.getS3UploadUrl(filename, contentType, assetType);
+    }
+
+    public Message completeUpload(Long fileHandle) {
+        S3UploadRequest request = productService.findUploadRequest(fileHandle);
+        if (request.getAssetType() == AssetType.LOGO)
+            setupService.updateLogo(request);
+
+        setupService.addMedia(request);
+
+        return new Message("success", "200");
+    }
+
+    public ProfileHashtagDTO saveTenantTag (ProfileHashtagDTO hashtag) throws NoSuchFieldException {
+        return setupService.saveTag(hashtag);
+    }
+    public Message deleteTenantTag (Long id) {
+        setupService.deleteTag(id);
+        return new Message("Success");
+    }
+
+    public Message setSliderList(String locale, List<String> images) {
+        setupService.setSliders(locale, images);
+        return new Message("success");
+    }
+
+    public Message setSocialProfile(String locale, List<Attribute> profiles) {
+        setupService.setSocialProfile(locale, profiles);
+        return new Message("success");
+    }
+
+
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public Message publishProduct(Long id) throws ProductNotFoundException {
+        productService.setProductPublished(id, true);
+        return new Message("Product published successfully");
+    }
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public Message unpublishProduct(Long id) throws ProductNotFoundException {
+        productService.setProductPublished(id, false);
+        return new Message("Product set to draft successfully");
+    }
+    public Message setOrderState(OrderState value) {
+        return null;
+    }
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public Message deleteProduct(Long id) throws ProductNotFoundException {
+        productService.deleteProduct(id);
+        return new Message("ok");
     }
 }
 

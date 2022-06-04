@@ -53,7 +53,7 @@ public class TenantAspect {
     * Sets a filter to the tenant Id which is captured using X-TenantId or graphql/[tenant_id]
     * Picks records corresponding to the filter
     */
-    @Before("execution(* com.badals.shop.service.TenantProductService.*(..)) || execution(* com.badals.shop.service.TenantCartService.*(..))")
+    @Before("execution(* com.badals.shop.service.TenantProductService.*(..)) || execution(* com.badals.shop.service.TenantCartService.*(..))|| execution(* com.badals.shop.service.TenantLayoutService.*(..))")
     public void beforeGraphQLExecution() throws Throwable {
        if (TenantContext.getCurrentProfile() != null) {
          Filter filter = entityManager.unwrap(Session.class).enableFilter("tenantFilter");

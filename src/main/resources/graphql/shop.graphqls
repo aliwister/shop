@@ -5,11 +5,12 @@ extend type Query {
     tenantTagProducts(hashtag: String): ProductResponse
     tenantOrders(state: [OrderState], limit: Int = 10, offset: Int = 0): OrderResponse
     tenantOrder(ref: String): Order
-    tenantByName (name: String): Tenant
+    tenantInfo: Tenant
     currentTenant: Tenant
     cart(secureKey: String): Cart
     orderSummary(ref: String, confirmationKey: String): Order
-    tenantSliders(locale: String): [Attribute]
+    tenantSliders: [Attribute]
+    socialProfiles: [Attribute]
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
 }
@@ -23,6 +24,7 @@ type TenantTag {
     langs: [I18String]
     icon: String
     position: Int
+    name: String
 }
 
 input TenantTagInput {
@@ -30,6 +32,7 @@ input TenantTagInput {
     langs: [I18StringInput]
     icon: String
     position: Int
+    name: String
 }
 
 input I18StringInput {
@@ -40,6 +43,7 @@ input I18StringInput {
 type Tenant {
     id: Long
     logo: String
+    mobileLogo: String
     name: String
     maxProducts: Int
     planName: String
@@ -50,6 +54,10 @@ type Tenant {
     contractStartDate: LocalDate
     publicPaymentProfile: [PaymentDef]
     tenantId: String
+    socialList: [Attribute]
+    subdomain: String
+    description: String
+    customDomain: String
 }
 
 type PaymentDef {
@@ -57,4 +65,3 @@ type PaymentDef {
     pk: String
     code: String
 }
-

@@ -3,9 +3,7 @@ package com.badals.shop.service;
 import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
-import com.badals.shop.domain.pojo.Attribute;
-import com.badals.shop.domain.pojo.Gallery;
-import com.badals.shop.domain.pojo.Price;
+import com.badals.shop.domain.pojo.*;
 import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.domain.tenant.TenantProduct;
@@ -24,6 +22,7 @@ import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +31,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -218,7 +219,6 @@ public class TenantProductService {
         }*/
 
         return productRepository.findBySlug(slug).map(productMapper::toDto).orElse(null);
-
     }
 
     public boolean exists(String productId) {
@@ -228,13 +228,5 @@ public class TenantProductService {
         return false;
     }
 
-    public List<Attribute> getSliders(String locale) {
-        Tenant tenant = tenantRepository.findAll().get(0);
-        if (tenant.getSliders() != null) {
-            List<String> images = tenant.getSliders().getMap().get(locale);
-            if(images != null )
-                return images.stream().map(y->new Attribute("slider", y)).collect(Collectors.toList());
-        }
-        return Collections.emptyList();
-    }
+
 }
