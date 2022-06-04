@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Component
-public class ProductQuery extends ShopQuery implements GraphQLQueryResolver {
+public class ProductQuery extends BaseQuery implements GraphQLQueryResolver {
 
    private final ProductService productService;
    private final ProductIndexService productIndexService;

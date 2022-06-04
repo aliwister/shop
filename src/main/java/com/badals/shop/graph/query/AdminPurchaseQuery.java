@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class AdminPurchaseQuery extends ShopQuery implements GraphQLQueryResolver {
+public class AdminPurchaseQuery extends BaseQuery implements GraphQLQueryResolver {
 
     private final PurchaseService purchaseService;
 

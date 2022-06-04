@@ -25,7 +25,9 @@ extend type Mutation {
     publishProduct(id: Long): Message
     unpublishProduct(id: Long): Message
     setSliderList(locale: String, images: [String]):Message
+    setSocialProfile(locale: String, profiles: [AttributeInput]): Message
     saveTenantTag(hashtag: TenantTagInput): TenantTag
+    deleteTenantTag(id: Long): Message
 
     setOrderState(value: OrderState): Message
     deleteProduct(id: Long): Message

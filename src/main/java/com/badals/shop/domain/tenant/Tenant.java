@@ -3,6 +3,7 @@ package com.badals.shop.domain.tenant;
 import com.badals.shop.domain.pojo.CarrierProfile;
 import com.badals.shop.domain.pojo.PaymentProfile;
 import com.badals.shop.domain.pojo.SliderConfig;
+import com.badals.shop.domain.pojo.SocialProfile;
 import lombok.Data;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
@@ -91,6 +92,10 @@ public class Tenant implements Serializable {
    @Type(type = "json")
    @Column(name = "sliders", columnDefinition = "string")
    private SliderConfig sliders;
+
+   @Type(type = "json")
+   @Column(name = "social", columnDefinition = "string")
+   private SocialProfile socialProfile;
 
    @Column(name="default_locale")
    String defaultLocale;

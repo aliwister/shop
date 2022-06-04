@@ -44,7 +44,7 @@ query {
  */
 
 @Component
-public class CustomerQuery extends ShopQuery implements GraphQLQueryResolver {
+public class CustomerQuery extends BaseQuery implements GraphQLQueryResolver {
 
     private final ProductService productService;
     private final AddressService addressService;

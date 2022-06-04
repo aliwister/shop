@@ -8,7 +8,6 @@ import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
-import com.badals.shop.service.dto.HashtagDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -25,7 +24,7 @@ import java.util.List;
 import static com.badals.shop.domain.enumeration.Currency.*;
 
 @Component
-public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
+public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
 
    private final TenantAdminProductService productService;
    private final TenantAdminOrderService orderService;
@@ -36,14 +35,16 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
 
    private final UserService userService;
    private final TenantService tenantService;
+   private final TenantSetupService setupService;
 
-   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService) {
+   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService, TenantSetupService setupService) {
       this.productService = productService;
       this.orderService = orderService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
       this.tenantService = tenantService;
+      this.setupService = setupService;
    }
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
@@ -77,7 +78,7 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
    }
 
    public List<ProfileHashtagDTO> partnerTenantTags () {
-      return productService.tenantTags();
+      return setupService.tenantTags();
    }
 
    public List<Attribute> deliveryProfiles () {
@@ -130,6 +131,10 @@ public class PartnerQuery extends ShopQuery implements GraphQLQueryResolver {
       OrderDTO o = orderService.getOrderWithOrderItems(id).orElse(null);
       if(o == null) throw new OrderNotFoundException("No order found with this name");
       return o;
+   }
+
+   public List<Attribute> sliders(String locale) {
+      return setupService.getSliders(locale);
    }
 }
 
