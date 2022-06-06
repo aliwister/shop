@@ -172,6 +172,7 @@ public class TenantAdminProductService {
             master.setGallery(update.getGallery());
             master.setVariationOptions(update.getVariationOptions());
             master.setDeliveryProfiles(update.getDeliveryProfiles());
+            master.setAttributes(update.getAttributes());
             //saveLang(master, update);
         }
 
@@ -289,6 +290,7 @@ public class TenantAdminProductService {
             //pl.setRef(Long.valueOf(ref));
             ///pl.setSlug(ref);
             pl.setVariationAttributes(c.getVariationAttributes());
+            pl.setAttributes(c.getAttributes());
             pl.setTitle(generateTitle(master.getTitle(), c.getVariationAttributes()));
             pl.setImage(c.getImage());
             pl.setGallery(c.getGallery());
