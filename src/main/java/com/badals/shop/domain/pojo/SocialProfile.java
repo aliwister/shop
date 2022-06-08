@@ -9,5 +9,8 @@ import java.util.Map;
 @Data
 public class SocialProfile implements Serializable {
    Map<String, Map<SocialPlatform, String>> map = new HashedMap<>();
+/*   public static Object valueOf(String name) {
+
+   }*/
 }
 

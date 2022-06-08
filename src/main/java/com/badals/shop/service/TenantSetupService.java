@@ -189,4 +189,13 @@ public class TenantSetupService {
       return hashtagRepository.findForList(profile).stream().map(hashtagMapper::toDto).collect(Collectors.toList());
    }
 
+   public List<Attribute> getSocial(String locale) {
+      Tenant tenant = tenantRepository.findAll().get(0);
+      if (tenant.getSocialProfile() != null) {
+         Map<SocialPlatform, String> social = tenant.getSocialProfile().getMap().get(locale);
+         if (social != null)
+            return social.keySet().stream().map(y -> new Attribute(y.name(), social.get(y))).collect(Collectors.toList());
+      }
+      return Collections.emptyList();
+   }
 }

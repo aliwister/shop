@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import com.badals.shop.service.pojo.Partner;
 /**
  * Service Implementation for managing {@link Tenant}.
  */
@@ -58,6 +58,14 @@ public class TenantService {
         log.debug("Request to get all Tenants");
         return tenantRepository.findAll().stream()
             .map(tenantMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Partner> findAllPartners() {
+        log.debug("Request to get all Tenants");
+        return tenantRepository.findAll().stream()
+            .map(tenantMapper::toPartnerDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }
 

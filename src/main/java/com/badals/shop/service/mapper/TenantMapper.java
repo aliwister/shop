@@ -10,7 +10,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+import com.badals.shop.service.pojo.Partner;
 /**
  * Mapper for the entity {@link Tenant} and its DTO {@link TenantDTO}.
  */
@@ -23,6 +23,10 @@ public interface TenantMapper extends EntityMapper<TenantDTO, Tenant> {
     @Mapping(target = "publicPaymentProfile", source="paymentProfile", qualifiedByName = "unBoxPayments")
     //@Mapping(target = "socialList", source="socialProfile", qualifiedByName = "unBoxSocial")
     TenantDTO toDto(Tenant tenant);
+
+    @Mapping(target = "publicPaymentProfile", source="paymentProfile", qualifiedByName = "unBoxPayments")
+    //@Mapping(target = "socialList", source="socialProfile", qualifiedByName = "unBoxSocial")
+    Partner toPartnerDto(Tenant tenant);
 
     @Named("unBoxPayments")
     public static List<PaymentDef> unBoxPayments(PaymentProfile paymentProfile) {
