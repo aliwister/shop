@@ -14,6 +14,8 @@ extend type Query {
     partnerOrder(id: ID): Order
 
     sliders(locale: String): [Attribute]
+    currentPartner(locale: String): Partner
+    social(locale: String): [Attribute]
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
 }
@@ -133,6 +135,26 @@ input PartnerProductInput {
     deliveryProfiles: [AttributeInput]
 }
 
+type Partner {
+    id: Long
+    logo: String
+    mobileLogo: String
+    name: String
+    maxProducts: Int
+    planName: String
+    discountRate: Int
+    active: Boolean
+    monthlyFee: BigDecimal
+    skuPrefix: String
+    contractStartDate: LocalDate
+    publicPaymentProfile: [PaymentDef]
+    tenantId: String
+    subdomain: String
+    description: String
+    customDomain: String
+}
+
+
 input ChildProductInput {
     id: ID
     slug: String     # Must be Unique
@@ -167,6 +189,7 @@ type ProductI18n {
     features: [String]
     brand: String
     lang: String #ar #en
+    attributes: [Attribute]
 }
 
 type AttributeI18n {
@@ -181,7 +204,6 @@ input ProductI18nInput {
     features: [String]
     brand: String
     lang: String
-
 }
 input AttributeI18nInput {
     attributeList: [AttributeInput]

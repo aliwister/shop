@@ -33,6 +33,7 @@ public class S3UploadRequest extends Auditable implements Serializable, TenantSu
     @Column(name="object_key")
     private String key;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="asset_type")
     private AssetType assetType;
 
