@@ -175,6 +175,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return productService.getS3UploadUrl(filename, contentType, assetType);
     }
 
+
     public Message completeUpload(Long fileHandle) {
         S3UploadRequest request = productService.findUploadRequest(fileHandle);
         if (request.getAssetType() == AssetType.LOGO)

@@ -10,6 +10,7 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
+import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.badals.shop.domain.enumeration.Currency.*;
-
+import com.badals.shop.service.pojo.Partner;
 @Component
 public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
 
@@ -131,6 +132,13 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
       OrderDTO o = orderService.getOrderWithOrderItems(id).orElse(null);
       if(o == null) throw new OrderNotFoundException("No order found with this name");
       return o;
+   }
+   public Partner currentPartner(String locale) {
+      return tenantService.findAllPartners().get(0);
+   }
+
+   public List<Attribute> social(String locale) {
+      return setupService.getSocial(locale);
    }
 
    public List<Attribute> sliders(String locale) {

@@ -1,8 +1,10 @@
-package com.badals.shop.service.dto;
+package com.badals.shop.service.pojo;
+
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.PaymentDef;
-import com.badals.shop.domain.pojo.PaymentProfile;
 import com.badals.shop.domain.pojo.SocialProfile;
+import com.badals.shop.service.dto.CustomerDTO;
+import com.badals.shop.service.dto.MerchantDTO;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,14 +12,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A DTO for the {@link com.badals.shop.domain.tenant.Tenant} entity.
  */
 @Data
-public class TenantDTO implements Serializable {
+public class Partner implements Serializable {
 
     private Long id;
 
@@ -53,6 +55,7 @@ public class TenantDTO implements Serializable {
 
     private String tenantId;
     private String defaultLocale;
+
     private List<Attribute> socialList;
 
     @Override
@@ -64,7 +67,7 @@ public class TenantDTO implements Serializable {
             return false;
         }
 
-        TenantDTO tenantDTO = (TenantDTO) o;
+        Partner tenantDTO = (Partner) o;
         if (tenantDTO.getId() == null || getId() == null) {
             return false;
         }
