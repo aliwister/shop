@@ -11,8 +11,6 @@ extend type Query {
     orderSummary(ref: String, confirmationKey: String): Order
     tenantSliders: [Attribute]
     socialProfiles: [Attribute]
-    #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
-    #partnerOrder(id: ID): Order
 }
 extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse
@@ -46,12 +44,9 @@ type Tenant {
     mobileLogo: String
     name: String
     maxProducts: Int
-    planName: String
     discountRate: Int
     active: Boolean
-    monthlyFee: BigDecimal
     skuPrefix: String
-    contractStartDate: LocalDate
     publicPaymentProfile: [PaymentDef]
     tenantId: String
     socialList: [Attribute]
