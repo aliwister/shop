@@ -1,6 +1,7 @@
 package com.badals.shop.web.rest;
 
 import com.badals.shop.domain.Customer;
+import com.badals.shop.security.SecurityUtils;
 import com.badals.shop.service.CustomerService;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
@@ -116,5 +117,9 @@ public class CustomerResource {
         log.debug("REST request to delete Customer : {}", id);
         customerService.delete(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+    }
+    @GetMapping("/me")
+    public Optional<Customer> getUserWithAuthorities() {
+        return customerService.getUserWithAuthorities();
     }
 }

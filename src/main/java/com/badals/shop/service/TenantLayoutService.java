@@ -39,9 +39,14 @@ public class TenantLayoutService {
 
     public List<Attribute> getSliders() {
         Locale locale = LocaleContextHolder.getLocale();
+        String country = locale.getCountry();
+        String language = locale.getLanguage();
+
         Tenant tenant = tenantRepository.findAll().get(0);
         if (tenant.getSliders() != null) {
-            List<String> images = tenant.getSliders().getMap().get(locale.toString());
+            List<String> images = tenant.getSliders().getMap().get(language+"-"+country);
+            if (images == null)
+                images = tenant.getSliders().getMap().get(language);
             if(images == null && tenant.getDefaultLocale() != null)
                 images = tenant.getSliders().getMap().get(tenant.getDefaultLocale());
             if(images != null )

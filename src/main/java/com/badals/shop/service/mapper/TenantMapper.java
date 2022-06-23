@@ -14,10 +14,8 @@ import com.badals.shop.service.pojo.Partner;
 /**
  * Mapper for the entity {@link Tenant} and its DTO {@link TenantDTO}.
  */
-@Mapper(componentModel = "spring", uses = {MerchantMapper.class, CustomerMapper.class})
+@Mapper(componentModel = "spring", uses = {})
 public interface TenantMapper extends EntityMapper<TenantDTO, Tenant> {
-
-
 /*    @Mapping(target = "removeMerchant", ignore = true)
     @Mapping(target = "removeCustomer", ignore = true)*/
     @Mapping(target = "publicPaymentProfile", source="paymentProfile", qualifiedByName = "unBoxPayments")
@@ -34,14 +32,15 @@ public interface TenantMapper extends EntityMapper<TenantDTO, Tenant> {
         return paymentProfile.getPayments();
     }
     @AfterMapping
-    default void afterMapping(@MappingTarget TenantDTO target, Tenant source, @Context Locale locale) {
+    default void afterMapping(@MappingTarget TenantDTO target, Tenant source) {
         SocialProfile socialProfile = source.getSocialProfile();
+        Locale locale = LocaleContextHolder.getLocale();
         if (socialProfile != null) {
             final Map<?, String> profiles;
             if (socialProfile.getMap().get(locale.toString()) != null)
                 profiles = socialProfile.getMap().get(locale.toString());
-            else if("xxx" != null)
-                profiles = socialProfile.getMap().get("xx");
+            else if(locale.getLanguage() != null)
+                profiles = socialProfile.getMap().get(locale.getLanguage() );
             else
                 profiles = null;
             if(profiles != null )
