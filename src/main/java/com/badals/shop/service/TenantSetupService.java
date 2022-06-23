@@ -16,6 +16,7 @@ import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.mapper.TenantHashtagMapper;
 import com.badals.shop.service.mapper.TenantMapper;
+import com.badals.shop.service.pojo.Partner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -135,6 +136,16 @@ public class TenantSetupService {
       }
       return Collections.emptyList();
    }
+
+   @Transactional(readOnly = true)
+   public List<Partner> findAllPartners() {
+      log.debug("Request to get all Tenants");
+      return tenantRepository.findAll().stream()
+              .map(tenantMapper::toPartnerDto)
+              .collect(Collectors.toCollection(LinkedList::new));
+   }
+
+
 
    @Transactional
    public void setSliders(String locale, List<String> images) {
