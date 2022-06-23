@@ -19,4 +19,11 @@ public class PriceMap implements Serializable {
    public void push(String currency, BigDecimal amount) {
       prices.put(currency, amount.toPlainString());
    }
+
+   public PriceMap(String base) {
+      this.base = base;
+   }
+
+   public PriceMap() {
+   }
 }
