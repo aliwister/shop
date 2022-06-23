@@ -35,16 +35,14 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    private static final Logger log = LoggerFactory.getLogger(PartnerQuery.class);
 
    private final UserService userService;
-   private final TenantService tenantService;
    private final TenantSetupService setupService;
 
-   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService, TenantSetupService setupService) {
+   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantSetupService setupService) {
       this.productService = productService;
       this.orderService = orderService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
-      this.tenantService = tenantService;
       this.setupService = setupService;
    }
 
@@ -134,7 +132,7 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
       return o;
    }
    public Partner currentPartner(String locale) {
-      return tenantService.findAllPartners().get(0);
+      return setupService.findAllPartners().get(0);
    }
 
    public List<Attribute> social(String locale) {
