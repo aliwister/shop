@@ -134,6 +134,45 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
         }
     }
 
+    @AfterMapping
+    default void afterMapping(@MappingTarget TenantProduct target, ProductDTO source) {
+
+        target.setPrice(new PriceMap(source.getCurrency()));
+        target.getPrice().push(source.getCurrency(), new BigDecimal(source.getPrice()));
+ /*       Locale locale = LocaleContextHolder.getLocale();
+        String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
+        String langCode = locale.getLanguage();
+        target.setCurrency(targetCurrency);
+        target.setInStock(true);
+
+        TenantProductLang lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(null);
+
+        if(lang == null) {
+            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().get();
+        }
+
+        TenantProductLang parentLang = lang;
+
+        if(source.getVariationType() == VariationType.CHILD) {
+            parentLang = lang;
+            if(source.getParent().getLangs() != null)
+                parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(lang);
+        }
+
+        if(lang == null && !langCode.equals("en")) {
+            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(null);
+            parentLang = lang;
+            if(source.getVariationType() == VariationType.CHILD)
+                parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(lang);
+        }
+
+        if(lang != null) {
+            target.setTitle(lang.getTitle());
+            target.setFeatures(parentLang.getFeatures());
+            target.setDescription(parentLang.getDescription());
+        }*/
+    }
+
     @BeforeMapping
     default void beforeMapping(@MappingTarget ProductDTO target, TenantProduct source) {
         if (source.getParent() != null) {

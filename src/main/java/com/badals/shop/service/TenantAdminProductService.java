@@ -14,6 +14,7 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.search.PartnerProductSearchRepository;
+import com.badals.shop.service.dto.MerchantDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -472,4 +474,6 @@ public class TenantAdminProductService {
         List<PartnerProduct> products = productRepository.findAll().stream().map(partnerProductMapper::toDto).collect(Collectors.toList());
         partnerProductSearchRepository.saveAll(products);
     }
+
+
 }

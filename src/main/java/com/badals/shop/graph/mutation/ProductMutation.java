@@ -137,8 +137,6 @@ public class ProductMutation implements GraphQLMutationResolver {
         return new Message("Done");
     }
 
-    public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
-        return productService.createStubFromSearch(dto);
-    }
+
 }
 
