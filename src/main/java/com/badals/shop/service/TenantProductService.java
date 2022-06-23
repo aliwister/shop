@@ -5,15 +5,14 @@ import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.*;
 import com.badals.shop.domain.tenant.S3UploadRequest;
-import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.graph.ProductResponse;
-import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantHashtagRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.TenantRepository;
 import com.badals.shop.repository.search.ProductSearchRepository;
+import com.badals.shop.service.dto.MerchantDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;
@@ -22,18 +21,17 @@ import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.badals.shop.service.ProductService.getDomainName;
 
 /**
  * Service Implementation for managing {@link Product}.
@@ -60,12 +58,11 @@ public class TenantProductService {
     private final SlugService slugService;
     private final ProductIndexService productIndexService;
 
-    private final ProductService productService;
-    private final S3UploadRequestRepository s3UploadRequestRepository;
+    private final MerchantService merchantService;
     private final TenantRepository tenantRepository;
 
 
-    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository, TenantRepository tenantRepository) {
+    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, MerchantService merchantService, TenantRepository tenantRepository) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
         this.productMapper = tenantProductMapper;
@@ -80,8 +77,7 @@ public class TenantProductService {
         this.recycleService = recycleService;
         this.slugService = slugService;
         this.productIndexService = productIndexService;
-        this.productService = productService;
-        this.s3UploadRequestRepository = s3UploadRequestRepository;
+        this.merchantService = merchantService;
         this.tenantRepository = tenantRepository;
     }
 
@@ -94,14 +90,6 @@ public class TenantProductService {
         if(dto.getSku() == null && dto.getId() != null) {
             throw new ValidationException("Sku required for new products");
         }
-    }
-
-    @Transactional
-    public void logUploadRequest(String key, String url) {
-        S3UploadRequest request = new S3UploadRequest();
-        request.setKey(key);
-        request.setUrl(url);
-        s3UploadRequestRepository.save(request);
     }
 
     private String generateTitle(String title, List<Attribute> variationAttributes) {
@@ -228,5 +216,46 @@ public class TenantProductService {
         return false;
     }
 
+    public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
 
+        Long merchantId = 1L;
+
+        if(dto.getUrl() != null) {
+            String domain = getDomainName(dto.getUrl());
+            MerchantDTO merchant = merchantService.merchantByDomain(domain);
+            if(merchant != null)
+                merchantId = merchant.getId();
+        }
+        TenantProduct product = productRepository.findOneBySkuAndMerchantId(dto.getSku(), merchantId).orElse(productMapper.toEntity(dto));
+
+
+        if(product.getId() != null) {
+            TenantProduct update = productMapper.toEntity(dto);
+            product.setRating(dto.getRating());
+            product.setPrice(update.getPrice());
+            product.setListPrice(update.getPrice());
+            product.setImage(update.getImage());
+            product.setWeight(update.getWeight());
+        }
+        if(product.getId() == null) {
+            product = initSearchStub(product, merchantId);
+
+        }
+        product =  productRepository.save(product);
+
+        //dto.setRef(product.getRef());
+        dto.setId(Long.valueOf(product.getRef()));
+        dto.setRef(Long.valueOf(product.getRef()));
+        //dto.setRef(product.getRef());
+
+        return dto;
+    }
+
+    public TenantProduct initSearchStub(TenantProduct p, Long merchantId) {
+        //p.setVariationType(VariationType.SEARCH);
+        Long ref = slugService.generateRef(p.getSku(), merchantId);
+        p.slug(String.valueOf(ref)).ref(String.valueOf(ref)).merchantId(merchantId).active(true).stub(true);
+        p.setMerchantId(merchantId);
+        return p;
+    }
 }

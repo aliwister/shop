@@ -25,7 +25,6 @@ extend type Query {
 }
 
 extend type Mutation {
-    createStubFromSearch(dto: ProductInput): Product
     addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
 }
 
@@ -215,10 +214,12 @@ input AttributeInput {
 input ProductInput {
     sku: String,
     upc: String,
-    price: BigDecimal,
-    salePrice: BigDecimal,
-    #currency: String,
+    price: String
+    #salePrice: String
+    listPrice: String
+    currency: String,
     image: String,
+    inStock: Boolean,
     #images: [String],
     #releaseDate: LocalDate,
     #active: Boolean,

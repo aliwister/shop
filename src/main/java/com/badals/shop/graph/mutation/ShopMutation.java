@@ -3,6 +3,7 @@ package com.badals.shop.graph.mutation;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.tenant.S3UploadRequest;
+import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.pojo.PresignedUrl;
@@ -25,6 +26,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,7 +35,7 @@ import java.util.Locale;
 public class ShopMutation implements GraphQLMutationResolver {
     private final Logger log = LoggerFactory.getLogger(ShopMutation.class);
 
-    private final TenantAdminProductService productService;
+    private final TenantProductService productService;
     private final TenantSetupService tenantSetupService;
     private final TenantCartService cartService;
 
@@ -51,7 +53,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public ShopMutation(TenantAdminProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
+    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
         this.productService = productService;
         this.tenantSetupService = tenantSetupService;
         this.cartService = cartService;
@@ -77,6 +79,10 @@ public class ShopMutation implements GraphQLMutationResolver {
     public CheckoutSession createTenantCheckout(final String secureKey, final List<CartItemDTO> items) {
         String token = cartService.createCheckout(secureKey, items);
         return new CheckoutSession("/checkout/" + token + "/address", token);
+    }
+
+    public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
+        return productService.createStubFromSearch(dto);
     }
 }
 
