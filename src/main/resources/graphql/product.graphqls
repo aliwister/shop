@@ -169,6 +169,7 @@ type Product {
     _locale: String
     stub: Boolean
     stock: String
+    api: String
 }
 
 
@@ -242,6 +243,9 @@ input ProductInput {
     quantity: Int
     isPrime: Boolean
     rating: String
+    api: String,
+    pricingApi: String
+    variationType: VariationType
     #volumeWeight: Float,
     #variationOptions: [VariationOptionInput]
 }

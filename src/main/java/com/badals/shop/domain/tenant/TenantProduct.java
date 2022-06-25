@@ -64,6 +64,12 @@ public class TenantProduct implements Serializable, TenantSupport {
     @Column(name = "upc")
     private String upc;
 
+    @Column(name = "api")
+    private String api;
+
+    @Column(name = "pricing_api")
+    private String pricingApi;
+
     @Column(name = "unit")
     private String unit;
 
@@ -182,7 +188,7 @@ public class TenantProduct implements Serializable, TenantSupport {
 
     @Type(type = "json")
     @Getter @Setter @Column(name = "description", columnDefinition = "string")
-    List<TenantProductLang> langs;
+    List<TenantProductLang> langs = new ArrayList<>();
 
     @Type(type = "json")
     @Getter @Setter @Column(name = "attributes", columnDefinition = "string")
