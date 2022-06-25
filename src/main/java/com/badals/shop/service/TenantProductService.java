@@ -236,6 +236,8 @@ public class TenantProductService {
             product.setListPrice(update.getPrice());
             product.setImage(update.getImage());
             product.setWeight(update.getWeight());
+            product.setLangs(update.getLangs());
+            product.setVariationType(update.getVariationType());
         }
         if(product.getId() == null) {
             product = initSearchStub(product, merchantId);
