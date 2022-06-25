@@ -78,7 +78,8 @@ public class ProductDTO implements Serializable {
 
     private Set<CategoryDTO> categories;
 
-
+   private String api;
+   private String pricingApi;
     private String brand;
 
     private ProductGroup group;

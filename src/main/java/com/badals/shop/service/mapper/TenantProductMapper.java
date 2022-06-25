@@ -139,13 +139,20 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
 
         target.setPrice(new PriceMap(source.getCurrency()));
         target.getPrice().push(source.getCurrency(), new BigDecimal(source.getPrice()));
+        TenantProductLang lang = new TenantProductLang();
+        lang.setLang("en");
+        lang.setDescription(source.getDescription());
+        lang.setTitle(source.getTitle());
+
+        target.getLangs().add(lang);
+        target.setVariationType(source.getVariationType());
+
  /*       Locale locale = LocaleContextHolder.getLocale();
         String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
         String langCode = locale.getLanguage();
         target.setCurrency(targetCurrency);
         target.setInStock(true);
 
-        TenantProductLang lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(null);
 
         if(lang == null) {
             lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().get();
