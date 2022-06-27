@@ -116,7 +116,7 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
 
         if(source.getVariationType() == VariationType.CHILD) {
             parentLang = lang;
-            if(source.getParent().getLangs() != null)
+            if(source.getParent() != null && source.getParent().getLangs() != null)
                 parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(lang);
         }
 
