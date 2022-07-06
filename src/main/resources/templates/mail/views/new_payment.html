@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title th:text="#{email.payment.title}">Badals.com New Order</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
-    </head>
-    <body>
+<head></head>
+<body>
+<div th:fragment="content">
         <p th:text="#{email.payment.greeting(${user.firstname})}">
             Dear
         </p>
@@ -21,10 +18,6 @@
             Your order is as follows:
         </p>
 
-        <p>
-            <span th:text="#{email.order.thanks}">Regards, </span>
-            <br/>
-            <em th:text="#{email.signature}">Badals.com.</em>
-        </p>
-    </body>
+</div>
+</body>
 </html>

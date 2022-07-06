@@ -1,11 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <title th:text="#{email.voltage.title}">Badals.com ACTION NEEDED</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
-    </head>
-    <body>
+<head></head>
+<body>
+<div th:fragment="content">
         <p th:text="#{email.order.greeting(${user.firstname})}">
             Dear
         </p>
@@ -36,10 +33,6 @@ We are unable to accept any returns of voltage mismatch items for any reason aft
         <p th:text="#{email.voltage.action}">>
 Please write Approve or cancel for each item above, and respond to this email. If we don't hear back from you in 48 hours, the items will get cancelled.
         </p>
-        <p>
-            <span th:text="#{email.order.thanks}">Regards, </span>
-            <br/>
-            <em th:text="#{email.signature}">Badals.com.</em>
-        </p>
-    </body>
+</div>
+</body>
 </html>

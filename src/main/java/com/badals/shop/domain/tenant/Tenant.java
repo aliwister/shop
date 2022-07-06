@@ -38,7 +38,7 @@ public class Tenant implements Serializable {
    private String name;
 
    @Column(name = "customDomain")
-   private String domain;
+   private String customDomain;
 
    @Column(name = "subdomain")
    private String subdomain;
