@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head></head>
+    <body>
+    <div th:fragment="content">
+        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;" th:text="#{email.activation.greeting(${user.firstname})}">
+            Dear
+        </p>
+        <p th:text="#{email.activation.text1(${baseUrl})}">
+            Your Badals.com account has been created, please click on the URL below to activate it:
+        </p>
+        <p>
+            <div th:with="url=(@{|${baseUrl}/activate?key=${user.secureKey}&email=${user.email}|})" th:replace="mail/fragments/general.html :: callToAction(link=@{|${baseUrl}/activate?key=${user.secureKey}&email=${user.email}|}, label='Activation link')"></div>
+        </p>
+
+    </div>
+    </body>
+
+</html>

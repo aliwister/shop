@@ -15,7 +15,7 @@ import java.util.Date;
  * A OrderPayment.
  */
 @Entity
-@Table(name = "payment")
+@Table(catalog="shop", name = "payment")
 public class Payment extends Auditable implements Serializable {
 
     private static final long serialVersionUID = 1L;

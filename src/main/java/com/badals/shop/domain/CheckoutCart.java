@@ -27,7 +27,7 @@ import java.util.List;
 })
 @Entity
 @Data
-@Table(name = "checkout_cart")
+@Table(catalog="shop", name = "checkout_cart")
 public class CheckoutCart implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -80,10 +80,6 @@ public class CheckoutCart implements Serializable {
     @Column(name="checked_out")
     private Boolean checkedOut = false;
 
-    @NotAudited
-    @Type(type = "json")
-    @Column(name = "adjustments", columnDefinition = "string")
-    private List<OrderAdjustment> orderAdjustments;
 
     @Override
     public boolean equals(Object o) {
