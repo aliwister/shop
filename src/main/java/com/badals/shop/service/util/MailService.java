@@ -4,17 +4,19 @@ import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Customer;
 
 import com.badals.shop.domain.UserBase;
-import com.badals.shop.service.dto.CustomerDTO;
-import com.badals.shop.service.dto.OrderDTO;
-import com.badals.shop.service.dto.PaymentDTO;
-import com.badals.shop.service.dto.PricingRequestDTO;
+import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.service.TenantLayoutService;
+import com.badals.shop.service.dto.*;
 import io.github.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -26,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import static com.badals.shop.domain.tenant.TenantCheckout_.payment;
+
 /**
  * Service for sending emails.
  * <p>
@@ -34,15 +38,18 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 @Service
 public class MailService {
 
+    private static final String LOGO_WIDTH = "logo_width" ;
+    private static final String LOGO_HEIGHT = "logo_height";
     private final Logger log = LoggerFactory.getLogger(MailService.class);
 
     private static final String USER = "user";
     private static final String REASON = "reason";
     private static final String PRICINGREQUESTS = "pricingrequests";
     private static final String ORDER = "order";
+    private static final String LOGO = "logo";
+    private static final String TENANT = "tenant";
     private static final String ITEMS = "items";
     private static final String PAYMENT = "payment";
-
     private static final String BASE_URL = "baseUrl";
 
     private final JHipsterProperties jHipsterProperties;
@@ -52,18 +59,20 @@ public class MailService {
     private final MessageSource messageSource;
 
     private final SpringTemplateEngine templateEngine;
+    private final TenantLayoutService tenantLayoutService;
 
     public MailService(JHipsterProperties jHipsterProperties, JavaMailSender javaMailSender,
-            MessageSource messageSource, SpringTemplateEngine templateEngine) {
+                       MessageSource messageSource, SpringTemplateEngine templateEngine, TenantLayoutService tenantLayoutService) {
 
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
         this.templateEngine = templateEngine;
+        this.tenantLayoutService = tenantLayoutService;
     }
 
     @Async
-    public void sendEmail(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
+    public void sendEmail(String from, String fromEmail, String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         log.debug("Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
             isMultipart, isHtml, to, subject, content);
 
@@ -72,7 +81,7 @@ public class MailService {
         try {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, StandardCharsets.UTF_8.name());
             message.setTo(to);
-            message.setFrom(jHipsterProperties.getMail().getFrom(), TenantContext.getCurrentProfile());
+            message.setFrom(fromEmail, from);
             message.setSubject(subject);
             message.setText(content, isHtml);
             javaMailSender.send(mimeMessage);
@@ -86,126 +95,131 @@ public class MailService {
         }
     }
 
-    @Async
-    public void sendEmailFromTemplate(UserBase user, String templateName, String titleKey) {
-        Locale locale = LocaleContextHolder.getLocale();//user.getLangKey());
-        Context context = new Context(locale);
-        context.setVariable(USER, user);
-        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
-        String content = templateEngine.process(templateName, context);
-        String subject = messageSource.getMessage(titleKey, new String[] {TenantContext.getCurrentProfile()}, locale);
-        sendEmail(user.getEmail(), subject, content, false, true);
-    }
-
-    private String buildProfileBaseUrl(String currentProfile) {
-        return "https://"+currentProfile+".profile.shop";
+    private String buildProfileBaseUrl(TenantDTO tenant) {
+        return tenant.getIsSubdomain()?"https://"+tenant.getSubdomain()+".profile.shop":"https://www."+tenant.getCustomDomain();
     }
 
     @Async
-    public void sendEmailFromTemplate(UserBase user, List<PricingRequestDTO> dtos, String templateName, String titleKey) {
-        Locale locale = LocaleContextHolder.getLocale();//user.getLangKey());
-        Context context = new Context(locale);
-        context.setVariable(USER, user);
-        context.setVariable(PRICINGREQUESTS, dtos);
-        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
-        String content = templateEngine.process(templateName, context);
-        String subject = messageSource.getMessage(titleKey, new String[] {TenantContext.getCurrentProfile()}, locale);
-        sendEmail(user.getEmail(), subject, content, false, true);
-    }
-
-    @Async
-    public void sendEmailFromTemplate(CustomerDTO user, OrderDTO order, String templateName, String titleKey) {
-        Locale locale = LocaleContextHolder.getLocale();//user.getLangKey());
-        Context context = new Context(locale);
-        context.setVariable(USER, user);
-        context.setVariable(ORDER, order);
-        context.setVariable(ITEMS, order.getItems());
-        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
-        String content = templateEngine.process(templateName, context);
-        final String[] params = new String[]{order.getReference()};
-        String subject = messageSource.getMessage(titleKey, params, locale);
-        sendEmail(user.getEmail(), subject, content, false, true);
-    }
-
-    @Async
-    public void sendEmailFromTemplate(CustomerDTO user, OrderDTO order, String reason, String templateName, String titleKey) {
-        Locale locale = LocaleContextHolder.getLocale();
-        Context context = new Context(locale);
-        context.setVariable(USER, user);
-        context.setVariable(ORDER, order);
-        context.setVariable(ITEMS, order.getItems());
-        context.setVariable(REASON, reason);
-        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
-        String content = templateEngine.process(templateName, context);
-        final String[] params = new String[]{order.getReference()};
-        String subject = messageSource.getMessage(titleKey, params, locale);
-        sendEmail(user.getEmail(), subject, content, false, true);
-    }
-
-    @Async
-    public void sendEmailFromTemplate(CustomerDTO user, PaymentDTO payment, String templateName, String titleKey) {
+    public void sendEmailFromTemplate(String email, String viewName, String titleKey, Map variables, String[] params) {
+        TenantDTO tenant = tenantLayoutService.getTenant();
+        String tenantName = tenant.getName();
         Locale locale = LocaleContextHolder.getLocale(); //user.getLangKey());
         Context context = new Context(locale);
-        context.setVariable(USER, user);
-        context.setVariable(PAYMENT, payment);
-        context.setVariable(BASE_URL, buildProfileBaseUrl(TenantContext.getCurrentProfile()));
-        String content = templateEngine.process(templateName, context);
-        final String[] params = new String[]{payment.getOrderReference()};
-        String subject = messageSource.getMessage(titleKey, params, locale);
-        sendEmail(user.getEmail(), subject, content, false, true);
+        context.setVariables(variables);
+        context.setVariable(BASE_URL, buildProfileBaseUrl(tenant));
+        context.setVariable(LOGO, tenant.getLogo());
+        context.setVariable(LOGO_WIDTH, parseWidth(tenant.getLogo()));
+        context.setVariable(LOGO_HEIGHT, parseHeight(tenant.getLogo()));
+        context.setVariable(TENANT, tenantName);
+        context.setVariable("view", viewName);
+        for (Attribute attribute: tenant.getSocialList()) {
+            context.setVariable(attribute.getName(), attribute.getValue());
+        }
+        String content = templateEngine.process("mail/template", context);
+        String[] subjectParams = params != null && params.length > 0? ArrayUtils.addAll(new String[] {tenantName}, params):new String[] {tenantName};
+        String subject = messageSource.getMessage(titleKey, subjectParams, locale);
+        String tenantEmail = buildProfileEmail(tenant);
+        sendEmail(tenantName, tenantEmail, email, subject, content, false, true);
     }
 
+    private String buildProfileEmail(TenantDTO tenant) {
+        return "care@" + tenant.getSubdomain()+".profile.shop";
+    }
+
+    private static String parseWidth(String logo) {
+        String [] x = logo.split("[x.-]");
+        return x[x.length-3];
+    }
+    private static String parseHeight(String logo) {
+        String [] x = logo.split("[x.-]");
+        return x[x.length-2];
+    }
     @Async
     public void sendActivationEmail(UserBase user) {
         log.debug("Sending activation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, "mail/activationEmail", "email.activation.title");
+        sendEmailFromTemplate(user.getEmail(),"mail/views/activate.html", "email.activation.title",
+                new HashMap<String, Object>() {{
+                    put(USER, user);
+                }}, null);
     }
-
-    @Async
-    public void sendCreationEmail(UserBase user) {
-        log.debug("Sending creation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, "mail/creationEmail", "email.activation.title");
-    }
-
     @Async
     public void sendPasswordResetMail(UserBase user) {
         log.debug("Sending password reset email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, "mail/passwordResetEmail", "email.reset.title");
+        sendEmailFromTemplate(user.getEmail(),"mail/views/password_reset.html", "email.reset.title",
+            new HashMap<String, Object>() {{
+                put(USER, user);
+        }}, null);
     }
-
     @Async
     public void sendOrderCreationMail(CustomerDTO user, OrderDTO order) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, order,"mail/orderCreationEmail", "email.order.title");
+        sendEmailFromTemplate(user.getEmail(), "mail/views/new_order.html", "email.order.title",
+            new HashMap<String, Object>() {{
+                put(ORDER, order);
+                put(ITEMS, order.getItems());
+                put(USER, user);
+        }}, new String[]{order.getReference()});
     }
-
     @Async
-    public void sendPaymentAddedMail(CustomerDTO user, PaymentDTO order) {
+    public void sendPaymentAddedMail(CustomerDTO user, PaymentDTO payment) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, order,"mail/paymentCreationEmail", "email.payment.title");
+        sendEmailFromTemplate(user.getEmail(),"mail/views/new_payment.html", "email.payment.title",
+            new HashMap<String, Object>() {{
+                put(USER, user);
+                put(PAYMENT, payment);
+        }}, new String[]{payment.getOrderReference()});
     }
 
     @Async
     public void sendPricingMail(Customer user, List<PricingRequestDTO> dtos) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, dtos,"mail/pricingRequestEmail", "email.pricing.title");
+        sendEmailFromTemplate(user.getEmail(),"mail/views/price_request.html", "email.pricing.title",
+                new HashMap<String, Object>() {{
+                    put(PRICINGREQUESTS, dtos);
+                    put(USER, user);
+        }}, null);
     }
 
     @Async
     public void sendVoltageMail(CustomerDTO user, OrderDTO order) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, order,"mail/edit/voltageEmail", "email.voltage.title");
+        sendEmailFromTemplate(user.getEmail(),"mail/views/edit/voltage.html", "email.voltage.title",
+        new HashMap<String, Object>() {{
+            put(USER, user);
+            put(ORDER, order);
+        }}, new String[]{order.getReference()}
+    );
     }
     @Async
     public void sendCancelMail(CustomerDTO user, OrderDTO order, String reason) {
-        sendEmailFromTemplate(user, order, reason,"mail/cancelEmail", "email.cancel.title");
+        sendEmailFromTemplate(user.getEmail(),"mail/views/cancel.html", "email.cancel.title",
+            new HashMap<String, Object>() {{
+                put(USER, user);
+                put(ORDER, order);
+                put(REASON, reason);
+            }}, new String[]{order.getReference()}
+        );
     }
     @Async
     public void sendEditCancelMail(CustomerDTO user, OrderDTO order, String reason) {
-        sendEmailFromTemplate(user, order, reason,"mail/edit/cancel", "email.edit.cancel.title");
+        sendEmailFromTemplate(user.getEmail(),"mail/views/edit_cancel.html", "email.edit.cancel.title",
+            new HashMap<String, Object>() {{
+                put(USER, user);
+                put(ORDER, order);
+                put(ITEMS, order.getItems());
+                put(REASON, reason);
+            }}, new String[]{order.getReference()}
+        );
     }
     @Async
     public void sendEditMail(CustomerDTO user, OrderDTO order, String reason) {
-        sendEmailFromTemplate(user, order, reason,"mail/edit/general", "email.edit.title");
+        sendEmailFromTemplate(user.getEmail(),"mail/views/edit.html", "email.edit.title",
+            new HashMap<String, Object>() {{
+                put(USER, user);
+                put(ORDER, order);
+                put(REASON, reason);
+                put(ITEMS, order.getItems());
+            }}, new String[]{order.getReference()}
+        );
     }
 }
