@@ -4,11 +4,9 @@ import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.OrderChannel;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.AddressPojo;
+import com.badals.shop.domain.tenant.*;
 import com.badals.shop.repository.projection.AggOrderEntry;
 import com.badals.shop.domain.pojo.LineItem;
-import com.badals.shop.domain.tenant.TenantOrder;
-import com.badals.shop.domain.tenant.TenantOrderItem;
-import com.badals.shop.domain.tenant.TenantPayment;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.repository.TenantOrderRepository;
@@ -158,12 +156,12 @@ public class TenantAdminOrderService {
         return ret;
     }
 
-    public BigDecimal calculateSubtotal(CheckoutCart checkout) {
+    public BigDecimal calculateSubtotal(TenantCheckout checkout) {
         BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
         return sum;
     }
 
-    public BigDecimal calculateTotal(CheckoutCart checkout) {
+    public BigDecimal calculateTotal(TenantCheckout checkout) {
         BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
         BigDecimal adjustments = BigDecimal.valueOf(checkout.getOrderAdjustments().stream().mapToDouble(x -> x.getValue().doubleValue() * x.getQuantity().doubleValue()).sum());
 
@@ -172,7 +170,7 @@ public class TenantAdminOrderService {
     }
 
     @Transactional
-    public TenantOrder createPosOrder(CheckoutCart cart, String paymentMethod) {
+    public TenantOrder createPosOrder(TenantCheckout cart, String paymentMethod) {
         TenantOrder order = new TenantOrder();
         order.setChannel(OrderChannel.POS);
         order.setCurrency(cart.getCurrency());
@@ -226,7 +224,7 @@ public class TenantAdminOrderService {
     
     
     @Transactional
-    public OrderDTO createPosOrder(CheckoutCart cart, String paymentMethod, String paymentAmount, String authCode) {
+    public OrderDTO createPosOrder(TenantCheckout cart, String paymentMethod, String paymentAmount, String authCode) {
         TenantOrder order = createPosOrder(cart, paymentMethod);
         saveOrder(order);
         //if(p.prePay) {

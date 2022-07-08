@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head></head>
+    <body>
+    <div th:fragment="content">
+        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;" th:text="#{email.activation.greeting(${user.firstname})}">
+            Dear
+        </p>
+        <p th:text="#{email.order.intro(${order.reference})}">
+            Thank you for your order # {0}
+        </p>
+        <p th:text="#{email.order.details}">>
+            Your order is as follows:
+
+        </p>
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; box-sizing: border-box; width: 100%;" width="100%">
+            <th style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #3498db; color: #ffffff;" valign="top" align="left"></th>
+            <th style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #3498db; color: #ffffff;" valign="top" align="left">Item Name</th>
+            <th style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #3498db; color: #ffffff;" valign="top" align="left">Quantity</th>
+            <th style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #3498db; color: #ffffff;" valign="top" align="left">Price</th>
+            <tbody>
+            <tr th:each="o: ${items}">
+                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #efefef;" valign="top" align="left"><img th:src="${o.image}" style="max-width: 70px"/></td>
+                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #efefef;" valign="top" align="left" th:text="${o.productName}" />
+                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #efefef;" valign="top" align="center" th:text="${o.quantity}" />
+                <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background-color: #efefef;" valign="top" align="center" th:text="${o.price}" />
+            </tr>
+            </tbody>
+        </table>
+        <p th:text="#{email.order.total(${order.currency},${order.total})}">>
+            Total is {0} {1}
+        </p>
+        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;" th:text="#{email.order.delivery.address}">>
+            Delivering to:
+        </p>
+        <div th:object="${order.deliveryAddress}">
+            <div><span th:text="#{email.order.name}">Name</span> <span th:text="*{firstName}">Name</span> <span th:text="*{lastName}">Last</span></div>
+            <div><span th:text="#{email.order.address}">Address</span> <span th:text="*{line1}">Name</span> <span th:text="*{line2}">Name</span></div>
+            <div><span th:text="#{email.order.city}">City</span> <span th:text="*{city}">City</span></div>
+            <div><span th:text="#{email.order.phone}">Phone</span> <span th:text="*{mobile}">Mobile</span></div>
+        </div>
+        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 15px;">
+            <div><span th:text="#{email.order.carrier}">Delivery Method:</span> <span th:text="${order.carrier}"/></div>
+            <div><span th:text="#{email.order.payment.method}">Payment Method:</span> <span th:text="${order.paymentMethod}"/></div>
+        </p>
+        <div th:switch="${order.paymentMethod}">
+            <p th:case="'checkoutcom'"><span th:text="#{email.order.payment.received}">Payment Received</span></p>
+            <p th:case="'bankwire'"><span th:text="#{email.order.payment.transfer}">Please transfer your payment to our Bank Muscat Account # 0333015845260014. Then confirm</span></p>
+        </div>
+    </div>
+    </body>
+</html>

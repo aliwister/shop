@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<div th:fragment="content">
+<p th:text="#{email.order.greeting(${user.firstname})}">
+    Dear
+</p>
+<p th:text="#{email.cancel.intro(${order.reference})}">
+    I'm sorry to inform you that your  order # {0} was cancelled.
+</p>
+<br/>
+<p th:text="#{email.cancel.details}">>
+    The reason for cancellation was:
+</p>
+<br/>
+<p th:text="${reason}">>
+</p>
+<p th:text="#{email.cancel.guarantee}">>
+    Please rest assured that that your payment will be refunded to you in full.
+</p>
+
+<div th:switch="${order.balance}">
+    <div th:case="0">We have received no payment for this order? Have you paid? If so, please send us your payment details:
+        <ul>
+            <li th:text="#{email.cancel.payment.date}">Payment Date</li>
+            <li th:text="#{email.cancel.payment.amount}">Payment Amount</li>
+        </ul>
+    </div>
+    <div th:case="*">
+        <div th:switch="${order.paymentMethod}">
+            <p th:case="'checkoutcom'">
+                            <span th:text="#{email.refund.payment.auto}">
+                                Your refund will automatically go back to the same card used for payment in 7-10 business days
+                            </span>
+            </p>
+            <p th:case="'bankwire'">
+                <span th:text="#{email.refund.payment.transfer}">To get your refund, please provide:</span>
+            <ul>
+                <li th:text="#{email.refund.name}">Name in English</li>
+                <li th:text="#{email.refund.bank.account}">Bank Account # (NOT Card number)</li>
+                <li th:text="#{email.refund.bank.name}">Bank Name</li>
+            </ul>
+            <span th:text="#{email.refund.bank.timeline}">Please note Bank Muscat refunds take 5-7 business days. Other banks may take up to 15 business days.</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+</div>
+</body>
+</html>

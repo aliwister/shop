@@ -2,6 +2,7 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.service.mapper.CheckoutLineItemMapper;
 import com.badals.shop.domain.enumeration.CartState;
@@ -12,6 +13,7 @@ import com.badals.shop.repository.*;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
+import com.badals.shop.service.mapper.CustomerMapper;
 import com.badals.shop.service.mapper.TenantCartMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,7 @@ public class TenantCartService {
     private final TenantCartItemRepository cartItemRepository;
 
     private final TenantCartMapper cartMapper;
+    private final CustomerMapper customerMapper;
     private final UserService userService;
     private final CustomerService customerService;
     private final TenantProductService productService;
@@ -46,13 +49,14 @@ public class TenantCartService {
     private final CheckoutLineItemMapper checkoutLineItemMapper;
     private final CheckoutAddressMapper checkoutAddressMapper;
 
-    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, UserService userService, CustomerService customerService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
+    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, CustomerMapper customerMapper, UserService userService, CustomerService customerService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
         this.checkoutRepository = checkoutRepository;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.cartItemRepository = cartItemRepository;
         this.cartMapper = cartMapper;
+        this.customerMapper = customerMapper;
         this.userService = userService;
         this.customerService = customerService;
         this.productService = productService;
@@ -267,6 +271,12 @@ public class TenantCartService {
     }
 
     @Transactional
+    public CustomerDTO me() {
+        CustomerDTO customerDTO = customerService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
+        return customerDTO;
+    }
+
+    @Transactional
     public TenantCheckout createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
         //ProfileCart cart = cartRepository.findBySecureKey(secureKey).orElse(new ProfileCart()); //cartMapper.toEntity(cartDTO);
         Locale locale = LocaleContextHolder.getLocale();
@@ -276,7 +286,7 @@ public class TenantCartService {
         TenantCart cart = null;
 
         if (customer != null) {
-            //customer = customerRepository.findByIdJoinAddresses(cart.getCustomer().getId()).orElse(null);
+            customer = customerRepository.findByIdJoinAddresses(customer.getId()).orElse(null);
             cart = this.getCartByCustomer(customer);
             //cart = cartRepository.getCartByCustomerJoinAddresses(cart.getId());
             //cart = cartRepository.getCartByCustomerJoinAddresses(customer.getId());

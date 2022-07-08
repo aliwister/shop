@@ -11,10 +11,14 @@ extend type Query {
     orderSummary(ref: String, confirmationKey: String): Order
     tenantSliders: [Attribute]
     socialProfiles: [Attribute]
+    me: Customer
+    mePlus: Customer
 }
 extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse
     createTenantCheckout(secureKey: String, items: [CartItemInput]): CheckoutSession
+    createStubFromSearch(dto: ProductInput): Product
+
 }
 
 type TenantTag {
@@ -59,4 +63,5 @@ type PaymentDef {
     name: String
     pk: String
     code: String
+    html: String
 }

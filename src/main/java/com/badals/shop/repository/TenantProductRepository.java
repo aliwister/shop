@@ -75,4 +75,5 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
     @Query(value="select * from profileshop.product u where :tag MEMBER OF(u.hashtags) and u.tenant_id = :tenantId and u.active = 1", nativeQuery=true)
     List<TenantProduct> findActiveTagProductsForTenant(@Param(value = "tag") String tag, @Param(value = "tenantId") String tenantId);
 
+    Optional<TenantProduct> findOneBySkuAndMerchantId(String sku, Long merchantId);
 }
