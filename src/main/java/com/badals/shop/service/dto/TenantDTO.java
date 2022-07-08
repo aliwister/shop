@@ -27,6 +27,7 @@ public class TenantDTO implements Serializable {
     private String title;
     private String customDomain;
     private String subdomain;
+    private Boolean isSubdomain;
 
     private Long maxProducts;
 
@@ -50,6 +51,7 @@ public class TenantDTO implements Serializable {
 
     private String logo;
     private String mobileLogo;
+    private String replyToEmail;
 
     private String tenantId;
     private String defaultLocale;

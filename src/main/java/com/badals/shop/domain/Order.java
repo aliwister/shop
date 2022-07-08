@@ -20,7 +20,7 @@ import java.util.Set;
  * A Order.
  */
 @Entity
-@Table(name = "jhi_order")
+@Table(catalog="shop", name = "jhi_order")
 @Audited
 public class Order implements Serializable {
 
