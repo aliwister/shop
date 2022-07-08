@@ -47,6 +47,8 @@ type CartItem {
     listPrice: String
     currency: String
     slug: String
+    api: String
+    sku: String
     unit: String
 }
 

@@ -1,5 +1,6 @@
 package com.badals.shop.graph.query;
 
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.graph.OrderResponse;
@@ -9,11 +10,13 @@ import com.badals.shop.service.dto.*;
 import com.badals.shop.service.TenantCartService;
 import com.badals.shop.service.TenantProductService;
 import com.badals.shop.service.TenantService;
+import com.badals.shop.service.mapper.CustomerMapper;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -25,19 +28,21 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    private final TenantProductService productService;
    private final HashtagService hashtagService;
    private final CategoryService categoryService;
-   private final UserService userService;
+   private final CustomerService customerService;
+   private final CustomerMapper customerMapper;
    private final TenantService tenantService;
    private final TenantAdminProductService tenantAdminProductService;
    private final TenantCartService cartService;
    private final TenantOrderService orderService;
    private final TenantAccountService accountService;
    private final TenantLayoutService layoutService;
-   public ShopQuery(TenantProductService productService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantService tenantService, TenantSetupService tenantSetupService, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService) {
+   public ShopQuery(TenantProductService productService, HashtagService hashtagService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService) {
       this.productService = productService;
       this.hashtagService = hashtagService;
       this.categoryService = categoryService;
-      this.userService = userService;
+      this.customerService = customerService;
       this.tenantService = tenantService;
+      this.customerMapper = customerMapper;
       this.tenantAdminProductService = tenantAdminProductService;
       this.cartService = cartService;
       this.orderService = orderService;
@@ -85,6 +90,19 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    }
    public List<Attribute> socialProfiles() {
       return layoutService.getSocial();
+   }
+
+   //@PreAuthorize("hasRole('ROLE_USER')")
+   public CustomerDTO me() {
+      return cartService.me();
+   }
+
+   @PreAuthorize("hasRole('ROLE_USER')")
+   public CustomerDTO mePlus() {
+      Customer customer = customerService.getUserWithAuthorities().orElse(null);
+      if(customer != null)
+         return customerService.findOne(customer.getId()).orElse(null);
+      return null;
    }
 }
 

@@ -10,4 +10,6 @@ public class PaymentDef implements Serializable {
    String pk;
    String sk;
    String code;
+
+   String html;
 }

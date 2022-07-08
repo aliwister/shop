@@ -15,7 +15,7 @@ import java.util.Set;
  * A OrderItem.
  */
 @Entity
-@Table(name = "order_item")
+@Table(catalog="shop", name = "order_item")
 public class OrderItem implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -73,7 +73,7 @@ public class OrderItem implements Serializable {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonIgnoreProperties("orderItems")
-    @JoinTable(name = "purchase_item_order_item",
+    @JoinTable(name = "purchase_item_order_item",catalog="shop",
             joinColumns = @JoinColumn(name = "order_item_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "purchase_item_id", referencedColumnName = "id"))
     private PurchaseItem purchaseItem;

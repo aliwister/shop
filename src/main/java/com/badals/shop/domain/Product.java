@@ -30,7 +30,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
  * A Product.
  */
 @Entity
-@Table(name = "product")
+@Table(catalog="shop",name = "product")
 @SelectBeforeUpdate(false)
 public class Product implements Serializable, IMerchantProduct {
 
