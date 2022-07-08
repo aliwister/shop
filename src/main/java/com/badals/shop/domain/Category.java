@@ -14,7 +14,7 @@ import com.badals.shop.domain.enumeration.ProductGroup;
  * A Category.
  */
 @Entity
-@Table(name = "category")
+@Table(catalog="shop", name = "category")
 public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;

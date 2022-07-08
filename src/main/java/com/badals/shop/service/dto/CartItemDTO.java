@@ -32,6 +32,8 @@ public class CartItemDTO implements Serializable {
 
     private String title;
     private String slug;
+    private String api;
+    private String sku;
     private String unit = "pcs";
 
     //private List<String> variationAttributes = new ArrayList<String>();

@@ -116,7 +116,7 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
 
         if(source.getVariationType() == VariationType.CHILD) {
             parentLang = lang;
-            if(source.getParent().getLangs() != null)
+            if(source.getParent() != null && source.getParent().getLangs() != null)
                 parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(lang);
         }
 
@@ -132,6 +132,54 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
             target.setFeatures(parentLang.getFeatures());
             target.setDescription(parentLang.getDescription());
         }
+    }
+
+    @AfterMapping
+    default void afterMapping(@MappingTarget TenantProduct target, ProductDTO source) {
+
+        target.setPrice(new PriceMap(source.getCurrency()));
+        target.getPrice().push(source.getCurrency(), new BigDecimal(source.getPrice()));
+        target.setListPrice(new PriceMap(source.getCurrency()));
+        target.getListPrice().push(source.getCurrency(), new BigDecimal(source.getListPrice()));
+        TenantProductLang lang = new TenantProductLang();
+        lang.setLang("en");
+        lang.setDescription(source.getDescription());
+        lang.setTitle(source.getTitle());
+
+        target.getLangs().add(lang);
+        target.setVariationType(source.getVariationType());
+
+ /*       Locale locale = LocaleContextHolder.getLocale();
+        String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
+        String langCode = locale.getLanguage();
+        target.setCurrency(targetCurrency);
+        target.setInStock(true);
+
+
+        if(lang == null) {
+            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().get();
+        }
+
+        TenantProductLang parentLang = lang;
+
+        if(source.getVariationType() == VariationType.CHILD) {
+            parentLang = lang;
+            if(source.getParent().getLangs() != null)
+                parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(lang);
+        }
+
+        if(lang == null && !langCode.equals("en")) {
+            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(null);
+            parentLang = lang;
+            if(source.getVariationType() == VariationType.CHILD)
+                parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(lang);
+        }
+
+        if(lang != null) {
+            target.setTitle(lang.getTitle());
+            target.setFeatures(parentLang.getFeatures());
+            target.setDescription(parentLang.getDescription());
+        }*/
     }
 
     @BeforeMapping

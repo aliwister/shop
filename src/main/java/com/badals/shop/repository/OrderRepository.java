@@ -26,6 +26,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
    List<Order> findAllByOrderStateInOrderByCreatedDateDesc(List<OrderState> orderStates, Pageable page);
    List<Order> findAllByOrderByCreatedDateDesc(Pageable page);
 
+   @Query("from Order o left join fetch o.orderItems oi left join fetch oi.product left join fetch o.payments where o.id between ?1 and ?2")
+   List<Order> findByIdForMigration(Long from, Long to);
+
    List<Order> findByIdBetween(Long from, Long to);
 
    @Query("from Order o left join o.customer left join fetch o.deliveryAddress where o.id = ?1")

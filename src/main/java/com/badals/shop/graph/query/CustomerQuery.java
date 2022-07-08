@@ -66,19 +66,7 @@ public class CustomerQuery extends BaseQuery implements GraphQLQueryResolver {
         return null;
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public CustomerDTO me() {
-       CustomerDTO customerDTO = customerService.getUserWithAuthorities().map(customerMapper::toDto).orElse(null);
-       return customerDTO;
-    }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public CustomerDTO mePlus() {
-       Customer customer = customerService.getUserWithAuthorities().orElse(null);
-       if(customer != null)
-          return customerService.findOne(customer.getId()).orElse(null);
-       return null;
-    }
 
     @PreAuthorize("hasRole('ROLE_NONE')")
     public CustomerDTO meTest(Long id) {
