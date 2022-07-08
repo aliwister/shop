@@ -49,6 +49,9 @@ public class Tenant implements Serializable {
    @Column(name = "logo")
    private String logo;
 
+   @Column(name = "reply_to_email")
+   private String replyToEmail;
+
    @Column(name = "mobile_logo")
    private String mobileLogo;
 

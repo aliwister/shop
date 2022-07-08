@@ -1,5 +1,6 @@
 package com.badals.shop.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
 import javax.persistence.*;
 
@@ -9,6 +10,7 @@ import java.io.Serializable;
  * A Address.
  */
 @Entity
+@Data
 @Table(catalog="profileshop", name = "ps_address")
 public class Address implements Serializable {
 
@@ -19,13 +21,7 @@ public class Address implements Serializable {
     @Column(name = "id_address")
     private Long id;
 
-    public Long getIdCountry() {
-        return idCountry;
-    }
 
-    public void setIdCountry(Long idCountry) {
-        this.idCountry = idCountry;
-    }
 
     @Column(name = "id_country")
     private Long idCountry;
@@ -51,13 +47,7 @@ public class Address implements Serializable {
     @Column(name = "phone")
     private String mobile;
 
-    public String getAlias() {
-        return alias;
-    }
 
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
 
     @Column(name = "alias")
     private String alias;
@@ -74,48 +64,15 @@ public class Address implements Serializable {
     private String lng;
     private String lat;
 
-    public String getState() {
-        return state;
-    }
 
-    public void setState(String state) {
-        this.state = state;
-    }
 
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
 
     private String state;
     private String country;
 
-    public String getPlusCode() {
-        return plusCode;
-    }
 
-    public void setPlusCode(String plusCode) {
-        this.plusCode = plusCode;
-    }
 
-    public String getLng() {
-        return lng;
-    }
 
-    public void setLng(String lng) {
-        this.lng = lng;
-    }
-
-    public String getLat() {
-        return lat;
-    }
-
-    public void setLat(String lat) {
-        this.lat = lat;
-    }
 /*ALTER TABLE shop.address ADD lng varchar(100) NULL;
     ALTER TABLE shop.address ADD lat varchar(100) NULL;
     ALTER TABLE shop.address ADD plus_code varchar(100) NULL;
@@ -127,66 +84,20 @@ public class Address implements Serializable {
     private Customer customer;
 
 
-    public String getPostCode() {
-        return postCode;
-    }
 
-    public void setPostCode(String postCode) {
-        this.postCode = postCode;
-    }
-
-    public Boolean getDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
-
-
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
 
     public Address firstName(String firstName) {
         this.firstName = firstName;
         return this;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
 
     public Address lastName(String lastName) {
         this.lastName = lastName;
         return this;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
 
-    public String getLine1() {
-        return line1;
-    }
-
-    public void setLine1(String line1) {
-        this.line1 = line1;
-    }
 
     public Address line1(String line1) {
         this.line1 = line1;
@@ -198,67 +109,28 @@ public class Address implements Serializable {
         return this;
     }
 
-
-    public String getLine2() {
-        return line2;
-    }
-
-    public void setLine2(String line2) {
-        this.line2 = line2;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
     public Address city(String city) {
         this.city = city;
         return this;
     }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
 
     public Address mobile(String mobile) {
         this.mobile = mobile;
         return this;
     }
 
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
 
     public Address active(Boolean active) {
         this.active = active;
         return this;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
 
     public Address customer(Customer customer) {
         this.customer = customer;
         return this;
     }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
     public boolean equals(Object o) {

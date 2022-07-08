@@ -44,6 +44,7 @@ public class MailService {
 
     private static final String USER = "user";
     private static final String REASON = "reason";
+    private static final String PREHEADER = "preheader";
     private static final String PRICINGREQUESTS = "pricingrequests";
     private static final String ORDER = "order";
     private static final String LOGO = "logo";
@@ -72,7 +73,7 @@ public class MailService {
     }
 
     @Async
-    public void sendEmail(String from, String fromEmail, String to, String subject, String content, boolean isMultipart, boolean isHtml) {
+    public void sendEmail(String from, String fromEmail, String to, String replyTo, String subject, String content, boolean isMultipart, boolean isHtml) {
         log.debug("Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
             isMultipart, isHtml, to, subject, content);
 
@@ -82,6 +83,7 @@ public class MailService {
             MimeMessageHelper message = new MimeMessageHelper(mimeMessage, isMultipart, StandardCharsets.UTF_8.name());
             message.setTo(to);
             message.setFrom(fromEmail, from);
+            message.setReplyTo(replyTo);
             message.setSubject(subject);
             message.setText(content, isHtml);
             javaMailSender.send(mimeMessage);
@@ -119,7 +121,7 @@ public class MailService {
         String[] subjectParams = params != null && params.length > 0? ArrayUtils.addAll(new String[] {tenantName}, params):new String[] {tenantName};
         String subject = messageSource.getMessage(titleKey, subjectParams, locale);
         String tenantEmail = buildProfileEmail(tenant);
-        sendEmail(tenantName, tenantEmail, email, subject, content, false, true);
+        sendEmail(tenantName, tenantEmail, email, tenant.getReplyToEmail(), subject, content, false, true);
     }
 
     private String buildProfileEmail(TenantDTO tenant) {
@@ -140,6 +142,8 @@ public class MailService {
         sendEmailFromTemplate(user.getEmail(),"mail/views/activate.html", "email.activation.title",
                 new HashMap<String, Object>() {{
                     put(USER, user);
+                    put(PREHEADER, "Your account requires activation");
+
                 }}, null);
     }
     @Async
@@ -148,17 +152,22 @@ public class MailService {
         sendEmailFromTemplate(user.getEmail(),"mail/views/password_reset.html", "email.reset.title",
             new HashMap<String, Object>() {{
                 put(USER, user);
-        }}, null);
+                put(PREHEADER, "A reset email has been requested");
+
+            }}, null);
     }
     @Async
     public void sendOrderCreationMail(CustomerDTO user, OrderDTO order) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
+        TenantDTO tenant = tenantLayoutService.getTenant();
         sendEmailFromTemplate(user.getEmail(), "mail/views/new_order.html", "email.order.title",
             new HashMap<String, Object>() {{
                 put(ORDER, order);
                 put(ITEMS, order.getItems());
                 put(USER, user);
-        }}, new String[]{order.getReference()});
+                put(PREHEADER, "Thank you for using "+buildProfileBaseUrl(tenant));
+
+            }}, new String[]{order.getReference()});
     }
     @Async
     public void sendPaymentAddedMail(CustomerDTO user, PaymentDTO payment) {
@@ -167,6 +176,7 @@ public class MailService {
             new HashMap<String, Object>() {{
                 put(USER, user);
                 put(PAYMENT, payment);
+                put(PREHEADER, "We have received your payment of " + payment.getAmount() );
         }}, new String[]{payment.getOrderReference()});
     }
 
@@ -187,6 +197,7 @@ public class MailService {
         new HashMap<String, Object>() {{
             put(USER, user);
             put(ORDER, order);
+            put(PREHEADER, "Approval Required" );
         }}, new String[]{order.getReference()}
     );
     }
@@ -197,6 +208,8 @@ public class MailService {
                 put(USER, user);
                 put(ORDER, order);
                 put(REASON, reason);
+                put(PREHEADER, "Your order has been cancelled" );
+
             }}, new String[]{order.getReference()}
         );
     }
@@ -208,6 +221,8 @@ public class MailService {
                 put(ORDER, order);
                 put(ITEMS, order.getItems());
                 put(REASON, reason);
+                put(PREHEADER, "Part of your order has been cancelled" );
+
             }}, new String[]{order.getReference()}
         );
     }
@@ -219,6 +234,8 @@ public class MailService {
                 put(ORDER, order);
                 put(REASON, reason);
                 put(ITEMS, order.getItems());
+                put(PREHEADER, "Your order has been modified" );
+
             }}, new String[]{order.getReference()}
         );
     }
