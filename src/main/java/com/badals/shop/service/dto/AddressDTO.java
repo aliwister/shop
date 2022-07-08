@@ -32,6 +32,7 @@ public class AddressDTO implements Serializable {
 
     private Long customerId;
 
+    private String postalCode;
     private String plusCode;
     private String lat;
     private String lng;
@@ -47,6 +48,22 @@ public class AddressDTO implements Serializable {
         this.line1 = line1;
         this.line2 = line2;
         this.city = city;
+        //this.mobile = mobile;
+    }
+    public AddressDTO(String alias, String firstName, String lastName, String line1, String line2, String city, String state, String country, String postalCode, String mobile, String plusCode, String lng, String lat) {
+        this.alias = alias;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.line1 = line1;
+        this.line2 = line2;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.postalCode = postalCode;
+        this.mobile = mobile;
+        this.plusCode = plusCode;
+        this.lng = lng;
+        this.lat = lat;
         //this.mobile = mobile;
     }
 
@@ -68,6 +85,6 @@ public class AddressDTO implements Serializable {
     public static AddressDTO fromAddressPojo(AddressPojo pojo) {
         if(pojo == null)
             return null;
-        return new AddressDTO(pojo.getFirstName(),pojo.getLastName(),pojo.getLine1(),pojo.getLine2(),pojo.getCity());
+        return new AddressDTO(pojo.getAlias(),pojo.getFirstName(),pojo.getLastName(),pojo.getLine1(),pojo.getLine2(),pojo.getCity(), pojo.getState(), pojo.getCountry(), pojo.getPostalCode(), pojo.getMobile(), pojo.getPlusCode(), pojo.getLng(), pojo.getLat());
     }
 }

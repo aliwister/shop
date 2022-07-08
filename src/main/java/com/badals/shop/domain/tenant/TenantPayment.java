@@ -47,6 +47,15 @@ public class TenantPayment extends Auditable implements Serializable, TenantSupp
     @Column(name = "transaction_id")
     private String transactionId;
 
+    @Column(name = "bank_account_number")
+    private String bankAccountNumber;
+
+    @Column(name = "bank_name")
+    private String bankName;
+
+    @Column(name = "bank_owner_name")
+    private String bankOwnerName;
+
 
     @Column(name = "currency")
     private String currency;
