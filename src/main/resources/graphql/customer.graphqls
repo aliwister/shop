@@ -59,8 +59,7 @@ extend type Query {
     #getAddresses(customerId: Int): [Address]
     customer(mobile: String): Customer
     #getAddress(addressId: Int): Address
-    me: Customer
-    mePlus: Customer
+
     meTest(id: Long): Customer
     customers: [Customer]
     addresses: AddressList

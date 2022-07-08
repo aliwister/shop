@@ -51,6 +51,7 @@ public class TenantDTO implements Serializable {
 
     private String logo;
     private String mobileLogo;
+    private String replyToEmail;
 
     private String tenantId;
     private String defaultLocale;
