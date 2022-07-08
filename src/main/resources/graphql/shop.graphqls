@@ -63,4 +63,5 @@ type PaymentDef {
     name: String
     pk: String
     code: String
+    html: String
 }
