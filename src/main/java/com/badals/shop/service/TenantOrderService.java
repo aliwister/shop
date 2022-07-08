@@ -6,7 +6,6 @@ import com.badals.shop.domain.Order;
 import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
-import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.TenantOrderRepository;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
@@ -15,6 +14,7 @@ import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
+import com.badals.shop.service.mapper.CustomerMapper;
 import com.badals.shop.service.mapper.TenantOrderMapper;
 import com.badals.shop.service.util.MailService;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
@@ -61,10 +61,12 @@ public class TenantOrderService {
     private final MailService mailService;
     private final AuditReader auditReader;
     private final CheckoutAddressMapper checkoutAddressMapper;
+    private final CustomerMapper customerMapper;
+
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
 
-    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService) {
+    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -73,6 +75,7 @@ public class TenantOrderService {
         this.mailService = mailService;
         this.auditReader = auditReader;
         this.checkoutAddressMapper = checkoutAddressMapper;
+        this.customerMapper = customerMapper;
         this.addressRepository = addressRepository;
         this.cartService = cartService;
     }
@@ -134,6 +137,9 @@ public class TenantOrderService {
         if(order == null) {
             throw new OrderNotFoundException("Order Not Found");
         }
+        if(order.getEmailSent()) {
+            return orderMapper.toDto(order);
+        }
         Customer customer = customerService.findByEmail(order.getEmail());
         //order.setCustomer(customer);
 
@@ -155,7 +161,9 @@ public class TenantOrderService {
         cartService.closeCart(secureKey);
 
         //order.setConfirmationKey(order.getConfirmationKey()+order.getId());
+        order.setEmailSent(true);
         OrderDTO dto = save(order);
+        dto.setCustomer(customerMapper.toDto(customer));
         sendConfirmationEmail(dto);
         return dto;
     }
@@ -169,7 +177,6 @@ public class TenantOrderService {
         Integer total = orderRepository.countForCustomer(loginUser);
         response.setHasMore((limit+offset) < total);
         return response;
-
     }
 
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) {

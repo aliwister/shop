@@ -49,6 +49,9 @@ public class TenantOrder implements Serializable, TenantSupport {
     @Column(name = "reference")
     private String reference;
 
+    @Column(name = "email_sent")
+    private Boolean emailSent;
+
     @Column(name = "invoice_date")
     private LocalDate invoiceDate;
 
@@ -121,15 +124,6 @@ public class TenantOrder implements Serializable, TenantSupport {
 
     @Column
     private String email;
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     @NotAudited
     @Type(type = "json")
     @Column(name = "delivery_address", columnDefinition = "string")

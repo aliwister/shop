@@ -11,6 +11,8 @@ extend type Query {
     orderSummary(ref: String, confirmationKey: String): Order
     tenantSliders: [Attribute]
     socialProfiles: [Attribute]
+    me: Customer
+    mePlus: Customer
 }
 extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse
