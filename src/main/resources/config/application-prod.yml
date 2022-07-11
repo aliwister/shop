@@ -208,9 +208,8 @@ badals:
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
 
 profileshop:
-  checkout-app: http://127.0.0.1:8081/checkout/start
-  cdnUrl: https://d2lcp3ge4tmvcl.cloudfront.net
-  s3bucket: profile-shop
+  cdnUrl: https://profileshop-main.s3.us-east-1.amazonaws.com/_m
+  s3bucket: profileshop-main
   s3region: us-east-1
 
 ebay:
