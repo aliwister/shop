@@ -43,14 +43,14 @@ public class TenantOrder implements Serializable, TenantSupport {
     private static final long serialVersionUID = 1L;
 
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "reference")
     private String reference;
 
     @Column(name = "email_sent")
-    private Boolean emailSent = false;
+    private Boolean emailSent;
 
     @Column(name = "invoice_date")
     private LocalDate invoiceDate;
