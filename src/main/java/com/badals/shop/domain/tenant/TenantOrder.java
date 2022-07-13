@@ -113,7 +113,7 @@ public class TenantOrder implements Serializable, TenantSupport {
     private BigDecimal discountsTotal;
 
     @Column(name = "coupon_name")
-    private BigDecimal couponName;
+    private String couponName;
 
     @Column(name="tenant_id")
     private String tenantId;
