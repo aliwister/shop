@@ -2,6 +2,7 @@ package com.badals.shop.migrate;
 
 import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Order;
+import com.badals.shop.domain.Payment;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
@@ -10,8 +11,7 @@ import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.repository.*;
 import com.badals.shop.web.rest.errors.BadRequestAlertException;
 import io.github.jhipster.web.util.HeaderUtil;
-import org.hibernate.Filter;
-import org.hibernate.Session;
+import org.hibernate.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -72,44 +74,72 @@ public class ProfileshopMigrationController {
       if (from == null || to == null) {
          throw new BadRequestAlertException("Invalid id", ORDER_MIGRATE_URL, "idnull");
       }
-      List<Order> fromList = orderRepository.findByIdForMigration(from, to, OrderState.AWAITING_PAYMENT).stream().collect(Collectors.toList());
-      //List<TenantOrder> toList = fromList.stream().map(orderMapper::toDto).collect(Collectors.toList());
-      TenantContext.setCurrentProfile("badals");
-      Filter filter = entityManager.unwrap(Session.class).enableFilter("tenantFilter");
-      filter.setParameter("tenantId", "badals");
-      filter.validate();
+      List<Long> productIds = new ArrayList();
+      ScrollableResults scrollableResults = null;
+      EntityTransaction txn = null;
+      EntityManager em = null;
+      try {
+         em = entityManager.getEntityManagerFactory().createEntityManager();
+         txn  = em.getTransaction();
+         txn.begin();
 
-      List<TenantOrder> tos = new ArrayList();
-      List<TenantOrderItem> orderItems = new ArrayList();
-      List<TenantProduct> products = new ArrayList();
-      List<TenantPayment> payments = new ArrayList();
+         Session session = em.unwrap( Session.class );
 
-      for(Order o: fromList) {
-         if( o.getOrderState() == OrderState.CANCELLED) {
-            if(o.getPayments() == null || o.getPayments().size() == 0)
-               continue;
+         scrollableResults = session
+                 .createQuery( "from Order o join fetch o.payments where o.orderState <> ?3 and o.id between ?1 and ?2" )
+                 .setParameter(1, from).setParameter(2, to).setParameter(3, OrderState.AWAITING_PAYMENT)
+                 .setCacheMode( CacheMode.IGNORE )
+                 .scroll( ScrollMode.FORWARD_ONLY );
+
+         int batchSize = 10;
+         int i = 0;
+         while(scrollableResults.next()) {
+            Order o = (Order) scrollableResults.get( 0 );
+            if( o.getOrderState() == OrderState.CANCELLED) {
+               if(o.getPayments() == null || o.getPayments().size() == 0)
+                  continue;
+            }
+            if ( i++ > 0 && i % batchSize == 0 ) {
+               //flush a batch of inserts and release memory
+               em.flush();
+               em.clear();
+            }
+            TenantOrder _to = orderMapper.toDto(o);
+            _to.setTenantId("badals");
+            List<TenantOrderItem> _items = o.getOrderItems().stream().map(orderItemMapper::toDto).map(x -> x.order(_to)).collect(Collectors.toList());
+            em.persist( _to );
+            for(TenantOrderItem item : _items) {
+               TenantProduct p = item.getProduct();
+
+               if(p != null && !productIds.contains(p.getId())) {
+                  p.setTenantId("badals");
+                  p.setParentId(null);
+                  productIds.add(p.getId());
+                  em.merge(p);
+                  item.setRef(p.getRef());
+               }
+               item.setTenantId("badals");
+               item.setProduct(null);
+               em.persist(item);
+            }
+            for(Payment p: o.getPayments()) {
+               TenantPayment tp = paymentMapper.toDto(p).order(_to);
+               tp.setTenantId("badals");
+               em.persist(tp);
+            }
          }
-         TenantOrder _to = orderMapper.toDto(o);
-         tos.add(_to );
-         List<TenantOrderItem> _items = o.getOrderItems().stream().map(orderItemMapper::toDto).map(x -> x.order(_to)).collect(Collectors.toList());
-         orderItems.addAll(_items);
-         products.addAll(_items.stream().map(TenantOrderItem::getProduct).collect(Collectors.toList()));
-         payments.addAll(o.getPayments().stream().map(paymentMapper::toDto).map(x -> x.order(_to)).collect(Collectors.toList()));
-
+         txn.commit();
+      } catch (RuntimeException e) {
+         if ( txn != null && txn.isActive()) txn.rollback();
+         throw e;
+      } finally {
+         if (scrollableResults != null) {
+            scrollableResults.close();
+         }
+         if (em != null) {
+            em.close();
+         }
       }
-
-      tenantProductRepository.saveAll(products);
-      tenantProductRepository.flush();
-
-      tenantOrderRepository.saveAll(tos);
-      tenantOrderRepository.flush();
-
-      tenantOrderItemRepository.saveAll(orderItems);
-      tenantOrderItemRepository.flush();
-
-      tenantPaymentRepository.saveAll(payments);
-      tenantPaymentRepository.flush();
-
       return ResponseEntity.ok()
               .headers(HeaderUtil.createEntityUpdateAlert("shop", true, ORDER_MIGRATE_URL, from+"-"+to))
               .body("Right on");

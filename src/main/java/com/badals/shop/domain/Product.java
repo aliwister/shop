@@ -69,7 +69,7 @@ public class Product implements Serializable, IMerchantProduct {
     @JoinColumn(name="parent_id", referencedColumnName = "ref", insertable = false, updatable = false)
     private Product parent;
 
-    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true, fetch=FetchType.LAZY)
     @JoinColumn(name = "parent_id",referencedColumnName = "ref")
     private Set<Product> children = new HashSet<>();;
 
@@ -256,7 +256,7 @@ public class Product implements Serializable, IMerchantProduct {
         this.merchantStock = merchantStock;
     }
 
-    @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<MerchantStock> merchantStock = new HashSet<>();
 
     @Column(name = "expires")
@@ -314,7 +314,7 @@ public class Product implements Serializable, IMerchantProduct {
         this.rating = rating;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="merchant_id", insertable = false, updatable = false)
     Merchant merchant;
 

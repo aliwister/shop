@@ -168,4 +168,13 @@ public class TenantOrderItem implements Serializable, TenantSupport {
     }
 
 
+   public TenantOrderItem product(TenantProduct p) {
+        this.setProduct(p);
+        return this;
+   }
+
+    public TenantOrderItem ref(String ref) {
+        this.setRef(ref);
+        return this;
+    }
 }

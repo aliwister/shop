@@ -126,7 +126,7 @@ public class PurchaseService {
         //
         Purchase purchase = purchaseRepository.findForUpdate(dto.getId()).orElse(null);
         if(purchase != null) {
-            purchase.getPurchaseItems().forEach(x -> x.getOrderItems().forEach( o -> orderItemRepository.save(o.purchaseItem(null))));
+            //purchase.getPurchaseItems().forEach(x -> x.getOrderItems().forEach( o -> orderItemRepository.save(o.purchaseItem(null))));
             purchase.getPurchaseItems().clear();
             purchase = purchaseRepository.save(purchase);
         }
@@ -164,7 +164,7 @@ public class PurchaseService {
                     orderItemRepository.save(oNew);
                     o = oNew;
                 }
-                orderItemRepository.save(o.purchaseItem(pi));
+                orderItemRepository.save(o);
             }
             sum += i.getQuantity().doubleValue() * i.getPrice().doubleValue();
         }

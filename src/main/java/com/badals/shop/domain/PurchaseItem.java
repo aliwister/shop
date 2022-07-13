@@ -60,23 +60,6 @@ public class PurchaseItem implements Serializable {
     @JsonIgnoreProperties("purchaseItems")
     private Purchase purchase;
 
-
-    @OneToMany(mappedBy = "purchaseItem")
-    private Set<OrderItem> orderItems = new HashSet<>();
-
-    public Set<OrderItem> getOrderItems() {
-        return orderItems;
-    }
-
-    public void setOrderItems(Set<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-    }
-
-    public void addOrderItem(OrderItem orderItem) {
-        orderItems.add(orderItem);
-        orderItem.setPurchaseItem(this);
-    }
-
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;

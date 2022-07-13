@@ -53,13 +53,13 @@ public class Order implements Serializable {
     private String currency;
 
    @NotAudited
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties("orders")
     @JoinColumn(name="customer_id", referencedColumnName = "id_customer")
     private Customer customer;
 
    @NotAudited
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(unique = true)
     private CheckoutCart cart;
 
@@ -67,13 +67,13 @@ public class Order implements Serializable {
     private String email;
 
     @NotAudited
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties("orders")
     @JoinColumn(name = "delivery_address_id",referencedColumnName = "id_address")
     private Address deliveryAddress;
 
    @NotAudited
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties("orders")
     @JoinColumn(name = "invoice_address_id",referencedColumnName = "id_address")
     private Address invoiceAddress;
@@ -120,7 +120,7 @@ public class Order implements Serializable {
    private String paymentMethod;
 
 @NotAudited
-   @OneToMany(mappedBy = "order")
+   @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
    private Set<OrderItem> orderItems = new HashSet<>();
 
 @NotAudited

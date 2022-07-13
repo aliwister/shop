@@ -71,7 +71,7 @@ public class OrderItem implements Serializable {
 
 
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+ /*   @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonIgnoreProperties("orderItems")
     @JoinTable(name = "purchase_item_order_item",catalog="shop",
             joinColumns = @JoinColumn(name = "order_item_id", referencedColumnName = "id"),
@@ -86,7 +86,7 @@ public class OrderItem implements Serializable {
     public void setPurchaseItem(PurchaseItem purchaseItem) {
         this.purchaseItem = purchaseItem;
     }
-
+*/
     public Product getProduct() {
         return product;
     }
@@ -278,9 +278,9 @@ public class OrderItem implements Serializable {
             "}";
     }
 
-
+/*
     public OrderItem purchaseItem(PurchaseItem pi) {
         this.purchaseItem = pi;
         return this;
-    }
+    }*/
 }

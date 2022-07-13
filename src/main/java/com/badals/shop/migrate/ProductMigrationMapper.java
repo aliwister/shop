@@ -19,6 +19,7 @@ public interface ProductMigrationMapper {
 
     @Mapping(target = "price", ignore = true)
     @Mapping(target = "children", ignore = true)
+    //@Mapping(target = "ref", source="ref")
     TenantProduct toDto(Product orderDTO);
 
     @AfterMapping

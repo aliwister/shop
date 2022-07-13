@@ -26,10 +26,10 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
    @Query("select p from Purchase p left join p.merchant where (?1 is null or p.merchant.name like CONCAT(?1, '%') or p.ref like CONCAT('%', ?1, '%')) order by p.id DESC")
    Page<Purchase> findForPurchaseList(Pageable page, String search);
 
-   @Query("from Purchase p left join fetch p.purchaseItems i left join fetch i.orderItems where p.id = ?1 order by i.sequence")
+   @Query("from Purchase p left join fetch p.purchaseItems i  where p.id = ?1 order by i.sequence")
    Optional<Purchase>  findForUpdate(Long id);
 
-   @Query("from Purchase p left join fetch p.merchant left join fetch p.deliveryAddress left join fetch p.purchaseItems i left join fetch i.orderItems where p.id = ?1 order by i.sequence")
+   @Query("from Purchase p left join fetch p.merchant left join fetch p.deliveryAddress left join fetch p.purchaseItems i  where p.id = ?1 order by i.sequence")
    Optional<Purchase> findForPurchaseDetails(Long id);
 
    @Query(value="Select id, product_name as productName, outstanding as quantity, image, weight, price, url, sku, cost, order_id as orderId, product_id as productId, attributes, merchantId from purchase_queue", nativeQuery=true)
