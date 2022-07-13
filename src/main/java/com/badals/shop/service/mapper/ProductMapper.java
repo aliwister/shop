@@ -32,7 +32,6 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     @Mapping(target = "dial", ignore = true)
     Product toEntity(ProductDTO productDTO);
 
-    @Mapping(source = "parent.id", target = "parent")
     @Mapping(target = "price", ignore = true)
     @Mapping(target = "salePrice", ignore = true)
     @Mapping(source="title", target="title")
@@ -45,7 +44,6 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
     ProductDTO toDto(Product product);
 
     @Named("mapWithoutCategories")
-    @Mapping(source = "parent.id", target = "parent")
     //@Mapping(source = "price", target = "price", qualifiedByName = "doubleToString")
     //@Mapping(source = "price", target = "salePrice", qualifiedByName = "doubleToString")
     @Mapping(target = "price", ignore = true)
@@ -75,38 +73,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
 
     @BeforeMapping
     default void beforeMapping(@MappingTarget ProductDTO target, Product source) {
-        if (source.getParent() != null) {
-            target.setVariations(source.getParent().getVariations());
-            List<String> dimensions = source.getVariationAttributes().stream().map(x -> x.getName()).collect(Collectors.toList());
-            List<VariationOption> variationOptions = new ArrayList<>();
-            for(String dim: dimensions) {
-                VariationOption o = new VariationOption();
-                o.setLabel(dim);
-                o.setName(dim);
-                o.setValues(new ArrayList<>());
-                variationOptions.add(o);
-                //List<String> values = source.getParent().getVariations().stream().filter(x -> (x.getVariationAttributes().stream().filter(y -> y.getName().toLowerCase().startsWith(dim.toLowerCase())).findFirst().get())
-            }
-            // Generate variation list on the fly
 
-            for (Variation v : source.getParent().getVariations()) {
-                for(Attribute attribute: v.getVariationAttributes()) {
-                    try {
-                        variationOptions.stream().filter(y -> attribute.getName().toLowerCase().startsWith(y.getName().toLowerCase())).findFirst().get().getValues().add(attribute.getValue());
-                    }
-                    catch (NoSuchElementException e) {
-                        target.setStub(true);
-                    }
-                }
-
-            }
-            variationOptions.forEach(o -> o.setValues(new ArrayList<>(new HashSet<>(o.getValues()))));
-            target.setVariationOptions(variationOptions);
-        }
-        else {
-            target.setVariations(source.getVariations());
-            target.setVariationOptions(source.getVariationOptions());
-        }
     }
     @AfterMapping
     default void afterMapping(@MappingTarget ProductDTO target, Product source) {
@@ -137,8 +104,7 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
             target.setGallery(target.getGallery().stream().map(x-> new Gallery(prepend+x.getUrl())).collect(Collectors.toList()));
         }
 
-        if(target.getRating() == null && target.getVariationType() == VariationType.CHILD && source.getParent() != null)
-            target.setRating(source.getParent().getRating());
+
 
         // Process sale price and discount percentage
         MerchantStock stock = opt(() ->  source.getMerchantStock().stream().findFirst().get());
@@ -174,16 +140,12 @@ public interface ProductMapper extends EntityMapper<ProductDTO, Product> {
 
         if(source.getVariationType() == VariationType.CHILD) {
             parentLang = lang;
-            if(source.getParent().getProductLangs() != null)
-                parentLang = source.getParent().getProductLangs().stream().filter(x -> x.getLang().equals(langCode)).findFirst().orElse(lang);
-        }
+         }
 
         if(lang == null && !langCode.equals("en")) {
             lang = source.getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
             parentLang = lang;
-            if(source.getVariationType() == VariationType.CHILD)
-                parentLang = source.getParent().getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(lang);
-        }
+         }
 
         if(lang != null) {
             target.setTitle(lang.getTitle());

@@ -154,11 +154,7 @@ public class ProductService {
         if(product == null)
             throw new ProductNotFoundException("Invalid Product");
 
-        if(product.getVariationType().equals(VariationType.PARENT)) {
-            if(product.getChildren().size() <1)
-                throw new ProductNotFoundException("Lonely Parent");
-            product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().orElse(product.getChildren().stream().findFirst().get());
-        }
+
         if(product.getStub() != null && product.getStub()) {
             //Product p = lookup(product.getSku());
             return productMapper.toDto(product);
@@ -192,11 +188,7 @@ public class ProductService {
         if(product == null)
             throw new ProductNotFoundException("Invalid Product");
 
-        if(product.getVariationType().equals(VariationType.PARENT)) {
-            if(product.getChildren().size() <1)
-                throw new ProductNotFoundException("Lonely Parent");
-            product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().get();
-        }
+
 
 
         return Mono.just(productRepository.findBySlugJoinCategories(product.getSlug()).get()).map(productMapper::toDto);
@@ -226,11 +218,7 @@ public class ProductService {
         if(product == null)
             throw new ProductNotFoundException("Invalid Product");
 
-        if(product.getVariationType().equals(VariationType.PARENT)) {
-            if(product.getChildren().size() < 1)
-                throw new ProductNotFoundException("Lonely Parent");
-            product = product.getChildren().iterator().next();
-        }
+
 
         //if(product.getPrice() == null)
         //    throw new PricingException("Invalid price");
@@ -266,19 +254,10 @@ public class ProductService {
             return product;
         }
 
-        ProductLang parentLang = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
+        ProductLang parentLang = null; // = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals(langCode)).findFirst().orElse(null);
         if (parentLang != null)
             return product;
 
-        ProductLang parentEn = product.getParent().getProductLangs().stream().filter(x->x.getLang().equals("en")).findFirst().orElse(null);
-        if(parentLang == null && parentEn != null) {
-            ProductLang target = new ProductLang();
-            //target = translateParent(parentEn, target, langCode);
-            Product parent = product.getParent();
-            parent.addProductLang(target);
-            parent = productRepository.save(parent);
-            return parent;
-        }
         return product;
     }
 
@@ -337,7 +316,7 @@ public class ProductService {
 
 
     public String getParentOf(String sku) {
-        return productRepository.findOneBySkuAndMerchantId(sku, 1L).get().getParent().getSku();
+        return null; //productRepository.findOneBySkuAndMerchantId(sku, 1L).get().getParent().getSku();
     }
 
     public AddProductDTO createMerchantProduct(AddProductDTO dto, Long currentMerchantId, String currentMerchant, Long tenantId, String currentTenant) {

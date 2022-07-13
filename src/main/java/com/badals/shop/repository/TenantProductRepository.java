@@ -37,13 +37,13 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
     @Query(value="Select weight from weight_lookup where sku = :sku", nativeQuery=true)
     BigDecimal lookupWeight(@Param(value = "sku") String sku);
 
-    @Query("from TenantProduct u  left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.sku = ?1 and u.merchantId = ?2")
+    @Query("from TenantProduct u  left join fetch u.stock  where u.sku = ?1 and u.merchantId = ?2")
     Optional<Product> findBySkuJoinChildren(String asin, Long merchantId);
 
-    @Query("from TenantProduct u left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.id = ?1 ")
+    @Query("from TenantProduct u left join fetch u.stock  where u.id = ?1 ")
     Optional<TenantProduct> findByIdJoinChildren(Long id);
 
-    @Query("from TenantProduct u left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.ref = ?1 ")
+    @Query("from TenantProduct u left join fetch u.stock  where u.ref = ?1 ")
     Optional<TenantProduct> findByRefJoinChildren(String id);
 
 

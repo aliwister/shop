@@ -65,13 +65,6 @@ public class Product implements Serializable, IMerchantProduct {
     @Column(name = "parent_id")
     private Long parentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="parent_id", referencedColumnName = "ref", insertable = false, updatable = false)
-    private Product parent;
-
-    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true, fetch=FetchType.LAZY)
-    @JoinColumn(name = "parent_id",referencedColumnName = "ref")
-    private Set<Product> children = new HashSet<>();;
 
     @ManyToMany
     @JoinTable(
@@ -760,33 +753,6 @@ public class Product implements Serializable, IMerchantProduct {
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
 
-    public Product getParent() {
-        return parent;
-    }
-
-    public void setParent(Product parent) {
-        this.parent = parent;
-    }
-
-    public Product parent(Product master) {
-        this.parent = parent;
-        return this;
-    }
-
-    public Set<Product> getChildren() {
-        return children;
-    }
-
-    public void setChildren(Set<Product> children) {
-        this.children = children;
-    }
-
-    public void addChild(Product child) {
-        child.setVariationType(VariationType.CHILD);
-        child.setMerchantId(this.merchantId);
-        this.children.add(child);
-        child.setParentId(this.ref);
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -820,9 +786,7 @@ public class Product implements Serializable, IMerchantProduct {
         return this;
     }
 
-    public void removeChild(Product child) {
-        this.children.remove(child);
-    }
+
 
     public BigDecimal getComputedWeight() {
         if(volumeWeight != null && weight != null && volumeWeight.compareTo(weight) == 1) {

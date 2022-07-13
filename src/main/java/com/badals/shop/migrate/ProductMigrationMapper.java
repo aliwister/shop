@@ -24,7 +24,7 @@ public interface ProductMigrationMapper {
 
     @AfterMapping
     default void afterMapping(@MappingTarget TenantProduct target, Product source) {
-        if(target.getMerchantId() == 1) {
+        if(target.getMerchantId() != null && target.getMerchantId() == 1) {
             target.setApi("AZ");
         }
         PriceMap map = new PriceMap("OMR");
