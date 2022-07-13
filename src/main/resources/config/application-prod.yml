@@ -208,7 +208,7 @@ badals:
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
 
 profileshop:
-  cdnUrl: https://profileshop-main.s3.us-east-1.amazonaws.com/_m
+  cdnUrl: https://cdn.profile.shop
   s3bucket: profileshop-main
   s3region: us-east-1
 
