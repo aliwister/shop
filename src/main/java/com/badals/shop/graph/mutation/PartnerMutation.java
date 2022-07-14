@@ -1,12 +1,11 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.aop.tenant.TenantContext;
-import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.S3UploadRequest;
-import com.badals.shop.domain.tenant.TenantCheckout;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.*;
@@ -62,7 +61,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
 */
 
 
-    public OrderDTO createPosOrder(TenantCheckout cart, String paymentMethod, String paymentAmount, String ref) {
+    public OrderDTO createPosOrder(Checkout cart, String paymentMethod, String paymentAmount, String ref) {
         return orderService.createPosOrder(cart, paymentMethod, paymentAmount, ref);
 
     }

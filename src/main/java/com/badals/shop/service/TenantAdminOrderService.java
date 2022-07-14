@@ -46,15 +46,13 @@ import java.util.stream.Collectors;
 
 import static com.badals.shop.service.TenantCartService.createUIUD;
 
-/**
- * Service Implementation for managing {@link Order}.
- */
+
 @Service
 @Transactional
 public class TenantAdminOrderService {
 
     private static double ORDER_REF_SIZE = 7;
-    private final Logger log = LoggerFactory.getLogger(OrderService.class);
+    private final Logger log = LoggerFactory.getLogger(TenantAdminOrderService.class);
 
     private final TenantOrderRepository orderRepository;
     private final TenantPaymentRepository paymentRepository;
@@ -156,12 +154,12 @@ public class TenantAdminOrderService {
         return ret;
     }
 
-    public BigDecimal calculateSubtotal(TenantCheckout checkout) {
+    public BigDecimal calculateSubtotal(Checkout checkout) {
         BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
         return sum;
     }
 
-    public BigDecimal calculateTotal(TenantCheckout checkout) {
+    public BigDecimal calculateTotal(Checkout checkout) {
         BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
         BigDecimal adjustments = BigDecimal.valueOf(checkout.getOrderAdjustments().stream().mapToDouble(x -> x.getValue().doubleValue() * x.getQuantity().doubleValue()).sum());
 
@@ -170,7 +168,7 @@ public class TenantAdminOrderService {
     }
 
     @Transactional
-    public TenantOrder createPosOrder(TenantCheckout cart, String paymentMethod) {
+    public TenantOrder createPosOrder(Checkout cart, String paymentMethod) {
         TenantOrder order = new TenantOrder();
         order.setChannel(OrderChannel.POS);
         order.setCurrency(cart.getCurrency());
@@ -224,7 +222,7 @@ public class TenantAdminOrderService {
     
     
     @Transactional
-    public OrderDTO createPosOrder(TenantCheckout cart, String paymentMethod, String paymentAmount, String authCode) {
+    public OrderDTO createPosOrder(Checkout cart, String paymentMethod, String paymentAmount, String authCode) {
         TenantOrder order = createPosOrder(cart, paymentMethod);
         saveOrder(order);
         //if(p.prePay) {
@@ -416,12 +414,12 @@ public class TenantAdminOrderService {
 
     public OrderDTO setStatus(Long id, OrderState state) {
         TenantOrder order = orderRepository.getOne(id);
-        List<Order> versions = new ArrayList<>();
+        List<TenantOrder> versions = new ArrayList<>();
 
         order.setOrderState(state);
-        List<Number> revisions = auditReader.getRevisions(Order.class, id);
+        List<Number> revisions = auditReader.getRevisions(TenantOrder.class, id);
         for (Number rev : revisions) {
-            Order v = auditReader.find(Order.class, order, rev);
+            TenantOrder v = auditReader.find(TenantOrder.class, order, rev);
             versions.add(v);
         }
 

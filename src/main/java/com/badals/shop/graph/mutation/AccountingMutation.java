@@ -1,9 +1,10 @@
 package com.badals.shop.graph.mutation;
 
+import com.badals.shop.service.TenantOrderService;
+import com.badals.shop.service.TenantPaymentService;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.CheckoutComService;
-import com.badals.shop.service.OrderService;
-import com.badals.shop.service.PaymentService;
+
 import com.badals.shop.service.PurchaseService;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,12 +26,12 @@ mutation {
 @Component
 public class AccountingMutation implements GraphQLMutationResolver {
 
-    final private OrderService orderService;
+    final private TenantOrderService orderService;
     final private PurchaseService purchaseService;
-    final private PaymentService paymentService;
+    final private TenantPaymentService paymentService;
     final private CheckoutComService checkoutComService;
 
-    public AccountingMutation(OrderService orderService, PurchaseService purchaseService, PaymentService paymentService, CheckoutComService checkoutComService) {
+    public AccountingMutation(TenantOrderService orderService, PurchaseService purchaseService, TenantPaymentService paymentService, CheckoutComService checkoutComService) {
         this.orderService = orderService;
         this.purchaseService = purchaseService;
         this.paymentService = paymentService;

@@ -1,14 +1,13 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.service.mapper.CheckoutLineItemMapper;
 import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.domain.tenant.TenantCart;
 import com.badals.shop.domain.tenant.TenantCartItem;
-import com.badals.shop.domain.tenant.TenantCheckout;
 import com.badals.shop.repository.*;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
@@ -277,7 +276,7 @@ public class TenantCartService {
     }
 
     @Transactional
-    public TenantCheckout createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
+    public Checkout createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
         //ProfileCart cart = cartRepository.findBySecureKey(secureKey).orElse(new ProfileCart()); //cartMapper.toEntity(cartDTO);
         Locale locale = LocaleContextHolder.getLocale();
         String currency = Currency.getInstance(locale).getCurrencyCode();
@@ -296,7 +295,7 @@ public class TenantCartService {
         }
         String currencyPath = "$.prices."+currency;
         List<CartItemInfo> cartItems = cartItemRepository.findCartItemsWithProductNative(cart.getId(), currencyPath);
-        TenantCheckout checkout = checkoutRepository.findBySecureKeyAndCheckedOut(cart.getSecureKey(),false).orElse(new TenantCheckout());
+        Checkout checkout = checkoutRepository.findBySecureKeyAndCheckedOut(cart.getSecureKey(),false).orElse(new Checkout());
         checkout.setSecureKey(cart.getSecureKey());
         checkout.setCheckedOut(false);
         checkout.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
@@ -327,7 +326,16 @@ public class TenantCartService {
         cartRepository.save(cart);
     }
 
-   public CheckoutCart createCustomCart(CheckoutCart cart) {
+   public Checkout createCustomCart(Checkout cart) {
         return cart;
+   }
+
+   public Checkout plusCart(String secureKey) {
+       Checkout cart = checkoutRepository.findBySecureKey(secureKey).orElse(null);
+       if(cart != null) {
+           if(cart.getCheckedOut() != null && cart.getCheckedOut())
+               return null;
+       }
+       return cart;
    }
 }

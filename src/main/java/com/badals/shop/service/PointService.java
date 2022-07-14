@@ -1,9 +1,9 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.Payment;
-import com.badals.shop.repository.PaymentRepository;
+import com.badals.shop.domain.tenant.TenantPayment;
+import com.badals.shop.repository.TenantPaymentRepository;
 import com.badals.shop.service.dto.PaymentDTO;
-import com.badals.shop.service.mapper.PaymentMapper;
+import com.badals.shop.service.mapper.TenantPaymentMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Service Implementation for managing {@link Payment}.
+ * Service Implementation for managing
  */
 @Service
 @Transactional
@@ -21,11 +21,11 @@ public class PointService {
 
     private final Logger log = LoggerFactory.getLogger(PointService.class);
 
-    private final PaymentRepository paymentRepository;
+    private final TenantPaymentRepository paymentRepository;
 
-    private final PaymentMapper paymentMapper;
+    private final TenantPaymentMapper paymentMapper;
 
-    public PointService(PaymentRepository paymentRepository, PaymentMapper paymentMapper) {
+    public PointService(TenantPaymentRepository paymentRepository, TenantPaymentMapper paymentMapper) {
         this.paymentRepository = paymentRepository;
         this.paymentMapper = paymentMapper;
     }
@@ -38,7 +38,7 @@ public class PointService {
      */
     public PaymentDTO save(PaymentDTO paymentDTO) {
         log.debug("Request to save Payment : {}", paymentDTO);
-        Payment payment = paymentMapper.toEntity(paymentDTO);
+        TenantPayment payment = paymentMapper.toEntity(paymentDTO);
         payment = paymentRepository.save(payment);
         return paymentMapper.toDto(payment);
     }
