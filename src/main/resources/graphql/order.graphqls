@@ -185,7 +185,7 @@ type LineItem {
     subTotal: Float
     url: String
 }
-type CheckoutCart {
+type Checkout {
     id: ID!
     ref: String
     name: String
@@ -226,7 +226,7 @@ input AddressPojo {
     plusCode: String
 }
 
-input CheckoutCartInput {
+input CheckoutInput {
     id: ID
     ref: String
     name: String
@@ -255,40 +255,36 @@ type PurchaseResponse {
 
 
 extend type Mutation {
-    createOrder(id: Int): Order
-    contact(id: Int): Message
+    #createOrder(id: Int): Order
+    #contact(id: Int): Message
     #createOrderFromCart(cart: CartInput): Order
 
     createPurchase(dto: PurchaseInput): Purchase
     updatePurchase(dto: PurchaseInput, items: [PurchaseItemInput]): Purchase
 
-    sendPaymentSms(id: ID, mobile: String): Message
-    discountOrder(id: ID): Order
-    setOrderState(id: ID, state: OrderState): Order
+    #sendPaymentSms(id: ID, mobile: String): Message
+    #discountOrder(id: ID): Order
+    #setOrderState(id: ID, state: OrderState): Order
     setPurchaseState(id: ID, state: OrderState): Purchase
-    cancelOrder(id: ID, reason: String): Order
-    closeOrder(id: ID, reason: String): Order
+    #cancelOrder(id: ID, reason: String): Order
+    #closeOrder(id: ID, reason: String): Order
     cancelPurchase(id: ID, reason: String): Purchase
     closePurchase(id: ID, reason: String): Purchase
-    addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
-    sendOrderLevelEmail(id:ID, template:String): Message
-    sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
+    #addPayment(id: ID, amount: BigDecimal, method: String, authCode: String): Payment
+    #sendOrderLevelEmail(id:ID, template:String): Message
+    #sendProductLevelEmail(orderId: ID, orderItems: [Long], template:String): Message
 
-    editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
+    #editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
     #cancelOrder(id: ID): Order
-    refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
+    #refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String): Payment
 
-    addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
+    #addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
 
 
 }
 
 extend type Query {
     #getOrders(): [Orders]
-    orderConfirmation(ref: String, key: String): Order
-    orders(limit: Int = 10, offset: Int = 0): OrderResponse
-    ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
-    orderA(id: ID): Order
     auditActivity(id: ID, type: String) : [Action]
 
     purchases(state: [OrderState], offset: Int, limit: Int, searchText: String): PurchaseResponse
@@ -297,5 +293,5 @@ extend type Query {
     purchase(id: ID): Purchase
     purchaseQueue: [PurchaseQueue]
     merchants: [Merchant]
-    payments(orderId: ID) : [Payment]
+    #payments(orderId: ID) : [Payment]
 }

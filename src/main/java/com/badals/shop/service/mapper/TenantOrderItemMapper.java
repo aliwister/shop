@@ -1,13 +1,12 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.OrderItem;
 import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.badals.shop.service.dto.OrderItemDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 /**
- * Mapper for the entity {@link OrderItem} and its DTO {@link OrderItemDTO}.
+ * Mapper for the entity {@link TenantOrderItem} and its DTO {@link OrderItemDTO}.
  */
 @Mapper(componentModel = "spring", uses = {TenantOrderMapper.class, PurchaseItemMapper.class})
 public interface TenantOrderItemMapper extends EntityMapper<OrderItemDTO, TenantOrderItem> {

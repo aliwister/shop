@@ -13,6 +13,7 @@ extend type Query {
     socialProfiles: [Attribute]
     me: Customer
     mePlus: Customer
+    plusCart(secureKey: String): Checkout
 }
 extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse

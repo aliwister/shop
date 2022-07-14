@@ -1,4 +1,5 @@
 package com.badals.shop.domain;
+import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -62,17 +63,17 @@ public class PurchaseItem implements Serializable {
 
 
     @OneToMany(mappedBy = "purchaseItem")
-    private Set<OrderItem> orderItems = new HashSet<>();
+    private Set<TenantOrderItem> orderItems = new HashSet<>();
 
-    public Set<OrderItem> getOrderItems() {
+    public Set<TenantOrderItem> getOrderItems() {
         return orderItems;
     }
 
-    public void setOrderItems(Set<OrderItem> orderItems) {
+    public void setOrderItems(Set<TenantOrderItem> orderItems) {
         this.orderItems = orderItems;
     }
 
-    public void addOrderItem(OrderItem orderItem) {
+    public void addOrderItem(TenantOrderItem orderItem) {
         orderItems.add(orderItem);
         orderItem.setPurchaseItem(this);
     }

@@ -2,6 +2,7 @@ package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.Auditable;
+import com.badals.shop.domain.Carrier;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.hibernate.annotations.Filter;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Date;
 
 /**
  * A OrderPayment.
@@ -39,6 +41,17 @@ public class TenantPayment extends Auditable implements Serializable, TenantSupp
 
     @Column(name = "card_number")
     private String cardNumber;
+
+    @Column(name = "processed_date")
+    private Date processedDate;
+
+    @Column(name = "settlement_date")
+    private Date settlementDate;
+
+    @Column(name = "capture_id")
+    private String captureId;
+
+    private String account;
 
     @NotNull
     @Column(name = "amount", precision = 21, scale = 2, nullable = false)
@@ -105,7 +118,8 @@ public class TenantPayment extends Auditable implements Serializable, TenantSupp
     @Column(name="tenant_id")
     private String tenantId;
 
-
+    @Column(name = "ref")
+    private Long ref;
 
     @Override
     public boolean equals(Object o) {
@@ -134,5 +148,25 @@ public class TenantPayment extends Auditable implements Serializable, TenantSupp
             ", transactionId='" + getTransactionId() + "'" +
             ", created_date='" + getCreatedDate() + "'" +
             "}";
+    }
+
+   public TenantPayment bankAccountNumber(String bankAccountNumber) {
+       this.bankAccountNumber = bankAccountNumber;
+       return this;
+   }
+
+   public TenantPayment bankName(String bankName) {
+       this.bankName = bankName;
+       return this;
+   }
+
+    public TenantPayment bankOwnerName(String bankOwnerName) {
+        this.bankOwnerName = bankOwnerName;
+        return this;
+    }
+
+    public TenantPayment ref(Long ref) {
+        this.ref = ref;
+        return this;
     }
 }
