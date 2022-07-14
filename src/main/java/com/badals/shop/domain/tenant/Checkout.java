@@ -44,9 +44,6 @@ public class Checkout implements Serializable, TenantSupport {
     private String phone;
     private String email;
 
-    @Column(name="_lock")
-    private Boolean lock;
-
     @Column(name="guest")
     private Boolean guest;
 

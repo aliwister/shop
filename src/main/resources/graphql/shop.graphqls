@@ -19,6 +19,7 @@ extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse
     createTenantCheckout(secureKey: String, items: [CartItemInput]): CheckoutSession
     createStubFromSearch(dto: ProductInput): Product
+    createPlusCart(secureKey: String, items: [LineItemInput]): Checkout
 
 }
 

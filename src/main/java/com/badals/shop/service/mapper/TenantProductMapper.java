@@ -140,7 +140,8 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
         target.setPrice(new PriceMap(source.getCurrency()));
         target.getPrice().push(source.getCurrency(), new BigDecimal(source.getPrice()));
         target.setListPrice(new PriceMap(source.getCurrency()));
-        target.getListPrice().push(source.getCurrency(), new BigDecimal(source.getListPrice()));
+        if(source.getListPrice() != null)
+            target.getListPrice().push(source.getCurrency(), new BigDecimal(source.getListPrice()));
         TenantProductLang lang = new TenantProductLang();
         lang.setLang("en");
         lang.setDescription(source.getDescription());

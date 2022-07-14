@@ -1,6 +1,7 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
@@ -303,7 +304,7 @@ public class TenantCartService {
 
         checkout.setCurrency(currency);
 
-        checkout.setLock(false);
+        //checkout.setLock(false);
         if (customer != null && customer.getAddresses() != null && customer.getAddresses().size() > 0)
             checkout.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
 
@@ -326,9 +327,37 @@ public class TenantCartService {
         cartRepository.save(cart);
     }
 
-   public Checkout createCustomCart(Checkout cart) {
-        return cart;
-   }
+    @Transactional
+    public Checkout createCheckoutPlus(String secureKey, List<LineItem> items) {
+        Customer customer = customerService.getUserWithAuthorities().orElse(null);
+
+        //if (secureKey == null)
+        Checkout checkoutCart;
+        if (secureKey == null)
+            checkoutCart = new Checkout();
+        else
+            checkoutCart = checkoutRepository.findBySecureKeyAndCheckedOut(secureKey, false).orElse(new Checkout());
+
+
+        checkoutCart.setItems(items);
+        if (customer.getAddresses() != null && customer.getAddresses().size() > 0)
+            checkoutCart.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
+
+        if(checkoutCart.getId() == null )
+            checkoutCart.setSecureKey(TenantCartService.createUIUD());
+
+
+
+
+        checkoutCart.setName(customer.getFirstname() + " " + customer.getFirstname());
+        checkoutCart.setEmail(customer.getEmail());
+        checkoutCart.setAllowPickup(customer.getAllowPickup());
+        checkoutCart.setPhone(customer.getMobile());
+        checkoutCart.setCheckedOut(false);
+
+        checkoutCart = checkoutRepository.save(checkoutCart);
+        return checkoutCart;
+    }
 
    public Checkout plusCart(String secureKey) {
        Checkout cart = checkoutRepository.findBySecureKey(secureKey).orElse(null);
