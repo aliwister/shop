@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
-import static com.badals.shop.domain.tenant.TenantCheckout_.payment;
+import static com.badals.shop.domain.tenant.Checkout_.payment;
 
 /**
  * Service for sending emails.

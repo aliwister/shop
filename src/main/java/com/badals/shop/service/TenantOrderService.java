@@ -2,7 +2,6 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.Order;
 import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
@@ -42,13 +41,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Service Implementation for managing {@link Order}.
+ * Service Implementation for managing {@link TenantOrder}.
  */
 @Service
 @Transactional
 public class TenantOrderService {
 
-    private final Logger log = LoggerFactory.getLogger(OrderService.class);
+    private final Logger log = LoggerFactory.getLogger(TenantOrderService.class);
 
     private final TenantOrderRepository orderRepository;
     //private final OrderSearchRepository orderSearchRepository;
@@ -146,7 +145,7 @@ public class TenantOrderService {
 
         AddressPojo addressPojo = order.getDeliveryAddressPojo();
 
-        if (addressPojo != null && addressPojo.getSave()) {
+        if (addressPojo != null && addressPojo.getSave() != null && addressPojo.getSave()) {
             Address address = checkoutAddressMapper.addressPojoToAddress(addressPojo);
             address.setCustomer(customer);
             address.setActive(true);
@@ -309,12 +308,12 @@ public class TenantOrderService {
 
     public OrderDTO setStatus(Long id, OrderState state) {
         TenantOrder order = orderRepository.getOne(id);
-        List<Order> versions = new ArrayList<>();
+        List<TenantOrder> versions = new ArrayList<>();
 
         order.setOrderState(state);
-        List<Number> revisions = auditReader.getRevisions(Order.class, id);
+        List<Number> revisions = auditReader.getRevisions(TenantOrder.class, id);
         for (Number rev : revisions) {
-            Order v = auditReader.find(Order.class, order, rev);
+            TenantOrder v = auditReader.find(TenantOrder.class, order, rev);
             versions.add(v);
         }
 

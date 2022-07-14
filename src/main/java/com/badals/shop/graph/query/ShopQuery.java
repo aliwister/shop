@@ -3,6 +3,7 @@ package com.badals.shop.graph.query;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
@@ -103,6 +104,10 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       if(customer != null)
          return customerService.findOne(customer.getId()).orElse(null);
       return null;
+   }
+
+   public Checkout plusCart(final String secureKey) {
+      return cartService.plusCart(secureKey);
    }
 }
 
