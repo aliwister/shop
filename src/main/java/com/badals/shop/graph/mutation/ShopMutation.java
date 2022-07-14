@@ -2,6 +2,8 @@ package com.badals.shop.graph.mutation;
 
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.LineItem;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
@@ -83,6 +85,12 @@ public class ShopMutation implements GraphQLMutationResolver {
 
     public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
         return productService.createStubFromSearch(dto);
+    }
+
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    public Checkout createPlusCart(String secureKey, List<LineItem> items) {
+        Checkout cart = cartService.createCheckoutPlus(secureKey, items);
+        return cart;
     }
 }
 
