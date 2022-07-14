@@ -5,10 +5,10 @@ import com.badals.shop.domain.ShipmentDoc;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.enumeration.ShipmentStatus;
 import com.badals.shop.service.AwsService;
-import com.badals.shop.service.OrderService;
 import com.badals.shop.service.ShipmentDocService;
 import com.badals.shop.service.ShipmentService;
 
+import com.badals.shop.service.TenantOrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +34,10 @@ public class DetrackController {
    private final Logger log = LoggerFactory.getLogger(DetrackController.class);
    private final ShipmentService shipmentService;
    private final ShipmentDocService shipmentDocService;
-   private final OrderService orderService;
+   private final TenantOrderService orderService;
    private final AwsService awsService;
 
-   public DetrackController(ShipmentService shipmentService, ShipmentDocService shipmentDocService, OrderService orderService, AwsService awsService) {
+   public DetrackController(ShipmentService shipmentService, ShipmentDocService shipmentDocService, TenantOrderService orderService, AwsService awsService) {
       this.shipmentService = shipmentService;
       this.shipmentDocService = shipmentDocService;
       this.orderService = orderService;

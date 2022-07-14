@@ -2,14 +2,10 @@ package com.badals.shop.controller;
 
 import com.badals.shop.domain.Action;
 import com.badals.shop.repository.ActionRepository;
-import com.badals.shop.repository.CheckoutCartRepository;
-import com.badals.shop.repository.PaymentRepository;
-import com.badals.shop.service.OrderService;
-import com.badals.shop.service.ShipmentDocService;
-import com.badals.shop.service.ShipmentService;
 /*import com.checkout.api.services.charge.response.Capture;
 import com.checkout.api.services.charge.response.Charge;
 import com.checkout.api.services.charge.response.Refund;*/
+import com.badals.shop.repository.TenantPaymentRepository;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +22,9 @@ import java.text.ParseException;
 public class CheckoutPaymentController {
    private final Logger log = LoggerFactory.getLogger(CheckoutPaymentController.class);
    private final ActionRepository actionRepository;
-   private final PaymentRepository paymentRepository;
+   private final TenantPaymentRepository paymentRepository;
 
-   public CheckoutPaymentController(ActionRepository actionRepository, PaymentRepository paymentRepository) {
+   public CheckoutPaymentController(ActionRepository actionRepository, TenantPaymentRepository paymentRepository) {
       this.actionRepository = actionRepository;
       this.paymentRepository = paymentRepository;
    }

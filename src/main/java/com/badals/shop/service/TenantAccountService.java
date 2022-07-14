@@ -1,6 +1,5 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.Order;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.tenant.TenantCart;
 import com.badals.shop.domain.tenant.TenantOrder;
@@ -24,14 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Service Implementation for managing {@link Order}.
- */
+
 @Service
 @Transactional
 public class TenantAccountService {
 
-    private final Logger log = LoggerFactory.getLogger(OrderService.class);
+    private final Logger log = LoggerFactory.getLogger(TenantAccountService.class);
 
     private final TenantOrderRepository orderRepository;
     //private final OrderSearchRepository orderSearchRepository;

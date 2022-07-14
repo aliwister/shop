@@ -1,6 +1,5 @@
 package com.badals.shop.repository;
 
-import com.badals.shop.domain.Order;
 import com.badals.shop.domain.Purchase;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.repository.projection.PurchaseQueue;

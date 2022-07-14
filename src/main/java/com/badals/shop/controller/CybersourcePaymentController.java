@@ -2,7 +2,7 @@ package com.badals.shop.controller;
 
 import com.badals.shop.domain.Action;
 import com.badals.shop.repository.ActionRepository;
-import com.badals.shop.repository.PaymentRepository;
+import com.badals.shop.repository.TenantPaymentRepository;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +21,9 @@ import java.text.ParseException;
 public class CybersourcePaymentController {
    private final Logger log = LoggerFactory.getLogger(CybersourcePaymentController.class);
    private final ActionRepository actionRepository;
-   private final PaymentRepository paymentRepository;
+   private final TenantPaymentRepository paymentRepository;
 
-   public CybersourcePaymentController(ActionRepository actionRepository, PaymentRepository paymentRepository) {
+   public CybersourcePaymentController(ActionRepository actionRepository, TenantPaymentRepository paymentRepository) {
       this.actionRepository = actionRepository;
       this.paymentRepository = paymentRepository;
    }
