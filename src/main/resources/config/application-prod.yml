@@ -150,7 +150,7 @@ jhipster:
         # - In the `JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET` environment variable
         base64-secret: NzQwMjdjZTQyZTJkMWJlNTEzOTU4ZDFhZWU1OGNkZmI5YTg5ZGEzNjkzZjU0M2U5OWY3MWI2NGJjNTVkNzM5ZTBlYWYwMWZhZmUwMmE5MDNlZjJiN2E2MWNlMDg0YTU0MjRjNTkwOTVmZWE3NGI2NTRkZjE2NzllM2ZjOTMyYjM=
         # Token is valid 24 hours
-        token-validity-in-seconds: 2592000
+        token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
   mail: # specific JHipster mail property, for standard properties see MailProperties
     from: sales@badals.com

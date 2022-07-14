@@ -174,17 +174,6 @@ type PurchaseQueue {
     merchantId: Long
 }
 
-type LineItem {
-    productId: Int
-    sku: String
-    image: String
-    name: String
-    quantity: Int
-    price: Float
-    cost: Float
-    subTotal: Float
-    url: String
-}
 type Checkout {
     id: ID!
     ref: String
