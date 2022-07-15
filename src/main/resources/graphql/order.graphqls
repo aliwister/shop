@@ -198,6 +198,7 @@ input LineItemInput {
     subTotal: Float
     url: String
     ref: String
+    weight: Float
 }
 
 input AddressPojo {
