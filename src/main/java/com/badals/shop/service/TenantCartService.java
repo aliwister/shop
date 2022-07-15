@@ -332,31 +332,31 @@ public class TenantCartService {
         Customer customer = customerService.getUserWithAuthorities().orElse(null);
 
         //if (secureKey == null)
-        Checkout checkoutCart;
+        Checkout checkout;
         if (secureKey == null)
-            checkoutCart = new Checkout();
+            checkout = new Checkout();
         else
-            checkoutCart = checkoutRepository.findBySecureKeyAndCheckedOut(secureKey, false).orElse(new Checkout());
+            checkout = checkoutRepository.findBySecureKeyAndCheckedOut(secureKey, false).orElse(new Checkout());
 
 
-        checkoutCart.setItems(items);
+        checkout.setItems(items);
         if (customer.getAddresses() != null && customer.getAddresses().size() > 0)
-            checkoutCart.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
+            checkout.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
 
-        if(checkoutCart.getId() == null )
-            checkoutCart.setSecureKey(TenantCartService.createUIUD());
-
-
+        if(checkout.getId() == null )
+            checkout.setSecureKey(TenantCartService.createUIUD());
 
 
-        checkoutCart.setName(customer.getFirstname() + " " + customer.getFirstname());
-        checkoutCart.setEmail(customer.getEmail());
-        checkoutCart.setAllowPickup(customer.getAllowPickup());
-        checkoutCart.setPhone(customer.getMobile());
-        checkoutCart.setCheckedOut(false);
+        checkout.setName(customer.getFirstname() + " " + customer.getFirstname());
+        checkout.setEmail(customer.getEmail());
+        checkout.setAllowPickup(customer.getAllowPickup());
+        checkout.setPhone(customer.getMobile());
+        checkout.setCartWeight(items.stream().map(x -> x.getWeight()).reduce(BigDecimal.ZERO, BigDecimal::add));
+        checkout.setCurrency("OMR");
+        checkout.setCheckedOut(false);
 
-        checkoutCart = checkoutRepository.save(checkoutCart);
-        return checkoutCart;
+        checkout = checkoutRepository.save(checkout);
+        return checkout;
     }
 
    public Checkout plusCart(String secureKey) {
