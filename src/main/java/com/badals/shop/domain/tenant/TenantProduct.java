@@ -129,6 +129,9 @@ public class TenantProduct implements Serializable, TenantSupport {
     @Column(name = "brand")
     private String brand;
 
+    @Column(name = "url")
+    private String url;
+
     @Column(name = "jhi_group")
     private ProductGroup group;
 
