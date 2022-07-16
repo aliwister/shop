@@ -35,7 +35,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
            "    `o`.`id` as `oid`, " +
            "    `oi`.`id` as `id`, " +
            "    `oi`.`product_name` as `productName`, " +
-           "    `oi`.`quantity` as `quantity`, " +
+           "    `oi`.`quantity` as `orderQuantity`, " +
            "    `oi`.`price` as `price`, " +
            "    `oi`.`comment` as `comment`, " +
            "    `oi`.`sequence` as `sequence`, " +
