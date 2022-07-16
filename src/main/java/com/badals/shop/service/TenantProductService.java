@@ -239,6 +239,7 @@ public class TenantProductService {
             product.setLangs(update.getLangs());
             product.setVariationType(update.getVariationType());
             product.setApi(update.getApi());
+            product.setUrl(update.getUrl());
         }
         if(product.getId() == null) {
             product = initSearchStub(product, merchantId);
