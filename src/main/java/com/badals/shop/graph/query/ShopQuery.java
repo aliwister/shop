@@ -98,7 +98,7 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       return cartService.me();
    }
 
-   @PreAuthorize("hasRole('ROLE_USER')")
+   //@PreAuthorize("hasRole('ROLE_USER')")
    public CustomerDTO mePlus() {
       Customer customer = customerService.getUserWithAuthorities().orElse(null);
       if(customer != null)
