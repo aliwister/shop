@@ -51,7 +51,7 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
     Optional<TenantOrder> findForOrderDetails(Long id, String valueOf);
 
     @Query("select o from TenantOrder o left join fetch o.customer left join fetch o.orderItems oi left join fetch o.deliveryAddress where o.id = ?1 and oi.id in ?2")
-    Optional<TenantOrder> getOrderWithSomeOrderItems(Long orderId, ArrayList<Long> orderItems);
+    Optional<TenantOrder> getOrderWithSomeOrderItems(Long orderId, List<Long> orderItems);
 
     @Query("SELECT function('DATE_FORMAT',function('CONVERT_TZ', o.createdDate, '+00:00', ?2), ?1) as period, COUNT(o) as count, sum(o.total) as total FROM TenantOrder o group by function('DATE_FORMAT',function('CONVERT_TZ', o.createdDate, '+00:00', ?2), ?1)")
     List<AggOrderEntry> aggOrderReport(String period, String timezone);
