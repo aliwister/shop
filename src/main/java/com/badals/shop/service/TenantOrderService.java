@@ -373,7 +373,7 @@ public class TenantOrderService {
         return sum;
     }
 
-    public void sendVoltageEmail(Long orderId, ArrayList<Long> orderItems) {
+    public void sendVoltageEmail(Long orderId, List<Long> orderItems) {
         TenantOrder order = orderRepository.getOrderWithSomeOrderItems(orderId, orderItems).orElse(null);
         OrderDTO dto = orderMapper.toDto(order);
         CustomerDTO customer = dto.getCustomer();
@@ -409,6 +409,7 @@ public class TenantOrderService {
         OrderDTO dto = save(order);
         return dto;
     }
+
 
 /*    public void reIndex(Long from, Long to) {
         List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toDto).collect(Collectors.toList());

@@ -4,25 +4,28 @@ import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantPayment;
 import com.badals.shop.graph.PaymentResponse;
 import com.badals.shop.repository.TenantPaymentRepository;
+import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.PaymentDTO;
 import com.badals.shop.service.mapper.TenantPaymentMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class TenantPaymentService {
-
+   private final Logger log = LoggerFactory.getLogger(TenantPaymentService.class);
    private final TenantPaymentRepository paymentRepository;
-
    private final TenantPaymentMapper paymentMapper;
 
    public TenantPaymentService(TenantPaymentRepository paymentRepository, TenantPaymentMapper paymentMapper) {
@@ -30,9 +33,17 @@ public class TenantPaymentService {
       this.paymentMapper = paymentMapper;
    }
 
-   public PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod, String authCode) {
+   @Transactional(readOnly = true)
+   public Optional<PaymentDTO> findOne(Long id) {
+      log.debug("Request to get Order : {}", id);
+      return paymentRepository.findById(id)
+              .map(paymentMapper::toDto);
+   }
+
+
+   public PaymentDTO addPayment(Long orderId, BigDecimal amount, String paymentMethod, String authCode, String currency) {
       TenantPayment p = new TenantPayment();
-      p.amount(amount).order(new TenantOrder(orderId)).paymentMethod(paymentMethod).authCode(authCode);
+      p.amount(amount).order(new TenantOrder(orderId)).paymentMethod(paymentMethod).authCode(authCode).currency(currency);
       p = paymentRepository.save(p);
       return paymentMapper.toDto(p);
    }
@@ -41,9 +52,9 @@ public class TenantPaymentService {
       return paymentRepository.findAllByOrderId(orderId).stream().map(paymentMapper::toDto).collect(Collectors.toList());
    }
 
-   public PaymentDTO addRefund(Long orderId, BigDecimal amount, String authCode, String bankName, String bankAccountNumber, String bankOwnerName, Long ref, String paymentMethod) {
+   public PaymentDTO addRefund(Long orderId, BigDecimal amount, String authCode, String bankName, String bankAccountNumber, String bankOwnerName, Long ref, String paymentMethod, String currency) {
       TenantPayment p = new TenantPayment();
-      p.amount(amount).order(new TenantOrder(orderId)).paymentMethod(paymentMethod).authCode(authCode).bankAccountNumber(bankAccountNumber).bankName(bankName).bankOwnerName(bankOwnerName).ref(ref);
+      p.amount(amount).order(new TenantOrder(orderId)).paymentMethod(paymentMethod).authCode(authCode).bankAccountNumber(bankAccountNumber).bankName(bankName).bankOwnerName(bankOwnerName).ref(ref).currency(currency);
       p = paymentRepository.save(p);
       return paymentMapper.toDto(p);
    }
