@@ -48,7 +48,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
            "    ifnull(`oi`.`url`,(select `pp`.`url` from `profileshop`.`product` `pp` where (`pp`.`ref` = `oi`.`product_id`))) as `url`,  " +
            "    (select `pp`.`merchant_id` from `profileshop`.`product` `pp` where (`pp`.`ref` = `oi`.`product_id`)) as `merchantId`,  " +
            "    `oi`.`sku` as `sku`,  " +
-           "    `oi`.`product_id` as `product_id`,  " +
+           "    `oi`.`product_id` as `productId`,  " +
            "    ifnull(sum(`pui`.`quantity`), 0) as `purchased`,  " +
            "    (`oi`.`quantity` - ifnull(sum(`pui`.`quantity`), 0)) as `quantity`,  " +
            "    ifnull((select sum(`os`.`quantity`) from ((`admin`.`order_shipment` `os` join `admin`.`shipment_item` `si` on  " +
@@ -56,8 +56,8 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
            "    where ((`os`.`order_item_id` = `oi`.`id`)  and (`s`.`shipment_type` = 'CUSTOMER')) group by `os`.`order_item_id`),0) as `issued`  " +
            "from `profileshop`.`order_item` `oi`  " +
            "join `profileshop`.`jhi_order` `o` on `o`.`id` = `oi`.`order_id` and o.state in ('PAYMENT_ACCEPTED', 'DELIVERED')  " +
-           "left join `shop`.`purchase_item_order_item` `pioi` on `pioi`.`order_item_id` = `oi`.`id`  " +
-           "left join `shop`.`purchase_item` `pui` on `pui`.`id` = `pioi`.`purchase_item_id`  " +
+           "left join `profileshop`.`purchase_item_order_item` `pioi` on `pioi`.`order_item_id` = `oi`.`id`  " +
+           "left join `profileshop`.`purchase_item` `pui` on `pui`.`id` = `pioi`.`purchase_item_id`  " +
            "where  " +
            "     o.tenant_id = 'badals'  " +
            "     and o.id> 90000  " +
@@ -69,11 +69,12 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
            "    `oi`.`id` desc", nativeQuery=true)
    List<PurchaseQueue> getPurchaseQueue();
 
-   @Query(value="SELECT pit.description as productName, pit.quantity - ifnull(SUM(si.quantity),0) as quantity, pp.image, pp.weight, pp.price, pp.url, pp.sku FROM shop.purchase_item pit  " +
-           "left JOIN shop.purchase p ON p.id = pit.purchase_id  " +
+
+   @Query(value="SELECT pit.description as productName, pit.quantity - ifnull(SUM(si.quantity),0) as quantity, pp.image, pp.weight, pp.price, pp.url, pp.sku FROM profileshop.purchase_item pit  " +
+           "left JOIN profileshop.purchase p ON p.id = pit.purchase_id  " +
            "left JOIN admin.purchase_shipment ps ON ps.purchase_item_id = pit.id  " +
            "left JOIN admin.shipment_item si ON ps.shipment_item_id = si.id  " +
-           "LEFT JOIN shop.product pp ON pp.ref = pit.product_id  " +
+           "LEFT JOIN profileshop.product pp ON pp.ref = pit.product_id  " +
            "WHERE p.order_state <> 'CANCELED' OR p.order_state IS null  " +
            "GROUP BY pit.id  " +
            "HAVING quantity > 0  ", nativeQuery=true)

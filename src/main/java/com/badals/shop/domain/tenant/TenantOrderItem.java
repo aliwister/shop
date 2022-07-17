@@ -32,7 +32,7 @@ public class TenantOrderItem implements Serializable, TenantSupport {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonIgnoreProperties("orderItems")
-    @JoinTable(name = "purchase_item_order_item", catalog = "shop",
+    @JoinTable(name = "purchase_item_order_item",
             joinColumns = @JoinColumn(name = "order_item_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "purchase_item_id", referencedColumnName = "id"))
     private PurchaseItem purchaseItem;

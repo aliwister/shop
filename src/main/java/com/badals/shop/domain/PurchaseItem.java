@@ -15,7 +15,7 @@ import java.util.Set;
  * A PurchaseItem.
  */
 @Entity
-@Table(catalog="shop", name = "purchase_item")
+@Table(catalog="profileshop", name = "purchase_item")
 public class PurchaseItem implements Serializable {
 
     private static final long serialVersionUID = 1L;
