@@ -169,4 +169,9 @@ public class TenantPayment extends Auditable implements Serializable, TenantSupp
         this.ref = ref;
         return this;
     }
+
+   public TenantPayment currency(String currency) {
+       this.currency = currency;
+       return this;
+   }
 }

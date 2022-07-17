@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class TrustQuery extends BaseQuery implements GraphQLQueryResolver {
+public class TrustPurchaseQuery extends BaseQuery implements GraphQLQueryResolver {
 
    private final PurchaseService purchaseService;
    private final MerchantService merchantService;
 
-   public TrustQuery(PurchaseService purchaseService, MerchantService merchantService) {
+   public TrustPurchaseQuery(PurchaseService purchaseService, MerchantService merchantService) {
       this.purchaseService = purchaseService;
       this.merchantService = merchantService;
    }

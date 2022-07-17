@@ -8,7 +8,6 @@ import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -22,11 +21,11 @@ mutation {
  */
 
 @Component
-public class PurchaseMutation implements GraphQLMutationResolver {
+public class TrustPurchaseMutation implements GraphQLMutationResolver {
 
     final private PurchaseService purchaseService;
 
-    public PurchaseMutation(PurchaseService purchaseService) {
+    public TrustPurchaseMutation(PurchaseService purchaseService) {
         this.purchaseService = purchaseService;
     }
 
