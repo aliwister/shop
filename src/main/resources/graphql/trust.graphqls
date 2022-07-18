@@ -33,6 +33,8 @@ extend type Mutation {
     editOrder(id: ID, orderItems: [OrderItemInput], reason: String): Order
     refundPayment(id: ID, amount: BigDecimal, authCode: String, bankName: String, bankAccountNumber: String, bankOwnerName: String, ref: Long, paymentMethod: String, currency: String): Payment
     addDiscount(id: ID, amount: BigDecimal, couponName: String): Message
+
+    getUploadUrl(filename: String, contentType: String): PresignedUrl
 }
 
 type Merchant {
