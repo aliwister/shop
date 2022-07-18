@@ -36,6 +36,15 @@ public class CartItemDTO implements Serializable {
     private String sku;
     private String unit = "pcs";
 
+
+    public CartItemDTO productId(Long productId) {
+        this.productId = productId;
+        return this;
+    }
+    public CartItemDTO quantity(Integer quantity) {
+        this.quantity = quantity;
+        return this;
+    }
     //private List<String> variationAttributes = new ArrayList<String>();
 
     @Override
