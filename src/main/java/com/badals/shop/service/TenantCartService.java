@@ -4,8 +4,7 @@ import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.service.dto.CustomerDTO;
-import com.badals.shop.service.mapper.CheckoutAddressMapper;
-import com.badals.shop.service.mapper.CheckoutLineItemMapper;
+import com.badals.shop.service.mapper.*;
 import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.domain.tenant.TenantCart;
 import com.badals.shop.domain.tenant.TenantCartItem;
@@ -13,8 +12,6 @@ import com.badals.shop.repository.*;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
-import com.badals.shop.service.mapper.CustomerMapper;
-import com.badals.shop.service.mapper.TenantCartMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -156,11 +153,13 @@ public class TenantCartService {
 
         //logged in user - always
         if (cart == null || cart.getCartState() == CartState.UNCLAIMED) {
-            cart = this.getCartByCustomer(loginUser);
-            if (isMerge)
-                return this.mergeCart(cart, items, false);
-            else
-                return this.mergeCart(cart, items, false);
+            TenantCart newCart = this.getCartByCustomer(loginUser);
+            List<CartItemDTO> mergelist = cart.getCartItems().stream().map(x -> new CartItemDTO().productId(x.getProductId()).quantity(x.getQuantity())).collect(Collectors.toList());
+            cart.getCartItems().clear();
+            //if (isMerge)
+                return this.mergeCart(newCart, mergelist, true);
+            //else
+                //return this.mergeCart(cart, items, false);
         }
 
         if (cart.getCartState() == CartState.CLAIMED) {
