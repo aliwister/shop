@@ -16,8 +16,8 @@ public interface TenantOrderItemMapper extends EntityMapper<OrderItemDTO, Tenant
     @Mapping(source = "product.sku", target = "productSku")
     @Mapping(source = "product.ref", target = "productId")
     @Mapping(source = "product.merchantId", target = "productMerchantId")
-/*    @Mapping(source = "purchaseItem.id", target = "purchaseItemId")
-    @Mapping(source = "purchaseItem.purchase.id", target = "po")*/
+    @Mapping(source = "purchaseItem.id", target = "purchaseItemId")
+    @Mapping(source = "purchaseItem.purchase.id", target = "po")
     OrderItemDTO toDto(TenantOrderItem orderItem);
 
     @Mapping(source = "orderId", target = "order")
