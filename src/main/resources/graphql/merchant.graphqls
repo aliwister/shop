@@ -1,7 +1,7 @@
 extend type Mutation {
     createMerchantProduct(product: AddProductInput) : Message
     getImageUploadUrl(filename: String, contentType: String): PresignedUrl
-    getUploadUrl(filename: String, contentType: String): PresignedUrl
+    #getUploadUrl(filename: String, contentType: String): PresignedUrl
 
     importProducts(products: [AddProductInput], shopIds: [Long], browseNode: String): Message
     createProduct(product: AddProductInput, isSaveES: Boolean, currentMerchantId: Long) : MerchantProduct
