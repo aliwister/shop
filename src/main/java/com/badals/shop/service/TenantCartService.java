@@ -154,10 +154,13 @@ public class TenantCartService {
         //logged in user - always
         if (cart == null || cart.getCartState() == CartState.UNCLAIMED) {
             TenantCart newCart = this.getCartByCustomer(loginUser);
+            if (newCart == null)
+                return this.mergeCart(newCart, items, false);
+
             List<CartItemDTO> mergelist = cart.getCartItems().stream().map(x -> new CartItemDTO().productId(x.getProductId()).quantity(x.getQuantity())).collect(Collectors.toList());
             cart.getCartItems().clear();
             //if (isMerge)
-                return this.mergeCart(newCart, mergelist, true);
+            return this.mergeCart(newCart, mergelist, true);
             //else
                 //return this.mergeCart(cart, items, false);
         }
@@ -298,8 +301,9 @@ public class TenantCartService {
         Checkout checkout = checkoutRepository.findBySecureKeyAndCheckedOut(cart.getSecureKey(),false).orElse(new Checkout());
         checkout.setSecureKey(cart.getSecureKey());
         checkout.setCheckedOut(false);
+        checkout.setCarrier(null);
         checkout.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
-        checkout.setCartWeight(cartItems.stream().map(x -> x.getWeight()).reduce(BigDecimal.ZERO, BigDecimal::add));
+        checkout.setCartWeight(cartItems.stream().map(x -> x.getWeight().multiply(x.getQuantity())).reduce(BigDecimal.ZERO, BigDecimal::add));
 
         checkout.setCurrency(currency);
 
@@ -315,6 +319,7 @@ public class TenantCartService {
             checkout.setGuest(true);
 
         checkout = checkoutRepository.save(checkout);
+        checkoutRepository.flush();
         return checkout;
     }
 
