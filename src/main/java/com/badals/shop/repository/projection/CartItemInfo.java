@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 public interface CartItemInfo {
    BigDecimal getPrice();
    BigDecimal getBasePrice();
+
+   BigDecimal getCost();
    String getBaseCurrency();
    Long getRef();
    BigDecimal getQuantity();
