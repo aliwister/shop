@@ -49,6 +49,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
     @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withCurrencyConversionList")
     @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversionList")
     @Mapping(target = "gallery", source="gallery", qualifiedByName = "buildGallery")
+    @Mapping(target = "cost", ignore = true)
     ProductDTO toProductDto(PartnerProduct product);
 
     @Mapping(target = "gallery", ignore = true)
