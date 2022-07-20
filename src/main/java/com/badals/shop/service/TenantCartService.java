@@ -154,15 +154,23 @@ public class TenantCartService {
         //logged in user - always
         if (cart == null || cart.getCartState() == CartState.UNCLAIMED) {
             TenantCart newCart = this.getCartByCustomer(loginUser);
-            if (newCart == null)
+            if (newCart == null ) {
+                if (cart == null) {
+                    cart = new TenantCart();
+                    cart.setSecureKey(createUIUD());
+                    cart.setCartState(CartState.CLAIMED);
+                    cart.setCustomer(loginUser);
+                }
+                return this.mergeCart(cart, items, false);
+            }
+            if (cart != null) {
+                List<CartItemDTO> mergelist = cart.getCartItems().stream().map(x -> new CartItemDTO().productId(x.getProductId()).quantity(x.getQuantity())).collect(Collectors.toList());
+                cart.getCartItems().clear();
+                //if (isMerge)
+                return this.mergeCart(newCart, mergelist, true);
+            }
+            else
                 return this.mergeCart(newCart, items, false);
-
-            List<CartItemDTO> mergelist = cart.getCartItems().stream().map(x -> new CartItemDTO().productId(x.getProductId()).quantity(x.getQuantity())).collect(Collectors.toList());
-            cart.getCartItems().clear();
-            //if (isMerge)
-            return this.mergeCart(newCart, mergelist, true);
-            //else
-                //return this.mergeCart(cart, items, false);
         }
 
         if (cart.getCartState() == CartState.CLAIMED) {
@@ -212,9 +220,10 @@ public class TenantCartService {
             }
             //cart.setTenantId(TenantContext.getCurrentProfile());
             //cart.setCartItems(cartItems);
-            Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
-            if(loginUser != null)
+/*            Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
+            if(loginUser != null) {
                 cart.setCustomer(loginUser);
+            }*/
             cart = cartRepository.saveAndFlush(cart);
             cartRepository.refresh(cart);
         }
@@ -244,11 +253,12 @@ public class TenantCartService {
     private TenantCart getCartByCustomer(Customer loginUser) {
         List<TenantCart> carts = cartRepository.findByCustomerIdAndCartStateOrderByIdDesc(loginUser.getId(), CartState.CLAIMED);
         if (carts.size() == 0) {
-            TenantCart cart = new TenantCart();
+            /*TenantCart cart = new TenantCart();
             //cart.setCustomer(loginUser);
             cart.setSecureKey(createUIUD());
             cart.setCartState(CartState.CLAIMED);
-            return cart;
+            return cart;*/
+            return null;
         }
         return carts.get(0);
     }
@@ -304,7 +314,7 @@ public class TenantCartService {
         checkout.setCarrier(null);
         checkout.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
         checkout.setCartWeight(cartItems.stream().map(x -> x.getWeight().multiply(x.getQuantity())).reduce(BigDecimal.ZERO, BigDecimal::add));
-
+        checkout.setAllowPickup(customer.getAllowPickup());
         checkout.setCurrency(currency);
 
         //checkout.setLock(false);
