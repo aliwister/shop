@@ -314,7 +314,6 @@ public class TenantCartService {
         checkout.setCarrier(null);
         checkout.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
         checkout.setCartWeight(cartItems.stream().map(x -> x.getWeight().multiply(x.getQuantity())).reduce(BigDecimal.ZERO, BigDecimal::add));
-        checkout.setAllowPickup(customer.getAllowPickup());
         checkout.setCurrency(currency);
 
         //checkout.setLock(false);
@@ -324,6 +323,7 @@ public class TenantCartService {
         if (customer != null) {
             checkout.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
             checkout.setEmail(cart.getCustomer().getEmail());
+            checkout.setAllowPickup(customer.getAllowPickup());
         }
         else
             checkout.setGuest(true);
