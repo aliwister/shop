@@ -173,8 +173,8 @@ public class TenantCartService {
                 return this.mergeCart(newCart, items, false);
         }
 
-        if (cart.getCartState() == CartState.CLAIMED) {
-            if( loginUser.getId().longValue() == cart.getCustomerId() )
+        if (cart.getCartState() == CartState.CLAIMED && cart.getCustomerId() != null) {
+            if(loginUser.getId().longValue() == cart.getCustomerId() )
                 return this.mergeCart(cart, items, isMerge);
 
             cart = this.getCartByCustomer(loginUser);
@@ -184,7 +184,7 @@ public class TenantCartService {
                 return this.save(cart, items);
         }
         //if (cart.getCartState() == CartState.CLOSED) {
-        cart = this.getCartByCustomer(loginUser);
+        cart = this.createCustomerCart(loginUser);
         return this.mergeCart(cart, items, isMerge);
         //}
     }
@@ -259,6 +259,17 @@ public class TenantCartService {
             cart.setCartState(CartState.CLAIMED);
             return cart;*/
             return null;
+        }
+        return carts.get(0);
+    }
+    private TenantCart createCustomerCart(Customer loginUser) {
+        List<TenantCart> carts = cartRepository.findByCustomerIdAndCartStateOrderByIdDesc(loginUser.getId(), CartState.CLAIMED);
+        if (carts.size() == 0) {
+            TenantCart cart = new TenantCart();
+            cart.setCustomer(loginUser);
+            cart.setSecureKey(createUIUD());
+            cart.setCartState(CartState.CLAIMED);
+            return cart;
         }
         return carts.get(0);
     }
