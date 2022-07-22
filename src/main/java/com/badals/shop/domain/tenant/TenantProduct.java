@@ -423,4 +423,20 @@ public class TenantProduct implements Serializable, TenantSupport {
         }
         return weight;
     }
+
+    public void addTag(String tag) {
+        if (this.hashtags == null)
+            this.hashtags = new ArrayList<>();
+
+        if (this.hashtags.contains(tag))
+            return;
+
+        this.hashtags.add(tag);
+    }
+
+    public void removeTag(String tag) {
+        if (this.hashtags == null)
+            return;
+         this.hashtags.remove(tag);
+    }
 }

@@ -83,8 +83,11 @@ public class ShopMutation implements GraphQLMutationResolver {
         return new CheckoutSession("/checkout/" + token + "/address", token);
     }
 
-    public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
-        return productService.createStubFromSearch(dto);
+    public ProductDTO createStubFromSearch(ProductDTO dto, String tag) throws URISyntaxException {
+        return productService.createStubFromSearch(dto, tag);
+    }
+    public ProductDTO removeTag(String ref, String tag) throws URISyntaxException {
+        return productService.removeTag(ref, tag);
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
