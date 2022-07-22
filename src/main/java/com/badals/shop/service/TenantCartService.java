@@ -158,9 +158,9 @@ public class TenantCartService {
                 if (cart == null) {
                     cart = new TenantCart();
                     cart.setSecureKey(createUIUD());
-                    cart.setCartState(CartState.CLAIMED);
-                    cart.setCustomer(loginUser);
                 }
+                cart.setCartState(CartState.CLAIMED);
+                cart.setCustomer(loginUser);
                 return this.mergeCart(cart, items, false);
             }
             if (cart != null) {
