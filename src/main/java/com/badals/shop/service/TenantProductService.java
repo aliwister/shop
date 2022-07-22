@@ -216,7 +216,7 @@ public class TenantProductService {
         return false;
     }
 
-    public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
+    public ProductDTO createStubFromSearch(ProductDTO dto, String tag) throws URISyntaxException {
 
         Long merchantId = 1L;
 
@@ -227,8 +227,6 @@ public class TenantProductService {
                 merchantId = merchant.getId();
         }
         TenantProduct product = productRepository.findOneBySkuAndMerchantId(dto.getSku(), merchantId).orElse(productMapper.toEntity(dto));
-
-
         if(product.getId() != null) {
             TenantProduct update = productMapper.toEntity(dto);
             product.setRating(dto.getRating());
@@ -240,13 +238,27 @@ public class TenantProductService {
             product.setVariationType(update.getVariationType());
             product.setApi(update.getApi());
             product.setUrl(update.getUrl());
+
+            TenantStock stock = product.getStock().stream().findFirst().orElse(null);
+            if (stock == null)
+                stock = new TenantStock();
+            stock.setCost(new Price(dto.getCost(), "USD"));
+            stock.setQuantity(BigDecimal.valueOf(49));
+            if (stock.getId() == null)
+                product.addStock(stock.allow_backorder(true).availability(200));
         }
         if(product.getId() == null) {
             product = initSearchStub(product, merchantId);
+            TenantStock stock = new TenantStock();
+            stock.setCost(new Price(dto.getCost(), "USD"));
+            stock.setQuantity(BigDecimal.valueOf(49));
+            product.addStock(stock.allow_backorder(true).availability(200));
+        }
 
+        if(tag != null) {
+            product.addTag(tag);
         }
         product =  productRepository.save(product);
-
         //dto.setRef(product.getRef());
         dto.setId(Long.valueOf(product.getRef()));
         dto.setRef(Long.valueOf(product.getRef()));
@@ -261,5 +273,14 @@ public class TenantProductService {
         p.slug(String.valueOf(ref)).ref(String.valueOf(ref)).merchantId(merchantId).active(true).stub(true);
         p.setMerchantId(merchantId);
         return p;
+    }
+
+    public ProductDTO removeTag(String ref, String tag) {
+        TenantProduct product = productRepository.findOneByRef(ref).orElse(null);
+        if (product == null)
+            return null;
+        product.removeTag(tag);
+        product = productRepository.save(product);
+        return productMapper.toDto(product);
     }
 }
