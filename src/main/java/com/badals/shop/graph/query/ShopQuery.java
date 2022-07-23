@@ -27,7 +27,6 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
 
    private static final Logger log = LoggerFactory.getLogger(ShopQuery.class);
    private final TenantProductService productService;
-   private final HashtagService hashtagService;
    private final CategoryService categoryService;
    private final CustomerService customerService;
    private final CustomerMapper customerMapper;
@@ -37,9 +36,8 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    private final TenantOrderService orderService;
    private final TenantAccountService accountService;
    private final TenantLayoutService layoutService;
-   public ShopQuery(TenantProductService productService, HashtagService hashtagService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService) {
+   public ShopQuery(TenantProductService productService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService) {
       this.productService = productService;
-      this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.customerService = customerService;
       this.tenantService = tenantService;

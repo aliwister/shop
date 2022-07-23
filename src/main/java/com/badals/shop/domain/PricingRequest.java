@@ -1,5 +1,6 @@
 package com.badals.shop.domain;
 
+import com.badals.shop.domain.tenant.TenantProduct;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -60,13 +61,13 @@ public class PricingRequest extends Auditable implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="sku", referencedColumnName = "ref", insertable = false, updatable = false)
-    private Product product;
+    private TenantProduct product;
 
-    public Product getProduct() {
+    public TenantProduct getProduct() {
         return product;
     }
 
-    public void setProduct(Product product) {
+    public void setProduct(TenantProduct product) {
         this.product = product;
     }
 

@@ -27,9 +27,6 @@ public class OnboardingMutation implements GraphQLMutationResolver {
 
     private final TenantAdminProductService productService;
     private final TenantCartService cartService;
-
-    private final ProductLangService productLangService;
-
     private final PricingRequestService pricingRequestService;
 
     private final MessageSource messageSource;
@@ -46,10 +43,9 @@ public class OnboardingMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public OnboardingMutation(TenantAdminProductService productService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantRepository tenantRepository, TenantAuthorityRepository tenantAuthorityRepository, CustomerService customerService) {
+    public OnboardingMutation(TenantAdminProductService productService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantRepository tenantRepository, TenantAuthorityRepository tenantAuthorityRepository, CustomerService customerService) {
         this.productService = productService;
         this.cartService = cartService;
-        this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.userService = userService;

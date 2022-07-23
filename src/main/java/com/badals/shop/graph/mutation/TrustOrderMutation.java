@@ -1,7 +1,9 @@
 package com.badals.shop.graph.mutation;
 
+import com.badals.shop.domain.UserBase;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.service.TenantOrderService;
+import com.badals.shop.service.mapper.CustomerMapper;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.util.MailService;
 import com.badals.shop.service.TenantPaymentService;
@@ -31,12 +33,14 @@ public class TrustOrderMutation implements GraphQLMutationResolver {
     final private TenantOrderService orderService;
     final private TenantPaymentService paymentService;
     private final MailService mailService;
+    final private CustomerMapper customerMapper;
 
-    public TrustOrderMutation(PurchaseService purchaseService, TenantOrderService orderService, TenantPaymentService paymentService, MailService mailService) {
+    public TrustOrderMutation(PurchaseService purchaseService, TenantOrderService orderService, TenantPaymentService paymentService, MailService mailService, CustomerMapper customerMapper) {
         this.purchaseService = purchaseService;
         this.orderService = orderService;
         this.paymentService = paymentService;
         this.mailService = mailService;
+        this.customerMapper = customerMapper;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -79,10 +83,10 @@ public class TrustOrderMutation implements GraphQLMutationResolver {
         return null;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+/*    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO setOrderState(Long id, OrderState state){
         return orderService.setStatus(id, state);
-    }
+    }*/
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message sendOrderLevelEmail(Long id, String template) {
@@ -94,7 +98,13 @@ public class TrustOrderMutation implements GraphQLMutationResolver {
             PaymentDTO payment = paymentService.findOne(id).orElse(null);
             OrderDTO order = orderService.getOrderWithOrderItems(payment.getOrderId()).orElse(null);
             CustomerDTO customer = order.getCustomer();
-            mailService.sendPaymentAddedMail(customer, payment);
+            UserBase userBase = null;
+            if (customer == null) {
+                userBase = new UserBase(order.getEmail(), "", order.getEmail());
+            }
+            else
+                userBase = customerMapper.toUserBase(customer);
+            mailService.sendPaymentAddedMail(userBase, payment);
         }
 
         return new Message("Success");
@@ -108,7 +118,13 @@ public class TrustOrderMutation implements GraphQLMutationResolver {
         // Send Email
         payment = paymentService.findOne(payment.getId()).orElse(null);
         CustomerDTO customer = order.getCustomer();
-        mailService.sendPaymentAddedMail(customer, payment);
+        UserBase userBase = null;
+        if (customer == null) {
+            userBase = new UserBase(order.getEmail(), "", order.getEmail());
+        }
+        else
+            userBase = customerMapper.toUserBase(customer);
+        mailService.sendPaymentAddedMail(userBase, payment);
         // Return
         return payment;
     }

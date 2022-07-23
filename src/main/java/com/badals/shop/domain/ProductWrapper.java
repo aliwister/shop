@@ -43,9 +43,6 @@ public class ProductWrapper implements Serializable {
     @Column(name = "parent")
     private Long parent;
 
-    @Type(type = "json")
-    @Column(columnDefinition = "string")
-    private Product body;
 
     @Column(name = "view_count")
     private Integer viewCount;
@@ -53,14 +50,6 @@ public class ProductWrapper implements Serializable {
     @Column(name = "is_parent")
 
 
-
-    public Product getBody() {
-        return body;
-    }
-
-    public void setBody(Product body) {
-        this.body = body;
-    }
 
 
     private Boolean is_parent;
@@ -169,7 +158,6 @@ public class ProductWrapper implements Serializable {
             ", sku='" + getSku() + "'" +
             ", rewrite='" + getRewrite() + "'" +
             ", parent=" + getParent() +
-            ", body='" + getBody() + "'" +
             ", view_count=" + getViewCount() +
             ", is_parent='" + isIs_parent() + "'" +
             "}";
