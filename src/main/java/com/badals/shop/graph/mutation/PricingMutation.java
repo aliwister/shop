@@ -22,9 +22,6 @@ import java.util.List;
 
 @Component
 public class PricingMutation implements GraphQLMutationResolver {
-    private final ProductService productService;
-
-    private final ProductLangService productLangService;
     private final PricingRequestService pricingRequestService;
     private final UserService userService;
     private final PurchaseService purchaseService;
@@ -32,14 +29,10 @@ public class PricingMutation implements GraphQLMutationResolver {
     private final CustomerService customerService;
     private final ProductOverrideService productOverrideService;
     private final AwsService awsService;
-    private final SpeedDialService speedDialService;
-
     private final MessageSource messageSource;
     private final CheckoutRepository checkoutRepository;
 
-    public PricingMutation(ProductService productService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, ProductOverrideService productOverrideService, PurchaseService purchaseService,  MailService mailService, AwsService awsService, SpeedDialService speedDialService, CheckoutRepository checkoutRepository) {
-        this.productService = productService;
-        this.productLangService = productLangService;
+    public PricingMutation( PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, ProductOverrideService productOverrideService, PurchaseService purchaseService,  MailService mailService, AwsService awsService, CheckoutRepository checkoutRepository) {
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.customerService = customerService;
@@ -48,7 +41,6 @@ public class PricingMutation implements GraphQLMutationResolver {
         this.purchaseService = purchaseService;
         this.mailService = mailService;
         this.awsService = awsService;
-        this.speedDialService = speedDialService;
         this.checkoutRepository = checkoutRepository;
     }
 
@@ -73,13 +65,6 @@ public class PricingMutation implements GraphQLMutationResolver {
             productDTO = productService.lookupPas(sku, true, false);
         else *//*if(merchantId == 2L)
             productDTO = productService.lookupEbay(sku);*/
-
-
-        if(dial != null && !dial.trim().isEmpty()) {
-            speedDialService.save(new SpeedDialDTO().dial(dial).ref(productDTO.getRef()).expires(Instant.now()));
-        }
-
-
         return productDTO;
     }
 

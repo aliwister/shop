@@ -1,6 +1,7 @@
 package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
+import com.badals.shop.domain.Category;
 import com.badals.shop.domain.converter.StringListConverter;
 import com.badals.shop.domain.enumeration.Condition;
 import com.badals.shop.domain.enumeration.ProductGroup;
@@ -379,6 +380,24 @@ public class TenantProduct implements Serializable, TenantSupport {
         child.setMerchantId(this.merchantId);
         this.children.add(child);
         child.setParentId(this.ref);
+    }
+    @ManyToMany
+    @JoinTable(
+            name = "category_product",
+            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id")
+    )
+    private Set<Category> categories = new HashSet<>();
+    public TenantProduct addCategory(Category category) {
+        this.categories.add(category);
+        category.getProducts().add(this);
+        return this;
+    }
+
+    public TenantProduct removeCategory(Category category) {
+        this.categories.remove(category);
+        category.getProducts().remove(this);
+        return this;
     }
 
     @Override

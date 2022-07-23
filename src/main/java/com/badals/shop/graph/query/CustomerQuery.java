@@ -4,7 +4,6 @@ import com.badals.shop.domain.Customer;
 import com.badals.shop.graph.AddressList;
 import com.badals.shop.service.AddressService;
 import com.badals.shop.service.CustomerService;
-import com.badals.shop.service.ProductService;
 import com.badals.shop.service.UserService;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.mapper.CustomerMapper;
@@ -46,7 +45,6 @@ query {
 @Component
 public class CustomerQuery extends BaseQuery implements GraphQLQueryResolver {
 
-    private final ProductService productService;
     private final AddressService addressService;
 
     private final CustomerMapper customerMapper;
@@ -54,8 +52,7 @@ public class CustomerQuery extends BaseQuery implements GraphQLQueryResolver {
     private final UserService userService;
     private final CustomerService customerService;
 
-    public CustomerQuery(ProductService productService, AddressService addressService, CustomerMapper customerMapper, UserService userService, CustomerService customerService) {
-        this.productService = productService;
+    public CustomerQuery(AddressService addressService, CustomerMapper customerMapper, UserService userService, CustomerService customerService) {
         this.addressService = addressService;
         this.customerMapper = customerMapper;
         this.userService = userService;

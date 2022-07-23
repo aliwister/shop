@@ -1,10 +1,8 @@
 package com.badals.shop.service;
 
 import com.badals.shop.aop.tenant.TenantContext;
-import com.badals.shop.domain.*;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.*;
-import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.graph.ProductResponse;
@@ -26,15 +24,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.badals.shop.service.ProductService.getDomainName;
 
 /**
- * Service Implementation for managing {@link Product}.
+ * Service Implementation for managing {@link TenantProduct}.
  */
 @Service
 @Transactional
@@ -43,7 +41,6 @@ public class TenantProductService {
     private final Logger log = LoggerFactory.getLogger(TenantProductService.class);
     private final TenantProductRepository productRepository;
     private final MessageSource messageSource;
-    private final AddProductMapper addProductMapper;
     private final PartnerProductMapper partnerProductMapper;
     private final ChildProductMapper childProductMapper;
 
@@ -51,35 +48,29 @@ public class TenantProductService {
     private final TenantHashtagMapper tenantHashtagMapper;
     private final TenantProductMapper productMapper;
 
-    private final ProductLangMapper productLangMapper;
     private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
     private final RecycleService recycleService;
     private final SlugService slugService;
-    private final ProductIndexService productIndexService;
-
     private final MerchantService merchantService;
     private final TenantRepository tenantRepository;
 
-
-    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, ProductMapper productMapper, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper tenantProductMapper, ProductLangMapper productLangMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, MerchantService merchantService, TenantRepository tenantRepository) {
+    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper productMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, MerchantService merchantService, TenantRepository tenantRepository) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
-        this.productMapper = tenantProductMapper;
-        this.addProductMapper = addProductMapper;
         this.partnerProductMapper = partnerProductMapper;
         this.childProductMapper = childProductMapper;
         this.hashtagRepository = hashtagRepository;
         this.tenantHashtagMapper = tenantHashtagMapper;
-        this.productLangMapper = productLangMapper;
+        this.productMapper = productMapper;
         this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
         this.recycleService = recycleService;
         this.slugService = slugService;
-        this.productIndexService = productIndexService;
         this.merchantService = merchantService;
         this.tenantRepository = tenantRepository;
     }
+
 
     public PartnerProduct getPartnerProduct(Long id) {
         TenantProduct product = productRepository.findByIdJoinChildren(id).get();
@@ -282,5 +273,10 @@ public class TenantProductService {
         product.removeTag(tag);
         product = productRepository.save(product);
         return productMapper.toDto(product);
+    }
+    public static String getDomainName(String url) throws URISyntaxException {
+        URI uri = new URI(url);
+        String domain = uri.getHost();
+        return domain.startsWith("www.") ? domain.substring(4) : domain;
     }
 }
