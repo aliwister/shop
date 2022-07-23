@@ -41,8 +41,6 @@ public class ShopMutation implements GraphQLMutationResolver {
     private final TenantSetupService tenantSetupService;
     private final TenantCartService cartService;
 
-    private final ProductLangService productLangService;
-
     private final PricingRequestService pricingRequestService;
 
     private final MessageSource messageSource;
@@ -55,11 +53,10 @@ public class ShopMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
+    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
         this.productService = productService;
         this.tenantSetupService = tenantSetupService;
         this.cartService = cartService;
-        this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.userService = userService;

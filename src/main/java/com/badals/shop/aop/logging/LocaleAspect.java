@@ -11,16 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocaleAspect {
 
-    @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..)) || "+
-            "execution(* com.badals.shop.graph.query.ProductQuery.getProductBySku(..)) || " +
-            //"execution(* com.badals.shop.graph.query.TenantQuery.*(..)) || " +
-            //"execution(* com.badals.shop.graph.mutation.TenantMutation.*(..)) || " +
-            "execution(* com.badals.shop.*.product(..)))")
-    public Object beforeWebMethodExecution1(ProceedingJoinPoint joinPoint) throws Throwable {
-        setLocale(joinPoint);
-        return joinPoint.proceed();
-    }
-
     private Object setLocale(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();

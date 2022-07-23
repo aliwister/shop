@@ -1,7 +1,5 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.aop.logging.LocaleContext;
-import com.badals.shop.domain.Product;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.*;
@@ -19,9 +17,9 @@ import java.util.stream.Collectors;
 import static com.badals.shop.service.CurrencyService.BASE_CURRENCY_KEY;
 
 /**
- * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
+ * Mapper for the entity {@link TenantProduct} and its DTO {@link ProductDTO}.
  */
-@Mapper(componentModel = "spring", uses = {CategoryMapper.class, MerchantStockMapper.class})
+@Mapper(componentModel = "spring", uses = {CategoryMapper.class})
 public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProduct> {
 
 

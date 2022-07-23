@@ -21,7 +21,7 @@ extend type Mutation {
     createOrder(id: Int): Order
     sendPaymentSms(id: ID, mobile: String): Message
     discountOrder(id: ID): Order
-    setOrderState(id: ID, state: OrderState): Order
+    #setOrderState(id: ID, state: OrderState): Order
     cancelOrder(id: ID, reason: String): Order
     closeOrder(id: ID, reason: String): Order
 

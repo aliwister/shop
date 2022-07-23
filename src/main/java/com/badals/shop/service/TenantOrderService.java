@@ -2,6 +2,7 @@ package com.badals.shop.service;
 
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.UserBase;
 import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
@@ -48,20 +49,15 @@ import java.util.stream.Collectors;
 public class TenantOrderService {
 
     private final Logger log = LoggerFactory.getLogger(TenantOrderService.class);
-
     private final TenantOrderRepository orderRepository;
-    //private final OrderSearchRepository orderSearchRepository;
-
     private final TenantOrderMapper orderMapper;
     private UserService userService;
-
     private final CustomerService customerService;
     private final MessageSource messageSource;
     private final MailService mailService;
     private final AuditReader auditReader;
     private final CheckoutAddressMapper checkoutAddressMapper;
     private final CustomerMapper customerMapper;
-
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
 
@@ -78,8 +74,6 @@ public class TenantOrderService {
         this.addressRepository = addressRepository;
         this.cartService = cartService;
     }
-
-
     /**
      * Save a order.
      *
@@ -91,7 +85,6 @@ public class TenantOrderService {
         TenantOrder order = orderMapper.toEntity(orderDTO);
         return save(order);
     }
-
     /**
      * Get all the orders.
      *
@@ -104,8 +97,6 @@ public class TenantOrderService {
                 .map(orderMapper::toDto)
                 .collect(Collectors.toCollection(LinkedList::new));
     }
-
-
     /**
      * Get one order by id.
      *
@@ -140,7 +131,8 @@ public class TenantOrderService {
             return orderMapper.toDto(order);
         }
         Customer customer = customerService.findByEmail(order.getEmail());
-        //order.setCustomer(customer);
+        if(customer != null)
+            order.setCustomer(customer);
 
 
         AddressPojo addressPojo = order.getDeliveryAddressPojo();
@@ -158,32 +150,13 @@ public class TenantOrderService {
         }
         String secureKey = confirmationKey.split("\\.")[0];
         cartService.closeCart(secureKey);
-
-        //order.setConfirmationKey(order.getConfirmationKey()+order.getId());
         order.setEmailSent(true);
         OrderDTO dto = save(order);
         dto.setCustomer(customerMapper.toDto(customer));
         sendConfirmationEmail(dto);
         return dto;
     }
-
-    public OrderResponse getCustomerOrders(Integer limit, Integer offset) {
-        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
-        List<TenantOrder> orders = orderRepository.findOrdersByCustomerOrderByCreatedDateDesc(loginUser, PageRequest.of((int) offset/limit,limit));
-        OrderResponse response = new OrderResponse();
-        response.setTotal(orders.size());
-        response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
-        Integer total = orderRepository.countForCustomer(loginUser);
-        response.setHasMore((limit+offset) < total);
-        return response;
-    }
-
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) {
-/*
-        if(searchText != null && searchText.trim().length() > 1 || balance)
-            return searchOrders(orderState, offset, limit, searchText, balance);
-*/
-
         Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();
         response.setTotal(orders.getSize());
@@ -193,31 +166,139 @@ public class TenantOrderService {
         return response;
 
     }
-
-/*    public OrderResponse searchOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) {
-
-        OrderResponse response = new OrderResponse();
-        List<OrderDTO> orders = null;
-        if(balance) {
-            orders = StreamSupport
-                    .stream(orderSearchRepository.findAllByOrderStateInAndBalanceNot(orderState, BigDecimal.ZERO, PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
-
+    public Optional<OrderDTO> getOrderWithOrderItems(Long id) {
+        return orderRepository.findForOrderDetails(id, String.valueOf(id)).map(orderMapper::toDto);
+    }
+    public OrderDTO setOrderState(Long orderId, OrderState os) {
+        TenantOrder order = orderRepository.getOne(orderId);
+        if(os.equals(OrderState.PAYMENT_ACCEPTED) && !order.getOrderState().equals(OrderState.PAYMENT_ACCEPTED))
+            order.setInvoiceDate(LocalDate.now());
+        order.setOrderState(os);
+        if(!os.equals(OrderState.CANCELLED)) {
+            order.setSubtotal(calculateSubtotal(order));
+            order.setTotal(calculateTotal(order));
+        }
+        return save(order);
+    }
+    public void sendConfirmationEmail(OrderDTO dto) {
+        CustomerDTO customer = dto.getCustomer();
+        UserBase userBase = null;
+        if (customer == null) {
+            userBase = new UserBase(dto.getEmail(), "", dto.getEmail());
         }
         else
-            orders = StreamSupport
-                    .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
-        response.setItems(orders);
-        response.setTotal(orders.size());
-        Integer total = orderRepository.countForState(orderState);
-        response.setHasMore((limit+offset) < total);
-        return response;
-    }*/
+            userBase = customerMapper.toUserBase(customer);
+        mailService.sendOrderCreationMail(userBase, dto);
+    }
+    public BigDecimal calculateSubtotal(TenantOrder order) {
+        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).setScale(2, RoundingMode.HALF_UP);
+        return sum;
+    }
 
-/*    public void sendPaymentMessage(Long id) {
-        Optional<TenantOrder> o = orderRepository.findJoinCustomerJoinAddress(id);
-        OrderDTO order = o.map(orderMapper::toDto).orElse(null);
-    }*/
+    public BigDecimal calculateTotal(TenantOrder order) {
+        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).setScale(2, RoundingMode.HALF_UP);
+        if(order.getDeliveryTotal() != null)
+            sum = sum.add(order.getDeliveryTotal());
+        if(order.getDiscountsTotal() != null)
+            sum = sum.subtract(order.getDiscountsTotal());
+        return sum;
+    }
+    private OrderDTO save(TenantOrder order) {
+        order = orderRepository.save(order);
+        OrderDTO dto = orderMapper.toDto(order);
+        //orderSearchRepository.save(dto);
+        return dto;
+    }
 
+    public void sendConfirmationEmail(Long id) {
+        TenantOrder order = orderRepository.getOne(id);
+        OrderDTO dto = orderMapper.toDto(order);
+        sendConfirmationEmail(dto);
+    }
+
+    public OrderDTO setStatus(String id, OrderState state) {
+        TenantOrder order = orderRepository.findByReference(id).get();
+        order.setOrderState(state);
+
+        return save(order);
+    }
+
+    public void sendVoltageEmail(Long orderId, List<Long> orderItems) {
+        TenantOrder order = orderRepository.getOrderWithSomeOrderItems(orderId, orderItems).orElse(null);
+        OrderDTO dto = orderMapper.toDto(order);
+        CustomerDTO customer = dto.getCustomer();
+        UserBase userBase = null;
+        if (customer == null) {
+            userBase = new UserBase(order.getEmail(), "", order.getEmail());
+        }
+        else
+            userBase = customerMapper.toUserBase(customer);
+        mailService.sendVoltageMail(userBase, dto);
+    }
+    public OrderDTO cancel(Long id, String reason) {
+        TenantOrder order = orderRepository.getOne(id);
+
+        order.setOrderState(OrderState.CANCELLED);
+        order.setTotal(BigDecimal.ZERO);
+
+        OrderDTO dto = save(order);
+        CustomerDTO customer = dto.getCustomer();
+        UserBase userBase = null;
+        if (customer == null) {
+            userBase = new UserBase(order.getEmail(), "", order.getEmail());
+        }
+        else
+            userBase = customerMapper.toUserBase(customer);
+
+        mailService.sendCancelMail(userBase, dto, reason);
+        return dto;
+    }
+    public OrderDTO editOrderItems(Long id, List<OrderItemDTO> orderItems, String reason) {
+        TenantOrder order = orderRepository.findForOrderDetails(id, String.valueOf(id)).get();
+        boolean isEditCancel = false;
+        for(OrderItemDTO item : orderItems) {
+            TenantOrderItem before = order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
+                    .findFirst().get();
+
+            if(item.getQuantity().compareTo(before.getQuantity()) < 0)
+                isEditCancel = true;
+
+            before.quantity(item.getQuantity())
+                    .price(item.getPrice())
+                    .lineTotal(item.getPrice().multiply(item.getQuantity()).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        }
+        order.setSubtotal(calculateSubtotal(order));
+        order.setTotal(calculateTotal(order));
+        OrderDTO dto = save(order);
+        CustomerDTO customer = dto.getCustomer();
+        UserBase userBase = null;
+        if (customer == null) {
+            userBase = new UserBase(order.getEmail(), "", order.getEmail());
+        }
+        else
+            userBase = customerMapper.toUserBase(customer);
+        if(isEditCancel)
+            mailService.sendEditCancelMail(userBase, dto, reason);
+        else
+            mailService.sendEditMail(userBase, dto, reason);
+        return dto;
+    }
+
+    public OrderDTO addDiscount(Long id, BigDecimal amount, String couponName) {
+        TenantOrder order = orderRepository.getOne(id);
+        order.setDiscountsTotal(amount);
+        //order.setCouponName(couponName);
+        order.setSubtotal(calculateSubtotal(order));
+        order.setTotal(calculateTotal(order));
+        return save(order);
+    }
+
+    public OrderDTO close(Long id, String reason) {
+        TenantOrder order = orderRepository.getOne(id);
+        order.setOrderState(OrderState.CLOSED);
+        OrderDTO dto = save(order);
+        return dto;
+    }
     public void sendRequestPaymentSms(Long id, String mobile) throws Exception {
         TenantOrder order = orderRepository.getOne(id);
         mobile = order.getDeliveryAddress().getMobile();
@@ -282,137 +363,4 @@ public class TenantOrderService {
         }
         return ret;
     }
-
-    public Optional<OrderDTO> getOrderWithOrderItems(Long id) {
-        return orderRepository.findForOrderDetails(id, String.valueOf(id)).map(orderMapper::toDto);
-    }
-
-    public OrderDTO setOrderState(Long orderId, OrderState os) {
-        TenantOrder order = orderRepository.getOne(orderId);
-        if(os.equals(OrderState.PAYMENT_ACCEPTED) && !order.getOrderState().equals(OrderState.PAYMENT_ACCEPTED))
-            order.setInvoiceDate(LocalDate.now());
-        order.setOrderState(os);
-        if(!os.equals(OrderState.CANCELLED)) {
-            order.setSubtotal(calculateSubtotal(order));
-            order.setTotal(calculateTotal(order));
-        }
-        return save(order);
-    }
-
-    public OrderDTO setStatus(String id, OrderState state) {
-        TenantOrder order = orderRepository.findByReference(id).get();
-        order.setOrderState(state);
-
-        return save(order);
-    }
-
-    public OrderDTO setStatus(Long id, OrderState state) {
-        TenantOrder order = orderRepository.getOne(id);
-        List<TenantOrder> versions = new ArrayList<>();
-
-        order.setOrderState(state);
-        List<Number> revisions = auditReader.getRevisions(TenantOrder.class, id);
-        for (Number rev : revisions) {
-            TenantOrder v = auditReader.find(TenantOrder.class, order, rev);
-            versions.add(v);
-        }
-
-        return save(order);
-    }
-
-    public void sendConfirmationEmail(OrderDTO dto) {
-        //OrderDTO order = getOrderWithOrderItems(id).orElse(null);
-        //CustomerDTO customer = order.getCustomer();
-        mailService.sendOrderCreationMail(dto.getCustomer(), dto);
-    }
-
-    public OrderDTO editOrderItems(Long id, List<OrderItemDTO> orderItems, String reason) {
-        TenantOrder order = orderRepository.findForOrderDetails(id, String.valueOf(id)).get();
-        boolean isEditCancel = false;
-        for(OrderItemDTO item : orderItems) {
-            TenantOrderItem before = order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
-                    .findFirst().get();
-
-            if(item.getQuantity().compareTo(before.getQuantity()) < 0)
-                isEditCancel = true;
-
-            before.quantity(item.getQuantity())
-                    .price(item.getPrice())
-                    .lineTotal(item.getPrice().multiply(item.getQuantity()).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        }
-        order.setSubtotal(calculateSubtotal(order));
-        order.setTotal(calculateTotal(order));
-        OrderDTO dto = save(order);
-        if(isEditCancel)
-            mailService.sendEditCancelMail(dto.getCustomer(), dto, reason);
-        else
-            mailService.sendEditMail(dto.getCustomer(), dto, reason);
-        return dto;
-    }
-
-    public OrderDTO addDiscount(Long id, BigDecimal amount, String couponName) {
-        TenantOrder order = orderRepository.getOne(id);
-        order.setDiscountsTotal(amount);
-        //order.setCouponName(couponName);
-        order.setSubtotal(calculateSubtotal(order));
-        order.setTotal(calculateTotal(order));
-        return save(order);
-    }
-
-    public BigDecimal calculateSubtotal(TenantOrder order) {
-        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).setScale(2, RoundingMode.HALF_UP);
-        return sum;
-    }
-
-    public BigDecimal calculateTotal(TenantOrder order) {
-        BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).setScale(2, RoundingMode.HALF_UP);
-        if(order.getDeliveryTotal() != null)
-            sum = sum.add(order.getDeliveryTotal());
-        if(order.getDiscountsTotal() != null)
-            sum = sum.subtract(order.getDiscountsTotal());
-        return sum;
-    }
-
-    public void sendVoltageEmail(Long orderId, List<Long> orderItems) {
-        TenantOrder order = orderRepository.getOrderWithSomeOrderItems(orderId, orderItems).orElse(null);
-        OrderDTO dto = orderMapper.toDto(order);
-        CustomerDTO customer = dto.getCustomer();
-        mailService.sendVoltageMail(customer, dto);
-    }
-
-    public OrderDTO cancel(Long id, String reason) {
-        TenantOrder order = orderRepository.getOne(id);
-
-        order.setOrderState(OrderState.CANCELLED);
-        order.setTotal(BigDecimal.ZERO);
-        OrderDTO dto = save(order);
-        mailService.sendCancelMail(dto.getCustomer(), dto, reason);
-        return dto;
-    }
-
-    private OrderDTO save(TenantOrder order) {
-        order = orderRepository.save(order);
-        OrderDTO dto = orderMapper.toDto(order);
-        //orderSearchRepository.save(dto);
-        return dto;
-    }
-
-    public void sendConfirmationEmail(Long id) {
-        TenantOrder order = orderRepository.getOne(id);
-        OrderDTO dto = orderMapper.toDto(order);
-        sendConfirmationEmail(dto);
-    }
-
-    public OrderDTO close(Long id, String reason) {
-        TenantOrder order = orderRepository.getOne(id);
-        order.setOrderState(OrderState.CLOSED);
-        OrderDTO dto = save(order);
-        return dto;
-    }
-
-
-/*    public void reIndex(Long from, Long to) {
-        List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toDto).collect(Collectors.toList());
-        orderSearchRepository.saveAll(dtos);
-    }*/
 }

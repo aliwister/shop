@@ -45,16 +45,13 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
-    private final ProductIndexService productIndexService;
-
-    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, ProductIndexService productIndexService) {
+    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService) {
         this.productService = productService;
         this.orderService = orderService;
         this.awsService = awsService;
         this.messageSource = messageSource;
         this.userService = userService;
         this.setupService = setupService;
-        this.productIndexService = productIndexService;
     }
 /*
 
@@ -69,11 +66,11 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return orderService.voidOrder(id);
 
     }
-    public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
+/*    public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
         String t =  TenantContext.getCurrentTenant();
         productIndexService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(),TenantContext.getCurrentTenant(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
         return new Message("success");
-    }
+    }*/
 
     //@PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {

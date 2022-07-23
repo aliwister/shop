@@ -1,7 +1,5 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.Product;
-
 import com.badals.shop.domain.pojo.Gallery;
 import com.badals.shop.domain.pojo.Price;
 import com.badals.shop.domain.pojo.PriceList;
@@ -19,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
+ * Mapper for the entity {@link TenantProduct} and its DTO {@link ProductDTO}.
  */
-@Mapper(componentModel = "spring", uses = {ProductLangMapper.class, MerchantStockMapper.class, ProductLangMapper.class})
+@Mapper(componentModel = "spring", uses = { })
 public interface ChildProductMapper extends EntityMapper<ChildProduct, TenantProduct> {
 
     //@Mapping(target = "productLangs", ignore = true)
@@ -113,13 +111,13 @@ public interface ChildProductMapper extends EntityMapper<ChildProduct, TenantPro
         }
     }
 
-    default Product fromId(Long id) {
+    default TenantProduct fromId(Long id) {
         if (id == null) {
             return null;
         }
-        Product purchase = new Product();
-        purchase.setId(id);
-        return purchase;
+        TenantProduct product = new TenantProduct();
+        product.setId(id);
+        return product;
     }
 
 }

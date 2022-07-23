@@ -1,4 +1,5 @@
 package com.badals.shop.domain;
+import com.badals.shop.domain.tenant.TenantProduct;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -61,7 +62,7 @@ public class Category implements Serializable {
     }
 
     @ManyToMany(mappedBy = "categories")
-    private Set<Product> products;
+    private Set<TenantProduct> products;
 
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
@@ -138,28 +139,28 @@ public class Category implements Serializable {
         this.parent = category;
     }
 
-    public Set<Product> getProducts() {
+    public Set<TenantProduct> getProducts() {
         return products;
     }
 
-    public Category products(Set<Product> products) {
+    public Category products(Set<TenantProduct> products) {
         this.products = products;
         return this;
     }
 
-    public Category addProduct(Product product) {
+    public Category addProduct(TenantProduct product) {
         this.products.add(product);
         //product.getCategories().add(this);
         return this;
     }
 
-    public Category removeProduct(Product product) {
+    public Category removeProduct(TenantProduct product) {
         this.products.remove(product);
         //product.getCategories().remove(this);
         return this;
     }
 
-    public void setProducts(Set<Product> products) {
+    public void setProducts(Set<TenantProduct> products) {
         this.products = products;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
@@ -192,13 +193,13 @@ public class Category implements Serializable {
     }
 
     @ManyToMany(mappedBy = "categories")
-    private Collection<Product> products2;
+    private Collection<TenantProduct> products2;
 
-    public Collection<Product> getProducts2() {
+    public Collection<TenantProduct> getProducts2() {
         return products2;
     }
 
-    public void setProducts2(Collection<Product> products2) {
+    public void setProducts2(Collection<TenantProduct> products2) {
         this.products2 = products2;
     }
 }

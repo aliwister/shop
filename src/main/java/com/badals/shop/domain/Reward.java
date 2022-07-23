@@ -1,4 +1,5 @@
 package com.badals.shop.domain;
+import com.badals.shop.domain.tenant.TenantProduct;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -49,7 +50,7 @@ public class Reward implements Serializable {
 
     @ManyToOne(optional = true)
     @JsonIgnoreProperties("rewards")
-    private Product product;
+    private TenantProduct product;
 
     @OneToMany(mappedBy = "reward")
     private Set<RewardLang> rewardLangs = new HashSet<>();
@@ -154,16 +155,16 @@ public class Reward implements Serializable {
         this.discountReductionType = discountReductionType;
     }
 
-    public Product getProduct() {
+    public TenantProduct getProduct() {
         return product;
     }
 
-    public Reward product(Product product) {
+    public Reward product(TenantProduct product) {
         this.product = product;
         return this;
     }
 
-    public void setProduct(Product product) {
+    public void setProduct(TenantProduct product) {
         this.product = product;
     }
 

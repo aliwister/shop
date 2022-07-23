@@ -29,7 +29,6 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
 
    private final TenantAdminProductService productService;
    private final TenantAdminOrderService orderService;
-   private final HashtagService hashtagService;
 
    private final CategoryService categoryService;
    private static final Logger log = LoggerFactory.getLogger(PartnerQuery.class);
@@ -37,10 +36,9 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    private final UserService userService;
    private final TenantSetupService setupService;
 
-   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, HashtagService hashtagService, CategoryService categoryService, UserService userService, TenantSetupService setupService) {
+   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, UserService userService, TenantSetupService setupService) {
       this.productService = productService;
       this.orderService = orderService;
-      this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
       this.setupService = setupService;

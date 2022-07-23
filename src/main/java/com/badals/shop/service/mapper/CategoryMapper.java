@@ -8,7 +8,7 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Category} and its DTO {@link CategoryDTO}.
  */
-@Mapper(componentModel = "spring", uses = {ProductMapper.class})
+@Mapper(componentModel = "spring", uses = {TenantProductMapper.class})
 public interface CategoryMapper extends EntityMapper<CategoryDTO, Category> {
 
     @Mapping(source = "parent.id", target = "parentId")

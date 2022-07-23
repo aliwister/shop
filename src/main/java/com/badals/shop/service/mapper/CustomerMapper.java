@@ -1,6 +1,7 @@
 package com.badals.shop.service.mapper;
 
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.UserBase;
 import com.badals.shop.service.dto.CustomerDTO;
 import org.mapstruct.*;
 
@@ -19,6 +20,11 @@ public interface CustomerMapper extends EntityMapper<CustomerDTO, Customer> {
     @Mapping(source = "pointCustomer.spentPoints", target = "spentPoints")
     @Mapping(target = "addresses", ignore = true)
     CustomerDTO toDto(Customer customer);
+    @Named("toUserBase")
+    @Mapping(source = "firstname", target = "firstname")
+    @Mapping(source = "lastname", target = "lastname")
+    @Mapping(source = "email", target = "email")
+    UserBase toUserBase(CustomerDTO customer);
 
     @BeanMapping(qualifiedByName = "plusCode")
     CustomerDTO toDtoWithMappedAddresses(Customer customer);
