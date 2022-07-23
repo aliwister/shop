@@ -45,4 +45,13 @@ public class UserBase implements Serializable  {
    @Size(min = 60, max = 60)
    @Column(name = "passwd", length = 60, nullable = false)
    private String password;
+
+   public UserBase() {
+   }
+
+   public UserBase(String firstname, String lastname, String email) {
+      this.firstname = firstname;
+      this.lastname = lastname;
+      this.email = email;
+   }
 }
