@@ -329,7 +329,7 @@ public class TenantCartService {
 
         //checkout.setLock(false);
         if (customer != null && customer.getAddresses() != null && customer.getAddresses().size() > 0)
-            checkout.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
+            checkout.setAddresses(customer.getAddresses().stream().filter(x->!x.getDeleted()).map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
 
         if (customer != null) {
             checkout.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
