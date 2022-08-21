@@ -108,6 +108,7 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
          add(SAR);
          add(KWD);
          add(QAR);
+         add(USD);
       }};
    }
 /*
