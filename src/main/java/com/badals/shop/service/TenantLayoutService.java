@@ -26,15 +26,19 @@ public class TenantLayoutService {
     private final TenantRepository tenantRepository;
 
     private final TenantMapper tenantMapper;
+    private final IndexService indexService;
 
-    public TenantLayoutService(TenantRepository tenantRepository, TenantMapper tenantMapper) {
+    public TenantLayoutService(TenantRepository tenantRepository, TenantMapper tenantMapper, IndexService indexService) {
         this.tenantRepository = tenantRepository;
         this.tenantMapper = tenantMapper;
+        this.indexService = indexService;
     }
 
     public TenantDTO getTenant() {
         Tenant tenant = tenantRepository.findAll().get(0);
-        return tenantMapper.toDto(tenant);
+        TenantDTO dto = tenantMapper.toDto(tenant);
+        dto.setSearchEngineKey(indexService.getSearchKey(dto.getTenantId()));
+        return dto;
     }
 
     public List<Attribute> getSliders() {
