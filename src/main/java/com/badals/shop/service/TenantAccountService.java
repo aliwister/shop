@@ -59,7 +59,7 @@ public class TenantAccountService {
     public OrderResponse orders(List<OrderState> orderState, Integer limit, Integer offset) {
         Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();
-        response.setTotal(orders.getSize());
+        response.setTotal(orders.getTotalPages());
         response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
         Integer total = orderRepository.countForState(orderState);
         response.setHasMore((limit+offset) < total);
