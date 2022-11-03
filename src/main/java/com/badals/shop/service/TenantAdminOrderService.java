@@ -192,6 +192,7 @@ public class TenantAdminOrderService {
         //order.setCarrier(cart.getCarrier());
         order.setDeliveryTotal(BigDecimal.ZERO);
         order.setPaymentMethod(paymentMethod);
+        order.setEmailSent(false);
 
         //order.s
 
