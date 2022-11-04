@@ -2,7 +2,7 @@ package com.badals.shop.graph.query;
 
 
 import com.badals.shop.graph.PaymentResponse;
-import com.badals.shop.service.PaymentService;
+import com.badals.shop.service.TenantPaymentService;
 import com.badals.shop.service.dto.PaymentDTO;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,9 +14,9 @@ import java.util.List;
 @Component
 public class AccountingQuery extends BaseQuery implements GraphQLQueryResolver {
 
-    private final PaymentService paymentService;
+    private final TenantPaymentService paymentService;
 
-    public AccountingQuery(PaymentService paymentService) {
+    public AccountingQuery(TenantPaymentService paymentService) {
         this.paymentService = paymentService;
     }
 

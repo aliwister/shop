@@ -3,6 +3,7 @@ package com.badals.shop.graph.query;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
@@ -26,7 +27,6 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
 
    private static final Logger log = LoggerFactory.getLogger(ShopQuery.class);
    private final TenantProductService productService;
-   private final HashtagService hashtagService;
    private final CategoryService categoryService;
    private final CustomerService customerService;
    private final CustomerMapper customerMapper;
@@ -36,9 +36,8 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    private final TenantOrderService orderService;
    private final TenantAccountService accountService;
    private final TenantLayoutService layoutService;
-   public ShopQuery(TenantProductService productService, HashtagService hashtagService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService) {
+   public ShopQuery(TenantProductService productService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService) {
       this.productService = productService;
-      this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.customerService = customerService;
       this.tenantService = tenantService;
@@ -97,12 +96,16 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       return cartService.me();
    }
 
-   @PreAuthorize("hasRole('ROLE_USER')")
+   //@PreAuthorize("hasRole('ROLE_USER')")
    public CustomerDTO mePlus() {
       Customer customer = customerService.getUserWithAuthorities().orElse(null);
       if(customer != null)
          return customerService.findOne(customer.getId()).orElse(null);
       return null;
+   }
+
+   public Checkout plusCart(final String secureKey) {
+      return cartService.plusCart(secureKey);
    }
 }
 

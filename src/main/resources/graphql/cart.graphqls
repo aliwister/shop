@@ -87,7 +87,7 @@ type LineItem {
     url: String
     ref: String
 }
-type CheckoutCart {
+type Checkout {
     id: ID!
     ref: String
     name: String

@@ -1,6 +1,7 @@
 package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
+import com.badals.shop.domain.Category;
 import com.badals.shop.domain.converter.StringListConverter;
 import com.badals.shop.domain.enumeration.Condition;
 import com.badals.shop.domain.enumeration.ProductGroup;
@@ -128,6 +129,9 @@ public class TenantProduct implements Serializable, TenantSupport {
 
     @Column(name = "brand")
     private String brand;
+
+    @Column(name = "url")
+    private String url;
 
     @Column(name = "jhi_group")
     private ProductGroup group;
@@ -377,6 +381,24 @@ public class TenantProduct implements Serializable, TenantSupport {
         this.children.add(child);
         child.setParentId(this.ref);
     }
+    @ManyToMany
+    @JoinTable(
+            name = "category_product",
+            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id")
+    )
+    private Set<Category> categories = new HashSet<>();
+    public TenantProduct addCategory(Category category) {
+        this.categories.add(category);
+        category.getProducts().add(this);
+        return this;
+    }
+
+    public TenantProduct removeCategory(Category category) {
+        this.categories.remove(category);
+        category.getProducts().remove(this);
+        return this;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -419,5 +441,21 @@ public class TenantProduct implements Serializable, TenantSupport {
             return volumeWeight;
         }
         return weight;
+    }
+
+    public void addTag(String tag) {
+        if (this.hashtags == null)
+            this.hashtags = new ArrayList<>();
+
+        if (this.hashtags.contains(tag))
+            return;
+
+        this.hashtags.add(tag);
+    }
+
+    public void removeTag(String tag) {
+        if (this.hashtags == null)
+            return;
+         this.hashtags.remove(tag);
     }
 }

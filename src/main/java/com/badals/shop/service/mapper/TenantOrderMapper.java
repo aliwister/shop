@@ -1,6 +1,5 @@
 package com.badals.shop.service.mapper;
 
-import com.badals.shop.domain.Order;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.service.dto.AddressDTO;
 import com.badals.shop.service.dto.OrderDTO;
@@ -13,7 +12,7 @@ import org.mapstruct.MappingTarget;
 import java.math.BigDecimal;
 
 /**
- * Mapper for the entity {@link Order} and its DTO {@link OrderDTO}.
+ * Mapper for the entity {@link TenantOrder} and its DTO {@link OrderDTO}.
  */
 @Mapper(componentModel = "spring", uses = {CustomerMapper.class, AddressMapper.class, TenantOrderItemMapper.class})
 public interface TenantOrderMapper extends EntityMapper<OrderDTO, TenantOrder> {

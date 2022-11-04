@@ -16,9 +16,7 @@ import java.util.concurrent.ExecutionException;
 @Component
 public class ProductSubscription  implements GraphQLSubscriptionResolver {
 
-   private final ProductService productService;
-   private final ProductIndexService productIndexService;
-   private final HashtagService hashtagService;
+   private final TenantProductService productService;
    //private final MwsLookup mwsLookup;
 
    private final CategoryService categoryService;
@@ -27,10 +25,8 @@ public class ProductSubscription  implements GraphQLSubscriptionResolver {
    private final UserService userService;
 
 
-   public ProductSubscription(ProductService productService, ProductIndexService productIndexService, HashtagService hashtagService, CategoryService categoryService, UserService userService) {
+   public ProductSubscription(TenantProductService productService, CategoryService categoryService, UserService userService) {
       this.productService = productService;
-      this.productIndexService = productIndexService;
-      this.hashtagService = hashtagService;
       this.categoryService = categoryService;
       this.userService = userService;
    }

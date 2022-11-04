@@ -1,4 +1,5 @@
 package com.badals.shop.domain;
+import com.badals.shop.domain.tenant.TenantHashtag;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -82,9 +83,9 @@ public class CartRule implements Serializable {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "hashtag_restriction",referencedColumnName = "en")
+    @JoinColumn(name = "hashtag_restriction",referencedColumnName = "name")
     @JsonIgnoreProperties("cartRules")
-    private Hashtag hashtagRestriction;
+    private TenantHashtag hashtagRestriction;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -316,16 +317,16 @@ public class CartRule implements Serializable {
         this.customer = customer;
     }
 
-    public Hashtag getHashtagRestriction() {
+    public TenantHashtag getHashtagRestriction() {
         return hashtagRestriction;
     }
 
-    public CartRule hashtagRestriction(Hashtag hashtag) {
+    public CartRule hashtagRestriction(TenantHashtag hashtag) {
         this.hashtagRestriction = hashtag;
         return this;
     }
 
-    public void setHashtagRestriction(Hashtag hashtag) {
+    public void setHashtagRestriction(TenantHashtag hashtag) {
         this.hashtagRestriction = hashtag;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
