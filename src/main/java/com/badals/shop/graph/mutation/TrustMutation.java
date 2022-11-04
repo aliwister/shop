@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 
 @Component
-public class AdminMutation implements GraphQLMutationResolver {
+public class TrustMutation implements GraphQLMutationResolver {
 
-    private final AwsService awsService;
+    private final LegacyAwsService awsService;
 
-    public AdminMutation(AwsService awsService) {
+    public TrustMutation(LegacyAwsService awsService) {
         this.awsService = awsService;
     }
 

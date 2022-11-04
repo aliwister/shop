@@ -22,9 +22,9 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
- * Mapper for the entity {@link Product} and its DTO {@link ProductDTO}.
+ * Mapper for the entity {@link TenantProduct} and its DTO {@link ProductDTO}.
  */
-@Mapper(componentModel = "spring", uses = {ProductLangMapper.class, MerchantStockMapper.class, ProductLangMapper.class, ChildProductMapper.class})
+@Mapper(componentModel = "spring", uses = {ChildProductMapper.class})
 public interface PartnerProductMapper extends EntityMapper<PartnerProduct, TenantProduct> {
 
     //@Mapping(source="langs", target = "productLangs")
@@ -49,6 +49,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
     @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withCurrencyConversionList")
     @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversionList")
     @Mapping(target = "gallery", source="gallery", qualifiedByName = "buildGallery")
+    @Mapping(target = "cost", ignore = true)
     ProductDTO toProductDto(PartnerProduct product);
 
     @Mapping(target = "gallery", ignore = true)
@@ -208,11 +209,11 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
         }
     }
 
-    default Product fromId(Long id) {
+    default TenantProduct fromId(Long id) {
         if (id == null) {
             return null;
         }
-        Product purchase = new Product();
+        TenantProduct purchase = new TenantProduct();
         purchase.setId(id);
         return purchase;
     }
