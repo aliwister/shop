@@ -17,6 +17,7 @@ import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
+import com.badals.shop.service.mapper.CustomerMapper;
 import com.badals.shop.service.mapper.TenantOrderMapper;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.util.MailService;
@@ -46,23 +47,18 @@ import java.util.stream.Collectors;
 
 import static com.badals.shop.service.TenantCartService.createUIUD;
 
-/**
- * Service Implementation for managing {@link Order}.
- */
+
 @Service
 @Transactional
 public class TenantAdminOrderService {
 
     private static double ORDER_REF_SIZE = 7;
-    private final Logger log = LoggerFactory.getLogger(OrderService.class);
+    private final Logger log = LoggerFactory.getLogger(TenantAdminOrderService.class);
 
     private final TenantOrderRepository orderRepository;
     private final TenantPaymentRepository paymentRepository;
     private final OrderSearchRepository orderSearchRepository;
-
     private final TenantOrderMapper orderMapper;
-    private UserService userService;
-
     private final CustomerService customerService;
     private final MessageSource messageSource;
     private final MailService mailService;
@@ -70,13 +66,13 @@ public class TenantAdminOrderService {
     private final CheckoutAddressMapper checkoutAddressMapper;
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
+    private final CustomerMapper customerMapper;
 
-    public TenantAdminOrderService(TenantOrderRepository orderRepository, TenantPaymentRepository paymentRepository, OrderSearchRepository orderSearchRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService) {
+    public TenantAdminOrderService(TenantOrderRepository orderRepository, TenantPaymentRepository paymentRepository, OrderSearchRepository orderSearchRepository, TenantOrderMapper orderMapper, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService, CustomerMapper customerMapper) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
         this.orderSearchRepository = orderSearchRepository;
         this.orderMapper = orderMapper;
-        this.userService = userService;
         this.customerService = customerService;
         this.messageSource = messageSource;
         this.mailService = mailService;
@@ -84,6 +80,7 @@ public class TenantAdminOrderService {
         this.checkoutAddressMapper = checkoutAddressMapper;
         this.addressRepository = addressRepository;
         this.cartService = cartService;
+        this.customerMapper = customerMapper;
     }
 
 
@@ -156,12 +153,12 @@ public class TenantAdminOrderService {
         return ret;
     }
 
-    public BigDecimal calculateSubtotal(TenantCheckout checkout) {
+    public BigDecimal calculateSubtotal(Checkout checkout) {
         BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
         return sum;
     }
 
-    public BigDecimal calculateTotal(TenantCheckout checkout) {
+    public BigDecimal calculateTotal(Checkout checkout) {
         BigDecimal sum = BigDecimal.valueOf(checkout.getItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum());
         BigDecimal adjustments = BigDecimal.valueOf(checkout.getOrderAdjustments().stream().mapToDouble(x -> x.getValue().doubleValue() * x.getQuantity().doubleValue()).sum());
 
@@ -170,7 +167,7 @@ public class TenantAdminOrderService {
     }
 
     @Transactional
-    public TenantOrder createPosOrder(TenantCheckout cart, String paymentMethod) {
+    public TenantOrder createPosOrder(Checkout cart, String paymentMethod) {
         TenantOrder order = new TenantOrder();
         order.setChannel(OrderChannel.POS);
         order.setCurrency(cart.getCurrency());
@@ -195,6 +192,7 @@ public class TenantAdminOrderService {
         //order.setCarrier(cart.getCarrier());
         order.setDeliveryTotal(BigDecimal.ZERO);
         order.setPaymentMethod(paymentMethod);
+        order.setEmailSent(false);
 
         //order.s
 
@@ -221,10 +219,8 @@ public class TenantAdminOrderService {
 
         return order;
     }
-    
-    
     @Transactional
-    public OrderDTO createPosOrder(TenantCheckout cart, String paymentMethod, String paymentAmount, String authCode) {
+    public OrderDTO createPosOrder(Checkout cart, String paymentMethod, String paymentAmount, String authCode) {
         TenantOrder order = createPosOrder(cart, paymentMethod);
         saveOrder(order);
         //if(p.prePay) {
@@ -242,7 +238,6 @@ public class TenantAdminOrderService {
         orderRepository.refresh(order);
         return orderMapper.toDto(order);
     }
-
     private void saveOrder(TenantOrder order) {
         orderRepository.save(order);
         orderRepository.refresh(order);
@@ -250,41 +245,6 @@ public class TenantAdminOrderService {
         orderSearchRepository.save(orderDTO);
         //orderDTO.getOrderItems().stream().forEach(x -> orderItemSearchRepository.save(x));
     }
-
-    @Transactional
-    public OrderDTO getOrderConfirmation(String reference, String confirmationKey) throws OrderNotFoundException {
-        log.info("reference + confirmation key = ", reference, confirmationKey);
-        TenantOrder order = orderRepository.findOrderByReferenceAndConfirmationKey(reference, confirmationKey).orElse(null);
-        if(order == null) {
-            throw new OrderNotFoundException("Order Not Found");
-        }
-        Customer customer = customerService.findByEmail(order.getEmail());
-        //order.setCustomer(customer);
-
-
-        AddressPojo addressPojo = order.getDeliveryAddressPojo();
-
-        if (addressPojo != null && addressPojo.getSave()) {
-            Address address = checkoutAddressMapper.addressPojoToAddress(addressPojo);
-            address.setCustomer(customer);
-            address.setActive(true);
-            address.setDeleted(false);
-            address.setIdCountry(164L);
-            address = addressRepository.save(address);
-            order.setDeliveryAddressPojo(null);
-            order.setDeliveryAddress(address);
-
-        }
-        String secureKey = confirmationKey.split("\\.")[0];
-        cartService.closeCart(secureKey);
-
-        order.setConfirmationKey(order.getConfirmationKey()+order.getId());
-        OrderDTO dto = save(order);
-        sendConfirmationEmail(dto);
-        return dto;
-    }
-
-
     @Transactional
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) {
 /*
@@ -326,70 +286,7 @@ public class TenantAdminOrderService {
         OrderDTO order = o.map(orderMapper::toDto).orElse(null);
     }*/
 
-    public void sendRequestPaymentSms(Long id, String mobile) throws Exception {
-        TenantOrder order = orderRepository.getOne(id);
-        mobile = order.getDeliveryAddress().getMobile();
-        if(mobile == null)
-            throw new InvalidPhoneException("Mobile not provided");
-        mobile = mobile.trim();
-        mobile = mobile.substring(mobile.length()-8, mobile.length());
-        final String[] params = new String[]{order.getReference(), String.valueOf(order.getTotal())};
-        Locale locale = Locale.forLanguageTag("en");//user.getLangKey());
-        String message = messageSource.getMessage("sms.payment.request", params, locale);
-        sendSms(message, "968"+mobile, false);
-    }
 
-    private static final String USERNAME = "badals";
-    private static final String PASSWORD = "***REMOVED***";
-    public void sendSms(String message, String phone, boolean isUnicode) throws Exception {
-        String data = "";
-        data += "User=" + URLEncoder.encode(USERNAME, "ISO-8859-1");
-        data += "&passwd=" + URLEncoder.encode(PASSWORD, "ISO-8859-1");
-        if (isUnicode)
-            data += "&message=" + hexify(message)+"&mtype=OL";
-        else
-            data += "&message=" + URLEncoder.encode(message, "ISO-8859-1");
-        data += "&DR=Y";
-        data += "&mobilenumber="+formatPhoneNumber(phone);
-
-        // Send data
-        URL url = new URL("http://api.smscountry.com/SMSCwebservice_bulk.aspx");
-
-        URLConnection conn = url.openConnection();
-        conn.setDoOutput(true);
-        OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-        wr.write(data);
-        wr.flush();
-
-        // Get the response
-        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String line;
-        while ((line = rd.readLine()) != null) {
-            // Print the response output...
-            System.out.println(line);
-        }
-        wr.close();
-        rd.close();
-
-    }
-    static String hexify(String str) {
-        String ret="";
-        for (int i = 0; i < str.length(); ++i) {
-            String hex = Integer.toHexString(str.charAt(i)).toUpperCase();
-            ret += ("0000"+hex).substring(hex.length());
-        }
-        return ret;
-    }
-    public static String formatPhoneNumber(String phone) throws Exception {
-        String ret = phone.trim().replaceFirst("^0+(?!$)", "");
-        if (ret.length() < 8) {
-            throw new Exception ("SMS Fail. Invalid Phone #");
-        }
-        if (phone.length() < 11) {
-            ret = "968"+ret;
-        }
-        return ret;
-    }
 
     public Optional<OrderDTO> getOrderWithOrderItems(Long id) {
         return orderRepository.findForOrderDetails(id, String.valueOf(id)).map(orderMapper::toDto);
@@ -407,71 +304,25 @@ public class TenantAdminOrderService {
         return save(order);
     }
 
-    public OrderDTO setStatus(String id, OrderState state) {
-        TenantOrder order = orderRepository.findByReference(id).get();
-        order.setOrderState(state);
 
-        return save(order);
-    }
 
     public OrderDTO setStatus(Long id, OrderState state) {
         TenantOrder order = orderRepository.getOne(id);
-        List<Order> versions = new ArrayList<>();
+        List<TenantOrder> versions = new ArrayList<>();
 
         order.setOrderState(state);
-        List<Number> revisions = auditReader.getRevisions(Order.class, id);
+        List<Number> revisions = auditReader.getRevisions(TenantOrder.class, id);
         for (Number rev : revisions) {
-            Order v = auditReader.find(Order.class, order, rev);
+            TenantOrder v = auditReader.find(TenantOrder.class, order, rev);
             versions.add(v);
         }
 
         return save(order);
     }
-
-    public void sendConfirmationEmail(OrderDTO dto) {
-        //OrderDTO order = getOrderWithOrderItems(id).orElse(null);
-        //CustomerDTO customer = order.getCustomer();
-        mailService.sendOrderCreationMail(dto.getCustomer(), dto);
-    }
-
-    public OrderDTO editOrderItems(Long id, List<OrderItemDTO> orderItems, String reason) {
-        TenantOrder order = orderRepository.findForOrderDetails(id, String.valueOf(id)).get();
-        boolean isEditCancel = false;
-        for(OrderItemDTO item : orderItems) {
-            TenantOrderItem before = order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
-                    .findFirst().get();
-
-            if(item.getQuantity().compareTo(before.getQuantity()) < 0)
-                isEditCancel = true;
-
-            before.quantity(item.getQuantity())
-                    .price(item.getPrice())
-                    .lineTotal(item.getPrice().multiply(item.getQuantity()).setScale(2, RoundingMode.HALF_UP).doubleValue());
-        }
-        order.setSubtotal(calculateSubtotal(order));
-        order.setTotal(calculateTotal(order));
-        OrderDTO dto = save(order);
-        if(isEditCancel)
-            mailService.sendEditCancelMail(dto.getCustomer(), dto, reason);
-        else
-            mailService.sendEditMail(dto.getCustomer(), dto, reason);
-        return dto;
-    }
-
-    public OrderDTO addDiscount(Long id, BigDecimal amount, String couponName) {
-        TenantOrder order = orderRepository.getOne(id);
-        order.setDiscountsTotal(amount);
-        //order.setCouponName(couponName);
-        order.setSubtotal(calculateSubtotal(order));
-        order.setTotal(calculateTotal(order));
-        return save(order);
-    }
-
     public BigDecimal calculateSubtotal(TenantOrder order) {
         BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).setScale(2, RoundingMode.HALF_UP);
         return sum;
     }
-
     public BigDecimal calculateTotal(TenantOrder order) {
         BigDecimal sum = BigDecimal.valueOf(order.getOrderItems().stream().mapToDouble(x -> x.getPrice().doubleValue() * x.getQuantity().doubleValue()).sum()).setScale(2, RoundingMode.HALF_UP);
         if(order.getDeliveryTotal() != null)
@@ -480,41 +331,10 @@ public class TenantAdminOrderService {
             sum = sum.subtract(order.getDiscountsTotal());
         return sum;
     }
-
-    public void sendVoltageEmail(Long orderId, ArrayList<Long> orderItems) {
-        TenantOrder order = orderRepository.getOrderWithSomeOrderItems(orderId, orderItems).orElse(null);
-        OrderDTO dto = orderMapper.toDto(order);
-        CustomerDTO customer = dto.getCustomer();
-        mailService.sendVoltageMail(customer, dto);
-    }
-
-    public OrderDTO cancel(Long id, String reason) {
-        TenantOrder order = orderRepository.getOne(id);
-
-        order.setOrderState(OrderState.CANCELLED);
-        order.setTotal(BigDecimal.ZERO);
-        OrderDTO dto = save(order);
-        mailService.sendCancelMail(dto.getCustomer(), dto, reason);
-        return dto;
-    }
-
     private OrderDTO save(TenantOrder order) {
         order = orderRepository.save(order);
         OrderDTO dto = orderMapper.toDto(order);
         //orderSearchRepository.save(dto);
-        return dto;
-    }
-
-    public void sendConfirmationEmail(Long id) {
-        TenantOrder order = orderRepository.getOne(id);
-        OrderDTO dto = orderMapper.toDto(order);
-        sendConfirmationEmail(dto);
-    }
-
-    public OrderDTO close(Long id, String reason) {
-        TenantOrder order = orderRepository.getOne(id);
-        order.setOrderState(OrderState.CLOSED);
-        OrderDTO dto = save(order);
         return dto;
     }
 
@@ -528,7 +348,6 @@ public class TenantAdminOrderService {
         List<AggregateOrderReport> report =  orderRepository.aggOrderNativeReport();
         return report;
     }*/
-
     @Transactional
     public Message voidOrder(Long id) {
         //this.cancel(id, "");
@@ -541,7 +360,6 @@ public class TenantAdminOrderService {
 
         return new Message("success");
     }
-
     public void reIndex(Long from, Long to) {
         List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toDto).collect(Collectors.toList());
         if(dtos.isEmpty())

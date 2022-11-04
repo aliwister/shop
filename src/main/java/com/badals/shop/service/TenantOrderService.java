@@ -7,7 +7,6 @@ import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.badals.shop.repository.TenantOrderRepository;
-import com.badals.shop.repository.search.OrderSearchRepository;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.graph.OrderResponse;
@@ -61,9 +60,8 @@ public class TenantOrderService {
     private final CustomerMapper customerMapper;
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
-    private final OrderSearchRepository orderSearchRepository;
 
-    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService, OrderSearchRepository orderSearchRepository) {
+    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -75,7 +73,6 @@ public class TenantOrderService {
         this.customerMapper = customerMapper;
         this.addressRepository = addressRepository;
         this.cartService = cartService;
-        this.orderSearchRepository = orderSearchRepository;
     }
     /**
      * Save a order.
@@ -155,13 +152,10 @@ public class TenantOrderService {
         cartService.closeCart(secureKey);
         order.setEmailSent(true);
         OrderDTO dto = save(order);
-        orderSearchRepository.save(dto);
         dto.setCustomer(customerMapper.toDto(customer));
         sendConfirmationEmail(dto);
         return dto;
     }
-
-    // @Todo use elastic
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) {
         Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();

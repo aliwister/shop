@@ -9,7 +9,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 /**
  * Mapper for the entity {@link Reward} and its DTO {@link RewardDTO}.
  */
-@Mapper(componentModel = "spring", uses = {ProductMapper.class})
+@Mapper(componentModel = "spring", uses = {TenantProductMapper.class})
 public interface RewardMapper extends EntityMapper<RewardDTO, Reward> {
 
     @Mapping(source = "product.id", target = "productId")

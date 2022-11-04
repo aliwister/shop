@@ -1,20 +1,17 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.pojo.LineItem;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.service.dto.CustomerDTO;
-import com.badals.shop.service.mapper.CheckoutAddressMapper;
-import com.badals.shop.service.mapper.CheckoutLineItemMapper;
+import com.badals.shop.service.mapper.*;
 import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.domain.tenant.TenantCart;
 import com.badals.shop.domain.tenant.TenantCartItem;
-import com.badals.shop.domain.tenant.TenantCheckout;
 import com.badals.shop.repository.*;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
-import com.badals.shop.service.mapper.CustomerMapper;
-import com.badals.shop.service.mapper.TenantCartMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -156,15 +153,28 @@ public class TenantCartService {
 
         //logged in user - always
         if (cart == null || cart.getCartState() == CartState.UNCLAIMED) {
-            cart = this.getCartByCustomer(loginUser);
-            if (isMerge)
+            TenantCart newCart = this.getCartByCustomer(loginUser);
+            if (newCart == null ) {
+                if (cart == null) {
+                    cart = new TenantCart();
+                    cart.setSecureKey(createUIUD());
+                }
+                cart.setCartState(CartState.CLAIMED);
+                cart.setCustomer(loginUser);
                 return this.mergeCart(cart, items, false);
+            }
+            if (cart != null) {
+                List<CartItemDTO> mergelist = cart.getCartItems().stream().map(x -> new CartItemDTO().productId(x.getProductId()).quantity(x.getQuantity())).collect(Collectors.toList());
+                cart.getCartItems().clear();
+                //if (isMerge)
+                return this.mergeCart(newCart, mergelist, true);
+            }
             else
-                return this.mergeCart(cart, items, false);
+                return this.mergeCart(newCart, items, false);
         }
 
-        if (cart.getCartState() == CartState.CLAIMED) {
-            if( loginUser.getId().longValue() == cart.getCustomerId() )
+        if (cart.getCartState() == CartState.CLAIMED && cart.getCustomerId() != null) {
+            if(loginUser.getId().longValue() == cart.getCustomerId() )
                 return this.mergeCart(cart, items, isMerge);
 
             cart = this.getCartByCustomer(loginUser);
@@ -174,7 +184,7 @@ public class TenantCartService {
                 return this.save(cart, items);
         }
         //if (cart.getCartState() == CartState.CLOSED) {
-        cart = this.getCartByCustomer(loginUser);
+        cart = this.createCustomerCart(loginUser);
         return this.mergeCart(cart, items, isMerge);
         //}
     }
@@ -210,9 +220,10 @@ public class TenantCartService {
             }
             //cart.setTenantId(TenantContext.getCurrentProfile());
             //cart.setCartItems(cartItems);
-            Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
-            if(loginUser != null)
+/*            Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
+            if(loginUser != null) {
                 cart.setCustomer(loginUser);
+            }*/
             cart = cartRepository.saveAndFlush(cart);
             cartRepository.refresh(cart);
         }
@@ -242,8 +253,20 @@ public class TenantCartService {
     private TenantCart getCartByCustomer(Customer loginUser) {
         List<TenantCart> carts = cartRepository.findByCustomerIdAndCartStateOrderByIdDesc(loginUser.getId(), CartState.CLAIMED);
         if (carts.size() == 0) {
-            TenantCart cart = new TenantCart();
+            /*TenantCart cart = new TenantCart();
             //cart.setCustomer(loginUser);
+            cart.setSecureKey(createUIUD());
+            cart.setCartState(CartState.CLAIMED);
+            return cart;*/
+            return null;
+        }
+        return carts.get(0);
+    }
+    private TenantCart createCustomerCart(Customer loginUser) {
+        List<TenantCart> carts = cartRepository.findByCustomerIdAndCartStateOrderByIdDesc(loginUser.getId(), CartState.CLAIMED);
+        if (carts.size() == 0) {
+            TenantCart cart = new TenantCart();
+            cart.setCustomer(loginUser);
             cart.setSecureKey(createUIUD());
             cart.setCartState(CartState.CLAIMED);
             return cart;
@@ -277,7 +300,7 @@ public class TenantCartService {
     }
 
     @Transactional
-    public TenantCheckout createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
+    public Checkout createCheckoutWithCart(String secureKey, List<CartItemDTO> items) {
         //ProfileCart cart = cartRepository.findBySecureKey(secureKey).orElse(new ProfileCart()); //cartMapper.toEntity(cartDTO);
         Locale locale = LocaleContextHolder.getLocale();
         String currency = Currency.getInstance(locale).getCurrencyCode();
@@ -296,26 +319,28 @@ public class TenantCartService {
         }
         String currencyPath = "$.prices."+currency;
         List<CartItemInfo> cartItems = cartItemRepository.findCartItemsWithProductNative(cart.getId(), currencyPath);
-        TenantCheckout checkout = checkoutRepository.findBySecureKeyAndCheckedOut(cart.getSecureKey(),false).orElse(new TenantCheckout());
+        Checkout checkout = checkoutRepository.findBySecureKeyAndCheckedOut(cart.getSecureKey(),false).orElse(new Checkout());
         checkout.setSecureKey(cart.getSecureKey());
         checkout.setCheckedOut(false);
+        checkout.setCarrier(null);
         checkout.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
-        checkout.setCartWeight(cartItems.stream().map(x -> x.getWeight()).reduce(BigDecimal.ZERO, BigDecimal::add));
-
+        checkout.setCartWeight(cartItems.stream().map(x -> x.getWeight().multiply(x.getQuantity())).reduce(BigDecimal.ZERO, BigDecimal::add));
         checkout.setCurrency(currency);
 
-        checkout.setLock(false);
+        //checkout.setLock(false);
         if (customer != null && customer.getAddresses() != null && customer.getAddresses().size() > 0)
-            checkout.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
+            checkout.setAddresses(customer.getAddresses().stream().filter(x->!x.getDeleted()).map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
 
         if (customer != null) {
             checkout.setName(cart.getCustomer().getFirstname() + " " + cart.getCustomer().getFirstname());
             checkout.setEmail(cart.getCustomer().getEmail());
+            checkout.setAllowPickup(customer.getAllowPickup());
         }
         else
             checkout.setGuest(true);
 
         checkout = checkoutRepository.save(checkout);
+        checkoutRepository.flush();
         return checkout;
     }
 
@@ -327,7 +352,44 @@ public class TenantCartService {
         cartRepository.save(cart);
     }
 
-   public CheckoutCart createCustomCart(CheckoutCart cart) {
-        return cart;
+    @Transactional
+    public Checkout createCheckoutPlus(String secureKey, List<LineItem> items) {
+        Customer customer = customerService.getUserWithAuthorities().orElse(null);
+
+        //if (secureKey == null)
+        Checkout checkout;
+        if (secureKey == null)
+            checkout = new Checkout();
+        else
+            checkout = checkoutRepository.findBySecureKeyAndCheckedOut(secureKey, false).orElse(new Checkout());
+
+
+        checkout.setItems(items);
+        if (customer.getAddresses() != null && customer.getAddresses().size() > 0)
+            checkout.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
+
+        if(checkout.getId() == null )
+            checkout.setSecureKey(TenantCartService.createUIUD());
+
+
+        checkout.setName(customer.getFirstname() + " " + customer.getFirstname());
+        checkout.setEmail(customer.getEmail());
+        checkout.setAllowPickup(customer.getAllowPickup());
+        checkout.setPhone(customer.getMobile());
+        checkout.setCartWeight(items.stream().map(x -> x.getWeight()).reduce(BigDecimal.ZERO, BigDecimal::add));
+        checkout.setCurrency("OMR");
+        checkout.setCheckedOut(false);
+
+        checkout = checkoutRepository.save(checkout);
+        return checkout;
+    }
+
+   public Checkout plusCart(String secureKey) {
+       Checkout cart = checkoutRepository.findBySecureKey(secureKey).orElse(null);
+       if(cart != null) {
+           if(cart.getCheckedOut() != null && cart.getCheckedOut())
+               return null;
+       }
+       return cart;
    }
 }

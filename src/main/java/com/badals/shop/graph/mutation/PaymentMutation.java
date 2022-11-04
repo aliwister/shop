@@ -1,10 +1,9 @@
 package com.badals.shop.graph.mutation;
 
+import com.badals.shop.service.TenantPaymentService;
 import com.badals.shop.service.pojo.Message;
-import com.badals.shop.service.pojo.PresignedUrl;
-import com.badals.shop.service.PaymentService;
+
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -12,9 +11,9 @@ import java.net.URL;
 @Component
 public class PaymentMutation implements GraphQLMutationResolver {
 
-    private final PaymentService paymentService;
+    private final TenantPaymentService paymentService;
 
-    public PaymentMutation(PaymentService paymentService) {
+    public PaymentMutation(TenantPaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
