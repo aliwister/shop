@@ -1,20 +1,3 @@
-extend type Query {
-    pricingRequests:[PricingRequest]
-    parentOf(sku: String): String
-    #mws(sku: String):Product
-    #pas(sku: String):Product
-    #pasUk(sku: String):Product
-    #ebay(id: String):Product
-}
-
-extend type Mutation {
-    pasLookup(sku: String): Product
-    addToPricingQ(sku: String):Message
-    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int, dial: String): Product
-    completePricingRequest(id: Long):Message
-    completePricingRequestAndEmail(id: Long):Message
-}
-
 
 enum OverrideType {
     COST

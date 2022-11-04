@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
-import static com.badals.shop.domain.tenant.TenantCheckout_.payment;
+import static com.badals.shop.domain.tenant.Checkout_.payment;
 
 /**
  * Service for sending emails.
@@ -114,9 +114,10 @@ public class MailService {
         context.setVariable(LOGO_HEIGHT, parseHeight(tenant.getLogo()));
         context.setVariable(TENANT, tenantName);
         context.setVariable("view", viewName);
-        for (Attribute attribute: tenant.getSocialList()) {
-            context.setVariable(attribute.getName(), attribute.getValue());
-        }
+        if(tenant.getSocialList() != null)
+            for (Attribute attribute: tenant.getSocialList()) {
+                context.setVariable(attribute.getName(), attribute.getValue());
+            }
         String content = templateEngine.process("mail/template", context);
         String[] subjectParams = params != null && params.length > 0? ArrayUtils.addAll(new String[] {tenantName}, params):new String[] {tenantName};
         String subject = messageSource.getMessage(titleKey, subjectParams, locale);
@@ -157,7 +158,7 @@ public class MailService {
             }}, null);
     }
     @Async
-    public void sendOrderCreationMail(CustomerDTO user, OrderDTO order) {
+    public void sendOrderCreationMail(UserBase user, OrderDTO order) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
         TenantDTO tenant = tenantLayoutService.getTenant();
         sendEmailFromTemplate(user.getEmail(), "mail/views/new_order.html", "email.order.title",
@@ -170,7 +171,7 @@ public class MailService {
             }}, new String[]{order.getReference()});
     }
     @Async
-    public void sendPaymentAddedMail(CustomerDTO user, PaymentDTO payment) {
+    public void sendPaymentAddedMail(UserBase user, PaymentDTO payment) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user.getEmail(),"mail/views/new_payment.html", "email.payment.title",
             new HashMap<String, Object>() {{
@@ -181,7 +182,7 @@ public class MailService {
     }
 
     @Async
-    public void sendPricingMail(Customer user, List<PricingRequestDTO> dtos) {
+    public void sendPricingMail(UserBase user, List<PricingRequestDTO> dtos) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user.getEmail(),"mail/views/price_request.html", "email.pricing.title",
                 new HashMap<String, Object>() {{
@@ -191,7 +192,7 @@ public class MailService {
     }
 
     @Async
-    public void sendVoltageMail(CustomerDTO user, OrderDTO order) {
+    public void sendVoltageMail(UserBase user, OrderDTO order) {
         log.debug("Sending order creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user.getEmail(),"mail/views/edit/voltage.html", "email.voltage.title",
         new HashMap<String, Object>() {{
@@ -202,7 +203,7 @@ public class MailService {
     );
     }
     @Async
-    public void sendCancelMail(CustomerDTO user, OrderDTO order, String reason) {
+    public void sendCancelMail(UserBase user, OrderDTO order, String reason) {
         sendEmailFromTemplate(user.getEmail(),"mail/views/cancel.html", "email.cancel.title",
             new HashMap<String, Object>() {{
                 put(USER, user);
@@ -214,7 +215,7 @@ public class MailService {
         );
     }
     @Async
-    public void sendEditCancelMail(CustomerDTO user, OrderDTO order, String reason) {
+    public void sendEditCancelMail(UserBase user, OrderDTO order, String reason) {
         sendEmailFromTemplate(user.getEmail(),"mail/views/edit_cancel.html", "email.edit.cancel.title",
             new HashMap<String, Object>() {{
                 put(USER, user);
@@ -227,7 +228,7 @@ public class MailService {
         );
     }
     @Async
-    public void sendEditMail(CustomerDTO user, OrderDTO order, String reason) {
+    public void sendEditMail(UserBase user, OrderDTO order, String reason) {
         sendEmailFromTemplate(user.getEmail(),"mail/views/edit.html", "email.edit.title",
             new HashMap<String, Object>() {{
                 put(USER, user);

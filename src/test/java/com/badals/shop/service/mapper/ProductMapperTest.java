@@ -7,11 +7,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProductMapperTest {
 
-    private ProductMapper productMapper;
+    private TenantProductMapper productMapper;
 
     @BeforeEach
     public void setUp() {
-        productMapper = new ProductMapperImpl();
+        productMapper = new TenantProductMapperImpl();
     }
 
     @Test

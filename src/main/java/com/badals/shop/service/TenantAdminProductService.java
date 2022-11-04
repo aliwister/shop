@@ -1,7 +1,6 @@
 package com.badals.shop.service;
 
 import com.badals.shop.aop.tenant.TenantContext;
-import com.badals.shop.domain.Product;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.Attribute;
@@ -14,9 +13,7 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.search.PartnerProductSearchRepository;
-import com.badals.shop.service.dto.MerchantDTO;
 import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -33,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,7 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Service Implementation for managing {@link Product}.
+ * Service Implementation for managing {@link TenantProduct}.
  */
 @Service
 @Transactional
@@ -51,38 +47,29 @@ public class TenantAdminProductService {
     private final Logger log = LoggerFactory.getLogger(TenantAdminProductService.class);
     private final TenantProductRepository productRepository;
     private final MessageSource messageSource;
-    private final AddProductMapper addProductMapper;
     private final PartnerProductMapper partnerProductMapper;
     private final ChildProductMapper childProductMapper;
 
     private final TenantProductMapper productMapper;
 
-    private final ProductLangMapper productLangMapper;
     private final PartnerProductSearchRepository partnerProductSearchRepository;
 
     private final TenantService tenantService;
     private final RecycleService recycleService;
     private final SlugService slugService;
-    private final ProductIndexService productIndexService;
-
-    private final ProductService productService;
     private final S3UploadRequestRepository s3UploadRequestRepository;
     private final AwsService awsService;
 
-    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, AddProductMapper addProductMapper, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, ProductLangMapper productLangMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, ProductIndexService productIndexService, ProductService productService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService) {
+    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
-        this.addProductMapper = addProductMapper;
         this.partnerProductMapper = partnerProductMapper;
         this.childProductMapper = childProductMapper;
         this.productMapper = productMapper;
-        this.productLangMapper = productLangMapper;
         this.partnerProductSearchRepository = partnerProductSearchRepository;
         this.tenantService = tenantService;
         this.recycleService = recycleService;
         this.slugService = slugService;
-        this.productIndexService = productIndexService;
-        this.productService = productService;
         this.s3UploadRequestRepository = s3UploadRequestRepository;
         this.awsService = awsService;
     }

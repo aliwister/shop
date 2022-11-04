@@ -3,11 +3,9 @@ package com.badals.shop.domain.tenant;
 import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.Payment;
 import com.badals.shop.domain.enumeration.OrderChannel;
 import com.badals.shop.domain.enumeration.OrderState;
 
-import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.pojo.OrderAdjustment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -76,7 +74,7 @@ public class TenantOrder implements Serializable, TenantSupport {
 
     @OneToOne
     @JoinColumn(unique = true)
-    private TenantCheckout cart;
+    private Checkout cart;
 
     @NotAudited
     @ManyToOne
@@ -113,7 +111,7 @@ public class TenantOrder implements Serializable, TenantSupport {
     private BigDecimal discountsTotal;
 
     @Column(name = "coupon_name")
-    private BigDecimal couponName;
+    private String couponName;
 
     @Column(name="tenant_id")
     private String tenantId;
@@ -133,6 +131,14 @@ public class TenantOrder implements Serializable, TenantSupport {
     @Type(type = "json")
     @Column(name = "adjustments", columnDefinition = "string")
     private List<OrderAdjustment> orderAdjustments;
+
+    public TenantOrder(Long orderId) {
+        this.id = orderId;
+    }
+
+   public TenantOrder() {
+
+   }
 
 
     public AddressPojo getDeliveryAddressPojo() {
@@ -187,7 +193,7 @@ public class TenantOrder implements Serializable, TenantSupport {
         return this;
     }
 
-    public TenantOrder cart(TenantCheckout cart) {
+    public TenantOrder cart(Checkout cart) {
         this.cart = cart;
         return this;
     }

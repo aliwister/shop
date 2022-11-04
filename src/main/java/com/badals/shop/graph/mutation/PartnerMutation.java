@@ -1,12 +1,11 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.aop.tenant.TenantContext;
-import com.badals.shop.domain.CheckoutCart;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.S3UploadRequest;
-import com.badals.shop.domain.tenant.TenantCheckout;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.*;
@@ -46,23 +45,20 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
-    private final ProductIndexService productIndexService;
-
-    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, ProductIndexService productIndexService) {
+    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService) {
         this.productService = productService;
         this.orderService = orderService;
         this.awsService = awsService;
         this.messageSource = messageSource;
         this.userService = userService;
         this.setupService = setupService;
-        this.productIndexService = productIndexService;
     }
 /*
 
 */
 
 
-    public OrderDTO createPosOrder(TenantCheckout cart, String paymentMethod, String paymentAmount, String ref) {
+    public OrderDTO createPosOrder(Checkout cart, String paymentMethod, String paymentAmount, String ref) {
         return orderService.createPosOrder(cart, paymentMethod, paymentAmount, ref);
 
     }
@@ -70,11 +66,11 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return orderService.voidOrder(id);
 
     }
-    public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
+/*    public Message importProducts(List<AddProductDTO> products, List<Long> shopIds, String browseNode) {
         String t =  TenantContext.getCurrentTenant();
         productIndexService.importProducts(products, TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId(),TenantContext.getCurrentTenant(), shopIds, browseNode);//TenantContext.getCurrentMerchantId(), TenantContext.getCurrentMerchant(), TenantContext.getCurrentTenantId());
         return new Message("success");
-    }
+    }*/
 
     //@PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {

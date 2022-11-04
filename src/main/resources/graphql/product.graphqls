@@ -1,34 +1,6 @@
 type Subscription {
     getProductBySku(sku: String, isParent: Boolean = false, _locale: String):Attribute!
 }
-
-extend type Query {
-
-    product(slug: String!, cookie: String = "", _locale: String): Product!
-    products(category: String, text: String, type: String, offset: Int = 0, limit: Int = 10, lang: String): ProductResponse!
-
-    relatedProducts(type: String, slug: String!): [Product!]!
-    categories(type: String!): [Category!]!
-    category(id: Int!): Category!
-
-    productAny(id: ID):Product
-    productAdmin(id: ID):Product
-
-    getProductBySku(sku: String, isParent: Boolean = false, _locale: String):Product
-    #getProductByDial(dial: String):Product
-
-    relatedTo(ref: Long, hashtags: [String], title: String): HashtagResponse
-    #findByKeyword(keyword: String): ProductResponse
-
-
-    #findByKeywordIndex(keyword: String): ProductResponse
-}
-
-extend type Mutation {
-    addToElastic(id: Long, sku: String, name: String, name_ar: String, shops: [String]): Message
-}
-
-
 enum Condition {
   NEW
   LIKE_NEW

@@ -1,15 +1,13 @@
 package com.badals.shop.graph.mutation;
 
 import com.badals.shop.domain.enumeration.OrderState;
-import com.badals.shop.service.OrderService;
-import com.badals.shop.service.PaymentService;
+
 import com.badals.shop.service.PurchaseService;
 import com.badals.shop.service.dto.*;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -23,16 +21,12 @@ mutation {
  */
 
 @Component
-public class PurchaseMutation implements GraphQLMutationResolver {
+public class TrustPurchaseMutation implements GraphQLMutationResolver {
 
-    final private OrderService orderService;
     final private PurchaseService purchaseService;
-    final private PaymentService paymentService;
 
-    public PurchaseMutation(OrderService orderService, PurchaseService purchaseService, PaymentService paymentService) {
-        this.orderService = orderService;
+    public TrustPurchaseMutation(PurchaseService purchaseService) {
         this.purchaseService = purchaseService;
-        this.paymentService = paymentService;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

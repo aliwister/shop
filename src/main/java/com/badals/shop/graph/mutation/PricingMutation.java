@@ -3,7 +3,7 @@ package com.badals.shop.graph.mutation;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.domain.enumeration.OverrideType;
-import com.badals.shop.repository.CheckoutCartRepository;
+import com.badals.shop.repository.CheckoutRepository;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.PricingRequestDTO;
 import com.badals.shop.service.dto.ProductDTO;
@@ -22,38 +22,26 @@ import java.util.List;
 
 @Component
 public class PricingMutation implements GraphQLMutationResolver {
-    private final ProductService productService;
-
-    private final ProductLangService productLangService;
     private final PricingRequestService pricingRequestService;
     private final UserService userService;
-    private final OrderService orderService;
     private final PurchaseService purchaseService;
-    private final PaymentService paymentService;
     private final MailService mailService;
     private final CustomerService customerService;
     private final ProductOverrideService productOverrideService;
     private final AwsService awsService;
-    private final SpeedDialService speedDialService;
-
     private final MessageSource messageSource;
-    private final CheckoutCartRepository checkoutCartRepository;
+    private final CheckoutRepository checkoutRepository;
 
-    public PricingMutation(ProductService productService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, OrderService orderService, ProductOverrideService productOverrideService, PurchaseService purchaseService, PaymentService paymentService, MailService mailService, AwsService awsService, SpeedDialService speedDialService, CheckoutCartRepository checkoutCartRepository) {
-        this.productService = productService;
-        this.productLangService = productLangService;
+    public PricingMutation( PricingRequestService pricingRequestService, MessageSource messageSource, CustomerService customerService, UserService userService, ProductOverrideService productOverrideService, PurchaseService purchaseService,  MailService mailService, AwsService awsService, CheckoutRepository checkoutRepository) {
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.customerService = customerService;
         this.userService = userService;
-        this.orderService = orderService;
         this.productOverrideService = productOverrideService;
         this.purchaseService = purchaseService;
-        this.paymentService = paymentService;
         this.mailService = mailService;
         this.awsService = awsService;
-        this.speedDialService = speedDialService;
-        this.checkoutCartRepository = checkoutCartRepository;
+        this.checkoutRepository = checkoutRepository;
     }
 
 
@@ -77,13 +65,6 @@ public class PricingMutation implements GraphQLMutationResolver {
             productDTO = productService.lookupPas(sku, true, false);
         else *//*if(merchantId == 2L)
             productDTO = productService.lookupEbay(sku);*/
-
-
-        if(dial != null && !dial.trim().isEmpty()) {
-            speedDialService.save(new SpeedDialDTO().dial(dial).ref(productDTO.getRef()).expires(Instant.now()));
-        }
-
-
         return productDTO;
     }
 

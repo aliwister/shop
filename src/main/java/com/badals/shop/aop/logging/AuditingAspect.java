@@ -33,13 +33,13 @@ public class AuditingAspect {
     @Autowired
     ActionRepository actionRepository;
 
-    @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..)) ||" +
+ /*   @Around("execution(* com.badals.shop.graph.query.ProductQuery.product(..)) ||" +
             "execution(* com.badals.shop.graph.query.ProductQuery.getProductBySku(..)) ||" +
             "execution(* com.badals.shop.graph.query.ProductQuery.getProductByDial(..))")
     public Object beforeWebMethodExecution1(ProceedingJoinPoint joinPoint) throws Throwable {
         addAction(joinPoint);
         return joinPoint.proceed();
-    }
+    }*/
 
     @Around("execution(* com.badals.shop.graph.mutation.*.*(..))")
     public Object beforeWebMethodExecution2(ProceedingJoinPoint joinPoint) throws Throwable {

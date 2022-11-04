@@ -56,6 +56,7 @@ public class TenantDTO implements Serializable {
     private String tenantId;
     private String defaultLocale;
     private List<Attribute> socialList;
+    private String searchEngineKey;
 
     @Override
     public boolean equals(Object o) {

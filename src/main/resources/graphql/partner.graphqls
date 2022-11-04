@@ -34,7 +34,7 @@ extend type Mutation {
     setOrderState(value: OrderState): Message
     deleteProduct(id: Long): Message
     voidOrder(id: Long): Message
-    createPosOrder(cart: CheckoutCartInput, paymentMethod: String, paymentAmount: String, ref: String): Order
+    createPosOrder(cart: CheckoutInput, paymentMethod: String, paymentAmount: String, ref: String): Order
 }
 
 enum AssetType {

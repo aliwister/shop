@@ -2,6 +2,8 @@ package com.badals.shop.graph.mutation;
 
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.pojo.Attribute;
+import com.badals.shop.domain.pojo.LineItem;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
@@ -39,8 +41,6 @@ public class ShopMutation implements GraphQLMutationResolver {
     private final TenantSetupService tenantSetupService;
     private final TenantCartService cartService;
 
-    private final ProductLangService productLangService;
-
     private final PricingRequestService pricingRequestService;
 
     private final MessageSource messageSource;
@@ -53,11 +53,10 @@ public class ShopMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, ProductLangService productLangService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
+    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
         this.productService = productService;
         this.tenantSetupService = tenantSetupService;
         this.cartService = cartService;
-        this.productLangService = productLangService;
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.userService = userService;
@@ -81,8 +80,17 @@ public class ShopMutation implements GraphQLMutationResolver {
         return new CheckoutSession("/checkout/" + token + "/address", token);
     }
 
-    public ProductDTO createStubFromSearch(ProductDTO dto) throws URISyntaxException {
-        return productService.createStubFromSearch(dto);
+    public ProductDTO createStubFromSearch(ProductDTO dto, String tag) throws URISyntaxException {
+        return productService.createStubFromSearch(dto, tag);
+    }
+    public ProductDTO removeTag(String ref, String tag) throws URISyntaxException {
+        return productService.removeTag(ref, tag);
+    }
+
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    public Checkout createPlusCart(String secureKey, List<LineItem> items) {
+        Checkout cart = cartService.createCheckoutPlus(secureKey, items);
+        return cart;
     }
 }
 

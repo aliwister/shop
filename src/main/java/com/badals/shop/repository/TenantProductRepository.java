@@ -1,6 +1,5 @@
 package com.badals.shop.repository;
 
-import com.badals.shop.domain.Product;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.web.rest.AuditResource;
@@ -38,7 +37,7 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
     BigDecimal lookupWeight(@Param(value = "sku") String sku);
 
     @Query("from TenantProduct u  left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.sku = ?1 and u.merchantId = ?2")
-    Optional<Product> findBySkuJoinChildren(String asin, Long merchantId);
+    Optional<TenantProduct> findBySkuJoinChildren(String asin, Long merchantId);
 
     @Query("from TenantProduct u left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.id = ?1 ")
     Optional<TenantProduct> findByIdJoinChildren(Long id);

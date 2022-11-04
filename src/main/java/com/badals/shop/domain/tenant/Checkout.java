@@ -30,7 +30,7 @@ import java.util.List;
 @Table(catalog = "profileshop", name = "checkout")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
-public class TenantCheckout implements Serializable, TenantSupport {
+public class Checkout implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,9 +43,6 @@ public class TenantCheckout implements Serializable, TenantSupport {
     private String name;
     private String phone;
     private String email;
-
-    @Column(name="_lock")
-    private Boolean lock;
 
     @Column(name="guest")
     private Boolean guest;
@@ -109,10 +106,10 @@ public class TenantCheckout implements Serializable, TenantSupport {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TenantCheckout)) {
+        if (!(o instanceof Checkout)) {
             return false;
         }
-        return id != null && id.equals(((TenantCheckout) o).id);
+        return id != null && id.equals(((Checkout) o).id);
     }
 
     @Override

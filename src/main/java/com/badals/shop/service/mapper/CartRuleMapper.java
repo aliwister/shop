@@ -8,12 +8,12 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link CartRule} and its DTO {@link CartRuleDTO}.
  */
-@Mapper(componentModel = "spring", uses = {CustomerMapper.class, HashtagMapper.class})
+@Mapper(componentModel = "spring", uses = {CustomerMapper.class, TenantHashtagMapper.class})
 public interface CartRuleMapper extends EntityMapper<CartRuleDTO, CartRule> {
 
     @Mapping(source = "customer.id", target = "customerId")
     @Mapping(source = "hashtagRestriction.id", target = "hashtagRestrictionId")
-    @Mapping(source = "hashtagRestriction.en", target = "hashtagRestrictionEn")
+    @Mapping(source = "hashtagRestriction.name", target = "hashtagRestrictionEn")
     CartRuleDTO toDto(CartRule cartRule);
 
     @Mapping(source = "customerId", target = "customer")
