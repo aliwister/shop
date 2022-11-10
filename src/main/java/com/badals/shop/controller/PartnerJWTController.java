@@ -2,6 +2,8 @@ package com.badals.shop.controller;
 
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.tenant.Tenant;
+import com.badals.shop.security.SecurityUtils;
+import com.badals.shop.web.rest.errors.InvalidPasswordException;
 import com.badals.shop.web.rest.vm.LoginVM;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
@@ -21,13 +23,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +47,20 @@ public class PartnerJWTController {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tenantRepository = tenantRepository;
         this.userRepository = userRepository;
+    }
+    @GetMapping("/partner-me")
+    public ResponseEntity<PartnerJWTController.JwtPartnerAuthenticationResponse> getUserWithAuthorities() throws IllegalAccessException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object userObj = authentication.getPrincipal();
+
+        if (userObj == null|| userObj.equals("anonymousUser")) {
+            throw new IllegalAccessException("Not Authorized");
+        }
+        User user = (User) userObj;
+        com.badals.shop.domain.User dbUser = userRepository.findOneByEmailIgnoreCaseAndTenantId(user.getUsername(), com.badals.shop.domain.User.tenantFilter).get();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        List<Tenant> tenantList = tenantRepository.findTenantsForUser(dbUser.getId());
+        return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(null, authentication.getPrincipal(), tenantList), httpHeaders, HttpStatus.OK);
     }
 
     @PostMapping("/store-select")
