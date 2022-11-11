@@ -60,7 +60,7 @@ public class PartnerJWTController {
         com.badals.shop.domain.User dbUser = userRepository.findOneByEmailIgnoreCaseAndTenantId(user.getUsername(), com.badals.shop.domain.User.tenantFilter).get();
         HttpHeaders httpHeaders = new HttpHeaders();
         List<Tenant> tenantList = tenantRepository.findTenantsForUser(dbUser.getId());
-        return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(null, authentication.getPrincipal(), tenantList), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(null, authentication.getPrincipal(), tenantList, false), httpHeaders, HttpStatus.OK);
     }
 
     @PostMapping("/store-select")
@@ -108,7 +108,7 @@ public class PartnerJWTController {
         String jwt = tokenProvider.createToken(authentication, rememberMe);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-        return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(jwt, authentication.getPrincipal(), tenantList), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(jwt, authentication.getPrincipal(), tenantList, true), httpHeaders, HttpStatus.OK);
     }
 
     /**
@@ -156,14 +156,16 @@ public class PartnerJWTController {
         private final String tenants;
         @JsonProperty("id_token")
         private final String idToken;
+        private final Boolean isStoreSelect;
         private final String tokenType = "Bearer";
         private final String username;
 
-        public JwtPartnerAuthenticationResponse(String accessToken, Object user, List<Tenant> stores) {
+        public JwtPartnerAuthenticationResponse(String accessToken, Object user, List<Tenant> stores, Boolean isStoreSelect) {
             this.idToken = accessToken;
             User userP = (User) user;
             //this.id = userP.
             this.username = userP.getUsername();
+            this.isStoreSelect = isStoreSelect;
             //this.firstName = userP.getName();
             this.authorities = String.join(",",userP.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()));
             this.tenants = String.join(",",stores.stream().map(Tenant::getTenantId).collect(Collectors.toSet()));
