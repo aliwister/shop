@@ -60,7 +60,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
            "left join `profileshop`.`purchase_item` `pui` on `pui`.`id` = `pioi`.`purchase_item_id`  " +
            "where  " +
            "     o.tenant_id = 'badals'  " +
-           "     and o.id> 90000  " +
+           "     and o.id> 105000  " +
            "group by  " +
            "    `oi`.`id`  " +
            "having  " +
