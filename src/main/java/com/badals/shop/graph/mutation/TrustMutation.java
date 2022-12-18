@@ -24,5 +24,12 @@ public class TrustMutation implements GraphQLMutationResolver {
         return new PresignedUrl(url.toString(), "https://cdn.badals.com/" + filename, "200");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public PresignedUrl getAdminFile(String filename, String contentType) {
+        String objectKey = filename;
+        URL url = awsService.presignGetUrl(objectKey, contentType);
+        return new PresignedUrl(url.toString(), "https://cdn.badals.com/" + filename, "200");
+    }
+
 }
 
