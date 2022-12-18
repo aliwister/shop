@@ -96,12 +96,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new PresignedUrl("","","");*
         return adminMutation.getUploadUrl(objectKey, contentType);*/
     }
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public PresignedUrl getAdminFile(String filename, String contentType) {
-        String objectKey = filename;
-        URL url = awsService.presignGetUrl(objectKey, contentType);
-        return new PresignedUrl(url.toString(), cdnUrl + "/" + filename, "200");
-    }
+
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public PresignedUrl getAdminImageUploadUrl(String filename, String merchant, String contentType) {
