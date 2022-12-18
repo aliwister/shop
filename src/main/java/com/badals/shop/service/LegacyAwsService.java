@@ -67,7 +67,17 @@ public class LegacyAwsService {
 
    public URL presignGetUrl( String objectKey, String contentType) {
       Region region = Region.EU_CENTRAL_1;
-      S3Presigner presigner = S3Presigner.builder().region(region).build();
+      S3Presigner presigner = S3Presigner.builder().credentialsProvider(StaticCredentialsProvider.create(new AwsCredentials() {
+         @Override
+         public String accessKeyId() {
+            return accessKey1;
+         }
+
+         @Override
+         public String secretAccessKey() {
+            return secretKey1;
+         }
+      })).region(region).build();
 
       PresignedGetObjectRequest presignedRequest =
               presigner.presignGetObject(z -> z.signatureDuration(Duration.ofMinutes(10))
