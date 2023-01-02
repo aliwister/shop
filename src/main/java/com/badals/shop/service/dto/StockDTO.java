@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
- * A DTO for the {@link com.badals.shop.domain.MerchantStock} entity.
+ * A DTO for the {@link com.badals.shop.domain.Stock} entity.
  */
 public class StockDTO implements Serializable {
 

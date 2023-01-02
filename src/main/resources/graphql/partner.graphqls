@@ -59,7 +59,7 @@ type PartnerProduct {
     image: String    # Main image
     listPrice: PriceList # null For Parent
     price: PriceList # null For Parent
-    cost: Price
+    #cost: Price
     weight: BigDecimal
     variationType: String     # SIMPLE, CHILD, PARENT
     slug: String
@@ -71,12 +71,23 @@ type PartnerProduct {
     gallery: [String]   # Ordered
     children: [ChildProduct]
     attributes: [AttributeI18n]
-    deliveryProfiles: [Attribute]
+    deliveryProfiles: [String]
+    stock: [PartnerStock]
 }
 type PartnerProductResponse {
     items: [PartnerProduct]
     total: Int!
     hasMore: Boolean!
+}
+
+type PartnerStock {
+    id: ID
+    quantity: BigDecimal
+    availability: Int
+    allow_backorder: Boolean
+    link: String
+    location: String
+    cost: Price
 }
 
 type ChildProduct {
@@ -132,7 +143,18 @@ input PartnerProductInput {
     gallery: [String]   # Ordered
     children: [ChildProductInput]
     attributes: [AttributeI18nInput]
-    deliveryProfiles: [AttributeInput]
+    deliveryProfiles: [String]
+    stock: [PartnerStockInput]
+}
+
+input PartnerStockInput {
+    id: ID
+    quantity: BigDecimal
+    availability: Int
+    allow_backorder: Boolean
+    link: String
+    location: String
+    cost: PriceInput
 }
 
 type Partner {

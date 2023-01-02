@@ -50,6 +50,7 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
     @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversionList")
     @Mapping(target = "gallery", source="gallery", qualifiedByName = "buildGallery")
     @Mapping(target = "cost", ignore = true)
+    @Mapping(target = "stock", ignore = true)
     ProductDTO toProductDto(PartnerProduct product);
 
     @Mapping(target = "gallery", ignore = true)
@@ -150,25 +151,25 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
         }
 
         // Process sale price and discount percentage
-        TenantStock stock = source.getStock().stream().findFirst().orElse(null);
+/*        TenantStock stock = source.getStock().stream().findFirst().orElse(null);
         if (stock != null) {
-/*            target.setSalePriceObj(stock.getPrice());
-            target.setPriceObj(source.getPrice());*/
+*//*            target.setSalePriceObj(stock.getPrice());
+            target.setPriceObj(source.getPrice());*//*
             target.setCost(stock.getCost());
             target.setQuantity(stock.getQuantity());
 
-/*            if(stock.getDiscount() != null) {
+*//*            if(stock.getDiscount() != null) {
                 int discount = stock.getDiscount();
                 target.setDiscountInPercent(discount);
                 //target.setPrice(new BigDecimal((int)(10*stock.getPrice().doubleValue()/(1.0-discount*.01))/10.0 ));
-            }*/
+            }*//*
             int hours = stock.getAvailability();
-            /*
+            *//*
             @Todo
             Move to language files
-             */
+             *//*
             target.setAvailability(hours);
-        }
+        }*/
         //String name = source.getLangs().stream().filter(x -> x != null && x.getLang().equals("en")).findFirst().get().getName();
         //target.setTi(name);
     }

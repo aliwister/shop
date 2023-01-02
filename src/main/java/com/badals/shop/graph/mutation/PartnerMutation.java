@@ -146,7 +146,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         Integer code = 202;
 
         try {
-            p = productService.savePartnerProduct(product, true);
+            p = productService.savePartnerProduct(product, false);
             message.append("Success");
         }
         catch(Throwable e) {

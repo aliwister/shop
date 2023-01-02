@@ -14,6 +14,7 @@ import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.search.PartnerProductSearchRepository;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.dto.StockDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -111,6 +112,11 @@ public class TenantAdminProductService {
         return req.getId();
     }
 
+/*    private TenantProduct saveStock(TenantProduct product, StockDTO stock) {
+        product.setS
+    }*/
+
+    @Transactional
     public PartnerProduct savePartnerProduct(PartnerProduct dto, boolean isSaveES) throws ProductNotFoundException, ValidationException {
         Long currentMerchantId = TenantContext.getCurrentMerchantId();
         String currentTenantId = TenantContext.getCurrentTenant();
@@ -169,12 +175,13 @@ public class TenantAdminProductService {
             assert(dto.getPrice() != null);
             master.setVariationType(VariationType.SIMPLE);
             TenantStock stock  = null;
-            if(master.getStock() != null) {
+            /*if(master.getStock() != null) {
                 stock = master.getStock().stream().findFirst().orElse(new TenantStock());
-                stock = setStock(stock, master,/* dto.getPriceObj(), dto.getSalePriceObj()==null?dto.getPriceObj():dto.getSalePriceObj(),*/ dto.getCost(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
+                stock = setStock(stock, master,*//* dto.getPriceObj(), dto.getSalePriceObj()==null?dto.getPriceObj():dto.getSalePriceObj(),*//* dto.getCost(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
             }
             if(stock != null && stock.getId() == null)
-                master.addStock(stock);
+                master.addStock(stock);*/
+            saveStock(master, update, dto, currentMerchantId, _new);
         }
         else { // PARENT    //if(product.getVariationType().equals(VariationType.PARENT)) {
             assert(dto.getPrice() == null);
@@ -182,17 +189,24 @@ public class TenantAdminProductService {
             saveChildren(master, update, dto, currentMerchantId, _new);
         }
 
-
-
-
         master.setActive(false);
         master.setMerchantId(currentMerchantId);
-        productRepository.save(master);
+        TenantProduct tp = productRepository.save(master);
 
-        PartnerProduct esDto = partnerProductMapper.toDto(master);
+        PartnerProduct esDto = partnerProductMapper.toDto(tp);
         if(isSaveES)
             partnerProductSearchRepository.save(esDto);
-        return partnerProductMapper.toDto(master);
+        return partnerProductMapper.toDto(tp);
+    }
+
+    private void saveStock(TenantProduct master, TenantProduct update, PartnerProduct dto, Long currentMerchantId, boolean _new) {
+        //Set<TenantStock> masterStock = master.getStock();
+        Set<TenantStock> updateStock = update.getStock();
+        master.getStock().clear();
+        for (TenantStock a: updateStock) {
+
+            master.addStock(a);
+        }
     }
 
     private void validatePartnerProduct(PartnerProduct dto, boolean isNew) {
