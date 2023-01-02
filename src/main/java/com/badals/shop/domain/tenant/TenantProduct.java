@@ -200,7 +200,7 @@ public class TenantProduct implements Serializable, TenantSupport {
 
     @Type(type = "json")
     @Getter @Setter @Column(name = "delivery_profiles", columnDefinition = "string")
-    List<Attribute> deliveryProfiles;
+    List<String> deliveryProfiles;
 
     @Type(type = "json")
     @Column(name = "list_price")

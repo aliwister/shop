@@ -1,6 +1,7 @@
 package com.badals.shop.service.pojo;
 
 import com.badals.shop.domain.pojo.*;
+import com.badals.shop.service.dto.StockDTO;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -48,6 +49,7 @@ public class PartnerProduct {
 
 
    List<ChildProduct> children;
+   List<PartnerStock> stock;
    public PriceList listPrice = new PriceList();
    public PriceList price = new PriceList();
 
@@ -60,6 +62,6 @@ public class PartnerProduct {
    List<AttributesLang> attributes;
    List<VariationOption> options;
 
-   List<Attribute> deliveryProfiles;
+   List<String> deliveryProfiles;
 
 }
