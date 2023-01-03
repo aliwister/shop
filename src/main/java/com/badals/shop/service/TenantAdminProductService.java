@@ -34,6 +34,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -146,6 +147,7 @@ public class TenantAdminProductService {
                 master.getProductLangs().stream().forEach(x -> x.setProduct(master));*/
             master.setMerchantId(currentMerchantId);
             master.setTenantId(currentTenantId);
+            master.setActive(false);
         }
         else {
             if(master.getSku().equals(update.getSku())) {
@@ -189,7 +191,7 @@ public class TenantAdminProductService {
             saveChildren(master, update, dto, currentMerchantId, _new);
         }
 
-        master.setActive(false);
+
         master.setMerchantId(currentMerchantId);
         TenantProduct tp = productRepository.save(master);
 
@@ -202,6 +204,8 @@ public class TenantAdminProductService {
     private void saveStock(TenantProduct master, TenantProduct update, PartnerProduct dto, Long currentMerchantId, boolean _new) {
         //Set<TenantStock> masterStock = master.getStock();
         Set<TenantStock> updateStock = update.getStock();
+        if(master.getStock() == null)
+            master.setStock(new HashSet<>());
         master.getStock().clear();
         for (TenantStock a: updateStock) {
 
