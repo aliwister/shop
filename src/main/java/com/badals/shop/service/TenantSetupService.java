@@ -120,6 +120,7 @@ public class TenantSetupService {
       tenantRepository.save(tenant);
    }
 
+   @Transactional
    public void addMedia(S3UploadRequest request) {
       Media media = new Media();
       media.setKey(request.getKey());
