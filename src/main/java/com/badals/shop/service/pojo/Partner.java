@@ -29,6 +29,7 @@ public class Partner implements Serializable {
     private String title;
     private String customDomain;
     private String subdomain;
+    private Boolean isSubdomain;
 
     private Long maxProducts;
 
