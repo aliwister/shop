@@ -21,6 +21,7 @@ import com.badals.shop.service.mapper.TenantOrderMapper;
 import com.badals.shop.service.util.MailService;
 import com.badals.shop.web.rest.errors.InvalidPhoneException;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
+import com.google.gson.Gson;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -187,16 +188,14 @@ public class TenantOrderService {
         Double minBalance = minBal.doubleValue();
         List<OrderDTO> orders = null;
         Page<OrderDTO> page = null;
+        if(!balance) minBalance = -100000.0;
         if (searchText != null && searchText.length() > 0) {
+            String states = new Gson().toJson(orderState);
+            page= orderSearchRepository.searchByKeyword(searchText, states, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id"))));
 
-            page= orderSearchRepository.searchByKeyword(searchText, TenantContext.getCurrentProfile(), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id"))));
-            if (balance) {
-                orders = StreamSupport
-                        .stream(page.spliterator(), false).filter(x -> x.getBalance().compareTo(minBal) == 1).collect(Collectors.toList());
-            }
-            else
-                orders = StreamSupport
+            orders = StreamSupport
                     .stream(page.spliterator(), false).collect(Collectors.toList());
+
         }
         else if(balance) {
             if(isAsc) {
@@ -205,7 +204,7 @@ public class TenantOrderService {
                         .stream(page.spliterator(), false).collect(Collectors.toList());
             }
             else {
-                page = orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset / limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC, "id"))));
+                page = orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateDesc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset / limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC, "id"))));
                 orders = StreamSupport
                         .stream(page.spliterator(), false).collect(Collectors.toList());
             }
