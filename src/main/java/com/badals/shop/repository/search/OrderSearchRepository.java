@@ -11,8 +11,8 @@ import java.util.List;
 
 public interface OrderSearchRepository extends ElasticsearchRepository<OrderDTO, Long> {
    //AddProductDTO findBySlug(String slug);
-   List<OrderDTO> findAllByCustomerContainsAndTenantIdOrderById(String search, String tenantId, Pageable p);
-   List<OrderDTO> findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(List<OrderState> orderStates, Double balance, String tenantId, Pageable p);
-   List<OrderDTO> findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateDesc(List<OrderState> orderStates, Double balance, String tenantId, Pageable p);
+   Page<OrderDTO> findAllByCustomerContainsAndTenantIdOrderById(String search, String tenantId, Pageable p);
+   Page<OrderDTO> findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(List<OrderState> orderStates, Double balance, String tenantId, Pageable p);
+   Page<OrderDTO> findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateDesc(List<OrderState> orderStates, Double balance, String tenantId, Pageable p);
 
 }
