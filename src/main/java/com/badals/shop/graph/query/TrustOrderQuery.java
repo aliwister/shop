@@ -13,6 +13,7 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -38,8 +39,8 @@ public class TrustOrderQuery extends BaseQuery implements GraphQLQueryResolver {
    }
 
    @PreAuthorize("hasRole('ROLE_ADMIN')")
-   public OrderResponse ordersA(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) throws OrderNotFoundException {
-      return orderService.getOrders(orderState, offset, limit, searchText, balance);
+   public OrderResponse ordersA(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance, Boolean isAsc, BigDecimal minBal) throws OrderNotFoundException {
+      return orderService.getOrders(orderState, offset, limit, searchText, balance, isAsc, minBal);
       //return orders;
    }
 

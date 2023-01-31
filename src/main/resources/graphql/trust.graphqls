@@ -5,7 +5,7 @@ extend type Query {
     purchaseQueue: [PurchaseQueue]
     merchants: [Merchant]
 
-    ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
+    ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean, isAsc: Boolean, minBal: BigDecimal): OrderResponse
     orderA(id: ID): Order
     auditActivity(id: ID, type: String) : [Action]
     payments(orderId: ID) : [Payment]

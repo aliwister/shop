@@ -47,6 +47,7 @@ public class OrderDTO implements Serializable {
     private CartDTO cart;
 
     private Long cartId;
+    private Long customerId;
     private String cartSecureKey;
 
     private AddressDTO deliveryAddress;

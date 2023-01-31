@@ -1,5 +1,6 @@
 package com.badals.shop.service;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.UserBase;
@@ -7,6 +8,7 @@ import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.badals.shop.repository.TenantOrderRepository;
+import com.badals.shop.repository.search.OrderSearchRepository;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.graph.OrderResponse;
@@ -26,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,9 @@ import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 /**
  * Service Implementation for managing {@link TenantOrder}.
@@ -60,8 +66,9 @@ public class TenantOrderService {
     private final CustomerMapper customerMapper;
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
+    private final OrderSearchRepository orderSearchRepository;
 
-    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService) {
+    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService, OrderSearchRepository orderSearchRepository) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -73,6 +80,7 @@ public class TenantOrderService {
         this.customerMapper = customerMapper;
         this.addressRepository = addressRepository;
         this.cartService = cartService;
+        this.orderSearchRepository = orderSearchRepository;
     }
     /**
      * Save a order.
@@ -156,7 +164,11 @@ public class TenantOrderService {
         sendConfirmationEmail(dto);
         return dto;
     }
-    public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) {
+    public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance, Boolean isAsc, BigDecimal minBal) {
+        if(searchText.length() > 2 || balance) {
+            return searchOrders(orderState, offset, limit, searchText, balance, isAsc, minBal);
+        }
+
         Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();
         response.setTotal(orders.getSize());
@@ -166,6 +178,29 @@ public class TenantOrderService {
         return response;
 
     }
+
+    public OrderResponse searchOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance, Boolean isAsc, BigDecimal minBal) {
+        OrderResponse response = new OrderResponse();
+        List<OrderDTO> orders = null;
+        if(balance) {
+            if(isAsc)
+                orders = StreamSupport
+                    .stream(orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(orderState, minBal, TenantContext.getCurrentProfile(), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
+            else
+                orders = StreamSupport
+                        .stream(orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateDesc(orderState, minBal, TenantContext.getCurrentProfile(), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
+
+        }
+        else
+            orders = StreamSupport
+                    .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
+        response.setItems(orders);
+        response.setTotal(orders.size());
+        Integer total = orderRepository.countForState(orderState);
+        response.setHasMore((limit+offset) < total);
+        return response;
+    }
+
     public Optional<OrderDTO> getOrderWithOrderItems(Long id) {
         return orderRepository.findForOrderDetails(id, String.valueOf(id)).map(orderMapper::toDto);
     }
@@ -206,7 +241,7 @@ public class TenantOrderService {
     private OrderDTO save(TenantOrder order) {
         order = orderRepository.save(order);
         OrderDTO dto = orderMapper.toDto(order);
-        //orderSearchRepository.save(dto);
+        orderSearchRepository.save(dto);
         return dto;
     }
 
