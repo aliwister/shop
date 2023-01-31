@@ -16,7 +16,7 @@ public interface OrderSearchRepository extends ElasticsearchRepository<OrderDTO,
    Page<OrderDTO> findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(List<OrderState> orderStates, Double balance, String tenantId, Pageable p);
    Page<OrderDTO> findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateDesc(List<OrderState> orderStates, Double balance, String tenantId, Pageable p);
 
-   @Query("{ \"bool\": {\"must\": [ {\"query_string\": { \"query\": \"?0\" } }],\"filter\": [ {\"match\": { \"tenantId\": \"?1\"} }] }}")
-   Page<OrderDTO> searchByKeyword(String keyword, String tenantId, Pageable p);
+   @Query("{ \"bool\": {\"must\": [ {\"query_string\": { \"query\": \"?0\" } }],\"filter\": [ {\"match\": { \"tenantId\": \"?3\"} },{\"terms\": { \"orderState.keyword\": ?1 }}, {\"range\": { \"balance\": {\"gt\": ?2 } } }] }}")
+   Page<OrderDTO> searchByKeyword(String keyword, String states, Double minBalance, String tenantId, Pageable p);
 
 }
