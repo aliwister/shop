@@ -183,24 +183,28 @@ public class TenantOrderService {
         OrderResponse response = new OrderResponse();
         Double minBalance = minBal.doubleValue();
         List<OrderDTO> orders = null;
+        Page<OrderDTO> page = null;
         if (searchText != null && searchText.length() > 0) {
+            page= orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id"))));
             if (balance) {
                 orders = StreamSupport
-                        .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).filter(x -> x.getBalance().compareTo(minBal) == 1).collect(Collectors.toList());
+                        .stream(page.spliterator(), false).filter(x -> x.getBalance().compareTo(minBal) == 1).collect(Collectors.toList());
             }
             else
                 orders = StreamSupport
                     .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
-
         }
         else if(balance) {
-            if(isAsc)
+            if(isAsc) {
+                page = orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset / limit, limit, new Sort(new Sort.Order(Sort.Direction.ASC, "id"))));
                 orders = StreamSupport
-                    .stream(orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
-            else
+                        .stream(page.spliterator(), false).collect(Collectors.toList());
+            }
+            else {
+                page = orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset / limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC, "id"))));
                 orders = StreamSupport
-                        .stream(orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateDesc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
-
+                        .stream(page.spliterator(), false).collect(Collectors.toList());
+            }
         }
         else
             orders = StreamSupport
@@ -208,8 +212,7 @@ public class TenantOrderService {
 
         response.setItems(orders);
         response.setTotal(orders.size());
-        Integer total = orderRepository.countForState(orderState);
-        response.setHasMore((limit+offset) < total);
+        response.setHasMore((limit+offset) < page.getTotalElements());
         return response;
     }
 
