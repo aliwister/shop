@@ -361,7 +361,7 @@ public class TenantAdminOrderService {
         return new Message("success");
     }
     public void reIndex(Long from, Long to) {
-        List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toDto).collect(Collectors.toList());
+        List<OrderDTO> dtos = orderRepository.findByIdBetween(from, to).stream().map(orderMapper::toIndexDto).collect(Collectors.toList());
         if(dtos.isEmpty())
             return;
         //dtos.stream().forEach(x -> orderSearchRepository.index(x));
