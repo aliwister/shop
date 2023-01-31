@@ -4,10 +4,7 @@ import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.service.dto.AddressDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.PaymentDTO;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 import java.math.BigDecimal;
 
@@ -26,6 +23,15 @@ public interface TenantOrderMapper extends EntityMapper<OrderDTO, TenantOrder> {
     @Mapping(source = "cart.secureKey", target="cartSecureKey")
     @Mapping(source = "orderItems", target="items")
     OrderDTO toDto(TenantOrder order);
+
+    @Mapping(target="cart", ignore = true)
+    @Mapping(target="customer", ignore = true)
+    @Mapping(source = "cart.id", target="cartId")
+    @Mapping(source = "cart.secureKey", target="cartSecureKey")
+    @Mapping(source = "orderItems", target="items")
+    @Mapping(source = "customer.id", target="customerId")
+    @Named("toIndexDto")
+    OrderDTO toIndexDto(TenantOrder order);
 
     default TenantOrder fromId(Long id) {
         if (id == null) {
