@@ -12,8 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -58,7 +57,14 @@ public class MyusController {
       log.info("detrack-------------------------------------------------------------------------------------------2");
       updateDelivery(confirmation);*/
       //  _emailService.sendMail("sales@badals.com", "ali@badals.com", "Post detrack", confirmation.getAddress());
-      return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
+      RestTemplate restTemplate = new RestTemplate();
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_JSON);
+
+      HttpEntity<JsonNode> entity = new HttpEntity<JsonNode>(json,headers);
+      ResponseEntity<byte[]> response = restTemplate.postForEntity("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b", entity, byte[].class);
+      return ResponseEntity.ok().build();//.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
+
    }
    @RequestMapping(path="/shipment", method= RequestMethod.POST)
    public ResponseEntity<Void> shipment(@RequestBody JsonNode json) throws IOException, URISyntaxException, ParseException {
@@ -71,6 +77,12 @@ public class MyusController {
       log.info("detrack-------------------------------------------------------------------------------------------2");
       updateDelivery(confirmation);
       //  _emailService.sendMail("sales@badals.com", "ali@badals.com", "Post detrack", confirmation.getAddress());*/
-      return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
+      RestTemplate restTemplate = new RestTemplate();
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_JSON);
+
+      HttpEntity<JsonNode> entity = new HttpEntity<JsonNode>(json,headers);
+      ResponseEntity<byte[]> response = restTemplate.postForEntity("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b", entity, byte[].class);
+      return ResponseEntity.ok().build();//.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
    }
 }
