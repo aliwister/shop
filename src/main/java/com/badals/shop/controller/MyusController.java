@@ -8,6 +8,7 @@ import com.badals.shop.service.AwsService;
 import com.badals.shop.service.ShipmentDocService;
 import com.badals.shop.service.ShipmentService;
 import com.badals.shop.service.TenantOrderService;
+import com.badals.shop.service.pojo.Message;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ public class MyusController {
    }
 
    @RequestMapping(path="/pkg", method= RequestMethod.POST)
-   public ResponseEntity<Void> pkg(@RequestBody JsonNode json) throws IOException, URISyntaxException, ParseException {
+   public ResponseEntity<Message> pkg(@RequestBody JsonNode json) throws IOException, URISyntaxException, ParseException {
 
       //_emailService.sendMail("sales@badals.com", "ali@badals.com", "Post detrack", json);
 /*      log.info("detrack-------------------------------------------------------------------------------------------");
@@ -63,11 +64,11 @@ public class MyusController {
 
       HttpEntity<JsonNode> entity = new HttpEntity<JsonNode>(json,headers);
       ResponseEntity<byte[]> response = restTemplate.postForEntity("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b", entity, byte[].class);
-      return ResponseEntity.ok().build();//.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
+      return new ResponseEntity<Message>(new Message("Success", "200"), HttpStatus.OK);//.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
 
    }
    @RequestMapping(path="/shipment", method= RequestMethod.POST)
-   public ResponseEntity<Void> shipment(@RequestBody JsonNode json) throws IOException, URISyntaxException, ParseException {
+   public ResponseEntity<Message> shipment(@RequestBody JsonNode json) throws IOException, URISyntaxException, ParseException {
 /*
       //_emailService.sendMail("sales@badals.com", "ali@badals.com", "Post detrack", json);
       log.info("detrack-------------------------------------------------------------------------------------------");
@@ -83,6 +84,6 @@ public class MyusController {
 
       HttpEntity<JsonNode> entity = new HttpEntity<JsonNode>(json,headers);
       ResponseEntity<byte[]> response = restTemplate.postForEntity("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b", entity, byte[].class);
-      return ResponseEntity.ok().build();//.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
+      return new ResponseEntity<Message>(new Message("Success", "200"), HttpStatus.OK);//.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
    }
 }
