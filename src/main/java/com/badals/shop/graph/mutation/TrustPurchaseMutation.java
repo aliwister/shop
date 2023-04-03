@@ -1,13 +1,17 @@
 package com.badals.shop.graph.mutation;
 
+import com.badals.shop.domain.Purchase;
 import com.badals.shop.domain.enumeration.OrderState;
 
+import com.badals.shop.service.AmazonPurchaseService;
 import com.badals.shop.service.PurchaseService;
 import com.badals.shop.service.dto.*;
+import com.badals.shop.service.pojo.Message;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -24,9 +28,11 @@ mutation {
 public class TrustPurchaseMutation implements GraphQLMutationResolver {
 
     final private PurchaseService purchaseService;
+    final private AmazonPurchaseService amazonPurchaseService;
 
-    public TrustPurchaseMutation(PurchaseService purchaseService) {
+    public TrustPurchaseMutation(PurchaseService purchaseService, AmazonPurchaseService amazonPurchaseService) {
         this.purchaseService = purchaseService;
+        this.amazonPurchaseService = amazonPurchaseService;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -60,6 +66,15 @@ public class TrustPurchaseMutation implements GraphQLMutationResolver {
         return purchaseService.setStatus(id, state);
     }
 
+
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Message sendPurchaseToAmazon(Long id) throws IOException {
+        PurchaseDTO p = purchaseService.findForPurchaseDetails(id).get();
+        String ret = amazonPurchaseService.buy(p);
+
+        return new Message(ret);
+    }
 
 }
 

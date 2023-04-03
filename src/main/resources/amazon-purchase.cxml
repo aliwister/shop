@@ -1,0 +1,111 @@
+<!-- Mandatory per the cXML standard -->
+<cXML version="1.2.007" payloadID="{{payloadId}}" timestamp="{{timestamp}}" xml:lang="en">
+    <!-- Payload ID should always be unique for every PO (Mandatory) -->
+    <Header>
+        <From>
+            <Credential domain="NetworkID">
+                <!-- Domain is always "NetworkID" -->
+                <Identity>{{Identity}}</Identity>
+                <!-- This is the punchout username that will be generated in your Amazon Business account (Mandatory) -->
+            </Credential>
+        </From>
+        <To>
+            <Credential domain="NetworkID">
+                <!-- Domain is always "NetworkID" -->
+                <Identity>Amazon</Identity>
+                <!-- This should always be Amazon (Mandatory) -->
+            </Credential>
+        </To>
+        <Sender>
+            <Credential domain="NetworkID">
+                <!-- Domain is always "NetworkID" -->
+                <Identity>{{Identity}}</Identity>
+                <!-- This is the punchout username that will be generated in your Amazon Business account (Mandatory) -->
+                <SharedSecret>{{SharedSecret}}</SharedSecret>
+                <!-- This is the punchout password that will be generated in your Amazon Business account (Mandatory) -->
+                <UserAgent>Teknify.com</UserAgent>
+            </Credential>
+            <UserAgent>User</UserAgent>
+        </Sender>
+    </Header>
+    <Request deploymentMode="production">
+        <!-- Deployment Mode should be "test" for Test transactions and "production" for live transactions (Mandatory) -->
+        <OrderRequest>
+            <OrderRequestHeader orderID="{{po}}" orderDate="{{orderDate}}" orderType="regular" type="new">
+                <!-- We only accept type as "new" (Mandatory), electronic order change or cancellation will not be accepted -->
+                <Total>
+                    <Money currency="USD">{{total}}</Money>
+                    <!-- Subtotal of all the line items (Mandatory) -->
+                </Total>
+                <ShipTo>
+                    <Address isoCountryCode="US" addressID="182">
+                        <Email>purchasing@teknify.com</Email>
+                        <Name xml:lang="en"/>
+                        <!-- Mandatory field per cXML standard, but do not pass any information in this field -->
+                        <PostalAddress>
+                            <DeliverTo>Ali Allawati</DeliverTo>
+                            <!-- Name of the person or any other information you would like to see on the shipping address. Maximum 50 characters (Mandatory) -->
+                            <Street>4283 Express Lane</Street>
+                            <!-- Pass Company Name in this field (Mandatory), maximum 60 characters. -->
+                            <Street>Suite 118-055</Street>
+                            <!-- Street name (Mandatory), maximum 60 characters -->
+                            <City>Sarasota</City>
+                            <!-- Mandatory -->
+                            <State>FL</State>
+                            <!-- Conditional -->
+                            <PostalCode>34249</PostalCode>
+                            <!-- Mandatory -->
+                            <Country isoCountryCode="US">US</Country>
+                            <!-- Mandatory -->
+                        </PostalAddress>
+                        <Phone>
+                            <TelephoneNumber>
+                                <CountryCode isoCountryCode="US"/>
+                                <!-- Optional -->
+                                <AreaOrCityCode/>
+                                <!-- Optional -->
+                                <Number>202-596-6695</Number>
+                                <!-- Optional -->
+                                <Extension/>
+                            </TelephoneNumber>
+                        </Phone>
+                        <URL/>
+                    </Address>
+                </ShipTo>
+                <BillTo>
+                    <Address isoCountryCode="US" addressID="182">
+                        <Name xml:lang="en">Teknify LLC</Name>
+                        <!-- Please pass entity name (Mandatory) -->
+                        <PostalAddress>
+                            <Street>10752 SE Highway 212</Street>
+                            <!-- Pass Company Name in this field (Mandatory), maximum 60 characters. -->
+                            <Street>D745</Street>
+                            <City>Clackamas</City>
+                            <!-- Mandatory -->
+                            <State>OR</State>
+                            <!-- Conditional -->
+                            <PostalCode>97015</PostalCode>
+                            <!-- Mandatory -->
+                            <Country isoCountryCode="US">US</Country>
+                            <!-- Mandatory -->
+                        </PostalAddress>
+                        <Email>purchasing@teknify.com</Email>
+                        <Phone>
+                            <TelephoneNumber>
+                                <CountryCode isoCountryCode="US"/>
+                                <!-- Optional -->
+                                <AreaOrCityCode/>
+                                <!-- Optional -->
+                                <Number>202-596-6695</Number>
+                                <!-- Optional -->
+                                <Extension/>
+                            </TelephoneNumber>
+                        </Phone>
+                        <URL/>
+                    </Address>
+                </BillTo>
+            </OrderRequestHeader>
+{{items}}
+        </OrderRequest>
+    </Request>
+</cXML>
