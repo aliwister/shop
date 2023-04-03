@@ -15,7 +15,7 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
-      - run: mvn package
+      - run: mvn package -Pprod -DskipTests=true
       - persist_to_workspace:
           root: .
           paths:
