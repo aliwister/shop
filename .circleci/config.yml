@@ -1,0 +1,58 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:11-jdk
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            - v1-dependencies-
+      - run: mvn dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+      - run: mvn package
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target/*.jar
+            - Procfile-aws
+  deploy:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y python3-pip zip
+            sudo pip3 install awscli
+      - run:
+          name: Create ZIP and Deploy to AWS Elastic Beanstalk
+          command: |
+            JAR_FILE=$(ls /tmp/workspace/target/*.jar)
+            mv /tmp/workspace/Procfile-aws /tmp/workspace/Procfile
+            cd /tmp/workspace
+            zip -r app.zip target/$(basename $JAR_FILE) Procfile
+            aws s3 cp app.zip s3://face-deployments/shop${CIRCLE_BUILD_NUM}.zip
+            aws elasticbeanstalk create-application-version --application-name shop --version-label v${CIRCLE_BUILD_NUM} --source-bundle S3Bucket="face-deployments",S3Key="shop${CIRCLE_BUILD_NUM}.zip" --region us-east-1
+            aws elasticbeanstalk update-environment --environment-name Shop-env-8 --version-label v${CIRCLE_BUILD_NUM} --region us-east-1
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          context: aws-creds
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master

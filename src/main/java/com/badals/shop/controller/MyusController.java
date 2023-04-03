@@ -63,7 +63,7 @@ public class MyusController {
       headers.setContentType(MediaType.APPLICATION_JSON);
 
       HttpEntity<JsonNode> entity = new HttpEntity<JsonNode>(json,headers);
-      ResponseEntity<byte[]> response = restTemplate.postForEntity("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b", entity, byte[].class);
+      ResponseEntity<byte[]> response = restTemplate.postForEntity("https://webhook.site/53dd5d04-8835-4ce5-8c47-a19d0bd95048", entity, byte[].class);
       return new ResponseEntity<Message>(new Message("Success", "200"), HttpStatus.OK);//.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
 
    }
@@ -83,7 +83,7 @@ public class MyusController {
       headers.setContentType(MediaType.APPLICATION_JSON);
 
       HttpEntity<JsonNode> entity = new HttpEntity<JsonNode>(json,headers);
-      ResponseEntity<byte[]> response = restTemplate.postForEntity("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b", entity, byte[].class);
+      ResponseEntity<byte[]> response = restTemplate.postForEntity("https://webhook.site/530bf620-a8ef-48b0-a423-a83c2a98739d", entity, byte[].class);
       return new ResponseEntity<Message>(new Message("Success", "200"), HttpStatus.OK);//.status(HttpStatus.FOUND).location(URI.create("https://webhook.site/0603401a-4e8f-42be-b3df-7f2bc3c9335b")).build();
    }
 }
