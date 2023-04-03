@@ -31,6 +31,8 @@ public class PurchaseItemDTO implements Serializable {
 
     private String comment;
 
+    private String sku;
+
     private Long purchaseId;
 
     private Long productId;
