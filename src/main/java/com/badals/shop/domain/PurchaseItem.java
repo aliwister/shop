@@ -1,6 +1,8 @@
 package com.badals.shop.domain;
 import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -44,6 +46,11 @@ public class PurchaseItem implements Serializable {
 
     @Column(name = "comment")
     private String comment;
+
+    @Getter
+    @Setter
+    @Column(name = "sku")
+    private String sku;
 
     @Column(name = "product_id")
     private Long productId;

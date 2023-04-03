@@ -17,6 +17,7 @@ extend type Mutation {
     cancelPurchase(id: ID, reason: String): Purchase
     closePurchase(id: ID, reason: String): Purchase
     setPurchaseState(id: ID, state: OrderState): Purchase
+    sendPurchaseToAmazon(id: ID): Message
 
     createOrder(id: Int): Order
     sendPaymentSms(id: ID, mobile: String): Message
@@ -70,6 +71,7 @@ type PurchaseItem {
     description: String
     orderItems: [OrderItem]
     productId: Long
+    sku: String
 }
 
 type PurchaseQueue {
@@ -117,6 +119,7 @@ input PurchaseItemInput {
     description: String
     orderItems: [OrderItemInput]
     productId: Long
+    sku: String
 }
 
 enum OrderState {
