@@ -43,7 +43,7 @@ public class AmazonPurchaseService {
            "                </ItemDetail></ItemOut>";
 
    public Resource getCxml() {
-      return new ClassPathResource("amazon-purchase.cxml");
+      return new ClassPathResource("/amazon-purchase.cxml");
    }
 
    public String buy(PurchaseDTO purchase) throws IOException {
