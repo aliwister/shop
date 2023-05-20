@@ -2,6 +2,7 @@ package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.Address;
+import com.badals.shop.domain.Auditable;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.OrderChannel;
 import com.badals.shop.domain.enumeration.OrderState;
@@ -36,7 +37,7 @@ import java.util.Set;
 @FilterDef(name = "userFilter", parameters = {@ParamDef(name = "username", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Filter(name = "userFilter", condition = "email = :username")
-public class TenantOrder implements Serializable, TenantSupport {
+public class TenantOrder extends Auditable implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
 
@@ -82,8 +83,7 @@ public class TenantOrder implements Serializable, TenantSupport {
     @JoinColumn(name = "delivery_address_id",referencedColumnName = "id_address")
     private Address deliveryAddress;
 
-    @CreatedDate
-    @Column(name = "created_date")
+    @Column(name = "timestamp")
     private Date createdDate;
 
     @NotAudited
