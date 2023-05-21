@@ -35,8 +35,10 @@ import java.util.Set;
 @Table(catalog="profileshop", name = "jhi_order")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @FilterDef(name = "userFilter", parameters = {@ParamDef(name = "username", type = "string")})
+@FilterDef(name = "tenantUserFilter", parameters = {@ParamDef(name = "createdBy", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Filter(name = "userFilter", condition = "email = :username")
+@Filter(name = "tenantUserFilter", condition = "created_by = :createdBy")
 public class TenantOrder extends Auditable implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 1L;
