@@ -2,8 +2,10 @@ package com.badals.shop.security.jwt;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 
 import java.util.Collection;
 
@@ -26,4 +28,10 @@ public class ProfileUser extends User {
    @Getter
    @Setter
    String profile;
+
+   public boolean hasAuthority(Authentication authentication, String authority) {
+      return authentication.getAuthorities().stream()
+              .map(GrantedAuthority::getAuthority)
+              .anyMatch(authority::equals);
+   }
 }
