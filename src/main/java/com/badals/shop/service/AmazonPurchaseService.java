@@ -1,17 +1,14 @@
 package com.badals.shop.service;
 
-import com.badals.shop.domain.PurchaseItem;
 import com.badals.shop.service.dto.PurchaseDTO;
 import com.badals.shop.service.dto.PurchaseItemDTO;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import net.logstash.logback.encoder.org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -42,13 +39,25 @@ public class AmazonPurchaseService {
            "                    <Classification domain=\"\"/>\n" +
            "                </ItemDetail></ItemOut>";
 
-   public Resource getCxml() {
-      return new ClassPathResource("/amazon-purchase.cxml");
-   }
+   public InputStream getCxml() {
+      return getClass().getResourceAsStream("/amazon-purchase.cxml");
 
+   }
+   public String convertStreamToString(InputStream is) throws IOException {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      StringBuilder sb = new StringBuilder();
+      String line;
+
+      while ((line = reader.readLine()) != null) {
+         sb.append(line + "\n");
+      }
+
+      is.close();
+      return sb.toString();
+   }
    public String buy(PurchaseDTO purchase) throws IOException {
-      File resource = getCxml().getFile();
-      String cxml = new String(Files.readAllBytes(resource.toPath()));
+      //File resource = getCxml().getFile();
+      String cxml = convertStreamToString(getCxml());
 
       RestTemplate restTemplate = new RestTemplate();
       HttpHeaders headers = new HttpHeaders();
@@ -83,7 +92,7 @@ public class AmazonPurchaseService {
                  .replaceAll("\\{\\{line\\}\\}", item.getSequence().toString())
                  .replaceAll("\\{\\{sku\\}\\}", item.getSku())
                  .replaceAll("\\{\\{price\\}\\}", item.getPrice().toString())
-                 .replaceAll("\\{\\{description\\}\\}", item.getDescription())
+                 .replaceAll("\\{\\{description\\}\\}", StringEscapeUtils.escapeXml(item.getDescription()))
                  );
       }
       return items;
