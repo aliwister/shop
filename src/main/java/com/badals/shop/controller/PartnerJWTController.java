@@ -3,6 +3,7 @@ package com.badals.shop.controller;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.security.SecurityUtils;
+import com.badals.shop.security.jwt.ProfileUser;
 import com.badals.shop.web.rest.errors.InvalidPasswordException;
 import com.badals.shop.web.rest.vm.LoginVM;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -56,11 +57,11 @@ public class PartnerJWTController {
         if (userObj == null|| userObj.equals("anonymousUser")) {
             throw new IllegalAccessException("Not Authorized");
         }
-        User user = (User) userObj;
+        ProfileUser user = (ProfileUser) userObj;
         com.badals.shop.domain.User dbUser = userRepository.findOneByEmailIgnoreCaseAndTenantId(user.getUsername(), com.badals.shop.domain.User.tenantFilter).get();
         HttpHeaders httpHeaders = new HttpHeaders();
         List<Tenant> tenantList = tenantRepository.findTenantsForUser(dbUser.getId());
-        return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(null, authentication.getPrincipal(), tenantList, false), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(null, authentication.getPrincipal(), tenantList, user.isStoreSelect()), httpHeaders, HttpStatus.OK);
     }
 
     @PostMapping("/store-select")
@@ -105,7 +106,7 @@ public class PartnerJWTController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         boolean rememberMe = (loginVM.getRememberMe() == null) ? false : loginVM.getRememberMe();
-        String jwt = tokenProvider.createToken(authentication, rememberMe);
+        String jwt = tokenProvider.createToken(authentication, rememberMe, true);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(jwt, authentication.getPrincipal(), tenantList, true), httpHeaders, HttpStatus.OK);
