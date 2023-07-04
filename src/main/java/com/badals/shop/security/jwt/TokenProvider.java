@@ -61,6 +61,28 @@ public class TokenProvider implements InitializingBean {
                 .getTokenValidityInSecondsForRememberMe();
     }
 
+    public String createToken(Authentication authentication, boolean rememberMe, boolean isStoreSelect) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date validity;
+        if (rememberMe) {
+            validity = new Date(now + this.tokenValidityInMillisecondsForRememberMe);
+        } else {
+            validity = new Date(now + this.tokenValidityInMilliseconds);
+        }
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .setAudience(TenantContext.getCurrentProfile())
+                .claim(AUTHORITIES_KEY, authorities)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity)
+                .setIssuer(""+isStoreSelect)
+                .compact();
+    }
     public String createToken(Authentication authentication, boolean rememberMe) {
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
@@ -125,7 +147,7 @@ public class TokenProvider implements InitializingBean {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        ProfileUser principal = new ProfileUser(claims.getSubject(), "", authorities);
+        ProfileUser principal = new ProfileUser(claims.getSubject(), "", authorities, claims.getIssuer());
         principal.setProfile(claims.getAudience());
         principal.setTenantId(claims.getId());
 
@@ -151,4 +173,5 @@ public class TokenProvider implements InitializingBean {
         }
         return false;
     }
+
 }
