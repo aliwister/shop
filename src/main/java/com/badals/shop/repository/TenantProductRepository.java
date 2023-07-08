@@ -1,8 +1,10 @@
 package com.badals.shop.repository;
 
+import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.enumeration.VariationType;
 import com.badals.shop.web.rest.AuditResource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,6 +28,8 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
     @Query("from TenantProduct u where u.sku = ?1")
     Optional<TenantProduct> findBySku(String asin);
 
+    List<TenantProduct> findAllByIdBetween(Long from, Long to);
+
     @Query("from TenantProduct u where u.slug = ?1 and u.active = true")
     Optional<TenantProduct> findBySlug(String slug);
 
@@ -45,7 +49,7 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
     @Query("from TenantProduct u left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.ref = ?1 ")
     Optional<TenantProduct> findByRefJoinChildren(String id);
 
-
+    Page<TenantProduct> findAllByAndVariationTypeIsNot(VariationType child, Pageable pageable);
 
     @Query("from TenantProduct u  left join fetch u.stock where  (?1 is null or u.title like ?1) and u.variationType <> ?2")
     List<TenantProduct> listForTenantAll( String like, VariationType child, Pageable pageable);
