@@ -14,7 +14,6 @@ import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.search.PartnerProductSearchRepository;
 import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.service.dto.StockDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.service.pojo.ChildProduct;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -25,7 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,8 +62,9 @@ public class TenantAdminProductService {
     private final SlugService slugService;
     private final S3UploadRequestRepository s3UploadRequestRepository;
     private final AwsService awsService;
+    private final IndexService indexService;
 
-    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService) {
+    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService, IndexService indexService) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
         this.partnerProductMapper = partnerProductMapper;
@@ -74,6 +76,7 @@ public class TenantAdminProductService {
         this.slugService = slugService;
         this.s3UploadRequestRepository = s3UploadRequestRepository;
         this.awsService = awsService;
+        this.indexService = indexService;
     }
 
 
@@ -207,6 +210,8 @@ public class TenantAdminProductService {
         if(master.getStock() == null)
             master.setStock(new HashSet<>());
         master.getStock().clear();
+        if (updateStock == null)
+            return;
         for (TenantStock a: updateStock) {
 
             master.addStock(a);
@@ -373,11 +378,11 @@ public class TenantAdminProductService {
         if(text != null)
             like = "%"+text+"%";
 
-        Integer total = productRepository.countForTenant(like, VariationType.CHILD);
-        List<TenantProduct> result = productRepository.listForTenantAll(like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
+        //Integer total = productRepository.countForTenant(like, VariationType.CHILD);
+        Page<TenantProduct> result = productRepository.findAllByAndVariationTypeIsNot(VariationType.CHILD, PageRequest.of((int) offset/limit,limit));  //listForTenantAll(like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
         ProductResponse response = new ProductResponse();
-        response.setTotal(total);
-        response.setHasMore((limit + offset) < total);
+        //response.setTotal(total);
+        response.setHasMore(true);
         response.setItems(result.stream().map(productMapper::toPartnerListDto).collect(Collectors.toList()));
         return response;
     }
@@ -476,7 +481,8 @@ public class TenantAdminProductService {
     }
 
     public void reIndex(Long from, Long to) {
-        List<PartnerProduct> products = productRepository.findAll().stream().map(partnerProductMapper::toDto).collect(Collectors.toList());
+        List<PartnerProduct> products = productRepository.findAllByIdBetween(from, to).stream().map(partnerProductMapper::toDto).collect(Collectors.toList());
+        //indexService.indexMulti(partnerProductMapper.toIndexProductDto(products.get(0)));
         partnerProductSearchRepository.saveAll(products);
     }
 
