@@ -26,6 +26,8 @@ extend type Mutation {
     cancelOrder(id: ID, reason: String): Order
     closeOrder(id: ID, reason: String): Order
 
+    updateCarrier(id: ID, carrier: String, value: BigDecimal): Message
+
     voidPayment(id: ID): Message
     addPayment(id: ID, amount: BigDecimal, method: String, authCode: String, currency: String): Payment
     sendOrderLevelEmail(id:ID, template:String): Message
