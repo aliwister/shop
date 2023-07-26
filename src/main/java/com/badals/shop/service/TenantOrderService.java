@@ -5,6 +5,8 @@ import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.UserBase;
 import com.badals.shop.domain.pojo.AddressPojo;
+
+import com.badals.shop.domain.pojo.OrderAdjustment;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.badals.shop.repository.TenantOrderRepository;
@@ -287,6 +289,23 @@ public class TenantOrderService {
         else
             userBase = customerMapper.toUserBase(customer);
         mailService.sendVoltageMail(userBase, dto);
+    }
+    @Transactional
+    public OrderDTO updateCarrier(Long id, String carrier, BigDecimal value) {
+        TenantOrder order = orderRepository.getOne(id);
+        order.setCarrier(carrier);
+        order.setDeliveryTotal(value);
+        if (order.getOrderAdjustments() == null)
+            order.setOrderAdjustments(new ArrayList<>());
+
+        OrderAdjustment adjustment = order.getOrderAdjustments().stream().filter(adj -> adj.shippingCheck()).findFirst().orElse(null);
+        if (adjustment == null) {
+            adjustment = new OrderAdjustment();
+            order.getOrderAdjustments().add(adjustment);
+        }
+        adjustment.setShippingValueAndType(value, carrier);
+        OrderDTO dto = save(order);
+        return dto;
     }
     public OrderDTO cancel(Long id, String reason) {
         TenantOrder order = orderRepository.getOne(id);

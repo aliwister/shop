@@ -67,7 +67,7 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       return accountService.findOrderByRef(ref);
    }
    public CartDTO cart(String secureKey) {
-      return cartService.updateCart(secureKey, null, false);
+      return cartService.updateCart(secureKey, null, false, null);
    }
    public List<ProfileHashtagDTO> tenantTags() {
       return productService.tenantTags();
