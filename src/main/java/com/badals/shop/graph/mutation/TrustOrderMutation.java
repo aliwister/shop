@@ -60,6 +60,11 @@ public class TrustOrderMutation implements GraphQLMutationResolver {
         OrderDTO order = orderService.cancel(id, reason);
         return order;
     }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public Message updateCarrier(Long id, String carrier, BigDecimal value){
+        OrderDTO order = orderService.updateCarrier(id, carrier, value);
+        return new Message("done");
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public OrderDTO closeOrder(Long id, String reason){
