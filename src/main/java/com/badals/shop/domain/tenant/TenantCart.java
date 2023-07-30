@@ -4,12 +4,16 @@ import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.CartState;
+
+import com.badals.shop.domain.pojo.AdjustmentProfile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.Type;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -84,6 +88,11 @@ public class TenantCart implements Serializable, TenantSupport {
     @Column(name="tenant_id")
     private String tenantId;
 
+    @Getter @Setter
+    @NotAudited
+    @Type(type = "json")
+    @Column(name = "adjustments", columnDefinition = "string")
+    private List<AdjustmentProfile> cartAdjustments;
 
 
     public List<TenantCartItem> getCartItems() {
@@ -239,6 +248,8 @@ public class TenantCart implements Serializable, TenantSupport {
         cartItem.setCart(null);
         return this;
     }
+
+
 
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove

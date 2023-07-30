@@ -1,8 +1,12 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Customer;
+
+import com.badals.shop.domain.pojo.AdjustmentProfile;
+import com.badals.shop.domain.pojo.DiscountRule;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.Checkout;
+import com.badals.shop.domain.tenant.TenantCartRule;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.domain.enumeration.CartState;
@@ -12,6 +16,7 @@ import com.badals.shop.repository.*;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
+import com.badals.shop.service.pojo.I18Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -32,6 +37,7 @@ public class TenantCartService {
     private final Logger log = LoggerFactory.getLogger(TenantCartService.class);
 
     private final TenantCartRepository cartRepository;
+    private final TenantCartRuleRepository cartRuleRepository;
     private final TenantCheckoutRepository checkoutRepository;
     private final TenantProductRepository productRepository;
     private final TenantCustomerRepository customerRepository;
@@ -46,8 +52,9 @@ public class TenantCartService {
     private final CheckoutLineItemMapper checkoutLineItemMapper;
     private final CheckoutAddressMapper checkoutAddressMapper;
 
-    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, CustomerMapper customerMapper, UserService userService, CustomerService customerService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
+    public TenantCartService(TenantCartRepository cartRepository, TenantCartRuleRepository cartRuleRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, CustomerMapper customerMapper, UserService userService, CustomerService customerService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
         this.cartRepository = cartRepository;
+        this.cartRuleRepository = cartRuleRepository;
         this.checkoutRepository = checkoutRepository;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
@@ -133,8 +140,9 @@ public class TenantCartService {
     }
 
     @Transactional
-    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge) {
+    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge, String coupon) {
         TenantCart cart = null;
+
         Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
         log.info("Logged in user " + loginUser);
         // secureKey always null
@@ -148,7 +156,7 @@ public class TenantCartService {
                 cart = new TenantCart();
                 cart.setSecureKey(createUIUD());
             }
-            return this.mergeCart(cart, items, isMerge);
+            return this.mergeCart(cart, items, isMerge, coupon);
         }
 
         //logged in user - always
@@ -161,35 +169,64 @@ public class TenantCartService {
                 }
                 cart.setCartState(CartState.CLAIMED);
                 cart.setCustomer(loginUser);
-                return this.mergeCart(cart, items, false);
+                return this.mergeCart(cart, items, false, coupon);
             }
             if (cart != null) {
                 List<CartItemDTO> mergelist = cart.getCartItems().stream().map(x -> new CartItemDTO().productId(x.getProductId()).quantity(x.getQuantity())).collect(Collectors.toList());
                 cart.getCartItems().clear();
                 //if (isMerge)
-                return this.mergeCart(newCart, mergelist, true);
+                return this.mergeCart(newCart, mergelist, true, coupon);
             }
             else
-                return this.mergeCart(newCart, items, false);
+                return this.mergeCart(newCart, items, false, coupon);
         }
 
         if (cart.getCartState() == CartState.CLAIMED && cart.getCustomerId() != null) {
             if(loginUser.getId().longValue() == cart.getCustomerId() )
-                return this.mergeCart(cart, items, isMerge);
+                return this.mergeCart(cart, items, isMerge, coupon);
 
             cart = this.getCartByCustomer(loginUser);
             if (isMerge)
-                return this.mergeCart(cart, items, isMerge);
+                return this.mergeCart(cart, items, isMerge, coupon);
             else
                 return this.save(cart, items);
         }
         //if (cart.getCartState() == CartState.CLOSED) {
+
         cart = this.createCustomerCart(loginUser);
-        return this.mergeCart(cart, items, isMerge);
+        return this.mergeCart(cart, items, isMerge, coupon);
         //}
     }
 
-    private CartDTO mergeCart(TenantCart cart, List<CartItemDTO> items, Boolean isMerge) {
+    private List<AdjustmentProfile> processRules(TenantCart cart, String coupon, I18Message message) {
+        if (coupon != null && !coupon.trim().isEmpty()) {
+            TenantCartRule rule = cartRuleRepository.findByCoupon(coupon).orElse(null);
+            if(rule != null) {
+                if(!checkRule(cart, rule.getRules())) {
+                    message.setValue(rule.getDescription());
+                    return null;
+                }
+            }
+            else {
+                message.setStatus("404");
+                return null;
+            }
+            AdjustmentProfile discount = new AdjustmentProfile(rule.getDiscount(), rule.getReductionType());
+            return List.of(discount);
+        }
+        return null;
+    }
+
+    private boolean checkRule(TenantCart cart, List<DiscountRule> rules) {
+        for (DiscountRule rule : rules) {
+            if (rule.getMinCartSize() > cart.getCartItems().size()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private CartDTO mergeCart(TenantCart cart, List<CartItemDTO> items, Boolean isMerge, String coupon) {
         List<TenantCartItem> cartItems = cart.getCartItems();
         //isMerge = false;
 
@@ -224,6 +261,10 @@ public class TenantCartService {
             if(loginUser != null) {
                 cart.setCustomer(loginUser);
             }*/
+            I18Message message = new I18Message(null, "200");
+            List<AdjustmentProfile> profile = this.processRules(cart, coupon, message);
+            cart.setCartAdjustments(profile);
+
             cart = cartRepository.saveAndFlush(cart);
             cartRepository.refresh(cart);
         }
@@ -392,4 +433,6 @@ public class TenantCartService {
        }
        return cart;
    }
+
+
 }

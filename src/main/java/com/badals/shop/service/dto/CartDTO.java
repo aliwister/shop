@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import com.badals.shop.domain.enumeration.CartState;
+import com.badals.shop.domain.pojo.OrderAdjustment;
 import lombok.Data;
 
 /**
@@ -37,6 +38,8 @@ public class CartDTO implements Serializable {
     private Long carrierId;
 
     private String currency;
+
+    private List<OrderAdjustment> adjustments = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

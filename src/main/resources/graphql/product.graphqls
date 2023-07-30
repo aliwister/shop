@@ -109,7 +109,7 @@ type Product {
     brand: String
     group: ProductGroup
     condition: Condition
-    isUsed: Boolean
+    #isUsed: Boolean
     availableForOrder: Boolean
     weight: Float
     volumeWeight: Float
