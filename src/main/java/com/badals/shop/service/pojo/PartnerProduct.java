@@ -3,6 +3,7 @@ package com.badals.shop.service.pojo;
 import com.badals.shop.domain.pojo.*;
 import com.badals.shop.service.dto.StockDTO;
 import lombok.Data;
+import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.math.BigDecimal;
 import java.util.List;
