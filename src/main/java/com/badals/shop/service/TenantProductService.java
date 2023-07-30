@@ -18,6 +18,7 @@ import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -151,7 +152,7 @@ public class TenantProductService {
             throw new ProductNotFoundException("Product not available");
     }
 
-
+    @Cacheable("tags-products")
     public ProductResponse findByHashtag(String tag) {
         String profile = TenantContext.getCurrentProfile();
         List<ProductDTO> products = productRepository.findActiveTagProductsForTenant(tag, profile).stream().map(productMapper::toDto).collect(Collectors.toList());
@@ -161,7 +162,7 @@ public class TenantProductService {
         response.setHasMore(false);
         return response;
     }
-
+    @Cacheable("tags")
     public List<ProfileHashtagDTO> tenantTags() {
         String profile = TenantContext.getCurrentProfile();
         return hashtagRepository.findForList(profile).stream().map(tenantHashtagMapper::toDto).collect(Collectors.toList());
