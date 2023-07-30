@@ -85,7 +85,7 @@ spring:
     host: smtp-relay.sendinblue.com
     port: 587
     username: ali@badals.com
-    password: ***REMOVED***
+    password: ${SMTP_KEY}
   thymeleaf:
     cache: true
 #  redis:
