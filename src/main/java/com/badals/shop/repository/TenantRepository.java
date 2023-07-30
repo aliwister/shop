@@ -38,6 +38,9 @@ public interface TenantRepository extends JpaRepository<Tenant, Long> {
     @Query
     Optional<Tenant> findByNameIgnoreCase(String name);
 
+    @Query
+    Optional<Tenant> findByTenantId(String name);
+
     @Query("from TenantAuthority a where a.userId = ?1 and a.tenantId = ?2 ")
     List<TenantAuthority> getTenantAuthorities(Long userId, String tenantId);
 
