@@ -1,3 +1,25 @@
+GET jhi_order/_search
+{
+   "sort": { "createdDate": "desc"},
+   "query": {
+     "bool": {
+       "must": {
+         "match": {
+           "orderState": "DELIVERED"
+         }
+       },
+       "filter": {
+         "term": {
+                   "tenantId": "badals"
+
+         }
+       }
+     }
+
+   }
+}
+
+
 GET add-product/_search
 {
   "query": {
