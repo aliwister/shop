@@ -42,7 +42,7 @@ public class UserBase implements Serializable  {
 
    @JsonIgnore
    @NotNull
-   @Size(min = 60, max = 60)
+   @Size(min = 20, max = 60)
    @Column(name = "passwd", length = 60, nullable = false)
    private String password;
 
