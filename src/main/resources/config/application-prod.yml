@@ -47,7 +47,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:mysql://profileshop.cprwxqewcyku.us-east-1.rds.amazonaws.com/profileshop?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
     username: shop-api
-    password: 8ICoW7vA55TebaTi4AWOlel3fOdOFE
+    password: ${DB_PASSWORD}
     hikari:
       poolName: Hikari
       auto-commit: false
