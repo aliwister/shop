@@ -15,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
+   public List<Customer> findTop5ByMobileContainingOrEmailContaining(String mobile, String email);
 
    public Optional<Customer> findByEmailIgnoreCase(String email);
 

@@ -107,6 +107,10 @@ public class CustomerService {
 
         return null;
     }
+    public List<CustomerDTO> findByMobileContaining(String mobileOrEmail) {
+        List<CustomerDTO> customerList = customerRepository.findTop5ByMobileContainingOrEmailContaining(mobileOrEmail, mobileOrEmail).stream().map(customerMapper::toDto).collect(Collectors.toList());
+        return customerList;
+    }
 
     public Customer registerUser(UserDTO userDTO, String password) {
         /*userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).ifPresent(existingUser -> {

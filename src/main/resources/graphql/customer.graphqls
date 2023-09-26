@@ -57,7 +57,7 @@ extend type Mutation {
 
 extend type Query {
     #getAddresses(customerId: Int): [Address]
-    customer(mobile: String): Customer
+    customer(mobileOrEmail: String): [Customer]
     #getAddress(addressId: Int): Address
 
     meTest(id: Long): Customer
