@@ -14,6 +14,7 @@ import com.badals.shop.web.rest.errors.ProductNotFoundException;
 
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,6 @@ import java.util.List;
 @Component
 public class PricingMutation implements GraphQLMutationResolver {
     private final PricingRequestService pricingRequestService;
-    private final UserService userService;
     private final PurchaseService purchaseService;
     private final MailService mailService;
     private final CustomerService customerService;
@@ -36,7 +36,6 @@ public class PricingMutation implements GraphQLMutationResolver {
         this.pricingRequestService = pricingRequestService;
         this.messageSource = messageSource;
         this.customerService = customerService;
-        this.userService = userService;
         this.productOverrideService = productOverrideService;
         this.purchaseService = purchaseService;
         this.mailService = mailService;
@@ -45,6 +44,20 @@ public class PricingMutation implements GraphQLMutationResolver {
     }
 
 
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Message addToPricingQ(String asin) {
+        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
+        if(loginUser == null)
+            return new Message("You have to be logged in to request a price");
+
+        try {
+            pricingRequestService.push(asin, loginUser.getEmail());
+        }
+        catch(RuntimeException e) {
+            return new Message(messageSource.getMessage("pricing.request.exists", null, LocaleContextHolder.getLocale()));
+        }
+        return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws ProductNotFoundException {
@@ -89,4 +102,3 @@ public class PricingMutation implements GraphQLMutationResolver {
 
 
 }
-
