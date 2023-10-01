@@ -90,7 +90,7 @@ spring:
     host: smtp-relay.sendinblue.com
     port: 587
     username: ali@badals.com
-    password: ***REMOVED***
+    password: j2zZ5T0XAMr6KdHS
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
@@ -159,8 +159,8 @@ translate:
   key: AIzaSyBL1StO62qTC5QTo3Ds8wKrIfwO6vMNMMY
 
 pas:
-  key: ***REMOVED***
-  secret: ***REMOVED***
+  key: AKIAJYRYOVGAHDQSWXFA
+  secret: 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
   us:
     tag: 4242020-20
     host: webservices.amazon.com
@@ -171,10 +171,10 @@ pas:
     region: eu-west-1
 
 mws:
-  key: ***REMOVED***
-  secret: ***REMOVED***
-  merchantid: ***REMOVED***
-  marketplaceid: ***REMOVED***
+  key: AKIAIOAQ437ZZB7K4O2A
+  secret: 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
+  merchantid: ARU2T5B3ROW0Z
+  marketplaceid: ATVPDKIKX0DER
 
 badals:
   checkout-app: http://127.0.0.1:8081/checkout/start

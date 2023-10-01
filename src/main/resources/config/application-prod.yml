@@ -189,7 +189,7 @@ badals:
   s3bucket: face-content
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
   accessKey1: AKIAZEJLGCKH53RGKS6U
-  secretKey1: ***REMOVED***
+  secretKey1: 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
 
 profileshop:
   cdnUrl: https://cdn.profile.shop
