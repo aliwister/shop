@@ -18,8 +18,8 @@ import java.util.Date;
 @Transactional
 public class AmazonPurchaseService {
    private String identity = "API8317721671";
-   private String sharedSecret = "Nlz6Sced7oH1pCUA09x5P6VAj7BSG0";
-   private String payloadIdTail = "@teknify.com.face.admin1";
+   private String sharedSecret = "***REMOVED***";
+   private String payloadIdTail = "***REMOVED***";
    //private String timestamp = "2023-02-11T21:00:07+00:00";
    private static final SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
    private static final SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
