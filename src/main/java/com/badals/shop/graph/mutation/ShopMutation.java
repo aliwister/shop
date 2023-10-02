@@ -92,5 +92,10 @@ public class ShopMutation implements GraphQLMutationResolver {
         Checkout cart = cartService.createCheckoutPlus(secureKey, items);
         return cart;
     }
+
+    public Checkout createPlusCartAdmin(String secureKey, List<LineItem> items, Long id) {
+        Checkout cart = cartService.createCheckoutPlus(secureKey, items, id);
+        return cart;
+    }
 }
 

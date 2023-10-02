@@ -21,7 +21,7 @@ extend type Mutation {
     createStubFromSearch(dto: ProductInput, tag: String): Product
     removeTag(ref: String, tag: String): Product
     createPlusCart(secureKey: String, items: [LineItemInput]): Checkout
-
+    createPlusCartAdmin(secureKey: String, items: [LineItemInput], id: String): Checkout
 }
 
 type TenantTag {

@@ -71,8 +71,8 @@ public class CustomerQuery extends BaseQuery implements GraphQLQueryResolver {
     }
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public CustomerDTO customer(String mobile) {
-        return customerService.findByMobileJoinAddresses(mobile);
+    public List<CustomerDTO> customer(String mobileOrEmail) {
+        return customerService.findByMobileContaining(mobileOrEmail);
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
