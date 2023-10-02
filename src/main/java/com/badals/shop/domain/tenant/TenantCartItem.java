@@ -53,7 +53,7 @@ public class TenantCartItem implements Serializable, TenantSupport {
     @Column(name = "product_id")
     private Long productId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="product_id", referencedColumnName = "ref", insertable = false, updatable = false)
     private TenantProduct product;
 
