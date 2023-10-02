@@ -385,7 +385,7 @@ public class TenantOrderService {
     }
 
     private static final String USERNAME = "badals";
-    private static final String PASSWORD = "Qaswedfr1";
+    private static final String PASSWORD = "***REMOVED***";
     public void sendSms(String message, String phone, boolean isUnicode) throws Exception {
         String data = "";
         data += "User=" + URLEncoder.encode(USERNAME, "ISO-8859-1");
