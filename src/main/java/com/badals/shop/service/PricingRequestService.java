@@ -97,6 +97,8 @@ public class PricingRequestService {
             throw new RuntimeException("Request already exists and we are still processing it");
         PricingRequest p = new PricingRequest();
         p.sku(asin);
+        p.setDone(false);
+        p.setEmailSent(false);
         pricingRequestRepository.save(p);
     }
 
