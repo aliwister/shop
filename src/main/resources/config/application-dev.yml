@@ -90,7 +90,7 @@ spring:
     host: smtp-relay.sendinblue.com
     port: 587
     username: ali@badals.com
-    password: ***REMOVED***
+    password: '***REMOVED***'
   messages:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
@@ -159,8 +159,8 @@ translate:
   key: AIzaSyBL1StO62qTC5QTo3Ds8wKrIfwO6vMNMMY
 
 pas:
-  key: ***REMOVED***
-  secret: ***REMOVED***+J/hPUP
+  key: '***REMOVED***'
+  secret: '***REMOVED***+J/hPUP'
   us:
     tag: 4242020-20
     host: webservices.amazon.com
@@ -171,10 +171,10 @@ pas:
     region: eu-west-1
 
 mws:
-  key: ***REMOVED***
-  secret: ***REMOVED***
-  merchantid: ***REMOVED***
-  marketplaceid: ***REMOVED***
+  key: '***REMOVED***'
+  secret: '***REMOVED***'
+  merchantid: '***REMOVED***'
+  marketplaceid: '***REMOVED***'
 
 badals:
   checkout-app: http://127.0.0.1:8081/checkout/start
@@ -182,7 +182,7 @@ badals:
   s3bucket: face-content-test
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
   accessKey1: AKIAZEJLGCKH53RGKS6U
-  secretKey1: ***REMOVED***
+  secretKey1: '***REMOVED***'
 
 profileshop:
   checkout-app: http://127.0.0.1:8081/checkout/start
@@ -192,7 +192,7 @@ profileshop:
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
 
 ebay:
-  app-id: ***REMOVED***
+  app-id: '***REMOVED***'
 
 graphiql:
   mapping: /graphiql
