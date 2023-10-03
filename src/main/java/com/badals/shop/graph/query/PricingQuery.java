@@ -17,7 +17,7 @@ public class PricingQuery extends BaseQuery implements GraphQLQueryResolver {
         this.pricingRequestService = pricingRequestService;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<PricingRequestDTO> pricingRequests() {
         return pricingRequestService.findUnprocessed();
     }
