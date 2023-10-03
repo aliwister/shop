@@ -3,6 +3,7 @@ package com.badals.shop.service;
 import com.badals.shop.service.dto.PurchaseDTO;
 import com.badals.shop.service.dto.PurchaseItemDTO;
 import net.logstash.logback.encoder.org.apache.commons.lang3.StringEscapeUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +19,11 @@ import java.util.Date;
 @Transactional
 public class AmazonPurchaseService {
    private String identity = "API8317721671";
-   private String sharedSecret = "***REMOVED***";
-   private String payloadIdTail = "***REMOVED***";
+   @Value("${amz-business.purchasing-sharedSecret}")
+   private String sharedSecret;
+   private String payloadIdTail = "@teknify.com.face.admin1";
    //private String timestamp = "2023-02-11T21:00:07+00:00";
    private static final SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-   private static final SimpleDateFormat sdf3 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
    String itemXml = "<ItemOut quantity=\"{{quantity}}\" lineNumber=\"{{line}}\">\n" +
            "                <!-- Mandatory -->\n" +
            "                <ItemID>\n" +
@@ -41,7 +41,6 @@ public class AmazonPurchaseService {
 
    public InputStream getCxml() {
       return getClass().getResourceAsStream("/amazon-purchase.cxml");
-
    }
    public String convertStreamToString(InputStream is) throws IOException {
       BufferedReader reader = new BufferedReader(new InputStreamReader(is));
