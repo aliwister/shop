@@ -216,3 +216,6 @@ graphiql:
   static:
     basePath: /
   enabled: true
+
+amz-business:
+  purchasing-sharedSecret: '***REMOVED***'
