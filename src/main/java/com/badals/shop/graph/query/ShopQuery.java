@@ -33,6 +33,7 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    private final TenantService tenantService;
    private final TenantAdminProductService tenantAdminProductService;
    private final TenantCartService cartService;
+//   private final TenantWishListService wishlistService;
    private final TenantOrderService orderService;
    private final TenantAccountService accountService;
    private final TenantLayoutService layoutService;
@@ -69,7 +70,8 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    public CartDTO cart(String secureKey) {
       return cartService.updateCart(secureKey, null, false);
    }
-   public List<ProfileHashtagDTO> tenantTags() {
+   public WishListDTO wishlist(Long id) { return new WishListDTO(id); }
+    public List<ProfileHashtagDTO> tenantTags() {
       return productService.tenantTags();
    }
    //@PreAuthorize("hasRole('ROLE_ADMIN')")

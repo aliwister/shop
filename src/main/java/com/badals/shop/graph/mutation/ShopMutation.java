@@ -5,6 +5,8 @@ import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.S3UploadRequest;
+import com.badals.shop.domain.tenant.TenantWishListItem;
+import com.badals.shop.graph.WishListItemResponse;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.Message;
@@ -40,7 +42,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     private final TenantProductService productService;
     private final TenantSetupService tenantSetupService;
     private final TenantCartService cartService;
-
+    private final TenantWishListService wishlistService;
     private final PricingRequestService pricingRequestService;
 
     private final MessageSource messageSource;
@@ -53,7 +55,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService) {
+    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantWishListService wishlistService) {
         this.productService = productService;
         this.tenantSetupService = tenantSetupService;
         this.cartService = cartService;
@@ -61,6 +63,7 @@ public class ShopMutation implements GraphQLMutationResolver {
         this.messageSource = messageSource;
         this.userService = userService;
         this.awsService = awsService;
+        this.wishlistService = wishlistService;
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
@@ -96,6 +99,15 @@ public class ShopMutation implements GraphQLMutationResolver {
     public Checkout createPlusCartAdmin(String secureKey, List<LineItem> items, Long id) {
         Checkout cart = cartService.createCheckoutPlus(secureKey, items, id);
         return cart;
+    }
+
+    public WishListItemResponse addWishlistItem(Long id, Long productId) {
+        return wishlistService.addWishlistItem(id, productId);
+    }
+
+    public WishListItemResponse removeWishlistItem(Long id, Long productId) {
+//        return wishlistService.removeWishlistItem(id, productId);
+        return new WishListItemResponse(productId);
     }
 }
 
