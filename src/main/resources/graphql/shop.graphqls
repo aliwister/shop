@@ -8,6 +8,7 @@ extend type Query {
     tenantInfo: Tenant
     currentTenant: Tenant
     cart(secureKey: String): Cart
+    wishlist(id : ID): Wishlist
     orderSummary(ref: String, confirmationKey: String): Order
     tenantSliders: [Attribute]
     socialProfiles: [Attribute]
@@ -22,6 +23,9 @@ extend type Mutation {
     removeTag(ref: String, tag: String): Product
     createPlusCart(secureKey: String, items: [LineItemInput]): Checkout
     createPlusCartAdmin(secureKey: String, items: [LineItemInput], id: String): Checkout
+    addWishlistItem(id: ID, productId:ID) : WishListItem
+    removeWishlistItem(id: ID, productId:ID) : WishListItem
+
 }
 
 type TenantTag {
