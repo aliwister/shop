@@ -16,20 +16,18 @@ type Cart {
 
 type Wishlist {
     id: ID!
-#    customerId: ID
+    customerId: ID
 #    currencyId: ID
-#    tenantId: String
+    tenantId: ID
 #    adjustments: String
-#    items: [WishlistItem]
+    wishlistItems: [WishlistItem]
 }
 
 type WishlistItem {
     id: ID!
-#    quantity: Int
-#    productId: ID!
-#    tenantId: String
-}
-
+    quantity: Int
+    productId: ID!
+    tenantId: String
 }
 
 type CartResponse {
