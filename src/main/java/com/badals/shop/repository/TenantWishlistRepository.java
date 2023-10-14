@@ -18,9 +18,8 @@ import java.util.Optional;
 public interface TenantWishlistRepository extends JpaRepository<TenantWishList, Long> {
 
     Optional<TenantWishList> findById(Long id);
-
     List<TenantWishList> findByCustomerIdOrderByIdDesc(Long id);
-
     void refresh(TenantWishList tenantWishList);
+    TenantWishList findTenantWishListByTenantIdAndAndCustomerId(String tenantId, Long customerId);
 
 }
