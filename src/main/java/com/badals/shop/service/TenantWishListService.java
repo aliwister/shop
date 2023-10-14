@@ -1,6 +1,8 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.tenant.TenantCart;
+import com.badals.shop.domain.tenant.TenantWishList;
+import com.badals.shop.domain.tenant.TenantWishListItem;
 import com.badals.shop.repository.TenantWishlistItemRepository;
 import com.badals.shop.repository.TenantWishlistRepository;
 import org.slf4j.Logger;
@@ -24,5 +26,27 @@ public class TenantWishListService {
         this.tenantWishlistItemRepository = tenantWishlistItemRepository;
     }
 
+    public TenantWishList getCustomerWishListByCustomerAndTenant(String tenantId, Long customerId) {
+        return tenantWishlistRepository.findTenantWishListByTenantIdAndAndCustomerId(tenantId, customerId);
+    }
 
+    public TenantWishList createWishList(TenantWishList tenantWishList) {
+        return tenantWishlistRepository.save(tenantWishList);
+    }
+
+    public TenantWishListItem addWishlistItem(TenantWishListItem tenantWishListItem) {
+        return tenantWishlistItemRepository.save(tenantWishListItem);
+    }
+
+    public Integer removeWishlistItem(String tenantId, Long wishListId, Long productId) {
+        return tenantWishlistItemRepository.deleteTenantWishListItemByTenantIdAndWishlistIdAndProductId(tenantId, wishListId, productId);
+    }
+
+    public TenantWishListItem findblabla(String tenantId, Long wishListId, Long productId) {
+        return tenantWishlistItemRepository.findTenantWishListItemByTenantIdAndWishlistIdAndProductId(tenantId, wishListId, productId);
+    }
+
+    public TenantWishList save(TenantWishList tenantWishList) {
+        return tenantWishlistRepository.save(tenantWishList);
+    }
 }
