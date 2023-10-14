@@ -2,6 +2,8 @@ package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -14,7 +16,7 @@ import java.io.Serializable;
  * A WishlistItem.
  */
 @Entity
-@Table(name = "wishlist_item", catalog = "profileshop")
+@Table(name = "whishlist_item", catalog = "profileshop")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class TenantWishListItem implements Serializable, TenantSupport {
@@ -32,6 +34,15 @@ public class TenantWishListItem implements Serializable, TenantSupport {
     @NotNull
     @JsonIgnoreProperties("wishlistItems")
     private TenantWishList wishlist;
+
+    @Getter
+    @Setter
+    @Column(name = "wishlist_id", updatable = false, insertable = false)
+    private Long wishlistId;
+
+    public TenantWishListItem() {
+
+    }
 
 
     public Long getProductId() {

@@ -21,7 +21,7 @@ import java.util.List;
  * A Cart.
  */
 @Entity
-@Table(name = "wishlist", catalog = "profileshop")
+@Table(name = "whishlist", catalog = "profileshop")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class TenantWishList implements Serializable, TenantSupport {
@@ -31,35 +31,22 @@ public class TenantWishList implements Serializable, TenantSupport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties("carts")
     private Customer customer;
-
-
     @Getter
     @Setter
     @Column(name = "customer_id", updatable = false, insertable = false)
     private Long customerId;
-
-
-/*
-    @ManyToOne
-    @JsonIgnoreProperties("carts")
-    private Currency currency;
-
-  @ManyToOne
-    @JsonIgnoreProperties("carts")
-    private Carrier carrier;*/
-
-    @OneToMany(mappedBy = "wishlist", cascade=CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "wishlist", cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<TenantWishListItem> wishlistItems = new ArrayList<TenantWishListItem>();
-
     @Column(name="tenant_id")
     private String tenantId;
 
+    public TenantWishList() {
 
+    }
 
     public List<TenantWishListItem> getWishListItems() {
         return wishlistItems;
