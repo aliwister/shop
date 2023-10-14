@@ -1,10 +1,13 @@
 package com.badals.shop.graph.mutation;
 
+import com.badals.shop.aop.tenant.TenantContext;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.S3UploadRequest;
+import com.badals.shop.domain.tenant.TenantWishList;
 import com.badals.shop.domain.tenant.TenantWishListItem;
 import com.badals.shop.graph.WishListItemResponse;
 import com.badals.shop.service.dto.ProductDTO;
@@ -28,6 +31,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.net.URISyntaxException;
@@ -45,6 +50,8 @@ public class ShopMutation implements GraphQLMutationResolver {
     private final TenantWishListService wishlistService;
     private final PricingRequestService pricingRequestService;
 
+    private final CustomerService customerService;
+
     private final MessageSource messageSource;
 
     private final UserService userService;
@@ -55,7 +62,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantWishListService wishlistService) {
+    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantWishListService wishlistService, CustomerService customerService) {
         this.productService = productService;
         this.tenantSetupService = tenantSetupService;
         this.cartService = cartService;
@@ -64,6 +71,7 @@ public class ShopMutation implements GraphQLMutationResolver {
         this.userService = userService;
         this.awsService = awsService;
         this.wishlistService = wishlistService;
+        this.customerService = customerService;
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
@@ -77,6 +85,52 @@ public class ShopMutation implements GraphQLMutationResolver {
         return response;
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantWishListItem addWishlistItem(Long productId) {
+        Customer customer = customerService.getUserWithAuthorities().orElse(null);
+        if (customer == null) {
+            throw new RuntimeException("User not found");
+        }
+        Long customerId = customer.getId();
+        String tenantId = TenantContext.getCurrentProfile();
+        TenantWishList tenantWishList = wishlistService.getCustomerWishListByCustomerAndTenant(tenantId, customerId);
+        if (tenantWishList == null) {
+            tenantWishList = new TenantWishList();
+            tenantWishList.setCustomer(customer);
+            tenantWishList.setTenantId(tenantId);
+            tenantWishList = wishlistService.createWishList(tenantWishList);
+        }
+        TenantWishListItem item = new TenantWishListItem();
+        item.setWishlist(tenantWishList);
+        item.setProductId(productId);
+        return wishlistService.addWishlistItem(item);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantWishList removeWishlistItem(Long productId) {
+        Customer customer = customerService.getUserWithAuthorities().orElse(null);
+        if (customer == null) {
+            throw new RuntimeException("User not found");
+        }
+        Long customerId = customer.getId();
+        String tenantId = TenantContext.getCurrentProfile();
+        TenantWishList tenantWishList = wishlistService.getCustomerWishListByCustomerAndTenant(tenantId, customerId);
+        if (tenantWishList == null) {
+            throw new RuntimeException("Wishlist not found");
+        }
+
+        wishlistService.removeWishlistItem(tenantId, tenantWishList.getId(), productId);
+        tenantWishList.getWishListItems().removeIf(item -> item.getProductId().equals(productId));
+        wishlistService.save(tenantWishList);
+        return  wishlistService.getCustomerWishListByCustomerAndTenant(tenantId, customerId);
+    }
+
+//    public CartResponse convertWishListToCart(final String secureKey){
+//        List<CartItemDTO> items;
+//
+//        return updateTenantCart(secureKey, items, true) ;
+//    }
+
     //@PreAuthorize("hasRole('ROLE_USER')")
     public CheckoutSession createTenantCheckout(final String secureKey, final List<CartItemDTO> items) {
         String token = cartService.createCheckout(secureKey, items);
@@ -86,6 +140,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     public ProductDTO createStubFromSearch(ProductDTO dto, String tag) throws URISyntaxException {
         return productService.createStubFromSearch(dto, tag);
     }
+
     public ProductDTO removeTag(String ref, String tag) throws URISyntaxException {
         return productService.removeTag(ref, tag);
     }
@@ -99,15 +154,6 @@ public class ShopMutation implements GraphQLMutationResolver {
     public Checkout createPlusCartAdmin(String secureKey, List<LineItem> items, Long id) {
         Checkout cart = cartService.createCheckoutPlus(secureKey, items, id);
         return cart;
-    }
-
-    public WishListItemResponse addWishlistItem(Long id, Long productId) {
-        return wishlistService.addWishlistItem(id, productId);
-    }
-
-    public WishListItemResponse removeWishlistItem(Long id, Long productId) {
-//        return wishlistService.removeWishlistItem(id, productId);
-        return new WishListItemResponse(productId);
     }
 }
 
