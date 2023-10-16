@@ -5,6 +5,7 @@ import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.I18String;
 import com.badals.shop.domain.pojo.VariationOption;
+import com.badals.shop.domain.tenant.PageInfo;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
@@ -35,13 +36,15 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
 
    private final UserService userService;
    private final TenantSetupService setupService;
+   private final PageInfoService pageInfoService;
 
-   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, UserService userService, TenantSetupService setupService) {
+   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService) {
       this.productService = productService;
       this.orderService = orderService;
       this.categoryService = categoryService;
       this.userService = userService;
       this.setupService = setupService;
+      this.pageInfoService = pageInfoService;
    }
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
@@ -140,6 +143,10 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
 
    public List<Attribute> sliders(String locale) {
       return setupService.getSliders(locale);
+   }
+
+   public List<PageInfo> pageInfos(String slug) {
+      return pageInfoService.getPageInfosBySlugAndAndTenantId(slug, "badals");
    }
 }
 
