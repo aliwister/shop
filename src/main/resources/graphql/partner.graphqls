@@ -18,6 +18,7 @@ extend type Query {
     social(locale: String): [Attribute]
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
+    pageInfos(slug: String!): [PageInfo]
 }
 
 extend type Mutation {
@@ -35,6 +36,9 @@ extend type Mutation {
     deleteProduct(id: Long): Message
     voidOrder(id: Long): Message
     createPosOrder(cart: CheckoutInput, paymentMethod: String, paymentAmount: String, ref: String): Order
+    createPageInfo(info: PageInfoInput): PageInfo
+    removePageInfo(id: Long): Message
+    updatePageInfo(info: PageInfoInput): PageInfo
 }
 
 enum AssetType {
@@ -291,4 +295,18 @@ input PriceListInput {
 type PriceList {
     priceList: [Price]
     baseCurrency: String
+}
+
+type PageInfo {
+    id: ID
+    slug: String!
+    tenantId: String
+    info: String
+    language: String
+}
+
+input PageInfoInput {
+    slug: String!
+    info: String
+    language: String
 }
