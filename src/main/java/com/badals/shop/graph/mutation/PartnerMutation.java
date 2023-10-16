@@ -5,8 +5,10 @@ import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.tenant.Checkout;
+import com.badals.shop.domain.tenant.PageInfo;
 import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.service.dto.OrderDTO;
+import com.badals.shop.service.dto.PageInfoDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.*;
 import com.badals.shop.service.*;
@@ -42,16 +44,18 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     private final UserService userService;
     private final TenantSetupService setupService;
+    private final PageInfoService pageInfoService;
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
-    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService) {
+    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService) {
         this.productService = productService;
         this.orderService = orderService;
         this.awsService = awsService;
         this.messageSource = messageSource;
         this.userService = userService;
         this.setupService = setupService;
+        this.pageInfoService = pageInfoService;
     }
 /*
 
@@ -216,6 +220,22 @@ public class PartnerMutation implements GraphQLMutationResolver {
     public Message deleteProduct(Long id) throws ProductNotFoundException {
         productService.deleteProduct(id);
         return new Message("ok");
+    }
+
+    //todo add security 
+    public PageInfo createPageInfo(PageInfoDTO info){
+        return pageInfoService.createPageInfo("badals", info);
+    }
+
+    public Message removePageInfo(Long id) {
+        if (pageInfoService.getPageInfoById(id) == null)
+            return new Message("Page info not found", "404");
+        pageInfoService.deleteById(id);
+        return new Message("ok");
+    }
+
+    public PageInfo updatePageInfo(PageInfoDTO info) throws Exception {
+        return pageInfoService.updatePageInfo(info, "badals");
     }
 }
 
