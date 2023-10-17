@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name = "page_info")
+@Table(name = "page_info", catalog = "profileshop")
 @Data
 public class PageInfo {
     @Id
