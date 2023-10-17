@@ -1,8 +1,5 @@
 package com.badals.shop.domain.tenant;
 
-import com.badals.shop.domain.converter.JsonNodeConverter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 
 import javax.persistence.*;
