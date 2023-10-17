@@ -19,6 +19,7 @@ extend type Query {
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
     pageInfos(slug: String!): [PageInfo]
+    pagesInfos : [PagesInfosDTO]
 }
 
 extend type Mutation {
@@ -303,6 +304,11 @@ type PageInfo {
     tenantId: String
     info: String
     language: String
+}
+
+type PagesInfosDTO {
+    slug: String
+    pageInfos: [PageInfo]
 }
 
 input PageInfoInput {
