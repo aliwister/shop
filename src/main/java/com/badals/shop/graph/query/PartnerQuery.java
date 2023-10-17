@@ -1,5 +1,6 @@
 package com.badals.shop.graph.query;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.enumeration.Currency;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
@@ -10,6 +11,7 @@ import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.OrderDTO;
+import com.badals.shop.service.dto.PagesInfosDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.badals.shop.domain.enumeration.Currency.*;
 import com.badals.shop.service.pojo.Partner;
@@ -144,9 +147,14 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    public List<Attribute> sliders(String locale) {
       return setupService.getSliders(locale);
    }
-
    public List<PageInfo> pageInfos(String slug) {
-      return pageInfoService.getPageInfosBySlugAndAndTenantId(slug, "badals");
+       String tenant_id = TenantContext.getCurrentProfile();
+       return pageInfoService.getPageInfosBySlugAndAndTenantId(slug, tenant_id);
+   }
+
+   public List<PagesInfosDTO> pagesInfos(){
+       String tenant_id = TenantContext.getCurrentProfile();
+       return pageInfoService.getPagesInfosByTenantID(tenant_id);
    }
 }
 
