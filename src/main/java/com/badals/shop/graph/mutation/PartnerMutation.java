@@ -222,20 +222,26 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new Message("ok");
     }
 
-    //todo add security 
+    @PreAuthorize("hasRole('ROLE_USER')")
     public PageInfo createPageInfo(PageInfoDTO info){
-        return pageInfoService.createPageInfo("badals", info);
+        return pageInfoService.createPageInfo(TenantContext.getCurrentProfile(), info);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Message removePageInfo(Long id) {
-        if (pageInfoService.getPageInfoById(id) == null)
+        PageInfo pageInfo = pageInfoService.getPageInfoById(id);
+        if (pageInfo == null)
             return new Message("Page info not found", "404");
+        System.out.println(pageInfo.getTenantId() + " " + TenantContext.getCurrentProfile());
+        if (!pageInfo.getTenantId().trim().equals(TenantContext.getCurrentProfile().trim()))
+            return new Message("Unauthorized", "401");
         pageInfoService.deleteById(id);
         return new Message("ok");
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     public PageInfo updatePageInfo(PageInfoDTO info) throws Exception {
-        return pageInfoService.updatePageInfo(info, "badals");
+        return pageInfoService.updatePageInfo(info, TenantContext.getCurrentProfile());
     }
 }
 
