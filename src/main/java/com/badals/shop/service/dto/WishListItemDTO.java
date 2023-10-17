@@ -4,19 +4,16 @@
 //import lombok.Data;
 //
 //import java.io.Serializable;
-//import java.util.List;
 //import java.util.Objects;
 //
 //@Data
 //@AllArgsConstructor
-//public class WishListDTO implements Serializable {
+//public class WishListItemDTO implements Serializable {
 //
 //    private Long id;
-//    private Long customerId;
-//    private Long currencyId;
+//    private int quantity;
+//    private Long productId;
 //    private String tenantId;
-//    private String adjustments;
-//    private List<WishListItemDTO> items;
 //
 //    @Override
 //    public boolean equals(Object o) {
@@ -27,11 +24,11 @@
 //            return false;
 //        }
 //
-//        WishListDTO wishlistDTO = (WishListDTO) o;
-//        if (wishlistDTO.getId() == null || getId() == null) {
+//        WishListItemDTO wishlistItemDTO = (WishListItemDTO) o;
+//        if (wishlistItemDTO.getId() == null || getId() == null) {
 //            return false;
 //        }
-//        return Objects.equals(getId(), wishlistDTO.getId());
+//        return Objects.equals(getId(), wishlistItemDTO.getId());
 //    }
 //
 //    @Override
@@ -41,12 +38,11 @@
 //
 //    @Override
 //    public String toString() {
-//        return "WishListDTO{" +
+//        return "WishListItemDTO{" +
 //            "id=" + getId() +
-//            ", customerId=" + getCustomerId() +
-//            ", currencyId=" + getCurrencyId() +
+//            ", quantity=" + getQuantity() +
+//            ", productId=" + getProductId() +
 //            ", tenantId='" + getTenantId() + "'" +
-//            ", adjustments='" + getAdjustments() + "'" +
 //            "}";
 //    }
 //}

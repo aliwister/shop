@@ -9,7 +9,6 @@ import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.domain.tenant.TenantWishList;
 import com.badals.shop.domain.tenant.TenantWishListItem;
-import com.badals.shop.graph.WishListItemResponse;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.Message;
