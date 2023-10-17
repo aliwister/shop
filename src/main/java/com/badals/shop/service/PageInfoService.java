@@ -3,13 +3,17 @@ package com.badals.shop.service;
 import com.badals.shop.domain.tenant.PageInfo;
 import com.badals.shop.repository.PageInfoRepository;
 import com.badals.shop.service.dto.PageInfoDTO;
+import com.badals.shop.service.dto.PagesInfosDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -47,6 +51,22 @@ public class PageInfoService {
 
     public PageInfo getPageInfoBySlugAndTenantIdAndLanguage(String slug, String tenant_id, String language) {
         return pageInfoRepository.findPageInfoBySlugAndTenantIdAndLanguage(slug,tenant_id, language);
+    }
+
+    public List<PagesInfosDTO> getPagesInfosByTenantID(String tenant_id) {
+        List<PageInfo> pageInfos = pageInfoRepository.findPageInfosByTenantId(tenant_id);
+        Map<String, PagesInfosDTO> map = new HashMap<>();
+        for (PageInfo pageInfo : pageInfos) {
+            if (map.containsKey(pageInfo.getSlug())) {
+                map.get(pageInfo.getSlug()).getPageInfos().add(pageInfo);
+            } else {
+                PagesInfosDTO pagesInfosDTO = new PagesInfosDTO();
+                pagesInfosDTO.setSlug(pageInfo.getSlug());
+                pagesInfosDTO.getPageInfos().add(pageInfo);
+                map.put(pageInfo.getSlug(), pagesInfosDTO);
+            }
+        }
+        return new ArrayList<>(map.values());
     }
 
     public void deleteById(Long id) {
