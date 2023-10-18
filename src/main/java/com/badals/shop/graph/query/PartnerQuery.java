@@ -13,7 +13,6 @@ import com.badals.shop.service.*;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.PagesInfosDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
-import com.badals.shop.service.dto.TenantDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.badals.shop.domain.enumeration.Currency.*;
 import com.badals.shop.service.pojo.Partner;
