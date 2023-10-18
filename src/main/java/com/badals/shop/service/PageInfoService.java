@@ -1,10 +1,10 @@
 package com.badals.shop.service;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.tenant.PageInfo;
 import com.badals.shop.repository.PageInfoRepository;
 import com.badals.shop.service.dto.PageInfoDTO;
 import com.badals.shop.service.dto.PagesInfosDTO;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,9 +25,8 @@ public class PageInfoService {
         this.pageInfoRepository = pageInfoRepository;
     }
 
-    public PageInfo createPageInfo(String tenant_id, PageInfoDTO pageInfoDTO) {
+    public PageInfo createPageInfo(PageInfoDTO pageInfoDTO) {
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setTenantId(tenant_id);
         pageInfo.setLanguage(pageInfoDTO.getLanguage());
         pageInfo.setSlug(pageInfoDTO.getSlug());
         pageInfo.setInfo(pageInfoDTO.getInfo());
@@ -41,8 +40,8 @@ public class PageInfoService {
         return pageInfoRepository.findPageInfosBySlugAndTenantId(slug, tenant_id);
     }
 
-    public PageInfo updatePageInfo(PageInfoDTO pageInfoDTO, String tenant_id) throws Exception {
-        PageInfo pageInfo = pageInfoRepository.findPageInfoBySlugAndTenantIdAndLanguage(pageInfoDTO.getSlug(), tenant_id, pageInfoDTO.getLanguage());
+    public PageInfo updatePageInfo(PageInfoDTO pageInfoDTO) throws Exception {
+        PageInfo pageInfo = pageInfoRepository.findPageInfoBySlugAndTenantIdAndLanguage(pageInfoDTO.getSlug(), TenantContext.getCurrentProfile(), pageInfoDTO.getLanguage());
         if (pageInfo == null)
             throw new Exception("Page info not found");
         pageInfo.setInfo(pageInfoDTO.getInfo());

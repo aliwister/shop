@@ -224,7 +224,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     @PreAuthorize("hasRole('ROLE_USER')")
     public PageInfo createPageInfo(PageInfoDTO info){
-        return pageInfoService.createPageInfo(TenantContext.getCurrentProfile(), info);
+        return pageInfoService.createPageInfo(info);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -241,7 +241,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     @PreAuthorize("hasRole('ROLE_USER')")
     public PageInfo updatePageInfo(PageInfoDTO info) throws Exception {
-        return pageInfoService.updatePageInfo(info, TenantContext.getCurrentProfile());
+        return pageInfoService.updatePageInfo(info);
     }
 }
 
