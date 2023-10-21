@@ -5,10 +5,11 @@ import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.tenant.Checkout;
+import com.badals.shop.domain.tenant.Page;
 import com.badals.shop.domain.tenant.PageInfo;
 import com.badals.shop.domain.tenant.S3UploadRequest;
 import com.badals.shop.service.dto.OrderDTO;
-import com.badals.shop.service.dto.PageInfoDTO;
+import com.badals.shop.service.dto.PageInfoInput;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.*;
 import com.badals.shop.service.*;
@@ -31,6 +32,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 
 @Component
@@ -223,7 +225,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    public PageInfo createPageInfo(PageInfoDTO info){
+    public Page createPageInfo(PageInfoInput info){
         return pageInfoService.createPageInfo(info);
     }
 
@@ -232,15 +234,13 @@ public class PartnerMutation implements GraphQLMutationResolver {
         PageInfo pageInfo = pageInfoService.getPageInfoById(id);
         if (pageInfo == null)
             return new Message("Page info not found", "404");
-        System.out.println(pageInfo.getTenantId() + " " + TenantContext.getCurrentProfile());
-        if (!pageInfo.getTenantId().trim().equals(TenantContext.getCurrentProfile().trim()))
-            return new Message("Unauthorized", "401");
-        pageInfoService.deleteById(id);
+        pageInfoService.deleteByIdAndAndTenantId(pageInfo, id, TenantContext.getCurrentProfile());
+
         return new Message("ok");
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    public PageInfo updatePageInfo(PageInfoDTO info) throws Exception {
+    public PageInfo updatePageInfo(PageInfoInput info) throws Exception {
         return pageInfoService.updatePageInfo(info);
     }
 }
