@@ -6,13 +6,13 @@ import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.I18String;
 import com.badals.shop.domain.pojo.VariationOption;
-import com.badals.shop.domain.tenant.PageInfo;
+import com.badals.shop.domain.tenant.Page;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
 import com.badals.shop.service.dto.OrderDTO;
-import com.badals.shop.service.dto.PagesInfosDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
+import com.badals.shop.service.pojo.Partner;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.badals.shop.domain.enumeration.Currency.*;
-import com.badals.shop.service.pojo.Partner;
 @Component
 public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
 
@@ -145,12 +144,12 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    public List<Attribute> sliders(String locale) {
       return setupService.getSliders(locale);
    }
-   public List<PageInfo> pageInfos(String slug) {
+   public Page pageInfos(String slug) {
        String tenant_id = TenantContext.getCurrentProfile();
        return pageInfoService.getPageInfosBySlugAndAndTenantId(slug, tenant_id);
    }
 
-   public List<PagesInfosDTO> pagesInfos(){
+   public List<Page> pagesInfos(){
        String tenant_id = TenantContext.getCurrentProfile();
        return pageInfoService.getPagesInfosByTenantID(tenant_id);
    }
