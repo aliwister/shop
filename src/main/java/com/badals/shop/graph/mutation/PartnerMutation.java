@@ -4,13 +4,8 @@ import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
-import com.badals.shop.domain.tenant.Checkout;
-import com.badals.shop.domain.tenant.Page;
-import com.badals.shop.domain.tenant.PageInfo;
-import com.badals.shop.domain.tenant.S3UploadRequest;
-import com.badals.shop.service.dto.OrderDTO;
-import com.badals.shop.service.dto.PageInfoInput;
-import com.badals.shop.service.dto.ProfileHashtagDTO;
+import com.badals.shop.domain.tenant.*;
+import com.badals.shop.service.dto.*;
 import com.badals.shop.service.pojo.*;
 import com.badals.shop.service.*;
 
@@ -47,10 +42,12 @@ public class PartnerMutation implements GraphQLMutationResolver {
     private final UserService userService;
     private final TenantSetupService setupService;
     private final PageInfoService pageInfoService;
+    private final FaqCategoryService faqCategoryService;
+    private final FaqQAService faqQAService;
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
-    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService) {
+    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService) {
         this.productService = productService;
         this.orderService = orderService;
         this.awsService = awsService;
@@ -58,6 +55,8 @@ public class PartnerMutation implements GraphQLMutationResolver {
         this.userService = userService;
         this.setupService = setupService;
         this.pageInfoService = pageInfoService;
+        this.faqCategoryService = faqCategoryService;
+        this.faqQAService = faqQAService;
     }
 /*
 
@@ -242,6 +241,14 @@ public class PartnerMutation implements GraphQLMutationResolver {
     @PreAuthorize("hasRole('ROLE_USER')")
     public PageInfo updatePageInfo(PageInfoInput info) throws Exception {
         return pageInfoService.updatePageInfo(info);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqCategory createFaqCategoryName(FaqCategoryNameInput faqCategoryNameInput){
+        return faqCategoryService.addCategory(TenantContext.getCurrentProfile(),faqCategoryNameInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqQA createFaqQA(FaqQAInput faqQAInput){
+        return faqQAService.addQA(TenantContext.getCurrentProfile(),faqQAInput);
     }
 }
 
