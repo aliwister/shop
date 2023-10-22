@@ -7,6 +7,8 @@ import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.I18String;
 import com.badals.shop.domain.pojo.VariationOption;
 import com.badals.shop.domain.tenant.Page;
+import com.badals.shop.domain.tenant.TenantFaqCategory;
+import com.badals.shop.domain.tenant.TenantFaqQA;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
@@ -37,14 +39,18 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    private final UserService userService;
    private final TenantSetupService setupService;
    private final PageInfoService pageInfoService;
+   private final FaqCategoryService faqCategoryService;
+   private final FaqQAService faqQAService;
 
-   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService) {
+   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService) {
       this.productService = productService;
       this.orderService = orderService;
       this.categoryService = categoryService;
       this.userService = userService;
       this.setupService = setupService;
       this.pageInfoService = pageInfoService;
+      this.faqCategoryService = faqCategoryService;
+      this.faqQAService = faqQAService;
    }
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
@@ -152,6 +158,14 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    public List<Page> pagesInfos(){
        String tenant_id = TenantContext.getCurrentProfile();
        return pageInfoService.getPagesInfosByTenantID(tenant_id);
+   }
+
+   public List<TenantFaqCategory> faqCategories() {
+      return faqCategoryService.getFaqCategories(TenantContext.getCurrentProfile());
+   }
+
+   public List<TenantFaqQA> faqQAs(){
+       return faqQAService.getFaqQAs(TenantContext.getCurrentProfile());
    }
 }
 
