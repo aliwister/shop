@@ -20,6 +20,8 @@ extend type Query {
     #partnerOrder(id: ID): Order
     pageInfos(slug: String!): Page
     pagesInfos : [Page]
+    faqCategories: [FaqCategory]
+    faqQAs : [FaqQA]
 }
 
 extend type Mutation {
@@ -40,6 +42,9 @@ extend type Mutation {
     createPageInfo(input: PageInfoInput): Page
     removePageInfo(id: Long): Message
     updatePageInfo(input: PageInfoInput): PageInfo
+
+    createFaqCategoryName(input: FaqCategoryNameInput) : FaqCategory
+    createFaqQA(input: FaqQAInput) : FaqQA
 }
 
 enum AssetType {
@@ -316,5 +321,49 @@ input PageInfoInput {
     slug: String!
     isImportant : Boolean
     info: String
+    language: String!
+}
+
+type FaqCategory {
+    id: ID!
+    position: Int!
+    tenantId: String!
+    faqCategoryNames: [FaqCategoryName]
+}
+
+type FaqCategoryName {
+    id: ID!
+    language: String!
+    name: String!
+    tenantId: String!
+}
+
+type FaqQA {
+    id: ID!
+    position: Int!
+    tenantId: String!
+    faqQALanguages: [FaqQALanguage]
+    categoryId: Int!
+}
+
+type FaqQALanguage {
+    id: ID!
+    question: String!
+    answer: String!
+    language: String!
+    tenantId: String!
+}
+
+input FaqCategoryNameInput{
+    position: Int!
+    name: String!
+    language: String!
+}
+
+input FaqQAInput{
+    categoryId: Int!
+    position: Int!
+    question: String!
+    answer: String!
     language: String!
 }
