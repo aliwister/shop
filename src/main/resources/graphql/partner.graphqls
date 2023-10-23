@@ -306,7 +306,6 @@ type PriceList {
 type Page{
     id: ID
     slug: String!
-    tenantId: String
     isImportant: Boolean
     pageInfos: [PageInfo]
 }
@@ -327,7 +326,6 @@ input PageInfoInput {
 type FaqCategory {
     id: ID!
     position: Int!
-    tenantId: String!
     faqCategoryNames: [FaqCategoryName]
 }
 
@@ -335,13 +333,11 @@ type FaqCategoryName {
     id: ID!
     language: String!
     name: String!
-    tenantId: String!
 }
 
 type FaqQA {
     id: ID!
     position: Int!
-    tenantId: String!
     faqQALanguages: [FaqQALanguage]
     categoryId: Int!
 }
@@ -351,7 +347,6 @@ type FaqQALanguage {
     question: String!
     answer: String!
     language: String!
-    tenantId: String!
 }
 
 input FaqCategoryNameInput{
