@@ -244,11 +244,11 @@ public class PartnerMutation implements GraphQLMutationResolver {
     }
     @PreAuthorize("hasRole('ROLE_USER')")
     public TenantFaqCategory createFaqCategoryName(FaqCategoryNameInput faqCategoryNameInput){
-        return faqCategoryService.addCategory(TenantContext.getCurrentProfile(),faqCategoryNameInput);
+        return faqCategoryService.addCategory(faqCategoryNameInput);
     }
     @PreAuthorize("hasRole('ROLE_USER')")
     public TenantFaqQA createFaqQA(FaqQAInput faqQAInput){
-        return faqQAService.addQA(TenantContext.getCurrentProfile(),faqQAInput);
+        return faqQAService.addQA(faqQAInput);
     }
 }
 
