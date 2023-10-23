@@ -21,12 +21,12 @@ public class FaqQAService {
     public FaqQAService(FaqQARepository faqQARepository){
         this.faqQARepository = faqQARepository;
     }
-    public List<TenantFaqQA> getFaqQAs(String tenantId) {
-        return faqQARepository.findAllByTenantId(tenantId);
+    public List<TenantFaqQA> getFaqQAs() {
+        return faqQARepository.findAll();
     }
 
-    public TenantFaqQA addQA(String tenantId, FaqQAInput faqQAInput) {
-        TenantFaqQA tenantFaqQA = faqQARepository.findTenantFaqQAByCategoryIdAndTenantIdAndPosition(faqQAInput.getCategoryId(),tenantId, faqQAInput.getPosition());
+    public TenantFaqQA addQA(FaqQAInput faqQAInput) {
+        TenantFaqQA tenantFaqQA = faqQARepository.findTenantFaqQAByCategoryIdAndPosition(faqQAInput.getCategoryId(), faqQAInput.getPosition());
         if(tenantFaqQA == null){
             tenantFaqQA = new TenantFaqQA();
             tenantFaqQA.setCategoryId(faqQAInput.getCategoryId());

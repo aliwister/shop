@@ -21,12 +21,12 @@ public class FaqCategoryService {
         this.faqCategoryRepository = faqCategoryRepository;
     }
 
-    public List<TenantFaqCategory> getFaqCategories(String tenantId) {
-        return faqCategoryRepository.findAllByTenantId(tenantId);
+    public List<TenantFaqCategory> getFaqCategories() {
+        return faqCategoryRepository.findAll();
     }
 
-    public TenantFaqCategory addCategory(String tenantId, FaqCategoryNameInput faqCategoryNameInput){
-        TenantFaqCategory tenantFaqCategory = faqCategoryRepository.findTenantFaqCategoryByTenantIdAndAndPosition(tenantId, faqCategoryNameInput.getPosition());
+    public TenantFaqCategory addCategory(FaqCategoryNameInput faqCategoryNameInput){
+        TenantFaqCategory tenantFaqCategory = faqCategoryRepository.findTenantFaqCategoryByPosition(faqCategoryNameInput.getPosition());
         if (tenantFaqCategory == null){
             tenantFaqCategory = new TenantFaqCategory();
             tenantFaqCategory.setPosition(faqCategoryNameInput.getPosition());

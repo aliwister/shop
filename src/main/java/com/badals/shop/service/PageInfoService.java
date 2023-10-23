@@ -26,7 +26,7 @@ public class PageInfoService {
     }
 
     public Page createPageInfo(PageInfoInput pageInfoInput) {
-        Page page = pageRepository.findPageBySlugAndTenantId(pageInfoInput.getSlug(),  TenantContext.getCurrentProfile());
+        Page page = pageRepository.findPageBySlug(pageInfoInput.getSlug());
         if (page == null){
             Page new_page = new Page();
             new_page.setSlug(pageInfoInput.getSlug());
@@ -44,8 +44,8 @@ public class PageInfoService {
     public PageInfo getPageInfoById(Long id) {
         return pageInfoRepository.findById(id).orElse(null);
     }
-    public Page getPageInfosBySlugAndAndTenantId(String slug, String tenant_id) {
-        return pageRepository.findPageBySlugAndTenantId(slug, tenant_id);
+    public Page getPageInfosBySlug(String slug) {
+        return pageRepository.findPageBySlug(slug);
     }
 
     public PageInfo updatePageInfo(PageInfoInput pageInfoInput) throws Exception {
@@ -56,12 +56,9 @@ public class PageInfoService {
         return pageInfoRepository.save(pageInfo);
     }
 
-//    public PageInfo getPageInfoBySlugAndTenantIdAndLanguage(String slug, String tenant_id, String language) {
-//        return pageInfoRepository.findPageInfoBySlugAndTenantIdAndLanguage(slug,tenant_id, language);
-//    }
 
-    public List<Page> getPagesInfosByTenantID(String tenant_id) {
-        return pageRepository.findPagesByTenantId(tenant_id);
+    public List<Page> getPages() {
+        return pageRepository.findAll();
     }
 
     public void deleteByIdAndAndTenantId(PageInfo pageInfo, Long id, String tenant_id){
