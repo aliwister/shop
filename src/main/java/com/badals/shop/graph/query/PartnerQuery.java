@@ -150,22 +150,24 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    public List<Attribute> sliders(String locale) {
       return setupService.getSliders(locale);
    }
-   public Page pageInfos(String slug) {
-       String tenant_id = TenantContext.getCurrentProfile();
-       return pageInfoService.getPageInfosBySlugAndAndTenantId(slug, tenant_id);
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Page pageInfos(String slug) {
+       return pageInfoService.getPageInfosBySlug(slug);
    }
 
+   @PreAuthorize("hasRole('ROLE_USER')")
    public List<Page> pagesInfos(){
-       String tenant_id = TenantContext.getCurrentProfile();
-       return pageInfoService.getPagesInfosByTenantID(tenant_id);
+       return pageInfoService.getPages();
    }
 
+   @PreAuthorize("hasRole('ROLE_USER')")
    public List<TenantFaqCategory> faqCategories() {
-      return faqCategoryService.getFaqCategories(TenantContext.getCurrentProfile());
+      return faqCategoryService.getFaqCategories();
    }
 
+   @PreAuthorize("hasRole('ROLE_USER')")
    public List<TenantFaqQA> faqQAs(){
-       return faqQAService.getFaqQAs(TenantContext.getCurrentProfile());
+       return faqQAService.getFaqQAs();
    }
 }
 
