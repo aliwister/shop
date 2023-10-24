@@ -1,9 +1,11 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.tenant.TenantFaqCategory;
-import com.badals.shop.domain.tenant.TenantFaqCategoryName;
+import com.badals.shop.domain.pojo.TenantFaqCategoryName;
 import com.badals.shop.repository.FaqCategoryRepository;
 import com.badals.shop.service.dto.FaqCategoryNameInput;
+import com.badals.shop.service.dto.FaqDeleteInput;
+import com.badals.shop.service.pojo.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,11 +35,37 @@ public class FaqCategoryService {
             faqCategoryRepository.save(tenantFaqCategory);
         }
         TenantFaqCategoryName tenantFaqCategoryName = new TenantFaqCategoryName();
-        tenantFaqCategoryName.setFaqCategory(tenantFaqCategory);
         tenantFaqCategoryName.setLanguage(faqCategoryNameInput.getLanguage());
         tenantFaqCategoryName.setName(faqCategoryNameInput.getName());
         tenantFaqCategory.getFaqCategoryNames().add(tenantFaqCategoryName);
         return faqCategoryRepository.save(tenantFaqCategory);
+    }
+
+    public TenantFaqCategory updateCategory(FaqCategoryNameInput faqCategoryNameInput){
+        TenantFaqCategory tenantFaqCategory = faqCategoryRepository.findTenantFaqCategoryByPosition(faqCategoryNameInput.getPosition());
+        if (tenantFaqCategory == null)
+            throw new RuntimeException("Category not found");
+        TenantFaqCategoryName tenantFaqCategoryName = tenantFaqCategory.getFaqCategoryNames().stream().filter(tenantFaqCategoryName1 -> tenantFaqCategoryName1.getLanguage().equals(faqCategoryNameInput.getLanguage())).findFirst().orElse(null);
+        if (tenantFaqCategoryName == null)
+            throw new RuntimeException("Category with the given language not found");
+        tenantFaqCategoryName.setName(faqCategoryNameInput.getName());
+        return faqCategoryRepository.save(tenantFaqCategory);
+    }
+
+    public Message deleteCategory(FaqDeleteInput faqDeleteInput){
+        TenantFaqCategory tenantFaqCategory = faqCategoryRepository.findById(faqDeleteInput.getId()).orElse(null);
+        if (tenantFaqCategory == null)
+            throw new RuntimeException("Category not found");
+        if(faqDeleteInput.getLanguage() == null){
+            faqCategoryRepository.delete(tenantFaqCategory);
+            return new Message("Category deleted successfully");
+        }
+        TenantFaqCategoryName tenantFaqCategoryName = tenantFaqCategory.getFaqCategoryNames().stream().filter(tenantFaqCategoryName1 -> tenantFaqCategoryName1.getLanguage().equals(faqDeleteInput.getLanguage())).findFirst().orElse(null);
+        if (tenantFaqCategoryName == null)
+            throw new RuntimeException("Category with the given language not found");
+        tenantFaqCategory.getFaqCategoryNames().remove(tenantFaqCategoryName);
+        faqCategoryRepository.save(tenantFaqCategory);
+        return new Message("Category deleted successfully");
     }
 
 }
