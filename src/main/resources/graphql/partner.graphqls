@@ -45,6 +45,10 @@ extend type Mutation {
 
     createFaqCategoryName(input: FaqCategoryNameInput) : FaqCategory
     createFaqQA(input: FaqQAInput) : FaqQA
+    updateFaqCategoryName(input: FaqCategoryNameInput) : FaqCategory
+    updateFaqQA(input: FaqQAInput) : FaqQA
+    removeFaqCategoryName(input : FaqDeleteInput) : Message
+    removeFaqQA(input : FaqDeleteInput) : Message
 }
 
 enum AssetType {
@@ -330,7 +334,6 @@ type FaqCategory {
 }
 
 type FaqCategoryName {
-    id: ID!
     language: String!
     name: String!
 }
@@ -343,7 +346,6 @@ type FaqQA {
 }
 
 type FaqQALanguage {
-    id: ID!
     question: String!
     answer: String!
     language: String!
@@ -361,4 +363,9 @@ input FaqQAInput{
     question: String!
     answer: String!
     language: String!
+}
+
+input FaqDeleteInput{
+    id: ID!
+    language: String
 }
