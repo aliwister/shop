@@ -1,12 +1,14 @@
 package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
+import com.badals.shop.domain.pojo.TenantFaqQALanguage;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -32,15 +34,13 @@ public class TenantFaqQA implements Serializable, TenantSupport {
     @Column(name = "tenant_id")
     private String tenantId;
 
-    @OneToMany(mappedBy = "faqQA",cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Type(type = "json")
+    @Column(name = "qa", columnDefinition = "string")
     private List<TenantFaqQALanguage> faqQALanguages = new ArrayList<>();
 
     @Getter
     @Setter
-    @Column(name = "faq_category_id", updatable = false, insertable = false)
+    @Column(name = "faq_category_id")
     private Long categoryId;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "faq_category_id", referencedColumnName = "id")
-    private TenantFaqCategory faqCategory;
 }
