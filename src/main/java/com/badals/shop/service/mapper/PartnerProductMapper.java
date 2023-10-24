@@ -6,6 +6,7 @@ import com.badals.shop.domain.pojo.*;
 import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.service.CurrencyService;
+import com.badals.shop.service.dto.IndexProductDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.pojo.AddProductDTO;
 import com.badals.shop.service.pojo.PartnerProduct;
@@ -52,6 +53,21 @@ public interface PartnerProductMapper extends EntityMapper<PartnerProduct, Tenan
     @Mapping(target = "cost", ignore = true)
     @Mapping(target = "stock", ignore = true)
     ProductDTO toProductDto(PartnerProduct product);
+
+/*    @Mapping(target = "title", ignore = true)
+    @Mapping(target = "description", ignore = true)
+    @Mapping(target = "variations", ignore = true)
+    @Mapping(target = "variationOptions", ignore = true)
+    @Mapping(source = "ref", target = "id")
+    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withCurrencyConversionList")
+    @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversionList")
+    @Mapping(target = "gallery", source="gallery", qualifiedByName = "buildGallery")
+    @Mapping(target = "stock", ignore = true)
+    IndexProductDTO toIndexProductDto(PartnerProduct product);*/
+
+
+
 
     @Mapping(target = "gallery", ignore = true)
     //@Mapping(target = "merchant", ignore = true)
