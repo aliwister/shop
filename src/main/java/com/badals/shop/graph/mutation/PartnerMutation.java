@@ -250,5 +250,21 @@ public class PartnerMutation implements GraphQLMutationResolver {
     public TenantFaqQA createFaqQA(FaqQAInput faqQAInput){
         return faqQAService.addQA(faqQAInput);
     }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqCategory updateFaqCategoryName(FaqCategoryNameInput faqCategoryNameInput){
+        return faqCategoryService.updateCategory(faqCategoryNameInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqQA updateFaqQA(FaqQAInput faqQAInput){
+        return faqQAService.updateQA(faqQAInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Message removeFaqCategoryName(FaqDeleteInput faqDeleteInput) {
+        return faqCategoryService.deleteCategory(faqDeleteInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Message removeFaqQA(FaqDeleteInput faqDeleteInput){
+        return faqQAService.deleteQA(faqDeleteInput);
+    }
 }
 
