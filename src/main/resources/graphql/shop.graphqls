@@ -15,6 +15,11 @@ extend type Query {
     me: Customer
     mePlus: Customer
     plusCart(secureKey: String): Checkout
+
+    pageInfosShop(slug: String!) : Page
+    pagesInfosShop : [Page]
+    faqCategoriesShop : [FaqCategory]
+    faqQAsShop : [FaqQA]
 }
 extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse
