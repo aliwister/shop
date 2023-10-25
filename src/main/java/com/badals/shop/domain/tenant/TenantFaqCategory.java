@@ -37,4 +37,7 @@ public class TenantFaqCategory implements Serializable, TenantSupport {
     @Column(name = "name", columnDefinition = "string")
     private List<TenantFaqCategoryName> faqCategoryNames = new ArrayList<>();
 
+    @OneToMany(mappedBy = "tenantFaqCategory", cascade=CascadeType.ALL, orphanRemoval = true)
+    private List<TenantFaqQA> faqQAs = new ArrayList<>();
+
 }
