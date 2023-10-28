@@ -40,7 +40,12 @@ public class TenantFaqQA implements Serializable, TenantSupport {
 
     @Getter
     @Setter
-    @Column(name = "faq_category_id")
+    @Column(name = "faq_category_id", insertable = false, updatable = false)
     private Long categoryId;
+
+    @ManyToOne()
+    @JoinColumn(name = "faq_category_id", referencedColumnName = "id")
+    private TenantFaqCategory tenantFaqCategory;
+
 
 }

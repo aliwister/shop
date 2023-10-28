@@ -41,7 +41,9 @@ extend type Mutation {
     createPosOrder(cart: CheckoutInput, paymentMethod: String, paymentAmount: String, ref: String): Order
     createPageInfo(input: PageInfoInput): Page
     removePageInfo(id: Long): Message
+    removePage(slug: String): Message
     updatePageInfo(input: PageInfoInput): PageInfo
+    updatePage(input : PageInput) : Page
 
     createFaqCategoryName(input: FaqCategoryNameInput) : FaqCategory
     createFaqQA(input: FaqQAInput) : FaqQA
@@ -312,6 +314,11 @@ type Page{
     slug: String!
     isImportant: Boolean
     pageInfos: [PageInfo]
+}
+
+input PageInput{
+    id: ID
+    isImportant: Boolean
 }
 
 type PageInfo {

@@ -1,7 +1,9 @@
 package com.badals.shop.service;
 
+import com.badals.shop.domain.tenant.TenantFaqCategory;
 import com.badals.shop.domain.tenant.TenantFaqQA;
 import com.badals.shop.domain.pojo.TenantFaqQALanguage;
+import com.badals.shop.repository.FaqCategoryRepository;
 import com.badals.shop.repository.FaqQARepository;
 import com.badals.shop.service.dto.FaqDeleteInput;
 import com.badals.shop.service.dto.FaqQAInput;
@@ -19,9 +21,11 @@ public class FaqQAService {
     private final Logger log = LoggerFactory.getLogger(FaqQAService.class);
 
     private final FaqQARepository faqQARepository;
+    private final FaqCategoryRepository faqCategoryRepository;;
 
-    public FaqQAService(FaqQARepository faqQARepository){
+    public FaqQAService(FaqQARepository faqQARepository, FaqCategoryRepository faqCategoryRepository){
         this.faqQARepository = faqQARepository;
+        this.faqCategoryRepository = faqCategoryRepository;
     }
     public List<TenantFaqQA> getFaqQAs() {
         return faqQARepository.findAll();
@@ -31,6 +35,10 @@ public class FaqQAService {
         TenantFaqQA tenantFaqQA = faqQARepository.findTenantFaqQAByCategoryIdAndPosition(faqQAInput.getCategoryId(), faqQAInput.getPosition());
         if(tenantFaqQA == null){
             tenantFaqQA = new TenantFaqQA();
+            TenantFaqCategory tenantFaqCategory = faqCategoryRepository.findById(faqQAInput.getCategoryId()).orElse(null);
+            if (tenantFaqCategory == null)
+                throw new RuntimeException("Category not found");
+            tenantFaqQA.setTenantFaqCategory(tenantFaqCategory);
             tenantFaqQA.setCategoryId(faqQAInput.getCategoryId());
             tenantFaqQA.setPosition(faqQAInput.getPosition());
             tenantFaqQA = faqQARepository.save(tenantFaqQA);
@@ -41,7 +49,6 @@ public class FaqQAService {
         tenantFaqQALanguage.setAnswer(faqQAInput.getAnswer());
         tenantFaqQA.getFaqQALanguages().add(tenantFaqQALanguage);
         return faqQARepository.save(tenantFaqQA);
-
     }
 
     public TenantFaqQA updateQA(FaqQAInput faqQAInput) {
