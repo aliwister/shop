@@ -252,6 +252,10 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return pageInfoService.updatePageInfo(info);
     }
     @PreAuthorize("hasRole('ROLE_USER')")
+    public Page updatePage(PageInput pageInput) throws Exception {
+        return pageInfoService.updatePage(pageInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
     public TenantFaqCategory createFaqCategoryName(FaqCategoryNameInput faqCategoryNameInput){
         return faqCategoryService.addCategory(faqCategoryNameInput);
     }
