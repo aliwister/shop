@@ -6,6 +6,7 @@ import com.badals.shop.domain.tenant.PageInfo;
 import com.badals.shop.repository.PageInfoRepository;
 import com.badals.shop.repository.PageRepository;
 import com.badals.shop.service.dto.PageInfoInput;
+import com.badals.shop.service.dto.PageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,14 @@ public class PageInfoService {
         return pageInfoRepository.save(pageInfo);
     }
 
+    public Page updatePage(PageInput pageInput) throws Exception {
+        Page page = pageRepository.findById(pageInput.getId()).orElse(null);
+        if (page == null)
+            throw new Exception("Page not found");
+        page.setIsImportant(pageInput.getIsImportant());
+        return pageRepository.save(page);
+    }
+
 
     public List<Page> getPages() {
         return pageRepository.findAll();
@@ -65,6 +74,14 @@ public class PageInfoService {
         pageInfo.getPage().getPageInfos().removeIf(page -> Objects.equals(page.getId(), id));
         pageRepository.save(pageInfo.getPage());
         pageInfoRepository.deleteByIdAndAndTenantId(id, tenant_id);
+    }
+
+    public Page getPageBySlug(String slug) {
+        return pageRepository.findPageBySlug(slug);
+    }
+
+    public void deletePage(Long id) {
+        pageRepository.deleteById(id);
     }
 
     public PageInfo save(PageInfo pageInfo) {

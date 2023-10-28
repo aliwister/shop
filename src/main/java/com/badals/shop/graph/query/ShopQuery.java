@@ -4,8 +4,7 @@ import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
-import com.badals.shop.domain.tenant.Checkout;
-import com.badals.shop.domain.tenant.TenantWishList;
+import com.badals.shop.domain.tenant.*;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
@@ -41,7 +40,10 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    private final TenantOrderService orderService;
    private final TenantAccountService accountService;
    private final TenantLayoutService layoutService;
-   public ShopQuery(TenantProductService productService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService, TenantWishListService wishlistService) {
+    private final PageInfoPublicService pageInfoService;
+    private final FaqPublicService faqService;
+
+    public ShopQuery(TenantProductService productService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService, TenantWishListService wishlistService, PageInfoPublicService pageInfoService, FaqPublicService faqService) {
       this.productService = productService;
       this.categoryService = categoryService;
       this.customerService = customerService;
@@ -53,6 +55,8 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       this.accountService = accountService;
       this.layoutService = publicService;
       this.wishlistService = wishlistService;
+      this.pageInfoService = pageInfoService;
+      this.faqService = faqService;
    }
    public TenantDTO currentTenant() {
       return tenantService.findAll().get(0);
@@ -128,5 +132,22 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    public Checkout plusCart(final String secureKey) {
       return cartService.plusCart(secureKey);
    }
+
+    public Page pageInfosShop(String slug) {
+        return pageInfoService.getPageInfosBySlug(TenantContext.getCurrentProfile(), slug);
+    }
+
+    public List<Page> pagesInfosShop(){
+        return pageInfoService.getPages(TenantContext.getCurrentProfile());
+    }
+
+    public List<TenantFaqCategory> faqCategoriesShop() {
+        return faqService.getFaqCategories(TenantContext.getCurrentProfile());
+    }
+
+    public List<TenantFaqQA> faqQAsShop(){
+        return faqService.getFaqQAs(TenantContext.getCurrentProfile());
+    }
+
 }
 
