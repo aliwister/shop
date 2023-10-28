@@ -239,6 +239,15 @@ public class PartnerMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
+    public Message removePage(String slug){
+        Page page = pageInfoService.getPageBySlug(slug);
+        if (page == null)
+            return new Message("Page not found", "404");
+        pageInfoService.deletePage(page.getId());
+        return new Message("ok");
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
     public PageInfo updatePageInfo(PageInfoInput info) throws Exception {
         return pageInfoService.updatePageInfo(info);
     }
