@@ -67,6 +67,14 @@ public class PageInfoService {
         pageInfoRepository.deleteByIdAndAndTenantId(id, tenant_id);
     }
 
+    public Page getPageBySlug(String slug) {
+        return pageRepository.findPageBySlug(slug);
+    }
+
+    public void deletePage(Long id) {
+        pageRepository.deleteById(id);
+    }
+
     public PageInfo save(PageInfo pageInfo) {
         return pageInfoRepository.save(pageInfo);
     }
