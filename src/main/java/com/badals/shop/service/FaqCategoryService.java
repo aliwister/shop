@@ -27,6 +27,10 @@ public class FaqCategoryService {
         return faqCategoryRepository.findAll();
     }
 
+    public TenantFaqCategory getFaqCategoryById(Long id) {
+        return faqCategoryRepository.findById(id).orElse(null);
+    }
+
     public TenantFaqCategory addCategory(FaqCategoryNameInput faqCategoryNameInput){
         TenantFaqCategory tenantFaqCategory = faqCategoryRepository.findTenantFaqCategoryByPosition(faqCategoryNameInput.getPosition());
         if (tenantFaqCategory == null){
