@@ -21,7 +21,9 @@ extend type Query {
     pageInfos(slug: String!): Page
     pagesInfos : [Page]
     faqCategories: [FaqCategory]
+    faqCategoryById(id: Long): FaqCategory
     faqQAs : [FaqQA]
+    faqQAById(id: Long): FaqQA
 }
 
 extend type Mutation {

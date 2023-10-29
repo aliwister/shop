@@ -166,8 +166,18 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    }
 
    @PreAuthorize("hasRole('ROLE_USER')")
+   public TenantFaqCategory faqCategoryById(Long id) {
+      return faqCategoryService.getFaqCategoryById(id);
+   }
+
+   @PreAuthorize("hasRole('ROLE_USER')")
    public List<TenantFaqQA> faqQAs(){
        return faqQAService.getFaqQAs();
    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqQA faqQAById(Long id) {
+        return faqQAService.getFaqQAById(id);
+    }
 }
 
