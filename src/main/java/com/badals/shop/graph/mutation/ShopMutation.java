@@ -74,6 +74,11 @@ public class ShopMutation implements GraphQLMutationResolver {
         return response;
     }
 
+    public Message addCouponToCart(final String secureKey, String coupon) {
+        Locale l = LocaleContextHolder.getLocale();
+        return this.cartService.addCouponToCart(secureKey, coupon);
+    }
+
     //@PreAuthorize("hasRole('ROLE_USER')")
     public CheckoutSession createTenantCheckout(final String secureKey, final List<CartItemDTO> items) {
         String token = cartService.createCheckout(secureKey, items);

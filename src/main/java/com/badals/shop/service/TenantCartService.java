@@ -7,6 +7,7 @@ import com.badals.shop.domain.pojo.DiscountRule;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.TenantCartRule;
+import com.badals.shop.graph.CartResponse;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.domain.enumeration.CartState;
@@ -17,6 +18,8 @@ import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.pojo.I18Message;
+import com.badals.shop.service.pojo.Message;
+import com.badals.shop.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -198,6 +201,40 @@ public class TenantCartService {
         //}
     }
 
+    public Message addCouponToCart(String secureKey, String coupon) {
+        TenantCart cart;
+        if(secureKey != null) {
+            cart = cartRepository.findBySecureKey(secureKey).orElse(null);
+        }else{
+            //todo do i need to handle non existing cart?
+            return null;
+        }
+        //check coupon validity
+        TenantCartRule cartRule =  cartRuleRepository.findByCoupon(coupon).orElse(null);
+        if (cartRule == null) {
+            throw new BadRequestAlertException("Invalid coupon", coupon, "couponinvalid");
+        }else if(!cartRule.getEnabled()){
+            // todo what exception should i return if not enabled?
+            throw new BadRequestAlertException("Coupon is not enabled", coupon, "couponinvalid");
+        }
+
+        //check if its applicable to this cart
+        I18Message message = new I18Message(null, "200");
+        List<AdjustmentProfile> adjustments = processRules(cart, coupon, message);
+        if (adjustments == null) {
+            throw new BadRequestAlertException("requirements not met", coupon, message.getStatus());
+        }
+        System.out.println("adjustments " + adjustments);
+        cart.setCartAdjustments(adjustments);
+        cart.setCartRule(cartRule);
+        this.save(cart, null);
+//        CartDTO cartDTO = cartMapper.toDto(cart);
+//        CartResponse cartResponse = new CartResponse();
+//        cartResponse.setCart(cartDTO);
+//        cartResponse.setMessage("Coupon added successfully");
+        return new Message("Coupon added successfully");
+    }
+
     private List<AdjustmentProfile> processRules(TenantCart cart, String coupon, I18Message message) {
         if (coupon != null && !coupon.trim().isEmpty()) {
             TenantCartRule rule = cartRuleRepository.findByCoupon(coupon).orElse(null);
@@ -261,9 +298,9 @@ public class TenantCartService {
             if(loginUser != null) {
                 cart.setCustomer(loginUser);
             }*/
-            I18Message message = new I18Message(null, "200");
-            List<AdjustmentProfile> profile = this.processRules(cart, coupon, message);
-            cart.setCartAdjustments(profile);
+//            I18Message message = new I18Message(null, "200");
+//            List<AdjustmentProfile> profile = this.processRules(cart, coupon, message);
+//            cart.setCartAdjustments(profile);
 
             cart = cartRepository.saveAndFlush(cart);
             cartRepository.refresh(cart);

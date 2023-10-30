@@ -17,6 +17,7 @@ extend type Query {
 }
 extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, coupon: String): CartResponse
+    addCouponToCart(secureKey: String, coupon: String): CartResponse
     createTenantCheckout(secureKey: String, items: [CartItemInput]): CheckoutSession
     createStubFromSearch(dto: ProductInput, tag: String): Product
     removeTag(ref: String, tag: String): Product
