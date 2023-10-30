@@ -61,9 +61,9 @@ public class TenantCartRule implements Serializable, TenantSupport {
     @Getter @Setter @Column(name = "rules", columnDefinition = "string")
     List<DiscountRule> rules = new ArrayList<>();
 
-    @Type(type = "json")
-    @Getter @Setter @Column(name = "checkout_rules", columnDefinition = "string")
-    List<DiscountCheckoutRule> checkoutRules = new ArrayList<>();
+//    @Type(type = "json")
+//    @Getter @Setter @Column(name = "checkout_rules", columnDefinition = "string")
+//    List<DiscountCheckoutRule> checkoutRules = new ArrayList<>();
 
     //@NotNull
     @Enumerated(EnumType.STRING)
@@ -79,20 +79,20 @@ public class TenantCartRule implements Serializable, TenantSupport {
     PriceMap discount;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    @JsonIgnoreProperties("carts")
-    private Customer customer;
-
-
-    @Getter
-    @Setter
-    @Column(name = "customer_id", updatable = false, insertable = false)
-    private Long customerId;
-
-
-    @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<TenantCartItem> cartItems = new ArrayList<TenantCartItem>();
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "customer_id")
+//    @JsonIgnoreProperties("carts")
+//    private Customer customer;
+//
+//
+//    @Getter
+//    @Setter
+//    @Column(name = "customer_id", updatable = false, insertable = false)
+//    private Long customerId;
+//
+//
+//    @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
+//    private List<TenantCartItem> cartItems = new ArrayList<TenantCartItem>();
 
     @Column(name="tenant_id")
     private String tenantId;
