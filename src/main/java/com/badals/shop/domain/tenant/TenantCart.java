@@ -94,6 +94,10 @@ public class TenantCart implements Serializable, TenantSupport {
     @Column(name = "adjustments", columnDefinition = "string")
     private List<AdjustmentProfile> cartAdjustments;
 
+    @Getter @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cart_rule_id")
+    private TenantCartRule cartRule;
 
     public List<TenantCartItem> getCartItems() {
         return cartItems;
