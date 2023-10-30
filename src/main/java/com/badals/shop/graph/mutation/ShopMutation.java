@@ -74,7 +74,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
-    public CartResponse updateTenantCart(final String secureKey, final List<CartItemDTO> items, boolean isMerge) {
+    public CartResponse updateTenantCart(final String secureKey, final List<CartItemDTO> items, boolean isMerge, String coupon) {
         Locale l = LocaleContextHolder.getLocale();
         CartDTO cart = this.cartService.updateCart(secureKey, items, isMerge);
         CartResponse response = new CartResponse();
