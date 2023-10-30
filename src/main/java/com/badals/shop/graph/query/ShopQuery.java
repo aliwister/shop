@@ -77,7 +77,7 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       return accountService.findOrderByRef(ref);
    }
    public CartDTO cart(String secureKey) {
-      return cartService.updateCart(secureKey, null, false, null);
+      return cartService.updateCart(secureKey, null, false);
    }
 
     @PreAuthorize("hasRole('ROLE_USER')")

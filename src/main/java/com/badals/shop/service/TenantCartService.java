@@ -143,7 +143,7 @@ public class TenantCartService {
     }
 
     @Transactional
-    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge, String coupon) {
+    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge) {
         TenantCart cart = null;
 
         Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
@@ -159,7 +159,7 @@ public class TenantCartService {
                 cart = new TenantCart();
                 cart.setSecureKey(createUIUD());
             }
-            return this.mergeCart(cart, items, isMerge, coupon);
+            return this.mergeCart(cart, items, isMerge);
         }
 
         //logged in user - always
@@ -172,32 +172,32 @@ public class TenantCartService {
                 }
                 cart.setCartState(CartState.CLAIMED);
                 cart.setCustomer(loginUser);
-                return this.mergeCart(cart, items, false, coupon);
+                return this.mergeCart(cart, items, false);
             }
             if (cart != null) {
                 List<CartItemDTO> mergelist = cart.getCartItems().stream().map(x -> new CartItemDTO().productId(x.getProductId()).quantity(x.getQuantity())).collect(Collectors.toList());
                 cart.getCartItems().clear();
                 //if (isMerge)
-                return this.mergeCart(newCart, mergelist, true, coupon);
+                return this.mergeCart(newCart, mergelist, true);
             }
             else
-                return this.mergeCart(newCart, items, false, coupon);
+                return this.mergeCart(newCart, items, false);
         }
 
         if (cart.getCartState() == CartState.CLAIMED && cart.getCustomerId() != null) {
             if(loginUser.getId().longValue() == cart.getCustomerId() )
-                return this.mergeCart(cart, items, isMerge, coupon);
+                return this.mergeCart(cart, items, isMerge);
 
             cart = this.getCartByCustomer(loginUser);
             if (isMerge)
-                return this.mergeCart(cart, items, isMerge, coupon);
+                return this.mergeCart(cart, items, isMerge);
             else
                 return this.save(cart, items);
         }
         //if (cart.getCartState() == CartState.CLOSED) {
 
         cart = this.createCustomerCart(loginUser);
-        return this.mergeCart(cart, items, isMerge, coupon);
+        return this.mergeCart(cart, items, isMerge);
         //}
     }
 
@@ -263,7 +263,7 @@ public class TenantCartService {
         return true;
     }
 
-    private CartDTO mergeCart(TenantCart cart, List<CartItemDTO> items, Boolean isMerge, String coupon) {
+    private CartDTO mergeCart(TenantCart cart, List<CartItemDTO> items, Boolean isMerge) {
         List<TenantCartItem> cartItems = cart.getCartItems();
         //isMerge = false;
 
