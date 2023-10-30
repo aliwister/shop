@@ -105,6 +105,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/**/graphql").permitAll()
                     .antMatchers("/detrack").permitAll()
                     .antMatchers("/myus/adfadf32423423423/**").permitAll()
+                    .antMatchers("/amazon/adfadf32423423423/**").permitAll()
                     .antMatchers("/checkout1432u102398019238092183").permitAll()
                     .antMatchers("/api/users/current").permitAll()
                     .antMatchers("/api/account/reset-password/init").permitAll()

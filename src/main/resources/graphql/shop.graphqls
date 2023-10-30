@@ -8,12 +8,18 @@ extend type Query {
     tenantInfo: Tenant
     currentTenant: Tenant
     cart(secureKey: String): Cart
+    wishlist: Wishlist
     orderSummary(ref: String, confirmationKey: String): Order
     tenantSliders: [Attribute]
     socialProfiles: [Attribute]
     me: Customer
     mePlus: Customer
     plusCart(secureKey: String): Checkout
+
+    pageInfosShop(slug: String!) : Page
+    pagesInfosShop : [Page]
+    faqCategoriesShop : [FaqCategory]
+    faqQAsShop : [FaqQA]
 }
 extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, coupon: String): CartResponse
@@ -22,6 +28,10 @@ extend type Mutation {
     createStubFromSearch(dto: ProductInput, tag: String): Product
     removeTag(ref: String, tag: String): Product
     createPlusCart(secureKey: String, items: [LineItemInput]): Checkout
+    createPlusCartAdmin(secureKey: String, items: [LineItemInput], id: String): Checkout
+    addWishlistItem(productId:ID) : WishlistItem
+    removeWishlistItem(productId:ID) : Wishlist
+#    convertWishListToCart: Cart
 
 }
 

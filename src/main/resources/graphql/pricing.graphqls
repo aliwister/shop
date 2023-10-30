@@ -1,3 +1,13 @@
+extend type Query {
+    pricingRequests:[PricingRequest]
+}
+
+extend type Mutation {
+    addToPricingQ(sku: String):Message
+    createOverride(sku: String, type: OverrideType, override: String, active: Boolean, lazy: Boolean, merchantId: Int, submitOnly: Int, dial: String): Product
+    completePricingRequest(id: Long):Message
+    completePricingRequestAndEmail(id: Long):Message
+}
 
 enum OverrideType {
     COST

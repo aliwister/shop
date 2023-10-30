@@ -2,6 +2,8 @@ package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -11,13 +13,13 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * A CartItem.
+ * A WishlistItem.
  */
 @Entity
-@Table(name = "cart_item", catalog = "profileshop")
+@Table(name = "whishlist_item", catalog = "profileshop")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
-public class TenantCartItem implements Serializable, TenantSupport {
+public class TenantWishListItem implements Serializable, TenantSupport {
 
     private static final long serialVersionUID = 22L;
 
@@ -30,8 +32,17 @@ public class TenantCartItem implements Serializable, TenantSupport {
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties("cartItems")
-    private TenantCart cart;
+    @JsonIgnoreProperties("wishlistItems")
+    private TenantWishList wishlist;
+
+    @Getter
+    @Setter
+    @Column(name = "wishlist_id", updatable = false, insertable = false)
+    private Long wishlistId;
+
+    public TenantWishListItem() {
+
+    }
 
 
     public Long getProductId() {
@@ -72,15 +83,15 @@ public class TenantCartItem implements Serializable, TenantSupport {
 
 
     // @Column(name = "product_id")
-   // private Long productId;
+    // private Long productId;
 
     //public Long getProductId() {
-     //   return productId;
-   // }
+    //   return productId;
+    // }
 
     //public void setProductId(Long productId) {
-     //   this.productId = productId;
-  //  }
+    //   this.productId = productId;
+    //  }
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -95,7 +106,7 @@ public class TenantCartItem implements Serializable, TenantSupport {
         return quantity;
     }
 
-    public TenantCartItem quantity(Integer quantity) {
+    public TenantWishListItem quantity(Integer quantity) {
         this.quantity = quantity;
         return this;
     }
@@ -104,17 +115,17 @@ public class TenantCartItem implements Serializable, TenantSupport {
         this.quantity = quantity;
     }
 
-    public TenantCart getCart() {
-        return cart;
+    public TenantWishList getWishList() {
+        return wishlist;
     }
 
-    public TenantCartItem cart(TenantCart cart) {
-        this.cart = cart;
+    public TenantWishListItem wishlist(TenantWishList tenantWishList) {
+        this.wishlist = tenantWishList;
         return this;
     }
 
-    public void setCart(TenantCart cart) {
-        this.cart = cart;
+    public void setWishlist(TenantWishList tenantWishList) {
+        this.wishlist = tenantWishList;
     }
 
     @Override
@@ -122,10 +133,10 @@ public class TenantCartItem implements Serializable, TenantSupport {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TenantCartItem)) {
+        if (!(o instanceof TenantWishListItem)) {
             return false;
         }
-        return id != null && id.equals(((TenantCartItem) o).id);
+        return id != null && id.equals(((TenantWishListItem) o).id);
     }
 
     @Override
@@ -135,9 +146,11 @@ public class TenantCartItem implements Serializable, TenantSupport {
 
     @Override
     public String toString() {
-        return "CartItem{" +
-            "id=" + getId() +
-            ", quantity=" + getQuantity() +
-            "}";
+        return "TenantWishListItem{" +
+            "id=" + id +
+            ", quantity=" + quantity +
+            ", productId=" + productId +
+            ", tenantId='" + tenantId + '\'' +
+            '}';
     }
 }

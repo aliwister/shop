@@ -462,6 +462,38 @@ public class TenantCartService {
         return checkout;
     }
 
+    @Transactional
+    public Checkout createCheckoutPlus(String secureKey, List<LineItem> items, Long customerId) {
+        Customer customer = customerRepository.findByIdJoinAddresses(customerId).orElse(null);
+
+        //if (secureKey == null)
+        Checkout checkout;
+        if (secureKey == null)
+            checkout = new Checkout();
+        else
+            checkout = checkoutRepository.findBySecureKeyAndCheckedOut(secureKey, false).orElse(new Checkout());
+
+
+        checkout.setItems(items);
+        if (customer.getAddresses() != null && customer.getAddresses().size() > 0)
+            checkout.setAddresses(customer.getAddresses().stream().map(checkoutAddressMapper::addressToAddressPojo).filter(x->x.getPlusCode() != null).collect(Collectors.toList()));
+
+        if(checkout.getId() == null )
+            checkout.setSecureKey(TenantCartService.createUIUD());
+
+
+        checkout.setName(customer.getFirstname() + " " + customer.getFirstname());
+        checkout.setEmail(customer.getEmail());
+        checkout.setAllowPickup(customer.getAllowPickup());
+        checkout.setPhone(customer.getMobile());
+        checkout.setCartWeight(items.stream().map(x -> x.getWeight()).reduce(BigDecimal.ZERO, BigDecimal::add));
+        checkout.setCurrency("OMR");
+        checkout.setCheckedOut(false);
+
+        checkout = checkoutRepository.save(checkout);
+        return checkout;
+    }
+
    public Checkout plusCart(String secureKey) {
        Checkout cart = checkoutRepository.findBySecureKey(secureKey).orElse(null);
        if(cart != null) {
