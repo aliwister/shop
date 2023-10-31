@@ -32,12 +32,13 @@ public class OrderAdjustment implements Serializable {
       this.quantity = quantity;
       this.value = value;
    }
-   public static OrderAdjustment discount(String description, BigDecimal value) {
-      return new OrderAdjustment(OrderAdjustmentType.DISCOUNT, description, 1, value);
-   }
-   public static OrderAdjustment delivery(String description, BigDecimal value) {
-      return new OrderAdjustment(OrderAdjustmentType.SHIPPING, description, 1, value);
-   }
+
+//   public static OrderAdjustment discount(String description, BigDecimal value) {
+//      return new OrderAdjustment(OrderAdjustmentType.DISCOUNT, description, 1, value);
+//   }
+//   public static OrderAdjustment delivery(String description, BigDecimal value) {
+//      return new OrderAdjustment(OrderAdjustmentType.SHIPPING, description, 1, value);
+//   }
 
    public boolean shippingCheck() {
       return this.getType().equals(OrderAdjustmentType.SHIPPING);
