@@ -4,12 +4,14 @@ import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.CartState;
+import com.badals.shop.domain.pojo.OrderAdjustment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -80,6 +82,16 @@ public class TenantCart implements Serializable, TenantSupport {
 
     @OneToMany(mappedBy = "cart", cascade=CascadeType.ALL, orphanRemoval = true)
     private List<TenantCartItem> cartItems = new ArrayList<TenantCartItem>();
+
+    @Getter @Setter
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cart_rule_id")
+    private TenantCartRule cartRule;
+
+    @Getter @Setter
+    @Type(type = "json")
+    @Column(name = "adjustments", columnDefinition = "string")
+    private List<OrderAdjustment> adjustments = new ArrayList<>();
 
     @Column(name="tenant_id")
     private String tenantId;
