@@ -4,6 +4,7 @@ import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.Address;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.CartState;
+import com.badals.shop.domain.pojo.AdjustmentProfile;
 import com.badals.shop.domain.pojo.OrderAdjustment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -91,7 +92,7 @@ public class TenantCart implements Serializable, TenantSupport {
     @Getter @Setter
     @Type(type = "json")
     @Column(name = "adjustments", columnDefinition = "string")
-    private List<OrderAdjustment> adjustments = new ArrayList<>();
+    private AdjustmentProfile adjustments;
 
     @Column(name="tenant_id")
     private String tenantId;
