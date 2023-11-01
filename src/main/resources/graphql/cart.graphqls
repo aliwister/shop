@@ -12,7 +12,7 @@ type Cart {
     #customer: Customer,
     cartItems: [CartItem]
     currency: String
-    adjustments: [OrderAdjustment]
+    adjustments: AdjustmentProfile
     cartRule: TenantCartRule
 }
 
@@ -141,6 +141,11 @@ type DiscountCheckoutRule {
 type PriceMap {
     prices: String
     base: String
+}
+
+type AdjustmentProfile{
+    discount: PriceMap
+    discountReductionType: DiscountReductionType
 }
 
 type TenantCartRule {
