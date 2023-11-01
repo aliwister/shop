@@ -1,8 +1,11 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.pojo.AdjustmentProfile;
+import com.badals.shop.domain.pojo.DiscountRule;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.Checkout;
+import com.badals.shop.domain.tenant.TenantCartRule;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.domain.enumeration.CartState;
@@ -12,6 +15,7 @@ import com.badals.shop.repository.*;
 import com.badals.shop.repository.projection.CartItemInfo;
 import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
+import com.badals.shop.service.pojo.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -42,11 +46,11 @@ public class TenantCartService {
     private final UserService userService;
     private final CustomerService customerService;
     private final TenantProductService productService;
-
     private final CheckoutLineItemMapper checkoutLineItemMapper;
     private final CheckoutAddressMapper checkoutAddressMapper;
+    private final TenantCartRuleRepository cartRuleRepository;
 
-    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, CustomerMapper customerMapper, UserService userService, CustomerService customerService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper) {
+    public TenantCartService(TenantCartRepository cartRepository, TenantCheckoutRepository checkoutRepository, TenantProductRepository productRepository, TenantCustomerRepository customerRepository, TenantCartItemRepository cartItemRepository, TenantCartMapper cartMapper, CustomerMapper customerMapper, UserService userService, CustomerService customerService, TenantProductService productService, CheckoutLineItemMapper checkoutLineItemMapper, CheckoutAddressMapper checkoutAddressMapper, TenantCartRuleRepository cartRuleRepository) {
         this.cartRepository = cartRepository;
         this.checkoutRepository = checkoutRepository;
         this.productRepository = productRepository;
@@ -59,6 +63,7 @@ public class TenantCartService {
         this.productService = productService;
         this.checkoutLineItemMapper = checkoutLineItemMapper;
         this.checkoutAddressMapper = checkoutAddressMapper;
+        this.cartRuleRepository = cartRuleRepository;
     }
 
 
@@ -189,6 +194,92 @@ public class TenantCartService {
         //}
     }
 
+    @Transactional
+    public Message addCouponToCart(String secureKey, String coupon) {
+        TenantCart cart;
+        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
+        log.info("Logged in user " + loginUser);
+        if(secureKey != null && loginUser == null) {
+            cart = cartRepository.findBySecureKey(secureKey).orElse(null);
+        } else if(loginUser != null){
+            cart = this.getCartByCustomer(loginUser);
+        } else {
+            return new Message("cart not found","404");
+        }
+        //check coupon validity
+        TenantCartRule cartRule =  cartRuleRepository.findByCoupon(coupon);
+        if (cartRule == null) {
+            return new Message("coupon not found","404");
+        }else if(!cartRule.getEnabled()){
+            return new Message("coupon not enabled","409");
+        }
+
+        AdjustmentProfile adjustments = processRules(cart, cartRule);
+        if (adjustments == null) {
+            return new Message("requirements not met", "405");
+        }
+
+        cart.setAdjustments(adjustments);
+        cart.setCartRule(cartRule);
+        cartRepository.save(cart);
+        return new Message("Coupon added successfully","200");
+    }
+
+    public Message removeCouponFromCart(String secureKey) {
+        TenantCart cart = null;
+        Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
+        log.info("Logged in user " + loginUser);
+        if(secureKey != null && loginUser == null) {
+            cart = cartRepository.findBySecureKey(secureKey).orElse(null);
+        } else if(loginUser != null){
+            cart = this.getCartByCustomer(loginUser);
+        }
+        if (cart == null)
+            return new Message("cart not found","404");
+
+        cart.setAdjustments(null);
+        cart.setCartRule(null);
+        cartRepository.save(cart);
+        return new Message("Coupon removed successfully","200");
+    }
+
+    private void processRulesAndAddAdjustments(TenantCart tenantCart){
+        if (tenantCart == null) {
+            return;
+        }
+        TenantCartRule cartRule = tenantCart.getCartRule();
+        if (cartRule == null || !cartRule.getEnabled()) {
+            return;
+        }
+        AdjustmentProfile adjustments = processRules(tenantCart, cartRule);
+        if (adjustments == null) {
+            tenantCart.setCartRule(null);
+        }
+        tenantCart.setAdjustments(adjustments);
+    }
+    private AdjustmentProfile processRules(TenantCart cart, TenantCartRule rule) {
+
+        if(rule.getCustomerId() != null && !rule.getCustomerId().equals(cart.getCustomerId())) {
+            return null;
+        }
+
+        if(!checkRule(cart, rule.getRules())) {
+            return null;
+        }
+
+        return new AdjustmentProfile(rule.getDiscount(), rule.getReductionType());
+    }
+
+    private boolean checkRule(TenantCart cart, List<DiscountRule> rules) {
+        int cart_quanity = cart.getCartItems().stream().mapToInt(TenantCartItem::getQuantity).sum();
+        for (DiscountRule rule : rules) {
+            if (rule.getMinCartSize() > cart_quanity) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private CartDTO mergeCart(TenantCart cart, List<CartItemDTO> items, Boolean isMerge) {
         List<TenantCartItem> cartItems = cart.getCartItems();
         //isMerge = false;
@@ -224,6 +315,7 @@ public class TenantCartService {
             if(loginUser != null) {
                 cart.setCustomer(loginUser);
             }*/
+            processRulesAndAddAdjustments(cart);
             cart = cartRepository.saveAndFlush(cart);
             cartRepository.refresh(cart);
         }
