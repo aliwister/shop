@@ -5,10 +5,7 @@ import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.LineItem;
-import com.badals.shop.domain.tenant.Checkout;
-import com.badals.shop.domain.tenant.S3UploadRequest;
-import com.badals.shop.domain.tenant.TenantWishList;
-import com.badals.shop.domain.tenant.TenantWishListItem;
+import com.badals.shop.domain.tenant.*;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.Message;
@@ -153,6 +150,14 @@ public class ShopMutation implements GraphQLMutationResolver {
     public Checkout createPlusCartAdmin(String secureKey, List<LineItem> items, Long id) {
         Checkout cart = cartService.createCheckoutPlus(secureKey, items, id);
         return cart;
+    }
+
+    public Message addCouponToCart(String secureKey, String coupon) {
+        return cartService.addCouponToCart(secureKey, coupon);
+    }
+
+    public Message removeCouponFromCart(String secureKey) {
+        return cartService.removeCouponFromCart(secureKey);
     }
 }
 
