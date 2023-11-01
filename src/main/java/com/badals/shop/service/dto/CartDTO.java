@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import com.badals.shop.domain.enumeration.CartState;
+import com.badals.shop.domain.pojo.AdjustmentProfile;
 import com.badals.shop.domain.pojo.OrderAdjustment;
 import com.badals.shop.domain.tenant.TenantCartRule;
 import lombok.Data;
@@ -38,7 +39,7 @@ public class CartDTO implements Serializable {
 
     private String currency;
 
-    private List<OrderAdjustment> adjustments = new ArrayList<>();
+    private AdjustmentProfile adjustments;
 
     private TenantCartRule cartRule;
 
