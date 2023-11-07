@@ -51,6 +51,10 @@ public class FaqQAService {
         return faqQARepository.save(tenantFaqQA);
     }
 
+    public TenantFaqQA getFaqQAById(Long id) {
+        return faqQARepository.findById(id).orElse(null);
+    }
+
     public TenantFaqQA updateQA(FaqQAInput faqQAInput) {
         TenantFaqQA tenantFaqQA = faqQARepository.findTenantFaqQAByCategoryIdAndPosition(faqQAInput.getCategoryId(), faqQAInput.getPosition());
         if(tenantFaqQA == null)
