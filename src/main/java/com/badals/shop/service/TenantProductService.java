@@ -162,7 +162,6 @@ public class TenantProductService {
         response.setHasMore(false);
         return response;
     }
-    @Cacheable("tags")
     public List<ProfileHashtagDTO> tenantTags() {
         String profile = TenantContext.getCurrentProfile();
         return hashtagRepository.findForList(profile).stream().map(tenantHashtagMapper::toDto).collect(Collectors.toList());
