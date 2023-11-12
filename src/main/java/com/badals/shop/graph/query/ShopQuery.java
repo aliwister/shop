@@ -2,6 +2,7 @@ package com.badals.shop.graph.query;
 
 import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.Reward;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.tenant.*;
@@ -42,8 +43,8 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    private final TenantLayoutService layoutService;
     private final PageInfoPublicService pageInfoService;
     private final FaqPublicService faqService;
-
-    public ShopQuery(TenantProductService productService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService, TenantWishListService wishlistService, PageInfoPublicService pageInfoService, FaqPublicService faqService) {
+    private final TenantRewardService rewardService;
+    public ShopQuery(TenantProductService productService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService, TenantWishListService wishlistService, PageInfoPublicService pageInfoService, FaqPublicService faqService, TenantRewardService rewardService) {
       this.productService = productService;
       this.categoryService = categoryService;
       this.customerService = customerService;
@@ -57,6 +58,7 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       this.wishlistService = wishlistService;
       this.pageInfoService = pageInfoService;
       this.faqService = faqService;
+      this.rewardService = rewardService;
    }
    public TenantDTO currentTenant() {
       return tenantService.findAll().get(0);
@@ -147,6 +149,11 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
 
     public List<TenantFaqQA> faqQAsShop(){
         return faqService.getFaqQAs(TenantContext.getCurrentProfile());
+    }
+
+    @PreAuthorize("hasAnyRole('ROLE_USER')")
+    public List<TenantReward> getAffordableRewards(){
+        return rewardService.getAffordableRewards();
     }
 
 }
