@@ -20,6 +20,9 @@ extend type Query {
     pagesInfosShop : [Page]
     faqCategoriesShop : [FaqCategory]
     faqQAsShop : [FaqQA]
+
+    getAffordableRewards: [Reward]
+
 }
 extend type Mutation {
     updateTenantCart(secureKey: String, items: [CartItemInput], isMerge: Boolean, ): CartResponse
