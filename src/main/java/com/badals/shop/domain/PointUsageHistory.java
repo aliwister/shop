@@ -1,7 +1,9 @@
 package com.badals.shop.domain;
 
 import com.badals.shop.aop.tenant.TenantSupport;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -11,6 +13,7 @@ import java.io.Serializable;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "point_usage_history", catalog = "profileshop")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
@@ -36,4 +39,12 @@ public class PointUsageHistory extends CheckoutAuditable<Long> implements Serial
 
     @Column(name = "points")
     private Integer points;
+
+    public PointUsageHistory( Long rewardId, Long customerId, String tenantId, Long checkoutId, Integer points) {
+        this.rewardId = rewardId;
+        this.customerId = customerId;
+        this.tenantId = tenantId;
+        this.checkoutId = checkoutId;
+        this.points = points;
+    }
 }
