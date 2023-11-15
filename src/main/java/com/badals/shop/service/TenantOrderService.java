@@ -1,20 +1,21 @@
 package com.badals.shop.service;
 
 import com.badals.shop.aop.tenant.TenantContext;
-import com.badals.shop.domain.Address;
-import com.badals.shop.domain.Customer;
-import com.badals.shop.domain.UserBase;
+import com.badals.shop.domain.*;
+import com.badals.shop.domain.enumeration.DiscountSource;
 import com.badals.shop.domain.pojo.AddressPojo;
 
+import com.badals.shop.domain.pojo.CheckoutOrderAdjustment;
 import com.badals.shop.domain.pojo.OrderAdjustment;
+import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
-import com.badals.shop.repository.TenantOrderRepository;
+import com.badals.shop.domain.tenant.TenantReward;
+import com.badals.shop.repository.*;
 import com.badals.shop.repository.search.OrderSearchRepository;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.graph.OrderResponse;
-import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.OrderItemDTO;
@@ -46,6 +47,7 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -73,8 +75,13 @@ public class TenantOrderService {
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
     private final OrderSearchRepository orderSearchRepository;
+    private final CheckoutRepository checkoutRepository;
+    private final TenantRewardRepository rewardRepository;
+    private final PointRepository pointRepository;
+    private final PointUsageHistoryRepository pointUsageHistoryRepository;
+    private final PointCustomerRepository pointCustomerRepository;
 
-    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService, OrderSearchRepository orderSearchRepository) {
+    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService, OrderSearchRepository orderSearchRepository, CheckoutRepository checkoutRepository, TenantRewardRepository rewardRepository, PointRepository pointRepository, PointUsageHistoryRepository pointUsageHistoryRepository, PointCustomerRepository pointCustomerRepository) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -87,6 +94,11 @@ public class TenantOrderService {
         this.addressRepository = addressRepository;
         this.cartService = cartService;
         this.orderSearchRepository = orderSearchRepository;
+        this.checkoutRepository = checkoutRepository;
+        this.rewardRepository = rewardRepository;
+        this.pointRepository = pointRepository;
+        this.pointUsageHistoryRepository = pointUsageHistoryRepository;
+        this.pointCustomerRepository = pointCustomerRepository;
     }
     /**
      * Save a order.
@@ -148,6 +160,20 @@ public class TenantOrderService {
         if(customer != null)
             order.setCustomer(customer);
 
+        //check rewards for the order, validate points
+        Checkout checkout =  checkoutRepository.findBySecureKey(order.getCheckoutSecureKey()).orElse(null);
+        if(checkout == null){
+            // throw new Exception("checkout not found");
+            //todo how do we reject an order
+            return null;
+        }
+        Integer pointsNeeded = calculateRewardPoints(checkout);
+        Integer pointsAvailable = getPointsForCustomer(customer.getId());
+        if(pointsNeeded > pointsAvailable){
+            // throw new Exception("not enough points");
+            //todo how do we reject an order
+            return null;
+        }
 
         AddressPojo addressPojo = order.getDeliveryAddressPojo();
 
@@ -162,10 +188,34 @@ public class TenantOrderService {
             order.setDeliveryAddress(address);
 
         }
+
         String secureKey = confirmationKey.split("\\.")[0];
         cartService.closeCart(secureKey);
         order.setEmailSent(true);
         OrderDTO dto = save(order);
+        // add to history
+        // deduct points
+        int spentPoints = 0;
+        for (CheckoutOrderAdjustment checkoutOrderAdjustment : checkout.getCheckoutAdjustments()) {
+            if(checkoutOrderAdjustment.getDiscountSource() == DiscountSource.REWARD){
+                TenantReward reward = rewardRepository.findByRewardType(checkoutOrderAdjustment.getSourceRef());
+
+                PointUsageHistory pointUsageHistory = new PointUsageHistory();
+                pointUsageHistory.setCustomerId(customer.getId());
+                pointUsageHistory.setCheckoutId(order.getId());
+                pointUsageHistory.setRewardId(reward.getId());
+                pointUsageHistory.setPoints(reward.getPoints());
+                pointUsageHistory.setCreatedDate(Date.from(Instant.now()));
+                pointUsageHistoryRepository.save(pointUsageHistory);
+
+                spentPoints += reward.getPoints();
+            }
+        }
+
+        PointCustomer pointCustomer = pointCustomerRepository.findByCustomerId(customer.getId());
+        pointCustomer.setSpentPoints(pointCustomer.getSpentPoints() + spentPoints);
+        pointCustomerRepository.save(pointCustomer);
+
         dto.setCustomer(customerMapper.toDto(customer));
         sendConfirmationEmail(dto);
         return dto;
@@ -434,5 +484,18 @@ public class TenantOrderService {
             ret = "968"+ret;
         }
         return ret;
+    }
+
+    private Integer calculateRewardPoints(Checkout checkout){
+        List<CheckoutOrderAdjustment> checkoutOrderAdjustments = checkout.getCheckoutAdjustments();
+        return checkoutOrderAdjustments.stream().mapToInt((x)  -> x.getDiscountSource() == DiscountSource.REWARD ? (rewardRepository.findByRewardType(x.getSourceRef()).getPoints()) : 0).sum();
+    }
+
+    private Integer getPointsForCustomer(Long customerId){
+        List<Point> earnedPoints = pointRepository.findAllByCustomerId(customerId);
+        List<PointUsageHistory> usedPoints = pointUsageHistoryRepository.findAllByCustomerId(customerId);
+        Integer earned = earnedPoints.stream().mapToInt(Point::getAmount).sum();
+        Integer used = usedPoints.stream().mapToInt(PointUsageHistory::getPoints).sum();
+        return earned - used;
     }
 }
