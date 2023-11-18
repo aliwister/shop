@@ -161,19 +161,19 @@ public class TenantOrderService {
             order.setCustomer(customer);
 
         //check rewards for the order, validate points
-        Checkout checkout =  checkoutRepository.findBySecureKey(order.getCheckoutSecureKey()).orElse(null);
-        if(checkout == null){
-            // throw new Exception("checkout not found");
-            //todo how do we reject an order
-            return null;
-        }
-        Integer pointsNeeded = calculateRewardPoints(checkout);
-        Integer pointsAvailable = getPointsForCustomer(customer.getId());
-        if(pointsNeeded > pointsAvailable){
-            // throw new Exception("not enough points");
-            //todo how do we reject an order
-            return null;
-        }
+//        Checkout checkout =  checkoutRepository.findBySecureKey(order.getCheckoutSecureKey()).orElse(null);
+//        if(checkout == null){
+//            // throw new Exception("checkout not found");
+//            //todo how do we reject an order
+//            return null;
+//        }
+//        Integer pointsNeeded = calculateRewardPoints(checkout);
+//        Integer pointsAvailable = getPointsForCustomer(customer.getId());
+//        if(pointsNeeded > pointsAvailable){
+//            // throw new Exception("not enough points");
+//            //todo how do we reject an order
+//            return null;
+//        }
 
         AddressPojo addressPojo = order.getDeliveryAddressPojo();
 
@@ -195,26 +195,26 @@ public class TenantOrderService {
         OrderDTO dto = save(order);
         // add to history
         // deduct points
-        int spentPoints = 0;
-        for (CheckoutOrderAdjustment checkoutOrderAdjustment : checkout.getCheckoutAdjustments()) {
-            if(checkoutOrderAdjustment.getDiscountSource() == DiscountSource.REWARD){
-                TenantReward reward = rewardRepository.findByRewardType(checkoutOrderAdjustment.getSourceRef());
+//        int spentPoints = 0;
+//        for (CheckoutOrderAdjustment checkoutOrderAdjustment : checkout.getCheckoutAdjustments()) {
+//            if(checkoutOrderAdjustment.getDiscountSource() == DiscountSource.REWARD){
+//                TenantReward reward = rewardRepository.findByRewardType(checkoutOrderAdjustment.getSourceRef());
+//
+//                PointUsageHistory pointUsageHistory = new PointUsageHistory();
+//                pointUsageHistory.setCustomerId(customer.getId());
+//                pointUsageHistory.setCheckoutId(order.getId());
+//                pointUsageHistory.setRewardId(reward.getId());
+//                pointUsageHistory.setPoints(reward.getPoints());
+//                pointUsageHistory.setCreatedDate(Date.from(Instant.now()));
+//                pointUsageHistoryRepository.save(pointUsageHistory);
+//
+//                spentPoints += reward.getPoints();
+//            }
+//        }
 
-                PointUsageHistory pointUsageHistory = new PointUsageHistory();
-                pointUsageHistory.setCustomerId(customer.getId());
-                pointUsageHistory.setCheckoutId(order.getId());
-                pointUsageHistory.setRewardId(reward.getId());
-                pointUsageHistory.setPoints(reward.getPoints());
-                pointUsageHistory.setCreatedDate(Date.from(Instant.now()));
-                pointUsageHistoryRepository.save(pointUsageHistory);
-
-                spentPoints += reward.getPoints();
-            }
-        }
-
-        PointCustomer pointCustomer = pointCustomerRepository.findByCustomerId(customer.getId());
-        pointCustomer.setSpentPoints(pointCustomer.getSpentPoints() + spentPoints);
-        pointCustomerRepository.save(pointCustomer);
+//        PointCustomer pointCustomer = pointCustomerRepository.findByCustomerId(customer.getId());
+//        pointCustomer.setSpentPoints(pointCustomer.getSpentPoints() + spentPoints);
+//        pointCustomerRepository.save(pointCustomer);
 
         dto.setCustomer(customerMapper.toDto(customer));
         sendConfirmationEmail(dto);
