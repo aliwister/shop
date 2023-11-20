@@ -321,6 +321,7 @@ type Page{
 input PageInput{
     id: ID
     isImportant: Boolean
+    enabled: Boolean
 }
 
 type PageInfo {

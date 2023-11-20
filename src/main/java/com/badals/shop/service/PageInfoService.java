@@ -62,6 +62,7 @@ public class PageInfoService {
         if (page == null)
             throw new Exception("Page not found");
         page.setIsImportant(pageInput.getIsImportant());
+        page.setEnabled(pageInput.getEnabled());
         return pageRepository.save(page);
     }
 
