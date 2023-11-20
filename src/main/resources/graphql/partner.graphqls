@@ -41,6 +41,7 @@ extend type Mutation {
     deleteProduct(id: Long): Message
     voidOrder(id: Long): Message
     createPosOrder(cart: CheckoutInput, paymentMethod: String, paymentAmount: String, ref: String): Order
+
     createPageInfo(input: PageInfoInput): Page
     removePageInfo(id: Long): Message
     removePage(slug: String): Message
@@ -365,6 +366,7 @@ input FaqCategoryNameInput{
     position: Int!
     name: String!
     language: String!
+    enabled: Boolean
 }
 
 input FaqQAInput{
@@ -373,6 +375,7 @@ input FaqQAInput{
     question: String!
     answer: String!
     language: String!
+    enabled: Boolean
 }
 
 input FaqDeleteInput{

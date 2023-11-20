@@ -11,9 +11,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class FaqCategoryNameInput implements Serializable {
 
+    @NotNull
     private Integer position;
     @NotNull
     private String name;
     @NotNull
     private String language;
+    private Boolean enabled;
 }
