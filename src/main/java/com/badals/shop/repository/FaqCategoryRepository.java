@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface FaqCategoryRepository extends JpaRepository<TenantFaqCategory,Long> {
     TenantFaqCategory findTenantFaqCategoryByPosition(Integer position);
-    List<TenantFaqCategory> findAllByTenantId(String tenant_id);
+    List<TenantFaqCategory> findAllByTenantIdAndEnabled(String tenant_id, Boolean enabled);
 }
