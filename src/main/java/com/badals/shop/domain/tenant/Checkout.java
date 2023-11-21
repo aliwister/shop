@@ -1,10 +1,7 @@
 package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
-import com.badals.shop.domain.pojo.AddressPojo;
-import com.badals.shop.domain.pojo.LineItem;
-import com.badals.shop.domain.pojo.OrderAdjustment;
-import com.badals.shop.domain.pojo.PaymentMethod;
+import com.badals.shop.domain.pojo.*;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Data;
@@ -16,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -99,6 +97,10 @@ public class Checkout implements Serializable, TenantSupport {
     @Type(type = "json")
     @Column(name = "adjustments", columnDefinition = "string")
     private List<OrderAdjustment> orderAdjustments;
+
+    @Type(type = "json")
+    @Column(name="new_adjustments", columnDefinition = "string")
+    private List<CheckoutAdjustmentProfile> adjustments = new ArrayList<>();
 
 
     @Override
