@@ -41,6 +41,7 @@ public class FaqQAService {
             tenantFaqQA.setTenantFaqCategory(tenantFaqCategory);
             tenantFaqQA.setCategoryId(faqQAInput.getCategoryId());
             tenantFaqQA.setPosition(faqQAInput.getPosition());
+            tenantFaqQA.setEnabled(true);
             tenantFaqQA = faqQARepository.save(tenantFaqQA);
         }
         TenantFaqQALanguage tenantFaqQALanguage = new TenantFaqQALanguage();
@@ -62,6 +63,8 @@ public class FaqQAService {
         TenantFaqQALanguage tenantFaqQALanguage = tenantFaqQA.getFaqQALanguages().stream().filter(tenantFaqQALanguage1 -> tenantFaqQALanguage1.getLanguage().equals(faqQAInput.getLanguage())).findFirst().orElse(null);
         if(tenantFaqQALanguage == null)
             throw new RuntimeException("QA with the given language not found");
+        if(faqQAInput.getEnabled()!=null)
+            tenantFaqQA.setEnabled(faqQAInput.getEnabled());
         tenantFaqQALanguage.setQuestion(faqQAInput.getQuestion());
         tenantFaqQALanguage.setAnswer(faqQAInput.getAnswer());
         return faqQARepository.save(tenantFaqQA);

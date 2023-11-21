@@ -20,5 +20,5 @@ public class FaqQAInput implements Serializable {
         private String answer;
         @NotNull
         private String language;
-
+        private Boolean enabled;
 }
