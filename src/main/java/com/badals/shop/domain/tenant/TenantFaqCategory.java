@@ -33,6 +33,9 @@ public class TenantFaqCategory implements Serializable, TenantSupport {
     @Column(name = "tenant_id")
     private String tenantId;
 
+    @Column(name = "enabled")
+    private Boolean enabled;
+
     @Type(type = "json")
     @Column(name = "name", columnDefinition = "string")
     private List<TenantFaqCategoryName> faqCategoryNames = new ArrayList<>();
