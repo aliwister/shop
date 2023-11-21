@@ -31,7 +31,7 @@ extend type Mutation {
     addWishlistItem(productId:ID) : WishlistItem
     removeWishlistItem(productId:ID) : Wishlist
 #    convertWishListToCart: Cart
-    addCouponToCart(secureKey: String, coupon: String): Message
+    addCouponToCart(secureKey: String, coupon: String): CheckoutSession
     removeCouponFromCart(secureKey: String): Message
 
 }
