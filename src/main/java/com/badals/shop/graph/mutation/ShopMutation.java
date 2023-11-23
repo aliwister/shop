@@ -163,7 +163,12 @@ public class ShopMutation implements GraphQLMutationResolver {
     }
 
     public Message removeCouponFromCart(String secureKey) {
-        return cartService.removeCouponFromCart(secureKey);
+        Message response = cartService.removeCouponFromCart(secureKey);
+        if (!Objects.equals(response.getStatus(), "200"))
+            throw new RuntimeException(response.getValue());
+        String token = cartService.createCheckout(secureKey, null); // items wasnt being used in createCheckout
+//        return new CheckoutSession("/checkout/" + token + "/address", token);
+        return response;
     }
 }
 
