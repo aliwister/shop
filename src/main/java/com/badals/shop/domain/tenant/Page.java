@@ -32,6 +32,9 @@ public class Page implements Serializable, TenantSupport {
     @Column(name = "is_important")
     private Boolean isImportant;
 
+    @Column(name = "enabled")
+    private Boolean enabled;
+
     @OneToMany(mappedBy = "page",cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<PageInfo> pageInfos = new ArrayList<>();
 

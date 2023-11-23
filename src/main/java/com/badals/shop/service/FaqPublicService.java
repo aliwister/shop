@@ -31,10 +31,10 @@ public class FaqPublicService {
 
 
     public List<TenantFaqQA> getFaqQAs(String tenant_id) {
-        return faqQARepository.findAllByTenantId(tenant_id);
+        return faqQARepository.findAllByTenantIdAndEnabled(tenant_id, true);
     }
     public List<TenantFaqCategory> getFaqCategories(String tenant_id) {
-        return faqCategoryRepository.findAllByTenantId(tenant_id);
+        return faqCategoryRepository.findAllByTenantIdAndEnabled(tenant_id, true);
     }
 
 

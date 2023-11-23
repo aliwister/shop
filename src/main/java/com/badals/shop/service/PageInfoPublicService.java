@@ -29,11 +29,11 @@ public class PageInfoPublicService {
     }
 
     public Page getPageInfosBySlug(String tenant_id, String slug) {
-        return pageRepository.findPageBySlugAndTenantId(slug, tenant_id);
+        return pageRepository.findPageBySlugAndTenantIdAndEnabled(slug, tenant_id, true);
     }
 
     public List<Page> getPages(String tenant_id) {
-        return pageRepository.findAllByTenantId(tenant_id);
+        return pageRepository.findAllByTenantIdAndEnabled(tenant_id,true);
     }
 
 
