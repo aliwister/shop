@@ -436,6 +436,8 @@ public class TenantCartService {
         if(cart.getCartRule() != null && cart.getAdjustments()!= null) {
             CheckoutAdjustmentProfile adjustmentProfile = new CheckoutAdjustmentProfile(cart.getCartRule().getDiscount(), cart.getCartRule().getReductionType(), DiscountSource.COUPON, cart.getCartRule().getCoupon());
             checkout.setAdjustments(List.of(adjustmentProfile));
+        }else{
+            checkout.setAdjustments(new ArrayList<>());
         }
 
         checkout = checkoutRepository.save(checkout);
