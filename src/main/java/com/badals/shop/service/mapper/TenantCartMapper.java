@@ -18,6 +18,7 @@ import java.util.Locale;
 public interface TenantCartMapper extends EntityMapper<CartDTO, TenantCart> {
 
     @Mapping(target = "cartRule", source = "cart.cartRule")
+    @Mapping(target = "adjustments", source = "cart.adjustments")
     CartDTO toDto(TenantCart cart);
 
     TenantCart toEntity(CartDTO cartDTO);
