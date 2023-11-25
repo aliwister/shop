@@ -5,10 +5,7 @@ import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.LineItem;
-import com.badals.shop.domain.tenant.Checkout;
-import com.badals.shop.domain.tenant.S3UploadRequest;
-import com.badals.shop.domain.tenant.TenantWishList;
-import com.badals.shop.domain.tenant.TenantWishListItem;
+import com.badals.shop.domain.tenant.*;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.pojo.Message;
@@ -37,6 +34,7 @@ import org.springframework.stereotype.Component;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 
 @Component
@@ -153,6 +151,24 @@ public class ShopMutation implements GraphQLMutationResolver {
     public Checkout createPlusCartAdmin(String secureKey, List<LineItem> items, Long id) {
         Checkout cart = cartService.createCheckoutPlus(secureKey, items, id);
         return cart;
+    }
+
+    public Message addCouponToCart(String secureKey, String coupon) {
+        Message response = cartService.addCouponToCart(secureKey, coupon);
+        if (!Objects.equals(response.getStatus(), "200"))
+            throw new RuntimeException(response.getValue());
+        String token = cartService.createCheckout(secureKey, null); // items wasnt being used in createCheckout
+//        return new CheckoutSession("/checkout/" + token + "/address", token);
+        return response;
+    }
+
+    public Message removeCouponFromCart(String secureKey) {
+        Message response = cartService.removeCouponFromCart(secureKey);
+        if (!Objects.equals(response.getStatus(), "200"))
+            throw new RuntimeException(response.getValue());
+        String token = cartService.createCheckout(secureKey, null); // items wasnt being used in createCheckout
+//        return new CheckoutSession("/checkout/" + token + "/address", token);
+        return response;
     }
 }
 
