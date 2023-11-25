@@ -6,6 +6,7 @@ import com.badals.shop.service.dto.CartDTO;
 import com.badals.shop.service.dto.CartItemDTO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -16,6 +17,8 @@ import java.util.Locale;
 @Mapper(componentModel = "spring", uses = {TenantCartItemMapper.class})
 public interface TenantCartMapper extends EntityMapper<CartDTO, TenantCart> {
 
+    @Mapping(target = "cartRule", source = "cart.cartRule")
+    @Mapping(target = "adjustments", source = "cart.adjustments")
     CartDTO toDto(TenantCart cart);
 
     TenantCart toEntity(CartDTO cartDTO);
