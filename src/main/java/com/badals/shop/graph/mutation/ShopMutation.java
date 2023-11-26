@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 
 @Component
@@ -153,11 +154,21 @@ public class ShopMutation implements GraphQLMutationResolver {
     }
 
     public Message addCouponToCart(String secureKey, String coupon) {
-        return cartService.addCouponToCart(secureKey, coupon);
+        Message response = cartService.addCouponToCart(secureKey, coupon);
+        if (!Objects.equals(response.getStatus(), "200"))
+            throw new RuntimeException(response.getValue());
+        String token = cartService.createCheckout(secureKey, null); // items wasnt being used in createCheckout
+//        return new CheckoutSession("/checkout/" + token + "/address", token);
+        return response;
     }
 
     public Message removeCouponFromCart(String secureKey) {
-        return cartService.removeCouponFromCart(secureKey);
+        Message response = cartService.removeCouponFromCart(secureKey);
+        if (!Objects.equals(response.getStatus(), "200"))
+            throw new RuntimeException(response.getValue());
+        String token = cartService.createCheckout(secureKey, null); // items wasnt being used in createCheckout
+//        return new CheckoutSession("/checkout/" + token + "/address", token);
+        return response;
     }
 }
 

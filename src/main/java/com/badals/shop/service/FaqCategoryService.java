@@ -36,6 +36,7 @@ public class FaqCategoryService {
         if (tenantFaqCategory == null){
             tenantFaqCategory = new TenantFaqCategory();
             tenantFaqCategory.setPosition(faqCategoryNameInput.getPosition());
+            tenantFaqCategory.setEnabled(true);
             faqCategoryRepository.save(tenantFaqCategory);
         }
         TenantFaqCategoryName tenantFaqCategoryName = new TenantFaqCategoryName();
@@ -53,6 +54,8 @@ public class FaqCategoryService {
         if (tenantFaqCategoryName == null)
             throw new RuntimeException("Category with the given language not found");
         tenantFaqCategoryName.setName(faqCategoryNameInput.getName());
+        if (faqCategoryNameInput.getEnabled() != null)
+            tenantFaqCategory.setEnabled(faqCategoryNameInput.getEnabled());
         return faqCategoryRepository.save(tenantFaqCategory);
     }
 

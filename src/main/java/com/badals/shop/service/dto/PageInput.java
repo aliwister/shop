@@ -11,4 +11,5 @@ public class PageInput {
     @NotNull
     private Long id;
     private Boolean isImportant;
+    private Boolean enabled;
 }
