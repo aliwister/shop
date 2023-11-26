@@ -317,6 +317,7 @@ type Page{
     slug: String!
     isImportant: Boolean
     pageInfos: [PageInfo]
+    enabled: Boolean
 }
 
 input PageInput{
@@ -342,6 +343,7 @@ type FaqCategory {
     id: ID!
     position: Int!
     faqCategoryNames: [FaqCategoryName]
+    enabled: Boolean
 }
 
 type FaqCategoryName {
@@ -354,6 +356,7 @@ type FaqQA {
     position: Int!
     faqQALanguages: [FaqQALanguage]
     categoryId: Int!
+    enabled: Boolean
 }
 
 type FaqQALanguage {
