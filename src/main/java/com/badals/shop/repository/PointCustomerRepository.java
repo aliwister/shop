@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface PointCustomerRepository extends JpaRepository<PointCustomer, Long> {
-
+    PointCustomer findByCustomerId(Long customerId);
 }

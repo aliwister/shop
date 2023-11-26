@@ -16,7 +16,7 @@ public interface TenantOrderMapper extends EntityMapper<OrderDTO, TenantOrder> {
 
     @Mapping(target = "orderItems", ignore = true)
     @Mapping(target = "removeOrderItem", ignore = true)
-    @Mapping(target = "cart.adjustments", ignore = true)
+    @Mapping(target = "cart.orderAdjustments", ignore = true)
     TenantOrder toEntity(OrderDTO orderDTO);
 
     @Mapping(target="cart", ignore = true)

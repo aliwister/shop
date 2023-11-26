@@ -1,3 +1,14 @@
+
+GET order/_search
+{
+   "size": 1,
+   "sort": { "createdDate": "desc"},
+   "query": {
+      "match_all": {}
+   }
+}
+
+
 GET jhi_order/_search
 {
    "sort": { "createdDate": "desc"},
@@ -18,7 +29,6 @@ GET jhi_order/_search
 
    }
 }
-
 
 GET add-product/_search
 {

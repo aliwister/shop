@@ -26,10 +26,10 @@ public class PricingRequest extends Auditable implements Serializable {
     @Column(name = "sku", nullable = false)
     private String sku;
 
-    @Column(name = "done", nullable = false)
+    @Column(name = "done")
     private Boolean done;
 
-    @Column(name = "email_sent", nullable = false)
+    @Column(name = "email_sent")
     private Boolean emailSent;
 
     @ManyToOne

@@ -9,18 +9,18 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-public class CheckoutAdjustmentProfile implements Serializable {
+public class CheckoutOrderAdjustment implements Serializable {
     PriceMap discount;
     DiscountReductionType discountReductionType;
     DiscountSource discountSource;
     String sourceRef;
 
-    public CheckoutAdjustmentProfile(PriceMap discount, DiscountReductionType discountReductionType) {
+    public CheckoutOrderAdjustment(PriceMap discount, DiscountReductionType discountReductionType) {
         this.discount = discount;
         this.discountReductionType = discountReductionType;
     }
 
-    public CheckoutAdjustmentProfile(PriceMap discount, DiscountReductionType discountReductionType, DiscountSource discountSource, String sourceRef) {
+    public CheckoutOrderAdjustment(PriceMap discount, DiscountReductionType discountReductionType, DiscountSource discountSource, String sourceRef) {
         this.discount = discount;
         this.discountReductionType = discountReductionType;
         this.discountSource = discountSource;
