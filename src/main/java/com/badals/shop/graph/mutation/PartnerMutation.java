@@ -4,10 +4,8 @@ import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
-import com.badals.shop.domain.tenant.Checkout;
-import com.badals.shop.domain.tenant.S3UploadRequest;
-import com.badals.shop.service.dto.OrderDTO;
-import com.badals.shop.service.dto.ProfileHashtagDTO;
+import com.badals.shop.domain.tenant.*;
+import com.badals.shop.service.dto.*;
 import com.badals.shop.service.pojo.*;
 import com.badals.shop.service.*;
 
@@ -29,6 +27,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 
 @Component
@@ -42,16 +41,22 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
     private final UserService userService;
     private final TenantSetupService setupService;
+    private final PageInfoService pageInfoService;
+    private final FaqCategoryService faqCategoryService;
+    private final FaqQAService faqQAService;
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
-    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService) {
+    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService) {
         this.productService = productService;
         this.orderService = orderService;
         this.awsService = awsService;
         this.messageSource = messageSource;
         this.userService = userService;
         this.setupService = setupService;
+        this.pageInfoService = pageInfoService;
+        this.faqCategoryService = faqCategoryService;
+        this.faqQAService = faqQAService;
     }
 /*
 
@@ -216,6 +221,63 @@ public class PartnerMutation implements GraphQLMutationResolver {
     public Message deleteProduct(Long id) throws ProductNotFoundException {
         productService.deleteProduct(id);
         return new Message("ok");
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Page createPageInfo(PageInfoInput info){
+        return pageInfoService.createPageInfo(info);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Message removePageInfo(Long id) {
+        PageInfo pageInfo = pageInfoService.getPageInfoById(id);
+        if (pageInfo == null)
+            return new Message("Page info not found", "404");
+        pageInfoService.deleteByIdAndAndTenantId(pageInfo, id, TenantContext.getCurrentProfile());
+
+        return new Message("ok");
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Message removePage(String slug){
+        Page page = pageInfoService.getPageBySlug(slug);
+        if (page == null)
+            return new Message("Page not found", "404");
+        pageInfoService.deletePage(page.getId());
+        return new Message("ok");
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public PageInfo updatePageInfo(PageInfoInput info) throws Exception {
+        return pageInfoService.updatePageInfo(info);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Page updatePage(PageInput pageInput) throws Exception {
+        return pageInfoService.updatePage(pageInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqCategory createFaqCategoryName(FaqCategoryNameInput faqCategoryNameInput){
+        return faqCategoryService.addCategory(faqCategoryNameInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqQA createFaqQA(FaqQAInput faqQAInput){
+        return faqQAService.addQA(faqQAInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqCategory updateFaqCategoryName(FaqCategoryNameInput faqCategoryNameInput){
+        return faqCategoryService.updateCategory(faqCategoryNameInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantFaqQA updateFaqQA(FaqQAInput faqQAInput){
+        return faqQAService.updateQA(faqQAInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Message removeFaqCategoryName(FaqDeleteInput faqDeleteInput) {
+        return faqCategoryService.deleteCategory(faqDeleteInput);
+    }
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Message removeFaqQA(FaqDeleteInput faqDeleteInput){
+        return faqQAService.deleteQA(faqDeleteInput);
     }
 }
 

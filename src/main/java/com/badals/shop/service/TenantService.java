@@ -108,6 +108,6 @@ public class TenantService {
     }
 
     public TenantDTO findOneByName(String name) {
-        return tenantRepository.findByNameIgnoreCase(name).map(tenantMapper::toDto).orElse(null);
+        return tenantRepository.findByTenantId(name).map(tenantMapper::toDto).orElse(null);
     }
 }

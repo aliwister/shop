@@ -36,7 +36,7 @@ public class TenantRequestFilter extends OncePerRequestFilter {
       Long profileId = null;
 
       if(name != null) {
-         Tenant tenant = tenantRepository.findByNameIgnoreCase(name).orElse(null);
+         Tenant tenant = tenantRepository.findByTenantId(name).orElse(null);
          if(tenant != null) {
             profileId = tenant.getId();
          }

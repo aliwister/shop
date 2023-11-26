@@ -8,6 +8,7 @@ import org.ehcache.jsr107.Eh107Configuration;
 import io.github.jhipster.config.JHipsterProperties;
 
 import org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.*;
 
@@ -34,6 +35,8 @@ public class CacheConfiguration {
         return cm -> {
             createCache(cm, com.badals.shop.repository.UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, com.badals.shop.repository.UserRepository.USERS_BY_EMAIL_CACHE);
+            createCache(cm, "tags");
+            createCache(cm, "tags-products");
             // jhipster-needle-ehcache-add-entry
         };
     }

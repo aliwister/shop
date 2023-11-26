@@ -5,11 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import com.badals.shop.domain.enumeration.CartState;
+import com.badals.shop.domain.pojo.AdjustmentProfile;
+import com.badals.shop.domain.pojo.OrderAdjustment;
+import com.badals.shop.domain.tenant.TenantCartRule;
 import lombok.Data;
 
-/**
- * A DTO for the {@link com.badals.shop.domain.Cart} entity.
- */
+
 @Data
 public class CartDTO implements Serializable {
 
@@ -37,6 +38,10 @@ public class CartDTO implements Serializable {
     private Long carrierId;
 
     private String currency;
+
+    private AdjustmentProfile adjustments;
+
+    private TenantCartRule cartRule;
 
     @Override
     public boolean equals(Object o) {
