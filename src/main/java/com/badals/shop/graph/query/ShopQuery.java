@@ -1,9 +1,10 @@
 package com.badals.shop.graph.query;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
-import com.badals.shop.domain.tenant.Checkout;
+import com.badals.shop.domain.tenant.*;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
@@ -18,6 +19,8 @@ import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -33,10 +36,14 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    private final TenantService tenantService;
    private final TenantAdminProductService tenantAdminProductService;
    private final TenantCartService cartService;
+   private final TenantWishListService wishlistService;
    private final TenantOrderService orderService;
    private final TenantAccountService accountService;
    private final TenantLayoutService layoutService;
-   public ShopQuery(TenantProductService productService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService) {
+    private final PageInfoPublicService pageInfoService;
+    private final FaqPublicService faqService;
+
+    public ShopQuery(TenantProductService productService, CategoryService categoryService, CustomerService customerService, TenantService tenantService, TenantSetupService tenantSetupService, CustomerMapper customerMapper, TenantAdminProductService tenantAdminProductService, TenantCartService cartService, TenantOrderService orderService, TenantAccountService accountService, TenantLayoutService publicService, TenantWishListService wishlistService, PageInfoPublicService pageInfoService, FaqPublicService faqService) {
       this.productService = productService;
       this.categoryService = categoryService;
       this.customerService = customerService;
@@ -47,6 +54,9 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       this.orderService = orderService;
       this.accountService = accountService;
       this.layoutService = publicService;
+      this.wishlistService = wishlistService;
+      this.pageInfoService = pageInfoService;
+      this.faqService = faqService;
    }
    public TenantDTO currentTenant() {
       return tenantService.findAll().get(0);
@@ -69,7 +79,22 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    public CartDTO cart(String secureKey) {
       return cartService.updateCart(secureKey, null, false);
    }
-   public List<ProfileHashtagDTO> tenantTags() {
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantWishList wishlist() {
+       //todo check for not null and refactor to service
+       //System.out.println(TenantContext.getCurrentProfileId());
+       UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+       Customer customer = customerService.findByEmail(userDetails.getUsername());
+       Long customer_id = customer.getId();
+//       System.out.println(userDetails.getUsername());
+       TenantWishList tenantWishList = wishlistService.getCustomerWishListByCustomerAndTenant(TenantContext.getCurrentProfile(),customer_id);
+//        System.out.println(tenantWishList);
+        return tenantWishList;
+       //       long h = 123;
+//       return new WishListDTO(h);
+   }
+    public List<ProfileHashtagDTO> tenantTags() {
       return productService.tenantTags();
    }
    //@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -107,5 +132,22 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
    public Checkout plusCart(final String secureKey) {
       return cartService.plusCart(secureKey);
    }
+
+    public Page pageInfosShop(String slug) {
+        return pageInfoService.getPageInfosBySlug(TenantContext.getCurrentProfile(), slug);
+    }
+
+    public List<Page> pagesInfosShop(){
+        return pageInfoService.getPages(TenantContext.getCurrentProfile());
+    }
+
+    public List<TenantFaqCategory> faqCategoriesShop() {
+        return faqService.getFaqCategories(TenantContext.getCurrentProfile());
+    }
+
+    public List<TenantFaqQA> faqQAsShop(){
+        return faqService.getFaqQAs(TenantContext.getCurrentProfile());
+    }
+
 }
 

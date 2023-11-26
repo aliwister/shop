@@ -12,6 +12,24 @@ type Cart {
     #customer: Customer,
     cartItems: [CartItem]
     currency: String
+    adjustments: AdjustmentProfile
+    cartRule: TenantCartRule
+}
+
+type Wishlist {
+    id: ID!
+    customerId: ID
+#    currencyId: ID
+    tenantId: ID
+#    adjustments: String
+    wishlistItems: [WishlistItem]
+}
+
+type WishlistItem {
+    id: ID!
+    quantity: Int
+    productId: ID!
+    tenantId: String
 }
 
 type CartResponse {
@@ -98,4 +116,51 @@ type Checkout {
     currency: String
     items: [LineItem]
     #tenantId: Long
+}
+
+enum DiscountType {
+    ALL
+    HASHTAG
+    CATEGORY
+}
+
+enum DiscountReductionType {
+    AMOUNT
+    PERCENT
+}
+
+type DiscountRule {
+    minCartSize: Int
+}
+
+type DiscountCheckoutRule {
+    excludedCarriers: [String]
+    excludedPayments: [String]
+}
+
+type PriceMap {
+    prices: String
+    base: String
+}
+
+type AdjustmentProfile{
+    discount: PriceMap
+    discountReductionType: DiscountReductionType
+}
+
+type TenantCartRule {
+    id: ID
+    coupon: String
+    autoApply: Boolean
+    canCombine: Boolean
+    enabled: Boolean
+    priority: Int
+    description: [I18String]
+    rules: [DiscountRule]
+    checkoutRules: [DiscountCheckoutRule]
+    discountType: DiscountType
+    reductionType: DiscountReductionType
+    discount: PriceMap
+    customerId: Long
+    tenantId: String
 }

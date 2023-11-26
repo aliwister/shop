@@ -18,6 +18,12 @@ extend type Query {
     social(locale: String): [Attribute]
     #partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
     #partnerOrder(id: ID): Order
+    pageInfos(slug: String!): Page
+    pagesInfos : [Page]
+    faqCategories: [FaqCategory]
+    faqCategoryById(id: Long): FaqCategory
+    faqQAs : [FaqQA]
+    faqQAById(id: Long): FaqQA
 }
 
 extend type Mutation {
@@ -35,6 +41,19 @@ extend type Mutation {
     deleteProduct(id: Long): Message
     voidOrder(id: Long): Message
     createPosOrder(cart: CheckoutInput, paymentMethod: String, paymentAmount: String, ref: String): Order
+
+    createPageInfo(input: PageInfoInput): Page
+    removePageInfo(id: Long): Message
+    removePage(slug: String): Message
+    updatePageInfo(input: PageInfoInput): PageInfo
+    updatePage(input : PageInput) : Page
+
+    createFaqCategoryName(input: FaqCategoryNameInput) : FaqCategory
+    createFaqQA(input: FaqQAInput) : FaqQA
+    updateFaqCategoryName(input: FaqCategoryNameInput) : FaqCategory
+    updateFaqQA(input: FaqQAInput) : FaqQA
+    removeFaqCategoryName(input : FaqDeleteInput) : Message
+    removeFaqQA(input : FaqDeleteInput) : Message
 }
 
 enum AssetType {
@@ -291,4 +310,75 @@ input PriceListInput {
 type PriceList {
     priceList: [Price]
     baseCurrency: String
+}
+
+type Page{
+    id: ID
+    slug: String!
+    isImportant: Boolean
+    pageInfos: [PageInfo]
+}
+
+input PageInput{
+    id: ID
+    isImportant: Boolean
+    enabled: Boolean
+}
+
+type PageInfo {
+    id: ID
+    info: String
+    language: String
+}
+
+input PageInfoInput {
+    slug: String!
+    isImportant : Boolean
+    info: String
+    language: String!
+}
+
+type FaqCategory {
+    id: ID!
+    position: Int!
+    faqCategoryNames: [FaqCategoryName]
+}
+
+type FaqCategoryName {
+    language: String!
+    name: String!
+}
+
+type FaqQA {
+    id: ID!
+    position: Int!
+    faqQALanguages: [FaqQALanguage]
+    categoryId: Int!
+}
+
+type FaqQALanguage {
+    question: String!
+    answer: String!
+    language: String!
+}
+
+input FaqCategoryNameInput{
+    position: Int!
+    name: String!
+    language: String!
+    enabled: Boolean
+}
+
+input FaqQAInput{
+    categoryId: Int!
+    position: Int!
+    question: String!
+    answer: String!
+    language: String!
+    enabled: Boolean
+}
+
+input FaqDeleteInput{
+    id: ID!
+    language: String
 }
