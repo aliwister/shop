@@ -97,6 +97,8 @@ public class PricingRequestService {
             throw new RuntimeException("Request already exists and we are still processing it");
         PricingRequest p = new PricingRequest();
         p.sku(asin);
+        p.setDone(null);
+        p.setEmailSent(null);
         pricingRequestRepository.save(p);
     }
 
@@ -114,7 +116,8 @@ public class PricingRequestService {
 
     public void setEmailSent(List<PricingRequestDTO> dtos) {
         List<Long> list = dtos.stream().map(PricingRequestDTO::getId).collect(Collectors.toList());
-        pricingRequestRepository.updateEmailSentWhereIdIn(list);
+        if(!list.isEmpty())
+            pricingRequestRepository.updateEmailSentWhereIdIn(list);
     }
 
     public List<ProductOverride> findOverrides(String asin, String parent) {

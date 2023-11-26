@@ -98,9 +98,10 @@ public class Checkout implements Serializable, TenantSupport {
     @Column(name = "adjustments", columnDefinition = "string")
     private List<OrderAdjustment> orderAdjustments;
 
+    @NotAudited
     @Type(type = "json")
-    @Column(name="new_adjustments", columnDefinition = "string")
-    private List<CheckoutAdjustmentProfile> adjustments = new ArrayList<>();
+    @Column(name = "new_adjustments", columnDefinition = "string")
+    private List<CheckoutOrderAdjustment> checkoutAdjustments;
 
 
     @Override

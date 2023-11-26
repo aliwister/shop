@@ -59,7 +59,7 @@ public class PricingMutation implements GraphQLMutationResolver {
         return new Message(messageSource.getMessage("pricing.request.success", null, LocaleContextHolder.getLocale()));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDTO createOverride(String sku, OverrideType type, String override, Boolean active, Boolean lazy, int merchantId, boolean submitOnly, String dial) throws ProductNotFoundException {
         if(override != null && !override.trim().isEmpty()) {
             ProductOverrideDTO dto = new ProductOverrideDTO(sku, type, override, active, lazy);
@@ -81,7 +81,7 @@ public class PricingMutation implements GraphQLMutationResolver {
         return productDTO;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message completePricingRequestAndEmail(Long id) throws ProductNotFoundException {
         PricingRequestDTO dto = pricingRequestService.complete(id);
         // Get all overrides for this customer
@@ -94,7 +94,7 @@ public class PricingMutation implements GraphQLMutationResolver {
         return new Message("done");
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public Message completePricingRequest(Long id) {
         pricingRequestService.complete(id);
         return new Message("done");

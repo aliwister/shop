@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface RewardRepository extends JpaRepository<Reward, Long> {
-
+    Reward findByRewardType(String rewardType);
 }

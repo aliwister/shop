@@ -84,13 +84,15 @@ type CheckoutSession {
 
 
 type Reward {
-    id: ID
+    rewardType: String
+    points: Int
+    rewardInfo: [RewardInfo]
+}
+
+type RewardInfo {
+    language: String
     name: String
     description: String
-    minimumCartAmount: Long
-    discountValue: Long
-    discountValidDays: Long
-    points: Long
 }
 
 type LineItem {
