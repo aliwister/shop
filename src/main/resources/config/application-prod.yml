@@ -183,13 +183,16 @@ translate:
 aws:
   s3bucket: profile-shop
 
+amz-business:
+  purchasing-sharedSecret: ${PURCHASING_SHAREDSECRET}
+
 badals:
   checkout-app: https://checkout.badals.com/checkout/start
   cdnUrl: https://cdn.badals.com
   s3bucket: face-content
   sk: sk_56109822-a7d8-41f7-ae5d-c332b6bcd995
   accessKey1: AKIAZEJLGCKH53RGKS6U
-  secretKey1: ***REMOVED***
+  secretKey1: ${BADALS_SECRET_KEY1}
 
 profileshop:
   cdnUrl: https://cdn.profile.shop

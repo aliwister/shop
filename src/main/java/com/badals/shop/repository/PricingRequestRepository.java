@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface PricingRequestRepository extends JpaRepository<PricingRequest, Long> {
 
-   @Query(" from PricingRequest u join fetch u.product p left join fetch p.parent where u.done = false or u.done is null")
+   @Query(" from PricingRequest u where u.done = false or u.done is null")
    List<PricingRequest> findWithProduct();
 
    Boolean existsBySkuAndCreatedBy(String sku, String createdBy);

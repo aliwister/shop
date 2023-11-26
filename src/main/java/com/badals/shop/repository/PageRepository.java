@@ -9,8 +9,8 @@ import java.util.List;
 @Repository
 public interface PageRepository extends JpaRepository<Page, Long> {
     Page findPageBySlug(String slug);
-    Page findPageBySlugAndTenantId(String slug, String tenant_id);
-    List<Page> findAllByTenantId(String tenant_id);
+    Page findPageBySlugAndTenantIdAndEnabled(String slug, String tenant_id, Boolean enabled);
+    List<Page> findAllByTenantIdAndEnabled(String tenant_id, Boolean enabled);
 
 
 }

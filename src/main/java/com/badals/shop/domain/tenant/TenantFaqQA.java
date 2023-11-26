@@ -34,6 +34,9 @@ public class TenantFaqQA implements Serializable, TenantSupport {
     @Column(name = "tenant_id")
     private String tenantId;
 
+    @Column(name = "enabled")
+    private Boolean enabled;
+
     @Type(type = "json")
     @Column(name = "qa", columnDefinition = "string")
     private List<TenantFaqQALanguage> faqQALanguages = new ArrayList<>();

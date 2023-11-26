@@ -1,7 +1,9 @@
 package com.badals.shop.service;
 
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.enumeration.DiscountSource;
 import com.badals.shop.domain.pojo.AdjustmentProfile;
+import com.badals.shop.domain.pojo.CheckoutAdjustmentProfile;
 import com.badals.shop.domain.pojo.DiscountRule;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.Checkout;
@@ -430,6 +432,13 @@ public class TenantCartService {
         }
         else
             checkout.setGuest(true);
+
+        if(cart.getCartRule() != null && cart.getAdjustments()!= null) {
+            CheckoutAdjustmentProfile adjustmentProfile = new CheckoutAdjustmentProfile(cart.getCartRule().getDiscount(), cart.getCartRule().getReductionType(), DiscountSource.COUPON, cart.getCartRule().getCoupon());
+            checkout.setAdjustments(List.of(adjustmentProfile));
+        }else{
+            checkout.setAdjustments(new ArrayList<>());
+        }
 
         checkout = checkoutRepository.save(checkout);
         checkoutRepository.flush();
