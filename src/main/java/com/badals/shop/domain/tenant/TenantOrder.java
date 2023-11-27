@@ -118,8 +118,6 @@ public class TenantOrder extends Auditable implements Serializable, TenantSuppor
     @Column(name="tenant_id")
     private String tenantId;
 
-    @Column(name="checkout_secure_key")
-    private String checkoutSecureKey;
 
     @NotAudited
     @OneToMany(mappedBy = "order")
