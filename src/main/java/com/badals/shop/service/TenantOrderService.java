@@ -80,8 +80,9 @@ public class TenantOrderService {
     private final PointRepository pointRepository;
     private final PointUsageHistoryRepository pointUsageHistoryRepository;
     private final PointCustomerRepository pointCustomerRepository;
+    private final CustomerRepository customerRepository;
 
-    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService, OrderSearchRepository orderSearchRepository, CheckoutRepository checkoutRepository, TenantRewardRepository rewardRepository, PointRepository pointRepository, PointUsageHistoryRepository pointUsageHistoryRepository, PointCustomerRepository pointCustomerRepository) {
+    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService, OrderSearchRepository orderSearchRepository, CheckoutRepository checkoutRepository, TenantRewardRepository rewardRepository, PointRepository pointRepository, PointUsageHistoryRepository pointUsageHistoryRepository, PointCustomerRepository pointCustomerRepository, CustomerRepository customerRepository) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -99,6 +100,7 @@ public class TenantOrderService {
         this.pointRepository = pointRepository;
         this.pointUsageHistoryRepository = pointUsageHistoryRepository;
         this.pointCustomerRepository = pointCustomerRepository;
+        this.customerRepository = customerRepository;
     }
     /**
      * Save a order.
@@ -147,8 +149,8 @@ public class TenantOrderService {
     }
 
     @Transactional
-    public OrderDTO getOrderConfirmation(String reference, String confirmationKey) throws OrderNotFoundException {
-        log.info("reference + confirmation key = ", reference, confirmationKey);
+    public OrderDTO getOrderConfirmation(String reference, String confirmationKey) throws Exception {
+        log.info("reference + confirmation key = "+ reference + " + " + confirmationKey);
         TenantOrder order = orderRepository.findOrderByReferenceAndConfirmationKey(reference, confirmationKey).orElse(null);
         if(order == null) {
             throw new OrderNotFoundException("Order Not Found");
@@ -160,8 +162,6 @@ public class TenantOrderService {
         if(customer != null)
             order.setCustomer(customer);
 
-//        check rewards for the order, validate points
-        Checkout checkout =  checkoutRepository.findBySecureKey(order.getCheckoutSecureKey()).orElse(null);
         AddressPojo addressPojo = order.getDeliveryAddressPojo();
 
         if (addressPojo != null && addressPojo.getSave() != null && addressPojo.getSave()) {
@@ -180,7 +180,49 @@ public class TenantOrderService {
         cartService.closeCart(secureKey);
         order.setEmailSent(true);
         OrderDTO dto = save(order);
-        // add to history
+
+        //check rewards for the order, validate points
+        Checkout checkout =  order.getCart();
+        if (checkout != null) {
+            Integer pointsNeeded = calculateRewardPoints(checkout);
+            int pointsAvailable = 0;
+            if (customer != null) {
+                pointsAvailable = getPointsForCustomer(customer.getId());
+                if(pointsNeeded > pointsAvailable){
+                    throw new Exception("not enough points");
+                }
+            }
+            // add to history
+            // deduct points
+            int spentPoints = 0;
+            for (CheckoutOrderAdjustment checkoutOrderAdjustment : checkout.getCheckoutAdjustments()) {
+                if(checkoutOrderAdjustment.getDiscountSource() == DiscountSource.REWARD){
+                    TenantReward reward = rewardRepository.findByRewardType(checkoutOrderAdjustment.getSourceRef());
+
+                    PointUsageHistory pointUsageHistory = new PointUsageHistory();
+                    pointUsageHistory.setCustomerId(customer != null ? customer.getId() : null);
+                    pointUsageHistory.setCheckoutId(order.getId());
+                    pointUsageHistory.setRewardId(reward.getId());
+                    pointUsageHistory.setPoints(reward.getPoints());
+                    pointUsageHistory.setCreatedDate(Date.from(Instant.now()));
+                    pointUsageHistoryRepository.save(pointUsageHistory);
+
+                    spentPoints += reward.getPoints();
+                }
+            }
+
+            PointCustomer pointCustomer = pointCustomerRepository.findByCustomerId(customer.getId());
+            if (pointCustomer == null) {
+                pointCustomer = new PointCustomer();
+                pointCustomer.setCustomer(customer);
+                pointCustomer.setSpentPoints(0L);
+                pointCustomer.setTotalPoints(0L);
+                customer.setPointCustomer(pointCustomer);
+                customerRepository.save(customer);
+            }
+            pointCustomer.setSpentPoints(pointCustomer.getSpentPoints() + spentPoints);
+            pointCustomerRepository.save(pointCustomer);
+        }
 
         dto.setCustomer(customerMapper.toDto(customer));
         sendConfirmationEmail(dto);
@@ -346,7 +388,7 @@ public class TenantOrderService {
         boolean isEditCancel = false;
         for(OrderItemDTO item : orderItems) {
             TenantOrderItem before = order.getOrderItems().stream().filter(x -> x.getSequence() == item.getSequence())
-                    .findFirst().get();
+                .findFirst().get();
 
             if(item.getQuantity().compareTo(before.getQuantity()) < 0)
                 isEditCancel = true;

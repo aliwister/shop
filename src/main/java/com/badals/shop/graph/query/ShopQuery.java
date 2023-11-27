@@ -100,7 +100,7 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
       return productService.tenantTags();
    }
    //@PreAuthorize("hasRole('ROLE_ADMIN')")
-   public OrderDTO orderSummary(String ref, String confirmationKey) throws OrderNotFoundException {
+   public OrderDTO orderSummary(String ref, String confirmationKey) throws Exception {
       OrderDTO o = orderService.getOrderConfirmation(ref, confirmationKey);
       if (o == null) throw new OrderNotFoundException("No order found with this name");
       return o;
