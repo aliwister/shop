@@ -25,7 +25,8 @@ public class SignUpQuestion implements Serializable {
     private Long id;
 
     @Column(name = "question")
-    private String question;
+    @Type(type = "json")
+    private SignUpQuestionDetails question;
 
     @Column(name = "question_code")
     private String questionCode;
