@@ -7,6 +7,7 @@ import com.badals.shop.domain.tenant.TenantAuthority;
 import com.badals.shop.repository.TenantAuthorityRepository;
 import com.badals.shop.repository.TenantRepository;
 import com.badals.shop.service.*;
+import com.badals.shop.service.dto.AddSignUpResponseInput;
 import com.badals.shop.service.pojo.*;
 import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLMutationResolver;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,12 +38,13 @@ public class OnboardingMutation implements GraphQLMutationResolver {
     private final TenantRepository tenantRepository;
     private final TenantAuthorityRepository tenantAuthorityRepository;
     private final CustomerService customerService;
+    private final PreOnBoardingService preOnBoardingService;
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
 
 
-    public OnboardingMutation(TenantAdminProductService productService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantRepository tenantRepository, TenantAuthorityRepository tenantAuthorityRepository, CustomerService customerService) {
+    public OnboardingMutation(TenantAdminProductService productService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantRepository tenantRepository, TenantAuthorityRepository tenantAuthorityRepository, CustomerService customerService, PreOnBoardingService preOnBoardingService) {
         this.productService = productService;
         this.cartService = cartService;
         this.pricingRequestService = pricingRequestService;
@@ -53,6 +54,7 @@ public class OnboardingMutation implements GraphQLMutationResolver {
         this.tenantRepository = tenantRepository;
         this.tenantAuthorityRepository = tenantAuthorityRepository;
         this.customerService = customerService;
+        this.preOnBoardingService = preOnBoardingService;
     }
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -83,5 +85,13 @@ public class OnboardingMutation implements GraphQLMutationResolver {
         return new Message(tenantId + ": " + role + " saved successfully!");
 
     }
+
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
+    public Message addResponse(AddSignUpResponseInput input) {
+        preOnBoardingService.saveSignUpResponse(input);
+        return new Message("Response added successfully!");
+    }
+
 }
 
