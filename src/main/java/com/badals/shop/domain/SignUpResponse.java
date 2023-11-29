@@ -1,13 +1,19 @@
 package com.badals.shop.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "signup_response", catalog = "profileshop")
 public class SignUpResponse implements Serializable {
 
@@ -16,9 +22,6 @@ public class SignUpResponse implements Serializable {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
-
-        @Column(name = "response")
-        private String response;
 
         @Column(name = "response_code")
         private String responseCode;
