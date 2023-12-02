@@ -27,7 +27,7 @@ public class SignUpResponse implements Serializable {
         private String responseCode;
 
         @ManyToOne(fetch = FetchType.LAZY, optional = false)
-        @JoinColumn(name = "tutorial_id", nullable = false)
+        @JoinColumn(name = "question_id", nullable = false)
         @JsonIgnore
         private SignUpQuestion question;
 
