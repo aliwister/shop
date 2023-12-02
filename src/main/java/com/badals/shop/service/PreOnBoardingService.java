@@ -25,6 +25,13 @@ public class PreOnBoardingService {
     private final CustomerService customerService;
 
     public void saveSignUpResponse(AddSignUpResponseInput addSignUpResponseInput) {
+        Customer customer = customerService.getUserWithAuthorities().orElse(null);
+        if (customer == null) {
+            log.info("Customer not logged in");
+            return ;
+        } else{
+            log.info("Customer logged in" + customer.getId().toString());
+        }
         SignUpQuestion signUpQuestion = signUpQuestionRepository.findByQuestionCode(addSignUpResponseInput.getQuestionCode()).orElse(null);
         if (signUpQuestion == null) {
             signUpQuestion = SignUpQuestion.builder()
@@ -36,11 +43,7 @@ public class PreOnBoardingService {
                 .build();
             signUpQuestion = signUpQuestionRepository.save(signUpQuestion);
         }
-        Customer customer = customerService.getUserWithAuthorities().orElse(null);
-        if (customer == null) {
-            log.debug("Customer not logged in");
-            return;
-        }
+
         for (String responseCode: addSignUpResponseInput.getResponseCodes()) {
             SignUpResponse signUpResponse = signUpResponseRepository.findByCustomerAndQuestionAndResponseCode(customer,signUpQuestion, responseCode);
             if (signUpResponse == null) {
