@@ -1,4 +1,17 @@
 extend type Mutation {
     createTenant(tenantId: String): Message
     assignRole(email: String, tenantId: String, role: String): Message
+    addResponse(input: AddResponseInput): Message
+}
+
+input Choice {
+    responseCode: String!
+    response: String
+}
+
+input AddResponseInput {
+    questionCode: String!
+    question: String
+    choices: [Choice]
+    responseCodes: [String]
 }
