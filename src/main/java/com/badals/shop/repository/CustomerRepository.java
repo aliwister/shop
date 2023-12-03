@@ -50,4 +50,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
    @EntityGraph(attributePaths = "authorities")
    //@Cacheable(cacheNames = USERS_BY_LOGIN_CACHE)
    Optional<Customer> findOneWithAuthoritiesByEmail(String login);
+
+   Optional<Customer> findOneByEmailIgnoreCaseAndTenantId(String email, String tenantId);
 }
