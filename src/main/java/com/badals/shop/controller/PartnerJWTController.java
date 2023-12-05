@@ -5,6 +5,7 @@ import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.repository.CustomerRepository;
 import com.badals.shop.security.SecurityUtils;
 import com.badals.shop.security.jwt.ProfileUser;
+import com.badals.shop.service.CustomerService;
 import com.badals.shop.service.util.RandomUtil;
 import com.badals.shop.web.rest.errors.InvalidPasswordException;
 import com.badals.shop.web.rest.vm.GoogleLoginVM;
@@ -13,6 +14,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
 import com.badals.shop.domain.pojo.Attribute;
@@ -49,11 +52,14 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class PartnerJWTController {
 
+    private final Logger logger =  LoggerFactory.getLogger(PartnerJWTController.class);
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
-    private final GoogleIdTokenVerifier googleIdTokenVerifier;
+    private final GoogleIdTokenVerifier googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+        .setAudience(Collections.singletonList("333813192941-5qd2vfdfif0000q1ehu13tkorhtqmqfp.apps.googleusercontent.com"))
+        .build();
     private final CustomerRepository customerRepository;
 
 
@@ -63,9 +69,6 @@ public class PartnerJWTController {
         this.tenantRepository = tenantRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
-        this.googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
-            .setAudience(Collections.singletonList("YOUR_GOOGLE_CLIENT_ID"))
-            .build();
     }
     @GetMapping("/partner-me")
     public ResponseEntity<PartnerJWTController.JwtPartnerAuthenticationResponse> getUserWithAuthorities() throws IllegalAccessException {
@@ -134,15 +137,16 @@ public class PartnerJWTController {
     @PostMapping("/google_signIn")
     public ResponseEntity<?> signInWithGoogle(@RequestBody GoogleLoginVM body) {
         String idToken = body.getIdToken();
-
+        logger.info(googleIdTokenVerifier.toString());
         try {
+            logger.info("got idToken : " + idToken);
             GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
             if (googleIdToken != null) {
                 GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
                 // Get user information from Google token payload
                 String email = payload.getEmail();
-
+                logger.info("got email : " + email);
                 Customer user = customerRepository.findOneByEmailIgnoreCaseAndTenantId(email, com.badals.shop.domain.User.tenantFilter).orElse(null);
                 if (user == null) {
                     String name = (String) payload.get("name");
@@ -175,7 +179,8 @@ public class PartnerJWTController {
                 return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(jwt, authentication.getPrincipal(), tenantList, true), httpHeaders, HttpStatus.OK);
             }
         } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace(); // Handle exception appropriately
+            logger.info(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred");
         }
 
         // Return error response if token verification fails
