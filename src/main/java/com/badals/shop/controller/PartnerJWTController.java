@@ -3,6 +3,7 @@ package com.badals.shop.controller;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.repository.CustomerRepository;
+import com.badals.shop.security.CustomPasswordEncoder;
 import com.badals.shop.security.SecurityUtils;
 import com.badals.shop.security.jwt.ProfileUser;
 import com.badals.shop.service.CustomerService;
@@ -34,6 +35,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -57,18 +59,20 @@ public class PartnerJWTController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final GoogleIdTokenVerifier googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
         .setAudience(Collections.singletonList("333813192941-5qd2vfdfif0000q1ehu13tkorhtqmqfp.apps.googleusercontent.com"))
         .build();
     private final CustomerRepository customerRepository;
 
 
-    public PartnerJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, TenantRepository tenantRepository, UserRepository userRepository, CustomerRepository customerRepository) {
+    public PartnerJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, TenantRepository tenantRepository, UserRepository userRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder){
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tenantRepository = tenantRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
+        this.passwordEncoder = passwordEncoder;
     }
     @GetMapping("/partner-me")
     public ResponseEntity<PartnerJWTController.JwtPartnerAuthenticationResponse> getUserWithAuthorities() throws IllegalAccessException {
@@ -154,6 +158,7 @@ public class PartnerJWTController {
 
                     user = new Customer();
                     user.setEmail(email);
+                    user.setPassword(passwordEncoder.encode("eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX"));
                     user.setFirstname(name);
                     user.setLastname(familyName);
                     user.setActive(true);
@@ -164,7 +169,7 @@ public class PartnerJWTController {
                 }
 
                 UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(email, null);
+                    new UsernamePasswordAuthenticationToken(email, "eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX");
                 List<Tenant> tenantList = tenantRepository.findTenantsForUser(user.getId());
                 Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
