@@ -158,15 +158,16 @@ public class PartnerJWTController {
 
                     user = new Customer();
                     user.setEmail(email);
-                    user.setPassword(passwordEncoder.encode("eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX"));
                     user.setFirstname(name);
                     user.setLastname(familyName);
                     user.setActive(true);
                     user.setSecureKey(RandomUtil.generateActivationKey());
 
                     // Set other user properties as needed
-                    user = customerRepository.save(user);
                 }
+                user.setPassword(passwordEncoder.encode("eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX"));
+                user = customerRepository.save(user);
+
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(email, "eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX");
