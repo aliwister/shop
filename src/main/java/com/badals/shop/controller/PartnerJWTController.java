@@ -1,9 +1,13 @@
 package com.badals.shop.controller;
 
+import com.badals.shop.domain.Authority;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.tenant.Tenant;
+import com.badals.shop.repository.AuthorityRepository;
 import com.badals.shop.repository.CustomerRepository;
+import com.badals.shop.security.AuthoritiesConstants;
 import com.badals.shop.security.CustomPasswordEncoder;
+import com.badals.shop.security.GoogleIdTokenAuthenticationToken;
 import com.badals.shop.security.SecurityUtils;
 import com.badals.shop.security.jwt.ProfileUser;
 import com.badals.shop.service.CustomerService;
@@ -17,6 +21,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.User;
 import com.badals.shop.domain.pojo.Attribute;
@@ -41,10 +46,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -60,19 +62,18 @@ public class PartnerJWTController {
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final GoogleIdTokenVerifier googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-        .setAudience(Collections.singletonList("333813192941-5qd2vfdfif0000q1ehu13tkorhtqmqfp.apps.googleusercontent.com"))
-        .build();
     private final CustomerRepository customerRepository;
+    private final AuthorityRepository authorityRepository;
 
 
-    public PartnerJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, TenantRepository tenantRepository, UserRepository userRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder){
+    public PartnerJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, TenantRepository tenantRepository, UserRepository userRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder,  AuthorityRepository authorityRepository){
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tenantRepository = tenantRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authorityRepository = authorityRepository;
     }
     @GetMapping("/partner-me")
     public ResponseEntity<PartnerJWTController.JwtPartnerAuthenticationResponse> getUserWithAuthorities() throws IllegalAccessException {
@@ -104,8 +105,8 @@ public class PartnerJWTController {
 
 
         List<GrantedAuthority> grantedAuthorities = tenantRepository.getTenantAuthorities(dbUser.getId(), tenantId).stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
-                .collect(Collectors.toList());
+            .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
+            .collect(Collectors.toList());
 
         if (grantedAuthorities.isEmpty())
             throw new IllegalAccessException("Not Authorized");
@@ -123,7 +124,7 @@ public class PartnerJWTController {
     public ResponseEntity<PartnerJWTController.JwtPartnerAuthenticationResponse> authorizePartner(@Valid @RequestBody LoginVM loginVM) {
         LocaleContextHolder.getLocale();
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
+            new UsernamePasswordAuthenticationToken(loginVM.getUsername(), loginVM.getPassword());
 
         com.badals.shop.domain.User dbUser = userRepository.findOneByEmailIgnoreCaseAndTenantId(loginVM.getUsername(), com.badals.shop.domain.User.tenantFilter).get();
         List<Tenant> tenantList = tenantRepository.findTenantsForUser(dbUser.getId());
@@ -141,16 +142,14 @@ public class PartnerJWTController {
     @PostMapping("/google_signIn")
     public ResponseEntity<?> signInWithGoogle(@RequestBody GoogleLoginVM body) {
         String idToken = body.getIdToken();
-        logger.info(googleIdTokenVerifier.toString());
         try {
-            logger.info("got idToken : " + idToken);
-            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
-            if (googleIdToken != null) {
-                GoogleIdToken.Payload payload = googleIdToken.getPayload();
+            GoogleIdTokenAuthenticationToken authenticationToken = new GoogleIdTokenAuthenticationToken(idToken);
+            Authentication authenticated = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            GoogleIdToken.Payload payload = (GoogleIdToken.Payload) authenticated.getPrincipal();
+            if (payload != null) {
 
                 // Get user information from Google token payload
                 String email = payload.getEmail();
-                logger.info("got email : " + email);
                 Customer user = customerRepository.findOneByEmailIgnoreCaseAndTenantId(email, com.badals.shop.domain.User.tenantFilter).orElse(null);
                 if (user == null) {
                     String name = (String) payload.get("name");
@@ -158,20 +157,25 @@ public class PartnerJWTController {
 
                     user = new Customer();
                     user.setEmail(email);
-                    user.setPassword(passwordEncoder.encode("eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX"));
                     user.setFirstname(name);
                     user.setLastname(familyName);
+                    user.setPassword(passwordEncoder.encode("eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX"));
                     user.setActive(true);
                     user.setSecureKey(RandomUtil.generateActivationKey());
-
-                    // Set other user properties as needed
+                    Set<Authority> authorities = new HashSet<>();
+                    authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+                    user.setAuthorities(authorities);
                     user = customerRepository.save(user);
+
                 }
 
-                UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(email, "eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX");
+                List<GrantedAuthority> grantedAuthorities = tenantRepository.getTenantAuthorities(user.getId(), "profileshop").stream()
+                    .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
+                    .collect(Collectors.toList());
+
+                UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(user, null, grantedAuthorities);
                 List<Tenant> tenantList = tenantRepository.findTenantsForUser(user.getId());
-                Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 // Generate JWT token
@@ -183,9 +187,12 @@ public class PartnerJWTController {
                 httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
                 return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(jwt, authentication.getPrincipal(), tenantList, true), httpHeaders, HttpStatus.OK);
             }
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (BadCredentialsException e) {
             logger.info(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token verification failed");
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
         }
 
         // Return error response if token verification fails

@@ -45,13 +45,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         private final TenantRequestFilter tenantRequestFilter;
 
         private final UserDetailsService userDetailsService;
+        private final GoogleAuthenticationProvider googleAuthenticationProvider;
 
-        public CustomerWebSecurityConfig(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport, TenantRequestFilter tenantRequestFilter, @Qualifier("customerDetailsService") UserDetailsService userDetailsService) {
+        public CustomerWebSecurityConfig(TokenProvider tokenProvider, CorsFilter corsFilter, SecurityProblemSupport problemSupport, TenantRequestFilter tenantRequestFilter, @Qualifier("customerDetailsService") UserDetailsService userDetailsService, GoogleAuthenticationProvider googleAuthenticationProvider) {
             this.tokenProvider = tokenProvider;
             this.corsFilter = corsFilter;
             this.problemSupport = problemSupport;
             this.tenantRequestFilter = tenantRequestFilter;
             this.userDetailsService = userDetailsService;
+            this.googleAuthenticationProvider = googleAuthenticationProvider;
         }
 
         @Bean
@@ -143,7 +145,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
             auth.userDetailsService(userDetailsService);
-            auth.authenticationProvider(emAuthenticationProvider());
+            auth.authenticationProvider(googleAuthenticationProvider)
+                .authenticationProvider(googleAuthenticationProvider);
         }
 
         private JWTConfigurer securityConfigurerAdapter() {
