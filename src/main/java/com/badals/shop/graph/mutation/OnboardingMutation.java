@@ -90,6 +90,7 @@ public class OnboardingMutation implements GraphQLMutationResolver {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Transactional
     public Message addResponse(AddSignUpResponseInput input) {
+        TenantContext.setCurrentProfile("profileshop");
         preOnBoardingService.saveSignUpResponse(input);
         return new Message("Response added successfully!");
     }
