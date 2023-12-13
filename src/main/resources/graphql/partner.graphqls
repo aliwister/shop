@@ -24,6 +24,9 @@ extend type Query {
     faqCategoryById(id: Long): FaqCategory
     faqQAs : [FaqQA]
     faqQAById(id: Long): FaqQA
+
+    coupons: [TenantCartRuleDTO]
+    couponByID(coupon: String): TenantCartRuleDTO
 }
 
 extend type Mutation {
@@ -54,6 +57,10 @@ extend type Mutation {
     updateFaqQA(input: FaqQAInput) : FaqQA
     removeFaqCategoryName(input : FaqDeleteInput) : Message
     removeFaqQA(input : FaqDeleteInput) : Message
+
+    createCoupon(input: TenantCartRuleInput): TenantCartRuleDTO
+    updateCoupon(coupon: String, input: TenantCartRuleInput): TenantCartRuleDTO
+    deleteCoupon(coupon: String): Message
 }
 
 enum AssetType {
@@ -290,6 +297,11 @@ type ProductEnvelope {
 
 
 type I18String {
+    lang: String
+    value: String
+}
+
+input I18StringInput {
     lang: String
     value: String
 }

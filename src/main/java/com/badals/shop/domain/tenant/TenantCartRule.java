@@ -36,6 +36,7 @@ public class TenantCartRule implements Serializable, TenantSupport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name ="coupon")
     private String coupon;
 
     @Column(name = "auto_apply")

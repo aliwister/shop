@@ -12,6 +12,7 @@ import java.time.LocalDate;
 /**
  * A CartRule.
  */
+@Deprecated
 @Entity
 @Table(name = "cart_rule")
 public class CartRule implements Serializable {
