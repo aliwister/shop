@@ -44,10 +44,12 @@ public class PartnerMutation implements GraphQLMutationResolver {
     private final PageInfoService pageInfoService;
     private final FaqCategoryService faqCategoryService;
     private final FaqQAService faqQAService;
+    private final TenantCartRuleService tenantCartRuleService;
+
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
-    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService) {
+    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService, TenantCartRuleService tenantCartRuleService) {
         this.productService = productService;
         this.orderService = orderService;
         this.awsService = awsService;
@@ -57,6 +59,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         this.pageInfoService = pageInfoService;
         this.faqCategoryService = faqCategoryService;
         this.faqQAService = faqQAService;
+        this.tenantCartRuleService = tenantCartRuleService;
     }
 /*
 
@@ -278,6 +281,21 @@ public class PartnerMutation implements GraphQLMutationResolver {
     @PreAuthorize("hasRole('ROLE_USER')")
     public Message removeFaqQA(FaqDeleteInput faqDeleteInput){
         return faqQAService.deleteQA(faqDeleteInput);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantCartRuleDTO createCoupon(TenantCartRuleDTO input){
+        return tenantCartRuleService.addCartRule(input);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public TenantCartRuleDTO updateCoupon(String coupon, TenantCartRuleDTO input){
+        return tenantCartRuleService.updateCartRule(coupon, input);
+    }
+
+    public Message deleteCoupon(String coupon){
+        tenantCartRuleService.deleteCartRule(coupon);
+        return new Message("ok");
     }
 }
 

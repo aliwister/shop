@@ -135,7 +135,16 @@ type DiscountRule {
     minCartSize: Int
 }
 
+input DiscountRuleInput {
+    minCartSize: Int
+}
+
 type DiscountCheckoutRule {
+    excludedCarriers: [String]
+    excludedPayments: [String]
+}
+
+input DiscountCheckoutRuleInput {
     excludedCarriers: [String]
     excludedPayments: [String]
 }
@@ -151,18 +160,43 @@ type AdjustmentProfile{
 }
 
 type TenantCartRule {
-    id: ID
     coupon: String
     autoApply: Boolean
     canCombine: Boolean
     enabled: Boolean
     priority: Int
-    description: [I18String]
-    rules: [DiscountRule]
-    checkoutRules: [DiscountCheckoutRule]
-    discountType: DiscountType
-    reductionType: DiscountReductionType
+    description: [I18String!]!
+    rules: [DiscountRule!]!
+    checkoutRules: [DiscountCheckoutRule!]!
+    discountType: DiscountType!
+    reductionType: DiscountReductionType!
     discount: PriceMap
-    customerId: Long
-    tenantId: String
+}
+
+type TenantCartRuleDTO {
+    coupon: String
+    autoApply: Boolean
+    canCombine: Boolean
+    enabled: Boolean
+    priority: Int
+    description: [I18String!]!
+    rules: [DiscountRule!]!
+    checkoutRules: [DiscountCheckoutRule!]!
+    discountType: DiscountType!
+    reductionType: DiscountReductionType!
+    discount: String
+}
+
+input TenantCartRuleInput{
+    coupon: String
+    autoApply: Boolean
+    canCombine: Boolean
+    enabled: Boolean
+    priority: Int
+    description: [I18StringInput!]!
+    rules: [DiscountRuleInput!]!
+    checkoutRules: [DiscountCheckoutRuleInput!]!
+    discountType: DiscountType!
+    reductionType: DiscountReductionType!
+    discount: String
 }

@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 /**
  * Service Implementation for managing {@link CartRule}.
  */
+
+@Deprecated
 @Service
 @Transactional
 public class CartRuleService {
