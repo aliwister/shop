@@ -180,8 +180,8 @@ type TenantCartRuleDTO {
     enabled: Boolean
     priority: Int
     description: [I18String!]!
-    rules: [DiscountRule!]!
-    checkoutRules: [DiscountCheckoutRule!]!
+    rules: [DiscountRule]
+    checkoutRules: [DiscountCheckoutRule]
     discountType: DiscountType!
     reductionType: DiscountReductionType!
     discount: String
