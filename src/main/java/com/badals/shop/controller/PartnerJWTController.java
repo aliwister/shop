@@ -194,8 +194,8 @@ public class PartnerJWTController {
 //        } catch (GeneralSecurityException | IOException e) {
         } catch (Exception e) {
 //            logger.error(e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred");
+//            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getStackTrace());
         }
 
         // Return error response if token verification fails
