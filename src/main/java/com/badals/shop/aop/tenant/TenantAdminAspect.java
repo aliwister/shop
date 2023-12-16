@@ -35,7 +35,8 @@ public class TenantAdminAspect {
     * @return
     * @throws Throwable
     */
-   @Around(value = "execution(* com.badals.shop.service.TenantAdminProductService.*(..)) || execution(* com.badals.shop.service.TenantAdminOrderService.*(..)) || execution(* com.badals.shop.service.TenantSetupService.*(..)) || execution(* com.badals.shop.service.PageInfoService.*(..)) || execution(* com.badals.shop.service.FaqQAService.*(..)) || execution(* com.badals.shop.service.FaqCategoryService.*(..))")
+   @Around(value = "execution(* com.badals.shop.service.TenantAdminProductService.*(..)) || execution(* com.badals.shop.service.TenantAdminOrderService.*(..)) || execution(* com.badals.shop.service.TenantSetupService.*(..)) || execution(* com.badals.shop.service.PageInfoService.*(..)) || execution(* com.badals.shop.service.FaqQAService.*(..)) || execution(* com.badals.shop.service.FaqCategoryService.*(..)) ||" +
+       "execution(* com.badals.shop.service.TenantCartRuleService.*(..))")
    public Object assignForController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       ProfileUser userObj =  (ProfileUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
