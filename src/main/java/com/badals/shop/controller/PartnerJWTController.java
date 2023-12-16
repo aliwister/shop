@@ -63,7 +63,6 @@ public class PartnerJWTController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final GoogleIdTokenVerifier googleIdTokenVerifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
         .setAudience(Collections.singletonList("333813192941-5qd2vfdfif0000q1ehu13tkorhtqmqfp.apps.googleusercontent.com"))
         .build();
@@ -71,13 +70,12 @@ public class PartnerJWTController {
     private final CustomerService customerService;
     private final DomainCustomerDetailsService domainUserDetailsService;
 
-    public PartnerJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, TenantRepository tenantRepository, UserRepository userRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder, DomainCustomerDetailsService domainUserDetailsService, CustomerService customerService) {
+    public PartnerJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, TenantRepository tenantRepository, UserRepository userRepository, CustomerRepository customerRepository, DomainCustomerDetailsService domainUserDetailsService, CustomerService customerService) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tenantRepository = tenantRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
-        this.passwordEncoder = passwordEncoder;
         this.domainUserDetailsService = domainUserDetailsService;
         this.customerService = customerService;
     }
@@ -148,53 +146,37 @@ public class PartnerJWTController {
     @PostMapping("/google_signIn")
     public ResponseEntity<?> signInWithGoogle(@RequestBody GoogleLoginVM body) {
         String idToken = body.getIdToken();
-        logger.info(googleIdTokenVerifier.toString());
         try {
-            logger.info("got idToken : " + idToken);
-//            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
-//            if (googleIdToken != null) {
-//                GoogleIdToken.Payload payload = googleIdToken.getPayload();
-            if (true){
+            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
+            if (googleIdToken != null) {
+                GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
-//                 Get user information from Google token payload
-                String email = "kohankan.mj@gmail.com"; //payload.getEmail();
-
-                logger.info("got email : " + email);
+                String email = payload.getEmail();
                 Customer user = customerRepository.findOneByEmailIgnoreCaseAndTenantId(email, com.badals.shop.domain.User.tenantFilter).orElse(null);
                 if (user == null) {
                     UserDTO userDTO = new UserDTO();
                     userDTO.setEmail(email);
-//                    userDTO.setFirstName((String) payload.get("name"));
-//                    userDTO.setLastName((String) payload.get("family_name"));
+                    userDTO.setFirstName((String) payload.get("name"));
+                    userDTO.setLastName((String) payload.get("family_name"));
                     userDTO.setActivated(false);
                     user = customerService.registerUser(userDTO, "eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX");
-
                 }
 
-                user.setPassword(passwordEncoder.encode("abc123"));
-                customerRepository.save(user);
-
                 UserDetails userDetails = domainUserDetailsService.loadUserByUsername(email);
-
                 UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(userDetails,"null", userDetails.getAuthorities());
                 List<Tenant> tenantList = tenantRepository.findTenantsForUser(user.getId());
-                //Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-                // Generate JWT token
-                boolean rememberMe = true; // You might have your own logic for rememberMe
-                String jwt = tokenProvider.createToken(authenticationToken, rememberMe, true);
+                String jwt = tokenProvider.createToken(authenticationToken, true, true);
 
                 // Return JWT token or any necessary response
                 HttpHeaders httpHeaders = new HttpHeaders();
                 httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
                 return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(jwt, authenticationToken.getPrincipal(), tenantList, true), httpHeaders, HttpStatus.OK);
             }
-//        } catch (GeneralSecurityException | IOException e) {
-        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//            e.printStackTrace();
+        } catch (GeneralSecurityException | IOException e) {
+            logger.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getStackTrace());
         }
 
