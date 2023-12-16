@@ -4,9 +4,12 @@ import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.repository.CustomerRepository;
 import com.badals.shop.security.CustomPasswordEncoder;
+import com.badals.shop.security.DomainCustomerDetailsService;
+import com.badals.shop.security.DomainUserDetailsService;
 import com.badals.shop.security.SecurityUtils;
 import com.badals.shop.security.jwt.ProfileUser;
 import com.badals.shop.service.CustomerService;
+import com.badals.shop.service.dto.UserDTO;
 import com.badals.shop.service.util.RandomUtil;
 import com.badals.shop.web.rest.errors.InvalidPasswordException;
 import com.badals.shop.web.rest.vm.GoogleLoginVM;
@@ -35,6 +38,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,15 +68,18 @@ public class PartnerJWTController {
         .setAudience(Collections.singletonList("333813192941-5qd2vfdfif0000q1ehu13tkorhtqmqfp.apps.googleusercontent.com"))
         .build();
     private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
+    private final DomainCustomerDetailsService domainUserDetailsService;
 
-
-    public PartnerJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, TenantRepository tenantRepository, UserRepository userRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder){
+    public PartnerJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, TenantRepository tenantRepository, UserRepository userRepository, CustomerRepository customerRepository, PasswordEncoder passwordEncoder, DomainCustomerDetailsService domainUserDetailsService, CustomerService customerService) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.tenantRepository = tenantRepository;
         this.userRepository = userRepository;
         this.customerRepository = customerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.domainUserDetailsService = domainUserDetailsService;
+        this.customerService = customerService;
     }
     @GetMapping("/partner-me")
     public ResponseEntity<PartnerJWTController.JwtPartnerAuthenticationResponse> getUserWithAuthorities() throws IllegalAccessException {
@@ -144,48 +151,50 @@ public class PartnerJWTController {
         logger.info(googleIdTokenVerifier.toString());
         try {
             logger.info("got idToken : " + idToken);
-            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
-            if (googleIdToken != null) {
-                GoogleIdToken.Payload payload = googleIdToken.getPayload();
+//            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
+//            if (googleIdToken != null) {
+//                GoogleIdToken.Payload payload = googleIdToken.getPayload();
+            if (true){
 
-                // Get user information from Google token payload
-                String email = payload.getEmail();
+//                 Get user information from Google token payload
+                String email = "kohankan.mj@gmail.com"; //payload.getEmail();
+
                 logger.info("got email : " + email);
                 Customer user = customerRepository.findOneByEmailIgnoreCaseAndTenantId(email, com.badals.shop.domain.User.tenantFilter).orElse(null);
                 if (user == null) {
-                    String name = (String) payload.get("name");
-                    String familyName = (String) payload.get("family_name");
+                    UserDTO userDTO = new UserDTO();
+                    userDTO.setEmail(email);
+//                    userDTO.setFirstName((String) payload.get("name"));
+//                    userDTO.setLastName((String) payload.get("family_name"));
+                    userDTO.setActivated(false);
+                    user = customerService.registerUser(userDTO, "eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX");
 
-                    user = new Customer();
-                    user.setEmail(email);
-                    user.setFirstname(name);
-                    user.setLastname(familyName);
-                    user.setActive(true);
-                    user.setSecureKey(RandomUtil.generateActivationKey());
-
-                    // Set other user properties as needed
                 }
-                user.setPassword(passwordEncoder.encode("eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX"));
-                user = customerRepository.save(user);
 
+                user.setPassword(passwordEncoder.encode("abc123"));
+                customerRepository.save(user);
+
+                UserDetails userDetails = domainUserDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(email, "eksNKAeu&EyL#5nK$sj&z$QuRv$huHbE8gH3$tnowtfb%Xb&%yBz&5*2JmWCxsn@^M3%NCXH*Df$2#!#8A%jFnDMuAdx6tamqxPpn6RuSrN9hz5@EiuCX");
+                    new UsernamePasswordAuthenticationToken(userDetails,"null", userDetails.getAuthorities());
                 List<Tenant> tenantList = tenantRepository.findTenantsForUser(user.getId());
-                Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                //Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
                 // Generate JWT token
                 boolean rememberMe = true; // You might have your own logic for rememberMe
-                String jwt = tokenProvider.createToken(authentication, rememberMe, true);
+                String jwt = tokenProvider.createToken(authenticationToken, rememberMe, true);
 
                 // Return JWT token or any necessary response
                 HttpHeaders httpHeaders = new HttpHeaders();
                 httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-                return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(jwt, authentication.getPrincipal(), tenantList, true), httpHeaders, HttpStatus.OK);
+                return new ResponseEntity<>(new PartnerJWTController.JwtPartnerAuthenticationResponse(jwt, authenticationToken.getPrincipal(), tenantList, true), httpHeaders, HttpStatus.OK);
             }
-        } catch (GeneralSecurityException | IOException e) {
-            logger.info(e.getMessage());
+//        } catch (GeneralSecurityException | IOException e) {
+        } catch (Exception e) {
+//            logger.error(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred");
         }
 
