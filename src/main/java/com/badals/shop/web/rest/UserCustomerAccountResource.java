@@ -3,9 +3,7 @@ package com.badals.shop.web.rest;
 
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.tenant.Tenant;
-import com.badals.shop.repository.CustomerRepository;
 import com.badals.shop.repository.TenantRepository;
-import com.badals.shop.repository.UserRepository;
 import com.badals.shop.security.jwt.JWTFilter;
 import com.badals.shop.security.jwt.TokenProvider;
 import com.badals.shop.service.CustomerService;
@@ -52,8 +50,6 @@ public class UserCustomerAccountResource {
 
     private final Logger log = LoggerFactory.getLogger(UserCustomerAccountResource.class);
 
-    private final CustomerRepository userRepository;
-    private final UserRepository user2Repository;
     private final CustomerService userService;
     private final TenantRepository tenantRepository;
     private final TokenProvider tokenProvider;
@@ -61,12 +57,10 @@ public class UserCustomerAccountResource {
 
     private final MailService mailService;
 
-    public UserCustomerAccountResource(CustomerRepository userRepository, CustomerService userService, MailService mailService, UserRepository user2Repository, TenantRepository tenantRepository, TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public UserCustomerAccountResource(CustomerService userService, MailService mailService, TenantRepository tenantRepository, TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
 
-        this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
-        this.user2Repository = user2Repository;
         this.tenantRepository = tenantRepository;
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
@@ -90,13 +84,12 @@ public class UserCustomerAccountResource {
         Customer user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
         UsernamePasswordAuthenticationToken authenticationToken =
             new UsernamePasswordAuthenticationToken(user.getEmail(), managedUserVM.getPassword());
-        com.badals.shop.domain.User dbUser = user2Repository.findOneByEmailIgnoreCaseAndTenantId(user.getEmail(), com.badals.shop.domain.User.tenantFilter).get();
-        List<Tenant> tenantList = tenantRepository.findTenantsForUser(dbUser.getId());
+
+        List<Tenant> tenantList = tenantRepository.findTenantsForUser(user.getId());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        boolean rememberMe = true;
-        String jwt = tokenProvider.createToken(authentication, rememberMe, true);
+        String jwt = tokenProvider.createToken(authentication, true, true);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         mailService.sendActivationEmail(user);
@@ -148,7 +141,7 @@ public class UserCustomerAccountResource {
      *
      * @param userDTO the current user information.
      * @throws EmailAlreadyUsedException {@code 400 (Bad Request)} if the email is already used.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the user login wasn't found.
+     * @throws RuntimeException          {@code 500 (Internal Server Error)} if the user login wasn't found.
      */
     @PostMapping("/account")
     public void saveAccount(@Valid @RequestBody UserDTO userDTO) {
@@ -163,7 +156,8 @@ public class UserCustomerAccountResource {
         }
         //userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
         //    userDTO.getLangKey(), userDTO.getImageUrl());
-    */}
+    */
+    }
 
     /**
      * {@code POST  /account/change-password} : changes the current user's password.
@@ -187,10 +181,10 @@ public class UserCustomerAccountResource {
      */
     @PostMapping(path = "/account/reset-password/init")
     public void requestPasswordReset(@RequestBody String mail) {
-       mailService.sendPasswordResetMail(
-           userService.requestPasswordReset(mail)
-               .orElseThrow(EmailNotFoundException::new)
-       );
+        mailService.sendPasswordResetMail(
+            userService.requestPasswordReset(mail)
+                .orElseThrow(EmailNotFoundException::new)
+        );
     }
 
     /**
@@ -198,7 +192,7 @@ public class UserCustomerAccountResource {
      *
      * @param keyAndPassword the generated key and the new password.
      * @throws InvalidPasswordException {@code 400 (Bad Request)} if the password is incorrect.
-     * @throws RuntimeException {@code 500 (Internal Server Error)} if the password could not be reset.
+     * @throws RuntimeException         {@code 500 (Internal Server Error)} if the password could not be reset.
      */
     @PostMapping(path = "/account/reset-password/finish")
     public void finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
@@ -236,8 +230,8 @@ public class UserCustomerAccountResource {
             this.username = userP.getUsername();
             this.isStoreSelect = isStoreSelect;
             //this.firstName = userP.getName();
-            this.authorities = String.join(",",userP.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()));
-            this.tenants = String.join(",",stores.stream().map(Tenant::getTenantId).collect(Collectors.toSet()));
+            this.authorities = String.join(",", userP.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet()));
+            this.tenants = String.join(",", stores.stream().map(Tenant::getTenantId).collect(Collectors.toSet()));
         }
     }
 }
