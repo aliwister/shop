@@ -388,9 +388,9 @@ public class TenantAdminProductService {
     }
 
     public void deleteProduct(Long id) throws ProductNotFoundException {
-        final TenantProduct product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+        final TenantProduct product = productRepository.findByRefJoinChildren(String.valueOf(id)).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
         verifyOwnership(product);
-        productRepository.delete(true, id);
+        productRepository.delete(true, product.getId());
     }
 
     @Transactional
