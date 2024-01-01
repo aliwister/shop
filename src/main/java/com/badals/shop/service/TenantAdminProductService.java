@@ -379,7 +379,7 @@ public class TenantAdminProductService {
             like = "%"+text+"%";
 
         //Integer total = productRepository.countForTenant(like, VariationType.CHILD);
-        Page<TenantProduct> result = productRepository.findAllByAndVariationTypeIsNot(VariationType.CHILD, PageRequest.of((int) offset/limit,limit));  //listForTenantAll(like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
+        Page<TenantProduct> result = productRepository.findAllByVariationTypeIsNotAndNotDeleted(VariationType.CHILD, PageRequest.of((int) offset/limit,limit));  //listForTenantAll(like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
         ProductResponse response = new ProductResponse();
         //response.setTotal(total);
         response.setHasMore(true);

@@ -49,8 +49,8 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
     @Query("from TenantProduct u left join fetch u.stock left join fetch u.children c left join fetch c.stock where u.ref = ?1 ")
     Optional<TenantProduct> findByRefJoinChildren(String id);
 
-    Page<TenantProduct> findAllByAndVariationTypeIsNot(VariationType child, Pageable pageable);
-
+    @Query("SELECT tp FROM TenantProduct tp WHERE tp.variationType <> ?1 AND (tp.deleted IS NULL OR tp.deleted = false)")
+    Page<TenantProduct> findAllByVariationTypeIsNotAndNotDeleted(VariationType child, Pageable pageable);
     @Query("from TenantProduct u  left join fetch u.stock where  (?1 is null or u.title like ?1) and u.variationType <> ?2")
     List<TenantProduct> listForTenantAll( String like, VariationType child, Pageable pageable);
 
