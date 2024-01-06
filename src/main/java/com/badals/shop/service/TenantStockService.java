@@ -24,7 +24,7 @@ public class TenantStockService {
     }
 
     public PartnerStock update(PartnerStock stock){
-        TenantStock tenantStock = tenantStockRepository.findById(stock.getId()).get();
+        TenantStock tenantStock = tenantStockRepository.findById(stock.getId()).orElse(null);
         if(tenantStock != null){
             tenantStock.setAvailability(stock.getAvailability());
             tenantStock.allow_backorder(stock.getAllow_backorder());
