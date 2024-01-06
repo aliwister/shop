@@ -34,15 +34,6 @@ public class TenantStock implements Serializable, TenantSupport {
    @Column(name="tenant_id")
    private String tenantId;
 
-   public String getTenantId() {
-      return tenantId;
-   }
-
-   @Override
-   public void setTenantId(String tenantId) {
-      this.tenantId = tenantId;
-   }
-
    //@NotNull
     @Column(name = "quantity", precision = 21, scale = 2, nullable = false)
     private BigDecimal quantity;
@@ -82,6 +73,16 @@ public class TenantStock implements Serializable, TenantSupport {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    @Override
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+    }
+
 
     public BigDecimal getQuantity() {
         return quantity;

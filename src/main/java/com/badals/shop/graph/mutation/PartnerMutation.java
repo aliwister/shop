@@ -45,11 +45,12 @@ public class PartnerMutation implements GraphQLMutationResolver {
     private final FaqCategoryService faqCategoryService;
     private final FaqQAService faqQAService;
     private final TenantCartRuleService tenantCartRuleService;
+    private final TenantStockService tenantStockService;
 
 
     @Value("${profileshop.cdnUrl}")
     private String cdnUrl;
-    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService, TenantCartRuleService tenantCartRuleService) {
+    public PartnerMutation(TenantAdminProductService productService, TenantAdminOrderService orderService, AwsService awsService, MessageSource messageSource, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService, TenantCartRuleService tenantCartRuleService, TenantStockService tenantStockService) {
         this.productService = productService;
         this.orderService = orderService;
         this.awsService = awsService;
@@ -60,6 +61,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         this.faqCategoryService = faqCategoryService;
         this.faqQAService = faqQAService;
         this.tenantCartRuleService = tenantCartRuleService;
+        this.tenantStockService = tenantStockService;
     }
 /*
 
@@ -168,6 +170,11 @@ public class PartnerMutation implements GraphQLMutationResolver {
         }
         log.error(message.toString());
         return new ProductEnvelope(p, message.toString(), code);
+    }
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public PartnerStock updateStock(PartnerStock stock){
+        return tenantStockService.update(stock);
     }
 
     //@PreAuthorize("hasRole('ROLE_MERCHANT')")
