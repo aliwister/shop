@@ -31,6 +31,8 @@ extend type Query {
 
 extend type Mutation {
     savePartnerProduct(product: PartnerProductInput): ProductEnvelope
+    updateStock(stock:PartnerStockInput): PartnerStock
+
     getPartnerImageUploadUrl(filename: String, contentType: String, assetType: AssetType): PresignedUrl
     completeUpload(fileHandle: Long): Message
     publishProduct(id: Long): Message
