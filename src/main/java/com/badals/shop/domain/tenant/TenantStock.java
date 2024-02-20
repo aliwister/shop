@@ -36,15 +36,15 @@ public class TenantStock implements Serializable, TenantSupport {
 
    //@NotNull
     @Column(name = "quantity", precision = 21, scale = 2, nullable = false)
-    private BigDecimal quantity;
+    private BigDecimal quantity = new BigDecimal(0);
 
     //@NotNull
     @Column(name = "availability", nullable = false)
-    private Integer availability;
+    private Integer availability = 0;
 
     //@NotNull
     @Column(name = "allow_backorder", nullable = false)
-    private Boolean allow_backorder;
+    private Boolean allow_backorder = false;
 
     @Column(name = "backorder_availability")
     private Integer backorder_availability;
