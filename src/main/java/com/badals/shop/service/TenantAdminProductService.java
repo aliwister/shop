@@ -379,14 +379,15 @@ public class TenantAdminProductService {
         //List<AddProductDTO> result = search("tenant:"+currentTenant + " AND imported:" + imported.toString() + ((text != null)?" AND "+text:""));
         String profile = TenantContext.getCurrentProfile();
         String like = null;
-        if(text != null)
-            like = "%"+text+"%";
+        if (text != null)
+            like = "%" + text + "%";
 
         //Integer total = productRepository.countForTenant(like, VariationType.CHILD);
-        Page<TenantProduct> result = productRepository.findAllByVariationTypeIsNotAndNotDeleted(VariationType.CHILD, PageRequest.of((int) offset/limit,limit));  //listForTenantAll(like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
+        Page<TenantProduct> result = productRepository.findAllByVariationTypeIsNotAndNotDeleted(VariationType.CHILD, PageRequest.of((int) offset / limit, limit));  //listForTenantAll(like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
         ProductResponse response = new ProductResponse();
         //response.setTotal(total);
-        response.setHasMore(response.isHasMore());
+        response.setTotal(result.getTotalPages());
+        response.setHasMore(result.hasNext());
         response.setItems(result.stream().map(productMapper::toPartnerListDto).collect(Collectors.toList()));
         return response;
     }
