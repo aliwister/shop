@@ -34,10 +34,7 @@ import javax.validation.ValidationException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -63,8 +60,9 @@ public class TenantAdminProductService {
     private final S3UploadRequestRepository s3UploadRequestRepository;
     private final AwsService awsService;
     private final IndexService indexService;
+    private final TenantProductMapper tenantProductMapper;
 
-    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService, IndexService indexService) {
+    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService, IndexService indexService, TenantProductMapper tenantProductMapper) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
         this.partnerProductMapper = partnerProductMapper;
@@ -77,6 +75,7 @@ public class TenantAdminProductService {
         this.s3UploadRequestRepository = s3UploadRequestRepository;
         this.awsService = awsService;
         this.indexService = indexService;
+        this.tenantProductMapper = tenantProductMapper;
     }
 
 
@@ -84,14 +83,16 @@ public class TenantAdminProductService {
         //PartnerProduct p = partnerProductSearchRepository.findBySlug(upc);
 
         //log.info(p.getSlug());
-
-        List <PartnerProduct> products = partnerProductSearchRepository.findByTenantIdEqualsAndUpcEquals(TenantContext.getCurrentTenant(), upc);
+        // todo ask ali if we can use postgres instead of elastic search
+        // todo is title important?
+        //List <PartnerProduct> products = partnerProductSearchRepository.findByTenantIdEqualsAndUpcEquals(TenantContext.getCurrentTenant(), upc);
         //List <PartnerProduct> products = partnerProductSearchRepository.findByTenantEquals(TenantContext.getCurrentTenant());
+        List <TenantProduct> products = productRepository.findAllByUpc(upc);
         Integer total = products.size();
         ProductResponse response = new ProductResponse();
         response.setTotal(total);
         response.setHasMore(false);
-        response.setItems(products.stream().map(partnerProductMapper::toProductDto).collect(Collectors.toList()));
+        response.setItems(products.stream().map(tenantProductMapper::toDto).collect(Collectors.toList()));
         return response;
     }
 
@@ -210,8 +211,11 @@ public class TenantAdminProductService {
         if(master.getStock() == null)
             master.setStock(new HashSet<>());
         master.getStock().clear();
-        if (updateStock == null)
-            return;
+        if (updateStock == null){
+            //todo: check with @Ali
+            updateStock = new HashSet<>(List.of(new TenantStock()));
+        }
+
         for (TenantStock a: updateStock) {
 
             master.addStock(a);
