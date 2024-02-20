@@ -173,6 +173,29 @@ public class PartnerMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public ProductEnvelope savePartnerProductPrice(PartnerProduct product) throws ProductNotFoundException {
+        PartnerProduct p = null;
+        StringBuilder message = new StringBuilder();
+        Integer code = 202;
+
+        try {
+            p = productService.savePartnerProductPrice(product, false);
+            message.append("Success");
+        }
+        catch(Throwable e) {
+            e.printStackTrace();
+            while (e != null) {
+                message.append(e.getMessage());
+                e = e.getCause();
+            }
+
+            code = 400;
+        }
+        log.error(message.toString());
+        return new ProductEnvelope(p, message.toString(), code);
+    }
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
     public PartnerStock updateStock(PartnerStock stock){
         return tenantStockService.update(stock);
     }
