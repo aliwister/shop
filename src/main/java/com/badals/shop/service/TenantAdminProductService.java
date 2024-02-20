@@ -83,11 +83,10 @@ public class TenantAdminProductService {
         //PartnerProduct p = partnerProductSearchRepository.findBySlug(upc);
 
         //log.info(p.getSlug());
-        // todo ask ali if we can use postgres instead of elastic search
-        // todo is title important?
+
         //List <PartnerProduct> products = partnerProductSearchRepository.findByTenantIdEqualsAndUpcEquals(TenantContext.getCurrentTenant(), upc);
         //List <PartnerProduct> products = partnerProductSearchRepository.findByTenantEquals(TenantContext.getCurrentTenant());
-        List <TenantProduct> products = productRepository.findAllByUpc(upc);
+        List<TenantProduct> products = productRepository.findAllByUpcOrSimilarTitle(upc, title);
         Integer total = products.size();
         ProductResponse response = new ProductResponse();
         response.setTotal(total);
@@ -205,56 +204,110 @@ public class TenantAdminProductService {
         return partnerProductMapper.toDto(tp);
     }
 
+    @Transactional
+    public PartnerProduct savePartnerProductPrice(PartnerProduct dto, boolean isSaveES) throws ProductNotFoundException, ValidationException {
+        //todo make sure we handle childer price change as well
+        Long currentMerchantId = TenantContext.getCurrentMerchantId();
+        String currentTenantId = TenantContext.getCurrentTenant();
+        TenantProduct update = partnerProductMapper.toEntity(dto);
+        final TenantProduct master;
+        boolean _new = dto.getId() == null;
+
+//        validatePartnerProduct(dto, _new);
+
+        if (!_new) {
+            master = productRepository.findByIdJoinChildren(dto.getId()).orElseThrow(() -> new ProductNotFoundException("No Product found for ID"));
+        } else {
+            assert (dto.getRef() == null) : "Shouldn't define ref of a new product";
+            master = partnerProductMapper.toEntity(dto);
+        }
+
+        // Shouldn't ever pass in ref
+        // If parent is new, children should be new as well
+
+
+        master.setPrice(update.getPrice());
+        master.setListPrice(update.getPrice());
+        //saveLang(master, update);
+
+//
+//        if (update.getChildren() == null || update.getVariationType().equals(VariationType.SIMPLE)) {
+////            assert (dto.getPrice() != null);
+////            master.setVariationType(VariationType.SIMPLE);
+////            TenantStock stock = null;
+////            /*if(master.getStock() != null) {
+////                stock = master.getStock().stream().findFirst().orElse(new TenantStock());
+////                stock = setStock(stock, master,*//* dto.getPriceObj(), dto.getSalePriceObj()==null?dto.getPriceObj():dto.getSalePriceObj(),*//* dto.getCost(), dto.getQuantity(), dto.getAvailability(), currentMerchantId);
+////            }
+////            if(stock != null && stock.getId() == null)
+////                master.addStock(stock);*/
+////            saveStock(master, update, dto, currentMerchantId, _new);
+//        } else { // PARENT    //if(product.getVariationType().equals(VariationType.PARENT)) {
+////            assert (dto.getPrice() == null);
+////            master.setVariationType(VariationType.PARENT);
+////            saveChildren(master, update, dto, currentMerchantId, _new);
+//        }
+
+
+        master.setMerchantId(currentMerchantId);
+        TenantProduct tp = productRepository.save(master);
+
+        PartnerProduct esDto = partnerProductMapper.toDto(tp);
+        if (isSaveES)
+            partnerProductSearchRepository.save(esDto);
+        return partnerProductMapper.toDto(tp);
+    }
+
     private void saveStock(TenantProduct master, TenantProduct update, PartnerProduct dto, Long currentMerchantId, boolean _new) {
         //Set<TenantStock> masterStock = master.getStock();
         Set<TenantStock> updateStock = update.getStock();
-        if(master.getStock() == null)
+        if (master.getStock() == null)
             master.setStock(new HashSet<>());
         master.getStock().clear();
-        if (updateStock == null){
+        if (updateStock == null) {
             //todo: check with @Ali
             updateStock = new HashSet<>(List.of(new TenantStock()));
         }
 
-        for (TenantStock a: updateStock) {
+        for (TenantStock a : updateStock) {
 
             master.addStock(a);
         }
     }
 
     private void validatePartnerProduct(PartnerProduct dto, boolean isNew) {
-        if(dto.getRef() != null)
+        if (dto.getRef() != null)
             throw new ValidationException("Should never pass ref");
 
-        if(dto.getVariationType() == null)
+        if (dto.getVariationType() == null)
             throw new ValidationException("Variation type must be PARENT or SIMPLE");
 
-        if(dto.getVariationType().equals(VariationType.SIMPLE)) {
-            if(!dto.getChildren().isEmpty())
+        if (dto.getVariationType().equals(VariationType.SIMPLE)) {
+            if (!dto.getChildren().isEmpty())
                 throw new ValidationException("Simple cannot have children");
-            if(dto.getPrice().getPriceList().isEmpty())
+            if (dto.getPrice().getPriceList().isEmpty())
                 throw new ValidationException("Must have price");
-            if(dto.getCost().getCurrency().isEmpty())
+            if (dto.getCost().getCurrency().isEmpty())
                 throw new ValidationException("Must have cost currency");
-            if(dto.getCost().getAmount() == null)
+            if (dto.getCost().getAmount() == null)
                 throw new ValidationException("Must have cost");
-            if(dto.getSku().isEmpty())
+            if (dto.getSku().isEmpty())
                 throw new ValidationException("Must have sku");
 
         }
 
-        if(dto.getVariationType().equals(VariationType.PARENT)) {
-            if(dto.getChildren().isEmpty())
+        if (dto.getVariationType().equals(VariationType.PARENT)) {
+            if (dto.getChildren().isEmpty())
                 throw new ValidationException("At least 1 child must be defined");
-            if(!dto.getPrice().getPriceList().isEmpty())
+            if (!dto.getPrice().getPriceList().isEmpty())
                 throw new ValidationException("Cannot include prices");
-            if(!dto.getCost().getCurrency().isEmpty())
+            if (!dto.getCost().getCurrency().isEmpty())
                 throw new ValidationException("Cannot have cost currency");
-            if(dto.getCost().getAmount() != null)
+            if (dto.getCost().getAmount() != null)
                 throw new ValidationException("Cannot have cost");
-            if(isNew && dto.getChildren().stream().anyMatch(x -> x.getId() != null))
+            if (isNew && dto.getChildren().stream().anyMatch(x -> x.getId() != null))
                 throw new ValidationException("Cannot have existing child in new product");
-            if(dto.getSku().isEmpty())
+            if (dto.getSku().isEmpty())
                 throw new ValidationException("Must have sku");
         }
 
@@ -265,8 +318,8 @@ public class TenantAdminProductService {
         Set<TenantProduct> updateChildren = update.getChildren();
 
 
-        if(_new) {
-            if(masterChildren != null)
+        if (_new) {
+            if (masterChildren != null)
                 masterChildren.stream().forEach(x -> x.variationType(VariationType.CHILD).active(true).slug(String.valueOf(slugService.generateRef(x.getSku(), currentMerchantId))).merchantId(currentMerchantId).ref(x.getSlug()).title(master.getTitle()).parent(master));
             master.setChildren(masterChildren);
             return;
@@ -283,7 +336,7 @@ public class TenantAdminProductService {
         }
         masterChildren.removeAll(remove);
 
-        for (TenantProduct c: updateChildren) {
+        for (TenantProduct c : updateChildren) {
 
             if (c == null || c.getId() == null) {
                 String ref = String.valueOf(ChecksumUtil.getChecksum(c.getSku()));
@@ -297,7 +350,7 @@ public class TenantAdminProductService {
                 continue;
             }
             TenantProduct pl = masterChildren.stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
-            if(pl == null)
+            if (pl == null)
                 throw new ValidationException("Inexistant child. Cannot update it!");
             ChildProduct dto2 = dto.getChildren().stream().filter(x -> x.getId().equals(c.getId())).findFirst().orElse(null);
 /*            if(!dto2.isDirty)
@@ -313,7 +366,7 @@ public class TenantAdminProductService {
             pl.sku(c.getSku()).image(c.getImage()).upc(c.getUpc()).weight(c.getWeight()).gallery(c.getGallery());
             TenantStock stock = pl.getStock().stream().findFirst().orElse(new TenantStock());
             stock = setStock(stock, master, /*dto2.getPriceObj(), dto2.getSalePriceObj(),*/ dto2.getCost(), dto2.getQuantity(), dto2.getAvailability(), currentMerchantId);
-            if(stock.getId() == null)
+            if (stock.getId() == null)
                 pl.addStock(stock);
 
         }
@@ -339,7 +392,7 @@ public class TenantAdminProductService {
             recycleService.recycleS3("s3", child.getImage());
         }
 
-        for (Gallery img: child.getGallery()) {
+        for (Gallery img : child.getGallery()) {
             if (gallery.indexOf(img) < 0) {
                 recycleService.recycleS3("s3", img.getUrl());
             }
@@ -367,11 +420,11 @@ public class TenantAdminProductService {
         }
 */
 
-        if(quantity == null)
+        if (quantity == null)
             quantity = BigDecimal.ZERO;
 
         return stock.quantity(quantity).availability(availability).cost(costPriceObj).allow_backorder(false)
-                /*.price(salePriceObj)*/.product(master);
+            /*.price(salePriceObj)*/.product(master);
     }
 
     @Transactional
@@ -399,20 +452,20 @@ public class TenantAdminProductService {
     }
 
     @Transactional
-   public void setProductPublished(Long id, Boolean value) throws ProductNotFoundException {
-       final TenantProduct product = productRepository.findOneByRef(id.toString()).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
-       verifyOwnership(product);
+    public void setProductPublished(Long id, Boolean value) throws ProductNotFoundException {
+        final TenantProduct product = productRepository.findOneByRef(id.toString()).orElseThrow(() -> new ProductNotFoundException("Product " + id + " was not found in the database"));
+        verifyOwnership(product);
 
-       product.setActive(value);
-       if(product.getChildren() != null) {
-           product.getChildren().stream().forEach(x -> x.setActive(value));
-       }
-       productRepository.save(product);
-   }
+        product.setActive(value);
+        if (product.getChildren() != null) {
+            product.getChildren().stream().forEach(x -> x.setActive(value));
+        }
+        productRepository.save(product);
+    }
 
     private void verifyOwnership(TenantProduct product) throws ProductNotFoundException {
         String tenant = TenantContext.getCurrentProfile();
-        if(!product.getTenantId().equals(tenant))
+        if (!product.getTenantId().equals(tenant))
             throw new ProductNotFoundException("Product not available");
     }
 
@@ -426,24 +479,25 @@ public class TenantAdminProductService {
         response.setHasMore(false);
         return response;
     }
+
     public ProductDTO findProductBySlug(String slug) throws ProductNotFoundException {
         //String profile = TenantContext.getCurrentProfile();
         TenantProduct product = productRepository.findBySlug(slug).get();
 
-        if(product == null)
+        if (product == null)
             throw new ProductNotFoundException("Invalid Product");
 
-        if(product.getVariationType().equals(VariationType.PARENT)) {
-            if(product.getChildren().size() <1)
+        if (product.getVariationType().equals(VariationType.PARENT)) {
+            if (product.getChildren().size() < 1)
                 throw new ProductNotFoundException("Lonely Parent");
             product = product.getChildren().stream().filter(p -> p.getStub() == false).findFirst().orElse(product.getChildren().stream().findFirst().get());
         }
-        if(product.getStub() != null && product.getStub()) {
+        if (product.getStub() != null && product.getStub()) {
             //Product p = lookup(product.getSku());
             return productMapper.toDto(product);
         }
 
-        if(product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
+        if (product.getExpires() != null && product.getExpires().isBefore(Instant.now())) {
             //Product p = lookup(product.getSku());
             product.setStub(true);
             return productMapper.toDto(product);

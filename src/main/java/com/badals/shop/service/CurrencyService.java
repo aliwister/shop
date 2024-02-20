@@ -40,8 +40,13 @@ public class CurrencyService {
       if(amount == null) return null;
       String rate = expiringMap.get(from+to);
       if(rate == null) {
-         rate = getRate(from, to);
-         expiringMap.put(from+to, rate);
+          try {
+                rate = getRate(from, to);
+                expiringMap.put(from+to, rate);
+            } catch (Exception e) {
+//                log.error("Error getting rate", e);
+                return "";
+          }
       }
       Locale locale = LocaleContextHolder.getLocale();
       Currency currency = Currency.getInstance(locale);

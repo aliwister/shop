@@ -80,5 +80,6 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
 
     Optional<TenantProduct> findOneBySkuAndMerchantId(String sku, Long merchantId);
 
-    List<TenantProduct> findAllByUpc(String upc);
+    @Query("SELECT tp FROM TenantProduct tp WHERE tp.upc = :upc OR tp.title LIKE %:title%")
+    List<TenantProduct> findAllByUpcOrSimilarTitle(@Param("upc") String upc, @Param("title") String title);
 }

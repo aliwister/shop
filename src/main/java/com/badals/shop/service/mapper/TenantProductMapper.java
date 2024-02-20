@@ -6,6 +6,7 @@ import com.badals.shop.domain.pojo.*;
 import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.service.CurrencyService;
 import com.badals.shop.service.dto.ProductDTO;
+import com.badals.shop.service.dto.StockDTO;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -33,6 +34,7 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
     @Mapping(target = "listPrice", source="listPrice", qualifiedByName = "withCurrencyConversionMap")
     @Mapping(target = "price", source="price", qualifiedByName = "withCurrencyConversionMap")
     @Mapping(target = "stock", source="stock", qualifiedByName = "withCountStock")
+    @Mapping(target = "merchantStock", source="stock", qualifiedByName = "withStock")
     ProductDTO toDto(TenantProduct product);
 
     @Named("mapWithBaseCurrency")
@@ -72,6 +74,21 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
 
         BigDecimal value = stock.stream().map(x -> x.getQuantity()).reduce(BigDecimal.ZERO, (a, b) -> a.add(b));
         return value.toString();
+    }
+
+    @Named("withStock")
+    public static List<StockDTO> withStock(Set<TenantStock> stock) {
+        if(stock == null || stock.isEmpty())
+            return new ArrayList<>();
+        // todo check if price and cost are same in StockDTO
+        return stock.stream().map(x -> new StockDTO(x.getId(),x.getQuantity(),
+            x.getAvailability(),x.isAllow_backorder(),
+            x.getBackorder_availability(), "", x.getLocation(),
+            x.getStore(),
+            x.getCost() != null ? x.getCost().toString() : "",
+            x.getCost() != null ? x.getCost().toString() : "",
+            x.getProduct().getMerchantId(),
+            x.getProduct().getId())).collect(Collectors.toList());
     }
 
     @Named("withBaseCurrencyMap")
@@ -125,8 +142,8 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
                 parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(lang);
         }
 
-        if(lang != null) {
-            target.setTitle(lang.getTitle());
+        if(lang != null ) {
+            target.setTitle(Objects.nonNull(lang.getTitle()) ? lang.getTitle() : source.getTitle());
             target.setFeatures(parentLang.getFeatures());
             target.setDescription(parentLang.getDescription());
         }
