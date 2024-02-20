@@ -216,7 +216,7 @@ public class TenantAdminProductService {
 //        validatePartnerProduct(dto, _new);
 
         if (!_new) {
-            master = productRepository.findByIdJoinChildren(dto.getId()).orElseThrow(() -> new ProductNotFoundException("No Product found for ID"));
+            master = productRepository.findByRefJoinChildren(dto.getId().toString()).orElseThrow(() -> new ProductNotFoundException("No Product found for ID"));
         } else {
             assert (dto.getRef() == null) : "Shouldn't define ref of a new product";
             master = partnerProductMapper.toEntity(dto);
