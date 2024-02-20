@@ -175,6 +175,17 @@ input PartnerProductInput {
     stock: [PartnerStockInput]
 }
 
+input PartnerProductPriceInput {
+    id: ID           # Auto generated
+    sku: String!
+    #ref: String  #Ignored since read only
+    slug: String!     # Must be Unique
+    price: PriceListInput
+    listPrice: PriceListInput
+    #    cost:  PriceInput # null For Parent
+
+}
+
 input PartnerStockInput {
     id: ID
     quantity: BigDecimal
