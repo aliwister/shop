@@ -1,4 +1,7 @@
 package com.badals.shop.service.dto;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -7,6 +10,8 @@ import java.util.Objects;
 /**
  * A DTO for the {@link com.badals.shop.domain.Stock} entity.
  */
+@AllArgsConstructor
+@NoArgsConstructor
 public class StockDTO implements Serializable {
 
     private Long id;

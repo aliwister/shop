@@ -160,7 +160,9 @@ type LocalizedValue {
     value: String
 }
 
+
 type Stock {
+    id : ID
     quantity: BigDecimal
     availability: Int
     allow_backorder: Boolean
