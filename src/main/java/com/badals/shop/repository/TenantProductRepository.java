@@ -79,4 +79,6 @@ public interface TenantProductRepository extends JpaRepository<TenantProduct, Lo
     List<TenantProduct> findActiveTagProductsForTenant(@Param(value = "tag") String tag, @Param(value = "tenantId") String tenantId);
 
     Optional<TenantProduct> findOneBySkuAndMerchantId(String sku, Long merchantId);
+
+    List<TenantProduct> findAllByUpc(String upc);
 }
