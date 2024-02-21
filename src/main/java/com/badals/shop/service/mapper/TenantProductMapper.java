@@ -59,6 +59,8 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
     public static String withCurrencyConversionMap(PriceMap priceMap) {
         Locale locale = LocaleContextHolder.getLocale();
         String targetCurrency = Currency.getInstance(locale).getCurrencyCode();
+        if (priceMap == null)
+            return null;
         String price = priceMap.getPriceForCurrency(targetCurrency);
         if(price == null) {
             String baseCurrency = priceMap.getBase();
@@ -121,10 +123,10 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
         target.setCurrency(targetCurrency);
         target.setInStock(true);
 
-        TenantProductLang lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(null);
+        TenantProductLang lang = Objects.requireNonNullElse(source.getLangs(),new ArrayList<TenantProductLang>()).stream().filter(x-> x!= null && x.getLang().equals(langCode)).findFirst().orElse(null);
 
         if(lang == null) {
-            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().get();
+            lang =  Objects.requireNonNullElse(source.getLangs(),new ArrayList<TenantProductLang>()).stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(null);
         }
 
         TenantProductLang parentLang = lang;
@@ -136,7 +138,7 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
         }
 
         if(lang == null && !langCode.equals("en")) {
-            lang = source.getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(null);
+            lang =  Objects.requireNonNullElse(source.getLangs(),new ArrayList<TenantProductLang>()).stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(null);
             parentLang = lang;
             if(source.getVariationType() == VariationType.CHILD)
                 parentLang = source.getParent().getLangs().stream().filter(x-> x!= null && x.getLang().equals("en")).findFirst().orElse(lang);
@@ -214,7 +216,7 @@ public interface TenantProductMapper extends EntityMapper<ProductDTO, TenantProd
             }
             // Generate variation list on the fly
 
-            for (Variation v : source.getParent().getVariations()) {
+            for (Variation v : Objects.requireNonNullElse(source.getParent().getVariations(), new ArrayList<Variation>())) {
                 for(Attribute attribute: v.getVariationAttributes()) {
                     try {
                         variationOptions.stream().filter(y -> attribute.getName().toLowerCase().startsWith(y.getName().toLowerCase())).findFirst().get().getValues().add(attribute.getValue());
