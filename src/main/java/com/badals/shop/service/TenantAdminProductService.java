@@ -86,7 +86,13 @@ public class TenantAdminProductService {
 
         //List <PartnerProduct> products = partnerProductSearchRepository.findByTenantIdEqualsAndUpcEquals(TenantContext.getCurrentTenant(), upc);
         //List <PartnerProduct> products = partnerProductSearchRepository.findByTenantEquals(TenantContext.getCurrentTenant());
-        List<TenantProduct> products = productRepository.findAllByUpcOrSimilarTitle(upc, title);
+        List<TenantProduct> products;
+        if (title != null && !title.isEmpty()) {
+            products = productRepository.findAllByUpcOrSimilarTitle(upc, title);
+        } else {
+            products = productRepository.findAllByUpc(upc);
+        }
+
         Integer total = products.size();
         ProductResponse response = new ProductResponse();
         response.setTotal(total);
