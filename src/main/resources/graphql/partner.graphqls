@@ -33,6 +33,8 @@ extend type Query {
 
 extend type Mutation {
     savePartnerProduct(product: PartnerProductInput): ProductEnvelope
+    savePartnerProductPrice(product: PartnerProductPriceInput): ProductEnvelope
+
     updateStock(stock:PartnerStockInput): PartnerStock
 
     getPartnerImageUploadUrl(filename: String, contentType: String, assetType: AssetType): PresignedUrl
@@ -179,9 +181,9 @@ input PartnerProductInput {
 
 input PartnerProductPriceInput {
     id: ID           # Auto generated
-    sku: String!
+#    sku: String!
     #ref: String  #Ignored since read only
-    slug: String!     # Must be Unique
+#    slug: String!     # Must be Unique
     price: PriceListInput
     listPrice: PriceListInput
     #    cost:  PriceInput # null For Parent
