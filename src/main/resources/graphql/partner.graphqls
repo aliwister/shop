@@ -10,6 +10,8 @@ extend type Query {
     currencies: [Currency]
     adminSearchTenantProducts(upc: String, title: String): ProductResponse
 
+    getStock(limit: Int,  offset: Int): ProductResponse #todo change this to make it more efficient
+
     partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
     partnerOrder(id: ID): Order
 

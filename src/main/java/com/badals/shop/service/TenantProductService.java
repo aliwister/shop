@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +75,15 @@ public class TenantProductService {
     }
 
 
+    @Transactional
+    public ProductResponse getPartnerProducts(Integer limit, Integer offset){
+        Page<TenantProduct> result = productRepository.findAllByVariationTypeIsNotAndNotDeleted(VariationType.CHILD, PageRequest.of((int) offset/limit,limit));  //listForTenantAll(like, VariationType.CHILD, PageRequest.of((int) offset / limit, limit));
+        ProductResponse response = new ProductResponse();
+
+        response.setHasMore(response.isHasMore());
+        response.setItems(result.stream().map(productMapper::toDto).collect(Collectors.toList()));
+        return response;
+    }
     public PartnerProduct getPartnerProduct(Long id) {
         TenantProduct product = productRepository.findByIdJoinChildren(id).get();
         return partnerProductMapper.toDto(product);

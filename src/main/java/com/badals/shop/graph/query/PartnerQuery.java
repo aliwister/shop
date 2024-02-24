@@ -18,6 +18,7 @@ import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.dto.TenantCartRuleDTO;
 import com.badals.shop.service.pojo.Partner;
 import com.badals.shop.service.pojo.PartnerProduct;
+import com.badals.shop.service.pojo.PartnerStock;
 import com.badals.shop.web.rest.errors.OrderNotFoundException;
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import org.slf4j.Logger;
@@ -44,8 +45,9 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    private final FaqCategoryService faqCategoryService;
    private final FaqQAService faqQAService;
    private final TenantCartRuleService tenantCartRuleService;
+   private final TenantStockService tenantStockService;
 
-   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService, TenantCartRuleService tenantCartRuleService) {
+   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService, TenantCartRuleService tenantCartRuleService, TenantStockService tenantStockService) {
       this.productService = productService;
       this.orderService = orderService;
       this.categoryService = categoryService;
@@ -54,7 +56,8 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
       this.pageInfoService = pageInfoService;
       this.faqCategoryService = faqCategoryService;
       this.faqQAService = faqQAService;
-        this.tenantCartRuleService = tenantCartRuleService;
+      this.tenantCartRuleService = tenantCartRuleService;
+      this.tenantStockService = tenantStockService;
    }
 
    @PreAuthorize("hasRole('ROLE_MERCHANT')")
@@ -128,6 +131,12 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    public TenantDTO tenantByName(String name) {
       return tenantService.findOneByName(name);
    }*/
+
+
+    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    public ProductResponse getStock(Integer limit, Integer offset){
+        return tenantStockService.getStock(limit, offset);
+    }
 
    //partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
    //partnerOrder(id: ID): Order
