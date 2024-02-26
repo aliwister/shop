@@ -271,8 +271,7 @@ public class TenantAdminProductService {
             master.setStock(new HashSet<>());
         master.getStock().clear();
         if (updateStock == null) {
-            //todo: check with @Ali
-            updateStock = new HashSet<>(List.of(new TenantStock()));
+            return;
         }
 
         for (TenantStock a : updateStock) {
