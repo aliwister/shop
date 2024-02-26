@@ -1,11 +1,13 @@
 package com.badals.shop.service;
 
+import com.badals.shop.domain.tenant.TenantProduct;
 import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.TenantStockRepository;
 import com.badals.shop.service.mapper.TenantStockMapper;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.pojo.PartnerStock;
+import com.badals.shop.web.rest.errors.ProductNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,9 +36,12 @@ public class TenantStockService {
     }
 
 
-    public PartnerStock update(PartnerStock stock){
-        TenantStock tenantStock = tenantStockRepository.findById(stock.getId()).orElse(null);
+    public PartnerStock update(PartnerStock stock) throws ProductNotFoundException {
+        TenantStock tenantStock = stock.getId()!=null ? tenantStockRepository.findById(stock.getId()).orElse(null) : null;
         if(tenantStock != null){
+            if(!productService.exists(stock.getProductRef()))
+                throw new ProductNotFoundException("the product with the given ref doesn't exist");
+            tenantStock = new TenantStock();
             tenantStock.setAvailability(stock.getAvailability());
             tenantStock.allow_backorder(stock.getAllow_backorder());
             tenantStock.availability(stock.getAvailability());
@@ -45,11 +50,17 @@ public class TenantStockService {
             tenantStock.setQuantity(stock.getQuantity());
             tenantStock.setBackorder_availability(stock.getBackorder_availability());
             tenantStock.setStore(stock.getStore());
+
         }else {
             tenantStock =  tenantStockMapper.toEntity(stock);
         }
 
-        return tenantStockMapper.toDto(tenantStockRepository.save(tenantStock));
+        TenantProduct tenantProduct = productService.getPartnerProductByRef(stock.getProductRef());
+        tenantProduct.addStock(tenantStock);
+
+        productService.save(tenantProduct);
+
+        return tenantStockMapper.toDto(tenantStock);
     }
 }
 

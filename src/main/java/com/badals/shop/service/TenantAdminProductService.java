@@ -212,7 +212,8 @@ public class TenantAdminProductService {
 
     @Transactional
     public PartnerProduct savePartnerProductPrice(PartnerProduct dto, boolean isSaveES) throws ProductNotFoundException, ValidationException {
-        //todo make sure we handle childer price change as well
+        //todo make sure we handle child price change as well
+        // ali said for now we only handle simple products
         Long currentMerchantId = TenantContext.getCurrentMerchantId();
         String currentTenantId = TenantContext.getCurrentTenant();
         TenantProduct update = partnerProductMapper.toEntity(dto);

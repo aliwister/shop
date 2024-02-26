@@ -198,6 +198,7 @@ input PartnerStockInput {
     link: String
     location: String
     cost: PriceInput
+    productRef: String
 }
 
 type Partner {

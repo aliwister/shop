@@ -196,7 +196,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
     }
 
     @PreAuthorize("hasRole('ROLE_MERCHANT')")
-    public PartnerStock updateStock(PartnerStock stock){
+    public PartnerStock updateStock(PartnerStock stock) throws ProductNotFoundException {
         return tenantStockService.update(stock);
     }
 

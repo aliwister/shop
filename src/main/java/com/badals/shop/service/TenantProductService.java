@@ -74,6 +74,12 @@ public class TenantProductService {
         this.tenantRepository = tenantRepository;
     }
 
+    @Transactional
+    public TenantProduct save(TenantProduct product) {
+        log.debug("Request to save TenantProduct : {}", product);
+        TenantProduct result = productRepository.save(product);
+        return productRepository.save(result);
+    }
 
     @Transactional
     public ProductResponse getPartnerProducts(Integer limit, Integer offset){
@@ -87,6 +93,10 @@ public class TenantProductService {
     public PartnerProduct getPartnerProduct(Long id) {
         TenantProduct product = productRepository.findByIdJoinChildren(id).get();
         return partnerProductMapper.toDto(product);
+    }
+
+    public TenantProduct getPartnerProductByRef(String ref) throws ProductNotFoundException {
+        return productRepository.findByRefJoinChildren(ref).orElseThrow(()->new ProductNotFoundException("profuct not found by ref"));
     }
 
     public void sanityCheck(PartnerProduct dto) {
@@ -211,8 +221,8 @@ public class TenantProductService {
         return productRepository.findBySlug(slug).map(productMapper::toDto).orElse(null);
     }
 
-    public boolean exists(String productId) {
-        if (productRepository.findOneByRef(productId).isPresent())
+    public boolean exists(String productRef) {
+        if (productRepository.findOneByRef(productRef).isPresent())
             return true;
 
         return false;
