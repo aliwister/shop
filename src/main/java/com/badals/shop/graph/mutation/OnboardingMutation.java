@@ -16,6 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +64,15 @@ public class OnboardingMutation implements GraphQLMutationResolver {
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
-    public Message createTenant(String tenantId) throws ProductNotFoundException {
+    public Message createTenant(String tenantId) throws IllegalAccessException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object userObj = authentication.getPrincipal();
+
+        if (userObj == null|| userObj.equals("anonymousUser")) {
+            throw new IllegalAccessException("Not Authorized");
+        }
+        User user = (User) userObj;
+
         Tenant tenant = new Tenant();
         tenant.setTenantId(tenantId);
         tenant.setName(tenantId);
@@ -69,7 +81,17 @@ public class OnboardingMutation implements GraphQLMutationResolver {
         tenant.setCreatedDate(LocalDate.now());
         tenant.setIsSubdomain(true);
         tenant.setMaxProducts(1000L);
+        tenant.setReplyToEmail(user.getUsername());
         tenantRepository.save(tenant);
+
+        TenantContext.setCurrentProfile("profileshop");
+        Customer customer = customerService.findByEmail(user.getUsername());
+        TenantAuthority authority = new TenantAuthority();
+        authority.setTenantId(tenantId);
+        authority.setUserId(customer.getId());
+        authority.setAuthority("ROLE_ADMIN");
+        tenantAuthorityRepository.save(authority);
+
         return new Message(tenantId + " saved successfully!");
     }
 
