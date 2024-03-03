@@ -1,12 +1,16 @@
 package com.badals.shop.service;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Authority;
 import com.badals.shop.domain.Customer;
+import com.badals.shop.domain.tenant.TenantAuthority;
 import com.badals.shop.repository.AuthorityRepository;
 import com.badals.shop.repository.CustomerRepository;
+import com.badals.shop.repository.TenantAuthorityRepository;
 import com.badals.shop.security.AuthoritiesConstants;
 import com.badals.shop.security.SecurityUtils;
 import com.badals.shop.service.dto.CustomerDTO;
+import com.badals.shop.service.dto.CustomerInfoDTO;
 import com.badals.shop.service.dto.UserDTO;
 import com.badals.shop.service.mapper.CustomerMapper;
 import com.badals.shop.service.util.RandomUtil;
@@ -38,12 +42,14 @@ public class CustomerService {
     private final PasswordEncoder passwordEncoder;
 
     private final AuthorityRepository authorityRepository;
+    private final TenantAuthorityRepository tenantAuthorityRepository;
 
-    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository) {
+    public CustomerService(CustomerRepository customerRepository, CustomerMapper customerMapper, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, TenantAuthorityRepository tenantAuthorityRepository) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
+        this.tenantAuthorityRepository = tenantAuthorityRepository;
     }
 
     /**

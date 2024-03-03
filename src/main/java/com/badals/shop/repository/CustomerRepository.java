@@ -4,8 +4,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 /**
@@ -52,4 +54,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
    Optional<Customer> findOneWithAuthoritiesByEmail(String login);
 
    Optional<Customer> findOneByEmailIgnoreCaseAndTenantId(String email, String tenantId);
+
+    List<Customer> findAllByIdIn(Set<Long> ids);
 }

@@ -35,8 +35,14 @@ public class TenantAdminAspect {
     * @return
     * @throws Throwable
     */
-   @Around(value = "execution(* com.badals.shop.service.TenantAdminProductService.*(..)) || execution(* com.badals.shop.service.TenantAdminOrderService.*(..)) || execution(* com.badals.shop.service.TenantSetupService.*(..)) || execution(* com.badals.shop.service.PageInfoService.*(..)) || execution(* com.badals.shop.service.FaqQAService.*(..)) || execution(* com.badals.shop.service.FaqCategoryService.*(..)) ||" +
-       "execution(* com.badals.shop.service.TenantCartRuleService.*(..))")
+   @Around(value = "execution(* com.badals.shop.service.TenantAdminProductService.*(..)) " +
+       "|| execution(* com.badals.shop.service.TenantAdminOrderService.*(..)) " +
+       "|| execution(* com.badals.shop.service.TenantSetupService.*(..)) " +
+       "|| execution(* com.badals.shop.service.PageInfoService.*(..)) " +
+       "|| execution(* com.badals.shop.service.FaqQAService.*(..)) " +
+       "|| execution(* com.badals.shop.service.FaqCategoryService.*(..)) " +
+       "|| execution(* com.badals.shop.service.TenantCartRuleService.*(..)) " +
+       "|| execution(* com.badals.shop.service.TenantUserManagementService.*(..))")
    public Object assignForController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
       ProfileUser userObj =  (ProfileUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -69,6 +75,27 @@ public class TenantAdminAspect {
       return assignTenant(proceedingJoinPoint, tenant);
    }
 */
+
+    // this is defined to set tenantId filter to be profileshop so admin can access users in ps_customer table
+    @Around(value = "execution(* com.badals.shop.service.TenantUserManagementService.*(..)) ")
+    public Object assignForController2(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+
+        ProfileUser userObj =  (ProfileUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (userObj == null|| userObj.equals("anonymousUser")) {
+            throw new IllegalAccessException("Not Authorized");
+        }
+        // Get the tenant the user is logged in for (done using select-store)
+        String tenant = userObj.getTenantId();
+
+        if (tenant != null) {
+            Filter filter = entityManager.unwrap(Session.class).enableFilter("tenantFilter");
+            filter.setParameter("tenantId", "profileshop");
+            filter.validate();
+        } else {
+            throw new IllegalAccessException("Not Authorized");
+        }
+        return assignTenant(proceedingJoinPoint, tenant);
+    }
 
    private Object assignTenant(ProceedingJoinPoint proceedingJoinPoint, String tenant) throws Throwable {
       try {

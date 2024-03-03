@@ -1,6 +1,7 @@
 package com.badals.shop.graph.query;
 
 import com.badals.shop.aop.tenant.TenantContext;
+import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.Currency;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.domain.pojo.Attribute;
@@ -13,6 +14,7 @@ import com.badals.shop.domain.tenant.TenantFaqQA;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
+import com.badals.shop.service.dto.CustomerInfoDTO;
 import com.badals.shop.service.dto.OrderDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
 import com.badals.shop.service.dto.TenantCartRuleDTO;
@@ -39,7 +41,7 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    private final CategoryService categoryService;
    private static final Logger log = LoggerFactory.getLogger(PartnerQuery.class);
 
-   private final UserService userService;
+   private final TenantUserManagementService userManagementService;
    private final TenantSetupService setupService;
    private final PageInfoService pageInfoService;
    private final FaqCategoryService faqCategoryService;
@@ -47,11 +49,11 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    private final TenantCartRuleService tenantCartRuleService;
    private final TenantStockService tenantStockService;
 
-   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, UserService userService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService, TenantCartRuleService tenantCartRuleService, TenantStockService tenantStockService) {
+   public PartnerQuery(TenantAdminProductService productService, TenantAdminOrderService orderService, CategoryService categoryService, TenantUserManagementService userManagementService, TenantSetupService setupService, PageInfoService pageInfoService, FaqCategoryService faqCategoryService, FaqQAService faqQAService, TenantCartRuleService tenantCartRuleService, TenantStockService tenantStockService) {
       this.productService = productService;
       this.orderService = orderService;
       this.categoryService = categoryService;
-      this.userService = userService;
+      this.userManagementService = userManagementService;
       this.setupService = setupService;
       this.pageInfoService = pageInfoService;
       this.faqCategoryService = faqCategoryService;
@@ -201,6 +203,11 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
     @PreAuthorize("hasRole('ROLE_USER')")
     public TenantCartRuleDTO couponByID(String coupon) {
         return tenantCartRuleService.getCartRuleByCoupon(coupon);
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<CustomerInfoDTO> getTenantModerators() {
+        return userManagementService.getTenantModerators();
     }
 }
 
