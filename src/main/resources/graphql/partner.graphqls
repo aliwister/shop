@@ -29,6 +29,8 @@ extend type Query {
 
     coupons: [TenantCartRuleDTO]
     couponByID(coupon: String): TenantCartRuleDTO
+
+    getTenantModerators: [UserAuth]
 }
 
 extend type Mutation {
@@ -414,4 +416,11 @@ input FaqQAInput{
 input FaqDeleteInput{
     id: ID!
     language: String
+}
+
+type UserAuth {
+    firstname: String
+    lastname: String
+    email: String
+    roles: [String]
 }
