@@ -28,7 +28,7 @@ import java.util.*;
  */
 @Entity
 @Data
-@Table(name = "product",  catalog = "profileshop")
+@Table(name = "product", catalog = "profileshop")
 @FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = "string")})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @SelectBeforeUpdate(false)
@@ -41,22 +41,26 @@ public class TenantProduct implements Serializable, TenantSupport {
     private Long id;
 
     @NaturalId
-    @Getter @Setter @Column(name = "ref")
+    @Getter
+    @Setter
+    @Column(name = "ref")
     public String ref;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String slug;
 
     @Column(name = "parent_id")
     private String parentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="parent_id", referencedColumnName = "ref", insertable = false, updatable = false)
+    @JoinColumn(name = "parent_id", referencedColumnName = "ref", insertable = false, updatable = false)
     private TenantProduct parent;
 
-    @OneToMany(cascade=CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "parent_id",referencedColumnName = "ref")
-    private Set<TenantProduct> children = new HashSet<>();;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "parent_id", referencedColumnName = "ref")
+    private Set<TenantProduct> children = new HashSet<>();
+    ;
 
     @NotNull
     @Column(name = "sku", nullable = false, unique = true)
@@ -89,31 +93,13 @@ public class TenantProduct implements Serializable, TenantSupport {
     private Boolean active;
 
     @NotNull
-    private Boolean oversize= false;
+    private Boolean oversize = false;
 
     @Column(name = "stub", nullable = false)
     private Boolean stub;
 
-    public Boolean getInStock() {
-        return inStock;
-    }
-
-    public void setInStock(Boolean inStock) {
-        this.inStock = inStock;
-    }
-
     @Column(name = "in_stock", nullable = false)
     private Boolean inStock;
-
-    public TenantProduct stub(boolean b) {
-        stub = b;
-        return this;
-    }
-
-    public TenantProduct inStock(Boolean b) {
-        inStock = b;
-        return this;
-    }
 
     @Convert(converter = StringListConverter.class)
     @Column(name = "similar_products")
@@ -137,11 +123,11 @@ public class TenantProduct implements Serializable, TenantSupport {
     private ProductGroup group;
 
     //@NotNull
-    @Column(name = "last_modified_date", nullable = false, updatable=false, insertable=false)
+    @Column(name = "last_modified_date", nullable = false, updatable = false, insertable = false)
     private Instant updated;
 
     //@NotNull
-    @Column(name = "created_date", nullable = false, updatable=false, insertable=false)
+    @Column(name = "created_date", nullable = false, updatable = false, insertable = false)
     private Instant created;
 
     @Enumerated(EnumType.STRING)
@@ -191,15 +177,21 @@ public class TenantProduct implements Serializable, TenantSupport {
     List<Attribute> variationAttributes;
 
     @Type(type = "json")
-    @Getter @Setter @Column(name = "description", columnDefinition = "string")
+    @Getter
+    @Setter
+    @Column(name = "description", columnDefinition = "string")
     List<TenantProductLang> langs = new ArrayList<>();
 
     @Type(type = "json")
-    @Getter @Setter @Column(name = "attributes", columnDefinition = "string")
+    @Getter
+    @Setter
+    @Column(name = "attributes", columnDefinition = "string")
     List<AttributesLang> attributes;
 
     @Type(type = "json")
-    @Getter @Setter @Column(name = "delivery_profiles", columnDefinition = "string")
+    @Getter
+    @Setter
+    @Column(name = "delivery_profiles", columnDefinition = "string")
     List<String> deliveryProfiles;
 
     @Type(type = "json")
@@ -211,7 +203,9 @@ public class TenantProduct implements Serializable, TenantSupport {
     PriceMap price;
 
 
-    @Column @Getter @Setter
+    @Column
+    @Getter
+    @Setter
     String rating;
 
 
@@ -219,14 +213,18 @@ public class TenantProduct implements Serializable, TenantSupport {
     @JoinColumn(name="merchant_id", insertable = false, updatable = false)
     Merchant merchant;*/
 
-    @Getter @Setter @Column(name = "merchant_id")
+    @Getter
+    @Setter
+    @Column(name = "merchant_id")
     private Long merchantId;
 
 /*    @ManyToOne
     @JoinColumn(name="tenant_id", referencedColumnName = "name", insertable = false, updatable = false)
     Tenant tenant;*/
 
-    @Getter @Setter @Column(name = "tenant_id")
+    @Getter
+    @Setter
+    @Column(name = "tenant_id")
     private String tenantId;
 
     @Column(name = "deleted")
@@ -381,13 +379,15 @@ public class TenantProduct implements Serializable, TenantSupport {
         this.children.add(child);
         child.setParentId(this.ref);
     }
+
     @ManyToMany
     @JoinTable(
-            name = "category_product",
-            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id")
+        name = "category_product",
+        joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id")
     )
     private Set<Category> categories = new HashSet<>();
+
     public TenantProduct addCategory(Category category) {
         this.categories.add(category);
         category.getProducts().add(this);
@@ -397,6 +397,24 @@ public class TenantProduct implements Serializable, TenantSupport {
     public TenantProduct removeCategory(Category category) {
         this.categories.remove(category);
         category.getProducts().remove(this);
+        return this;
+    }
+
+    public Boolean getInStock() {
+        return inStock;
+    }
+
+    public void setInStock(Boolean inStock) {
+        this.inStock = inStock;
+    }
+
+    public TenantProduct stub(boolean b) {
+        stub = b;
+        return this;
+    }
+
+    public TenantProduct inStock(Boolean b) {
+        inStock = b;
         return this;
     }
 
@@ -419,11 +437,11 @@ public class TenantProduct implements Serializable, TenantSupport {
     @Override
     public String toString() {
         return "Product{" +
-                "id=" + id +
-                ", ref=" + ref +
-                ", slug='" + slug + '\'' +
-                ", parentId=" + parentId +
-                '}';
+            "id=" + id +
+            ", ref=" + ref +
+            ", slug='" + slug + '\'' +
+            ", parentId=" + parentId +
+            '}';
     }
 
 
@@ -437,7 +455,7 @@ public class TenantProduct implements Serializable, TenantSupport {
     }
 
     public BigDecimal getComputedWeight() {
-        if(volumeWeight != null && volumeWeight.compareTo(weight) == 1) {
+        if (volumeWeight != null && volumeWeight.compareTo(weight) == 1) {
             return volumeWeight;
         }
         return weight;
@@ -456,6 +474,6 @@ public class TenantProduct implements Serializable, TenantSupport {
     public void removeTag(String tag) {
         if (this.hashtags == null)
             return;
-         this.hashtags.remove(tag);
+        this.hashtags.remove(tag);
     }
 }
