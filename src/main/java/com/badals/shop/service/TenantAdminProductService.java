@@ -13,6 +13,7 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.search.PartnerProductSearchRepository;
+import com.badals.shop.service.dto.MonthEndProductInventoryDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.service.pojo.ChildProduct;
@@ -553,5 +554,16 @@ public class TenantAdminProductService {
         partnerProductSearchRepository.saveAll(products);
     }
 
+    public List<MonthEndProductInventoryDTO> getMonthEndInventorySnapShot(){
+        // todo should we avoid children ?
+        List<TenantProduct> products = productRepository.getAllByNotDeleted();
+        return products.stream().map(tenantProduct ->
+            MonthEndProductInventoryDTO.builder()
+                .sku(tenantProduct.getSku())
+                .title(tenantProduct.getTitle())
+                .quantity(tenantProduct.getStock().stream().map(TenantStock::getQuantity).reduce(new BigDecimal(0), BigDecimal::add))
+                .build()
+            ).collect(Collectors.toList());
+    }
 
 }
