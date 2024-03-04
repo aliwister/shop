@@ -11,6 +11,7 @@ extend type Query {
     adminSearchTenantProducts(upc: String, title: String): ProductResponse
 
     getStock(limit: Int,  offset: Int): ProductResponse #todo change this to make it more efficient
+    getMonthEndInventorySnapShot: [StockReportDTO]
 
     partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean): OrderResponse
     partnerOrder(id: ID): Order
@@ -69,6 +70,12 @@ extend type Mutation {
     createCoupon(input: TenantCartRuleInput): TenantCartRuleDTO
     updateCoupon(coupon: String, input: TenantCartRuleInput): TenantCartRuleDTO
     deleteCoupon(coupon: String): Message
+}
+
+type StockReportDTO{
+    title:  String
+    sku: String
+    quantity: BigDecimal
 }
 
 enum AssetType {

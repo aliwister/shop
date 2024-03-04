@@ -14,10 +14,7 @@ import com.badals.shop.domain.tenant.TenantFaqQA;
 import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.service.*;
-import com.badals.shop.service.dto.CustomerInfoDTO;
-import com.badals.shop.service.dto.OrderDTO;
-import com.badals.shop.service.dto.ProfileHashtagDTO;
-import com.badals.shop.service.dto.TenantCartRuleDTO;
+import com.badals.shop.service.dto.*;
 import com.badals.shop.service.pojo.Partner;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.pojo.PartnerStock;
@@ -209,5 +206,10 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
     public List<CustomerInfoDTO> getTenantModerators() {
         return userManagementService.getTenantModerators();
     }
+
+    public List<MonthEndProductInventoryDTO> getMonthEndInventorySnapShot() {
+        return productService.getMonthEndInventorySnapShot();
+    }
+
 }
 
