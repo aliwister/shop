@@ -163,42 +163,42 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    public List<Attribute> sliders(String locale) {
       return setupService.getSliders(locale);
    }
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public Page pageInfos(String slug) {
        return pageInfoService.getPageInfosBySlug(slug);
    }
 
-   @PreAuthorize("hasRole('ROLE_USER')")
+   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
    public List<Page> pagesInfos(){
        return pageInfoService.getPages();
    }
 
-   @PreAuthorize("hasRole('ROLE_USER')")
+   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
    public List<TenantFaqCategory> faqCategories() {
       return faqCategoryService.getFaqCategories();
    }
 
-   @PreAuthorize("hasRole('ROLE_USER')")
+   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
    public TenantFaqCategory faqCategoryById(Long id) {
       return faqCategoryService.getFaqCategoryById(id);
    }
 
-   @PreAuthorize("hasRole('ROLE_USER')")
+   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
    public List<TenantFaqQA> faqQAs(){
        return faqQAService.getFaqQAs();
    }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public TenantFaqQA faqQAById(Long id) {
         return faqQAService.getFaqQAById(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public List<TenantCartRuleDTO> coupons() {
         return tenantCartRuleService.getCartRules();
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public TenantCartRuleDTO couponByID(String coupon) {
         return tenantCartRuleService.getCartRuleByCoupon(coupon);
     }

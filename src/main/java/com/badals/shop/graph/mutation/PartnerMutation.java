@@ -256,12 +256,12 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new Message("ok");
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public Page createPageInfo(PageInfoInput info){
         return pageInfoService.createPageInfo(info);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public Message removePageInfo(Long id) {
         PageInfo pageInfo = pageInfoService.getPageInfoById(id);
         if (pageInfo == null)
@@ -271,7 +271,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new Message("ok");
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public Message removePage(String slug){
         Page page = pageInfoService.getPageBySlug(slug);
         if (page == null)
@@ -280,45 +280,45 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new Message("ok");
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public PageInfo updatePageInfo(PageInfoInput info) throws Exception {
         return pageInfoService.updatePageInfo(info);
     }
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public Page updatePage(PageInput pageInput) throws Exception {
         return pageInfoService.updatePage(pageInput);
     }
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public TenantFaqCategory createFaqCategoryName(FaqCategoryNameInput faqCategoryNameInput){
         return faqCategoryService.addCategory(faqCategoryNameInput);
     }
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public TenantFaqQA createFaqQA(FaqQAInput faqQAInput){
         return faqQAService.addQA(faqQAInput);
     }
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public TenantFaqCategory updateFaqCategoryName(FaqCategoryNameInput faqCategoryNameInput){
         return faqCategoryService.updateCategory(faqCategoryNameInput);
     }
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public TenantFaqQA updateFaqQA(FaqQAInput faqQAInput){
         return faqQAService.updateQA(faqQAInput);
     }
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public Message removeFaqCategoryName(FaqDeleteInput faqDeleteInput) {
         return faqCategoryService.deleteCategory(faqDeleteInput);
     }
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public Message removeFaqQA(FaqDeleteInput faqDeleteInput){
         return faqQAService.deleteQA(faqDeleteInput);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public TenantCartRuleDTO createCoupon(TenantCartRuleDTO input){
         return tenantCartRuleService.addCartRule(input);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT','ROLE_USER')")
     public TenantCartRuleDTO updateCoupon(String coupon, TenantCartRuleDTO input){
         return tenantCartRuleService.updateCartRule(coupon, input);
     }
