@@ -59,16 +59,16 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
       this.tenantStockService = tenantStockService;
    }
 
-   @PreAuthorize("hasRole('ROLE_MERCHANT')")
+   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public PartnerProduct partnerProduct(String id) {
        return productService.getPartnerProduct(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
    public ProductResponse partnerProducts(String search, Integer limit, Integer offset, Boolean active) {
       return productService.findPartnerProducts(search, limit, offset, active);
    }
-   @PreAuthorize("hasRole('ROLE_MERCHANT')")
+   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
    public VariationOption variationOptions(String name) {
       if (name.equals("size")) {
          return new VariationOption("size", "Size", new ArrayList<String>(){{add("Small"); add("Medium"); add("Large");}});
@@ -97,7 +97,8 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
       return List.of(new Attribute("deliveryProfile", "default"), new Attribute("deliveryProfile", "nol+dhl"), new Attribute("deliveryProfile", "pickup"));
    }
 
-   @PreAuthorize("hasRole('ROLE_MERCHANT')")
+//   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
    public List<I18String> brands() {
       return new ArrayList<I18String>(){{
          add(new I18String("en", "Coach"));
@@ -106,7 +107,7 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
          add(new I18String("en", "Guess"));
       }};
    }
-   @PreAuthorize("hasRole('ROLE_MERCHANT')")
+   @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
    public List<I18String> collections() {
       return new ArrayList<I18String>(){{
          add(new I18String("en", "Fashion"));
@@ -132,14 +133,14 @@ public class PartnerQuery extends BaseQuery implements GraphQLQueryResolver {
    }*/
 
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public ProductResponse getStock(Integer limit, Integer offset){
         return tenantStockService.getStock(limit, offset);
     }
 
    //partnerOrders(state: [OrderState], offset: Int, limit: Int, searchText: String): OrderResponse
    //partnerOrder(id: ID): Order
-   //@PreAuthorize("hasRole('ROLE_MERCHANT')")
+   //@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
    public OrderResponse partnerOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance) throws OrderNotFoundException {
       return orderService.getOrders(orderState, offset, limit, searchText, balance);
       //return orders;

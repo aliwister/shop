@@ -30,7 +30,7 @@ public class TenantStockService {
         this.productService = productService;
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public ProductResponse getStock(Integer limit, Integer offset) {
         return productService.getPartnerProducts(limit, offset);
     }

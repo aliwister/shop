@@ -82,7 +82,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new Message("success");
     }*/
 
-    //@PreAuthorize("hasRole('ROLE_MERCHANT')")
+    //@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public PresignedUrl getImageUploadUrl(String filename, String contentType) {
         String t =  TenantContext.getCurrentTenant();
         String m = TenantContext.getCurrentMerchant();
@@ -149,7 +149,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public ProductEnvelope savePartnerProduct(PartnerProduct product) throws ProductNotFoundException {
         PartnerProduct p = null;
         StringBuilder message = new StringBuilder();
@@ -172,7 +172,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new ProductEnvelope(p, message.toString(), code);
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public ProductEnvelope savePartnerProductPrice(PartnerProduct product) throws ProductNotFoundException {
         PartnerProduct p = null;
         StringBuilder message = new StringBuilder();
@@ -195,12 +195,12 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return new ProductEnvelope(p, message.toString(), code);
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public PartnerStock updateStock(PartnerStock stock) throws ProductNotFoundException {
         return tenantStockService.update(stock);
     }
 
-    //@PreAuthorize("hasRole('ROLE_MERCHANT')")
+    //@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public PresignedUrl getPartnerImageUploadUrl(String filename, String contentType, AssetType assetType) {
         return productService.getS3UploadUrl(filename, contentType, assetType);
     }
@@ -236,12 +236,12 @@ public class PartnerMutation implements GraphQLMutationResolver {
 
 
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public Message publishProduct(Long id) throws ProductNotFoundException {
         productService.setProductPublished(id, true);
         return new Message("Product published successfully");
     }
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public Message unpublishProduct(Long id) throws ProductNotFoundException {
         productService.setProductPublished(id, false);
         return new Message("Product set to draft successfully");
@@ -250,7 +250,7 @@ public class PartnerMutation implements GraphQLMutationResolver {
         return null;
     }
 
-    @PreAuthorize("hasRole('ROLE_MERCHANT')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MERCHANT')")
     public Message deleteProduct(Long id) throws ProductNotFoundException {
         productService.deleteProduct(id);
         return new Message("ok");
