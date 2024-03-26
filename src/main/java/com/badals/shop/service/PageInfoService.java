@@ -32,6 +32,7 @@ public class PageInfoService {
             Page new_page = new Page();
             new_page.setSlug(pageInfoInput.getSlug());
             new_page.setIsImportant(pageInfoInput.getIsImportant());
+            new_page.setEnabled(pageInfoInput.getEnabled());
             page = pageRepository.save(new_page);
         }
         PageInfo pageInfo = new PageInfo();

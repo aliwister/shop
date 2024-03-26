@@ -376,6 +376,7 @@ input PageInfoInput {
     isImportant : Boolean
     info: String
     language: String!
+    enabled: Boolean
 }
 
 type FaqCategory {

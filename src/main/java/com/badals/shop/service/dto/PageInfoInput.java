@@ -16,4 +16,5 @@ public class PageInfoInput implements Serializable {
     @NotNull
     private String info;
     private Boolean isImportant;
+    private Boolean enabled;
 }
