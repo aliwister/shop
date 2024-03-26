@@ -15,7 +15,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Repository
 public interface TenantHashtagRepository extends JpaRepository<TenantHashtag, Long> {
-    @Cacheable(value = "tags")
+//    @Cacheable(value = "tags")
     @Query("from TenantHashtag p where p.tenantId = ?1")
     List<TenantHashtag> findForList(String tenantId);
 
