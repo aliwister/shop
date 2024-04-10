@@ -1,5 +1,6 @@
 package com.badals.shop.controller;
 
+import com.badals.shop.aop.tenant.TenantContext;
 import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.tenant.Tenant;
 import com.badals.shop.repository.CustomerRepository;
@@ -94,7 +95,7 @@ public class UserJWTController {
                 GoogleIdToken.Payload payload = googleIdToken.getPayload();
 
                 String email = payload.getEmail();
-                Customer user = customerRepository.findOneByEmailIgnoreCaseAndTenantId(email, com.badals.shop.domain.User.tenantFilter).orElse(null);
+                Customer user = customerRepository.findOneByEmailIgnoreCaseAndTenantId(email, TenantContext.getCurrentProfile()).orElse(null);
                 if (user == null) {
                     UserDTO userDTO = new UserDTO();
                     userDTO.setEmail(email);
