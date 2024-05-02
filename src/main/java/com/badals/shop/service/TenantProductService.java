@@ -9,7 +9,6 @@ import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.TenantHashtagRepository;
 import com.badals.shop.repository.TenantProductRepository;
 import com.badals.shop.repository.TenantRepository;
-import com.badals.shop.repository.search.ProductSearchRepository;
 import com.badals.shop.service.dto.MerchantDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.dto.ProfileHashtagDTO;
@@ -51,14 +50,13 @@ public class TenantProductService {
     private final TenantHashtagMapper tenantHashtagMapper;
     private final TenantProductMapper productMapper;
 
-    private final ProductSearchRepository productSearchRepository;
     private final TenantService tenantService;
     private final RecycleService recycleService;
     private final SlugService slugService;
     private final MerchantService merchantService;
     private final TenantRepository tenantRepository;
 
-    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper productMapper, ProductSearchRepository productSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, MerchantService merchantService, TenantRepository tenantRepository) {
+    public TenantProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantHashtagRepository hashtagRepository, TenantHashtagMapper tenantHashtagMapper, TenantProductMapper productMapper, TenantService tenantService, RecycleService recycleService, SlugService slugService, MerchantService merchantService, TenantRepository tenantRepository) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
         this.partnerProductMapper = partnerProductMapper;
@@ -66,7 +64,6 @@ public class TenantProductService {
         this.hashtagRepository = hashtagRepository;
         this.tenantHashtagMapper = tenantHashtagMapper;
         this.productMapper = productMapper;
-        this.productSearchRepository = productSearchRepository;
         this.tenantService = tenantService;
         this.recycleService = recycleService;
         this.slugService = slugService;

@@ -11,7 +11,6 @@ import com.badals.shop.graph.OrderResponse;
 import com.badals.shop.repository.AddressRepository;
 import com.badals.shop.repository.TenantOrderRepository;
 import com.badals.shop.repository.TenantPaymentRepository;
-import com.badals.shop.repository.search.OrderSearchRepository;
 
 import com.badals.shop.service.dto.CustomerDTO;
 import com.badals.shop.service.dto.OrderDTO;
@@ -57,7 +56,6 @@ public class TenantAdminOrderService {
 
     private final TenantOrderRepository orderRepository;
     private final TenantPaymentRepository paymentRepository;
-    private final OrderSearchRepository orderSearchRepository;
     private final TenantOrderMapper orderMapper;
     private final CustomerService customerService;
     private final MessageSource messageSource;
@@ -68,10 +66,9 @@ public class TenantAdminOrderService {
     private final TenantCartService cartService;
     private final CustomerMapper customerMapper;
 
-    public TenantAdminOrderService(TenantOrderRepository orderRepository, TenantPaymentRepository paymentRepository, OrderSearchRepository orderSearchRepository, TenantOrderMapper orderMapper, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService, CustomerMapper customerMapper) {
+    public TenantAdminOrderService(TenantOrderRepository orderRepository, TenantPaymentRepository paymentRepository, TenantOrderMapper orderMapper, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, AddressRepository addressRepository, TenantCartService cartService, CustomerMapper customerMapper) {
         this.orderRepository = orderRepository;
         this.paymentRepository = paymentRepository;
-        this.orderSearchRepository = orderSearchRepository;
         this.orderMapper = orderMapper;
         this.customerService = customerService;
         this.messageSource = messageSource;
@@ -179,7 +176,7 @@ public class TenantAdminOrderService {
         //order.setDeliveryAddress(cart.getDeliveryAddress());
         order.setEmail(cart.getEmail());
         order.setOrderState(OrderState.DELIVERED);
-        
+
         String orderRef = generateOrderId(1);
         String uiud = createUIUD();
 
@@ -242,7 +239,7 @@ public class TenantAdminOrderService {
         orderRepository.save(order);
         orderRepository.refresh(order);
         OrderDTO orderDTO = orderMapper.toDto(order);
-        orderSearchRepository.save(orderDTO);
+//        orderSearchRepository.save(orderDTO);
         //orderDTO.getOrderItems().stream().forEach(x -> orderItemSearchRepository.save(x));
     }
     @Transactional
@@ -365,7 +362,7 @@ public class TenantAdminOrderService {
         if(dtos.isEmpty())
             return;
         //dtos.stream().forEach(x -> orderSearchRepository.index(x));
-        orderSearchRepository.saveAll(dtos);
+//        orderSearchRepository.saveAll(dtos);
         //dtos.forEach(dto -> orderItemSearchRepository.saveAll(dto.getOrderItems()));
     }
 }

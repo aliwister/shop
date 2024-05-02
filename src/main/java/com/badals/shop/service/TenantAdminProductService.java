@@ -12,7 +12,6 @@ import com.badals.shop.domain.tenant.TenantStock;
 import com.badals.shop.graph.ProductResponse;
 import com.badals.shop.repository.S3UploadRequestRepository;
 import com.badals.shop.repository.TenantProductRepository;
-import com.badals.shop.repository.search.PartnerProductSearchRepository;
 import com.badals.shop.service.dto.MonthEndProductInventoryDTO;
 import com.badals.shop.service.dto.ProductDTO;
 import com.badals.shop.service.mapper.*;
@@ -52,9 +51,6 @@ public class TenantAdminProductService {
     private final ChildProductMapper childProductMapper;
 
     private final TenantProductMapper productMapper;
-
-    private final PartnerProductSearchRepository partnerProductSearchRepository;
-
     private final TenantService tenantService;
     private final RecycleService recycleService;
     private final SlugService slugService;
@@ -63,13 +59,12 @@ public class TenantAdminProductService {
     private final IndexService indexService;
     private final TenantProductMapper tenantProductMapper;
 
-    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, PartnerProductSearchRepository partnerProductSearchRepository, TenantService tenantService, RecycleService recycleService, SlugService slugService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService, IndexService indexService, TenantProductMapper tenantProductMapper) {
+    public TenantAdminProductService(TenantProductRepository productRepository, MessageSource messageSource, PartnerProductMapper partnerProductMapper, ChildProductMapper childProductMapper, TenantProductMapper productMapper, TenantService tenantService, RecycleService recycleService, SlugService slugService, S3UploadRequestRepository s3UploadRequestRepository, AwsService awsService, IndexService indexService, TenantProductMapper tenantProductMapper) {
         this.productRepository = productRepository;
         this.messageSource = messageSource;
         this.partnerProductMapper = partnerProductMapper;
         this.childProductMapper = childProductMapper;
         this.productMapper = productMapper;
-        this.partnerProductSearchRepository = partnerProductSearchRepository;
         this.tenantService = tenantService;
         this.recycleService = recycleService;
         this.slugService = slugService;
@@ -206,8 +201,8 @@ public class TenantAdminProductService {
         TenantProduct tp = productRepository.save(master);
 
         PartnerProduct esDto = partnerProductMapper.toDto(tp);
-        if(isSaveES)
-            partnerProductSearchRepository.save(esDto);
+//        if(isSaveES)
+//            partnerProductSearchRepository.save(esDto);
         return partnerProductMapper.toDto(tp);
     }
 
@@ -261,8 +256,8 @@ public class TenantAdminProductService {
         TenantProduct tp = productRepository.save(master);
 
         PartnerProduct esDto = partnerProductMapper.toDto(tp);
-        if (isSaveES)
-            partnerProductSearchRepository.save(esDto);
+//        if (isSaveES)
+//            partnerProductSearchRepository.save(esDto);
         return partnerProductMapper.toDto(tp);
     }
 
@@ -551,7 +546,7 @@ public class TenantAdminProductService {
     public void reIndex(Long from, Long to) {
         List<PartnerProduct> products = productRepository.findAllByIdBetween(from, to).stream().map(partnerProductMapper::toDto).collect(Collectors.toList());
         //indexService.indexMulti(partnerProductMapper.toIndexProductDto(products.get(0)));
-        partnerProductSearchRepository.saveAll(products);
+//        partnerProductSearchRepository.saveAll(products);
     }
 
     public List<MonthEndProductInventoryDTO> getMonthEndInventorySnapShot(){

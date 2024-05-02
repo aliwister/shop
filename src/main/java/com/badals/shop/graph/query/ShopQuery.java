@@ -120,7 +120,8 @@ public class ShopQuery extends BaseQuery implements GraphQLQueryResolver {
 
    //@PreAuthorize("hasRole('ROLE_USER')")
    public CustomerDTO me() {
-      return cartService.me();
+       System.out.println("me");
+        return cartService.me();
    }
 
    //@PreAuthorize("hasRole('ROLE_USER')")

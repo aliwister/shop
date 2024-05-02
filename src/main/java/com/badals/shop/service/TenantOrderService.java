@@ -12,7 +12,6 @@ import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.badals.shop.domain.tenant.TenantReward;
 import com.badals.shop.repository.*;
-import com.badals.shop.repository.search.OrderSearchRepository;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.graph.OrderResponse;
@@ -74,14 +73,13 @@ public class TenantOrderService {
     private final CustomerMapper customerMapper;
     private final AddressRepository addressRepository;
     private final TenantCartService cartService;
-    private final OrderSearchRepository orderSearchRepository;
     private final CheckoutRepository checkoutRepository;
     private final TenantRewardRepository rewardRepository;
     private final PointRepository pointRepository;
     private final PointUsageHistoryRepository pointUsageHistoryRepository;
     private final PointCustomerRepository pointCustomerRepository;
 
-    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService, OrderSearchRepository orderSearchRepository, CheckoutRepository checkoutRepository, TenantRewardRepository rewardRepository, PointRepository pointRepository, PointUsageHistoryRepository pointUsageHistoryRepository, PointCustomerRepository pointCustomerRepository) {
+    public TenantOrderService(TenantOrderRepository orderRepository, TenantOrderMapper orderMapper, UserService userService, CustomerService customerService, MessageSource messageSource, MailService mailService, AuditReader auditReader, CheckoutAddressMapper checkoutAddressMapper, CustomerMapper customerMapper, AddressRepository addressRepository, TenantCartService cartService, CheckoutRepository checkoutRepository, TenantRewardRepository rewardRepository, PointRepository pointRepository, PointUsageHistoryRepository pointUsageHistoryRepository, PointCustomerRepository pointCustomerRepository) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.userService = userService;
@@ -93,7 +91,6 @@ public class TenantOrderService {
         this.customerMapper = customerMapper;
         this.addressRepository = addressRepository;
         this.cartService = cartService;
-        this.orderSearchRepository = orderSearchRepository;
         this.checkoutRepository = checkoutRepository;
         this.rewardRepository = rewardRepository;
         this.pointRepository = pointRepository;
@@ -188,7 +185,7 @@ public class TenantOrderService {
     }
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance, Boolean isAsc, BigDecimal minBal) {
         if(searchText.length() > 2 || balance) {
-            return searchOrders(orderState, offset, limit, searchText, balance, isAsc, minBal);
+//            return searchOrders(orderState, offset, limit, searchText, balance, isAsc, minBal);
         }
 
         Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
@@ -201,41 +198,41 @@ public class TenantOrderService {
 
     }
 
-    public OrderResponse searchOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance, Boolean isAsc, BigDecimal minBal) {
-        OrderResponse response = new OrderResponse();
-        Double minBalance = minBal.doubleValue();
-        List<OrderDTO> orders = null;
-        Page<OrderDTO> page = null;
-        if(!balance) minBalance = -100000.0;
-        if (searchText != null && searchText.length() > 0) {
-            String states = new Gson().toJson(orderState);
-            page= orderSearchRepository.searchByKeyword(searchText, states, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id"))));
-
-            orders = StreamSupport
-                    .stream(page.spliterator(), false).collect(Collectors.toList());
-
-        }
-        else if(balance) {
-            if(isAsc) {
-                page = orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset / limit, limit, new Sort(new Sort.Order(Sort.Direction.ASC, "id"))));
-                orders = StreamSupport
-                        .stream(page.spliterator(), false).collect(Collectors.toList());
-            }
-            else {
-                page = orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateDesc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset / limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC, "id"))));
-                orders = StreamSupport
-                        .stream(page.spliterator(), false).collect(Collectors.toList());
-            }
-        }
-        else
-            orders = StreamSupport
-                    .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
-
-        response.setItems(orders);
-        response.setTotal(orders.size());
-        response.setHasMore((limit+offset) < page.getTotalElements());
-        return response;
-    }
+//    public OrderResponse searchOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance, Boolean isAsc, BigDecimal minBal) {
+//        OrderResponse response = new OrderResponse();
+//        Double minBalance = minBal.doubleValue();
+//        List<OrderDTO> orders = null;
+//        Page<OrderDTO> page = null;
+//        if(!balance) minBalance = -100000.0;
+//        if (searchText != null && searchText.length() > 0) {
+//            String states = new Gson().toJson(orderState);
+//            page= orderSearchRepository.searchByKeyword(searchText, states, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id"))));
+//
+//            orders = StreamSupport
+//                    .stream(page.spliterator(), false).collect(Collectors.toList());
+//
+//        }
+//        else if(balance) {
+//            if(isAsc) {
+//                page = orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateAsc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset / limit, limit, new Sort(new Sort.Order(Sort.Direction.ASC, "id"))));
+//                orders = StreamSupport
+//                        .stream(page.spliterator(), false).collect(Collectors.toList());
+//            }
+//            else {
+//                page = orderSearchRepository.findAllByOrderStateInAndBalanceGreaterThanEqualAndTenantIdOrderByInvoiceDateDesc(orderState, minBalance, TenantContext.getCurrentProfile(), PageRequest.of((int) offset / limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC, "id"))));
+//                orders = StreamSupport
+//                        .stream(page.spliterator(), false).collect(Collectors.toList());
+//            }
+//        }
+//        else
+//            orders = StreamSupport
+//                    .stream(orderSearchRepository.search(queryStringQuery(searchText), PageRequest.of((int) offset/limit, limit, new Sort(new Sort.Order(Sort.Direction.DESC,"id")))).spliterator(), false).collect(Collectors.toList());
+//
+//        response.setItems(orders);
+//        response.setTotal(orders.size());
+//        response.setHasMore((limit+offset) < page.getTotalElements());
+//        return response;
+//    }
 
     public Optional<OrderDTO> getOrderWithOrderItems(Long id) {
         return orderRepository.findForOrderDetails(id, String.valueOf(id)).map(orderMapper::toDto);
@@ -277,7 +274,7 @@ public class TenantOrderService {
     private OrderDTO save(TenantOrder order) {
         order = orderRepository.save(order);
         OrderDTO dto = orderMapper.toDto(order);
-        orderSearchRepository.save(dto);
+//        orderSearchRepository.save(dto);
         return dto;
     }
 
