@@ -97,6 +97,11 @@ public class TenantCart implements Serializable, TenantSupport {
     @Column(name="tenant_id")
     private String tenantId;
 
+    @Getter
+    @Setter
+    @Type(type = "json")
+    @Column(name = "additional_info")
+    private String additionalInfo;
 
 
     public List<TenantCartItem> getCartItems() {

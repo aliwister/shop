@@ -5,6 +5,8 @@ import com.badals.shop.domain.pojo.*;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.*;
 import org.hibernate.envers.NotAudited;
 
@@ -102,6 +104,13 @@ public class Checkout implements Serializable, TenantSupport {
     @Type(type = "json")
     @Column(name = "new_adjustments", columnDefinition = "string")
     private List<CheckoutOrderAdjustment> checkoutAdjustments;
+
+    @Getter
+    @Setter
+    @Type(type = "json")
+    @Column(name = "additional_info")
+    private String additionalInfo;
+
 
 
     @Override

@@ -19,6 +19,7 @@ public interface TenantCartMapper extends EntityMapper<CartDTO, TenantCart> {
 
     @Mapping(target = "cartRule", source = "cart.cartRule")
     @Mapping(target = "adjustments", source = "cart.adjustments")
+    @Mapping(target = "additionalInfo", source = "cart.additionalInfo")
     CartDTO toDto(TenantCart cart);
 
     TenantCart toEntity(CartDTO cartDTO);

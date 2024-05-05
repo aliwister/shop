@@ -137,7 +137,7 @@ public class TenantCartService {
     }
 
     @Transactional
-    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge) {
+    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge, String additional_info) {
         TenantCart cart = null;
         Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
         log.info("Logged in user " + loginUser);
@@ -165,17 +165,21 @@ public class TenantCartService {
                 }
                 cart.setCartState(CartState.CLAIMED);
                 cart.setCustomer(loginUser);
+                cart.setAdditionalInfo(additional_info);
                 return this.mergeCart(cart, items, false);
             }
             if (cart != null) {
                 List<CartItemDTO> mergelist = cart.getCartItems().stream().map(x -> new CartItemDTO().productId(x.getProductId()).quantity(x.getQuantity())).collect(Collectors.toList());
                 cart.getCartItems().clear();
+                newCart.setAdditionalInfo(additional_info);
                 //if (isMerge)
                 return this.mergeCart(newCart, mergelist, true);
             }
             else
                 return this.mergeCart(newCart, items, false);
+
         }
+        cart.setAdditionalInfo(additional_info);
 
         if (cart.getCartState() == CartState.CLAIMED && cart.getCustomerId() != null) {
             if(loginUser.getId().longValue() == cart.getCustomerId() )
@@ -417,6 +421,7 @@ public class TenantCartService {
         checkout.setItems(cartItems.stream().map(checkoutLineItemMapper::cartItemToLineItem).collect(Collectors.toList()));
         checkout.setCartWeight(cartItems.stream().map(x -> x.getWeight().multiply(x.getQuantity())).reduce(BigDecimal.ZERO, BigDecimal::add));
         checkout.setCurrency(currency);
+        checkout.setAdditionalInfo(cart.getAdditionalInfo());
 
         //checkout.setLock(false);
         if (customer != null && customer.getAddresses() != null && customer.getAddresses().size() > 0)
