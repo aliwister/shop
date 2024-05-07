@@ -44,6 +44,11 @@ public class TrustOrderQuery extends BaseQuery implements GraphQLQueryResolver {
       //return orders;
    }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public OrderResponse orderHistory(List<OrderState> orderState, Integer offset, Integer limit) {
+        return orderService.getOrders(orderState, offset, limit);
+    }
+
    @PreAuthorize("hasRole('ROLE_ADMIN')")
    public List<PaymentDTO> payments(long orderId) {
       return paymentService.findForOrder(orderId);

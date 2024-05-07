@@ -137,6 +137,10 @@ public class TenantOrder extends Auditable implements Serializable, TenantSuppor
     @Column(name = "adjustments", columnDefinition = "string")
     private List<OrderAdjustment> orderAdjustments;
 
+    @Type(type = "json")
+    @Column(name = "additional_info")
+    private String additionalInfo;
+
     public TenantOrder(Long orderId) {
         this.id = orderId;
     }

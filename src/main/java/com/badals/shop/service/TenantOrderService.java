@@ -198,6 +198,18 @@ public class TenantOrderService {
 
     }
 
+    public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit) {
+
+        Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
+        OrderResponse response = new OrderResponse();
+        response.setTotal(orders.getSize());
+        response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
+        Integer total = orderRepository.countForState(orderState);
+        response.setHasMore((limit+offset) < total);
+        return response;
+
+    }
+
 //    public OrderResponse searchOrders(List<OrderState> orderState, Integer offset, Integer limit, String searchText, Boolean balance, Boolean isAsc, BigDecimal minBal) {
 //        OrderResponse response = new OrderResponse();
 //        Double minBalance = minBal.doubleValue();

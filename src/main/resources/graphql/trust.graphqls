@@ -6,6 +6,7 @@ extend type Query {
     merchants: [Merchant]
 
     ordersA(state: [OrderState], offset: Int, limit: Int, searchText: String, balance: Boolean, isAsc: Boolean, minBal: BigDecimal): OrderResponse
+    orderHistory(state: [OrderState], offset: Int, limit: Int): OrderResponse
     orderA(id: ID): Order
     auditActivity(id: ID, type: String) : [Action]
     payments(orderId: ID) : [Payment]
@@ -189,6 +190,7 @@ type Order {
     channel: OrderChannel
     email: String
     orderAdjustments: [OrderAdjustment]
+    additionalInfo: String
 }
 
 type OrderAdjustment {
