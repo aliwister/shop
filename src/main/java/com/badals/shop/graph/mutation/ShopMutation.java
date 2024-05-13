@@ -131,6 +131,10 @@ public class ShopMutation implements GraphQLMutationResolver {
     //@PreAuthorize("hasRole('ROLE_USER')")
     public CheckoutSession createTenantCheckout(final String secureKey, final List<CartItemDTO> items) {
         String token = cartService.createCheckout(secureKey, items);
+
+        if(TenantContext.getCurrentProfile().equalsIgnoreCase("instanna"))
+            return new CheckoutSession("/checkout/" + token + "/payment", token);
+
         return new CheckoutSession("/checkout/" + token + "/address", token);
     }
 
