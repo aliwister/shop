@@ -5,15 +5,13 @@ import com.badals.shop.domain.enumeration.DiscountSource;
 import com.badals.shop.domain.pojo.*;
 import com.badals.shop.domain.tenant.Checkout;
 import com.badals.shop.domain.tenant.TenantCartRule;
-import com.badals.shop.service.dto.CustomerDTO;
+import com.badals.shop.service.dto.*;
 import com.badals.shop.service.mapper.*;
 import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.domain.tenant.TenantCart;
 import com.badals.shop.domain.tenant.TenantCartItem;
 import com.badals.shop.repository.*;
 import com.badals.shop.repository.projection.CartItemInfo;
-import com.badals.shop.service.dto.CartDTO;
-import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.pojo.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +135,7 @@ public class TenantCartService {
     }
 
     @Transactional
-    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge, String additional_info) {
+    public CartDTO updateCart(String secureKey, List<CartItemDTO> items, boolean isMerge, AdditionalInfoDto additional_info) {
         TenantCart cart = null;
         Customer loginUser = customerService.getUserWithAuthorities().orElse(null);
         log.info("Logged in user " + loginUser);

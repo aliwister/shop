@@ -2,6 +2,7 @@ package com.badals.shop.domain.tenant;
 
 import com.badals.shop.aop.tenant.TenantSupport;
 import com.badals.shop.domain.pojo.*;
+import com.badals.shop.service.dto.AdditionalInfoDto;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Data;
@@ -109,7 +110,7 @@ public class Checkout implements Serializable, TenantSupport {
     @Setter
     @Type(type = "json")
     @Column(name = "additional_info")
-    private String additionalInfo;
+    private AdditionalInfoDto additionalInfo;
 
 
 

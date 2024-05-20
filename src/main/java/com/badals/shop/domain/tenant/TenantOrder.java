@@ -9,6 +9,7 @@ import com.badals.shop.domain.enumeration.OrderState;
 
 import com.badals.shop.domain.pojo.AddressPojo;
 import com.badals.shop.domain.pojo.OrderAdjustment;
+import com.badals.shop.service.dto.AdditionalInfoDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.hibernate.annotations.Filter;
@@ -139,7 +140,7 @@ public class TenantOrder extends Auditable implements Serializable, TenantSuppor
 
     @Type(type = "json")
     @Column(name = "additional_info")
-    private String additionalInfo;
+    private AdditionalInfoDto additionalInfo;
 
     public TenantOrder(Long orderId) {
         this.id = orderId;

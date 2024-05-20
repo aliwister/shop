@@ -43,7 +43,7 @@ public class CartDTO implements Serializable {
 
     private TenantCartRule cartRule;
 
-    private String additionalInfo;
+    private AdditionalInfoDto additionalInfo;
 
     @Override
     public boolean equals(Object o) {

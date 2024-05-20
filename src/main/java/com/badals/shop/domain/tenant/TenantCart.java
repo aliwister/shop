@@ -6,6 +6,7 @@ import com.badals.shop.domain.Customer;
 import com.badals.shop.domain.enumeration.CartState;
 import com.badals.shop.domain.pojo.AdjustmentProfile;
 import com.badals.shop.domain.pojo.OrderAdjustment;
+import com.badals.shop.service.dto.AdditionalInfoDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
@@ -101,7 +102,7 @@ public class TenantCart implements Serializable, TenantSupport {
     @Setter
     @Type(type = "json")
     @Column(name = "additional_info")
-    private String additionalInfo;
+    private AdditionalInfoDto additionalInfo;
 
 
     public List<TenantCartItem> getCartItems() {

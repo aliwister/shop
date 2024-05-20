@@ -190,7 +190,7 @@ type Order {
     channel: OrderChannel
     email: String
     orderAdjustments: [OrderAdjustment]
-    additionalInfo: String
+    additionalInfo: AdditionalInfoDto
 }
 
 type OrderAdjustment {

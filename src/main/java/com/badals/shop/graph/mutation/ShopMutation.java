@@ -6,15 +6,12 @@ import com.badals.shop.domain.enumeration.AssetType;
 import com.badals.shop.domain.pojo.Attribute;
 import com.badals.shop.domain.pojo.LineItem;
 import com.badals.shop.domain.tenant.*;
-import com.badals.shop.service.dto.ProductDTO;
-import com.badals.shop.service.dto.ProfileHashtagDTO;
+import com.badals.shop.service.dto.*;
 import com.badals.shop.service.pojo.Message;
 import com.badals.shop.service.pojo.PresignedUrl;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.graph.CartResponse;
 import com.badals.shop.service.*;
-import com.badals.shop.service.dto.CartDTO;
-import com.badals.shop.service.dto.CartItemDTO;
 import com.badals.shop.service.pojo.CheckoutSession;
 import com.badals.shop.service.pojo.PartnerProduct;
 import com.badals.shop.service.pojo.ProductEnvelope;
@@ -72,7 +69,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
-    public CartResponse updateTenantCart(final String secureKey, final List<CartItemDTO> items, boolean isMerge, String additional_info) {
+    public CartResponse updateTenantCart(final String secureKey, final List<CartItemDTO> items, boolean isMerge, AdditionalInfoDto additional_info) {
         Locale l = LocaleContextHolder.getLocale();
         CartDTO cart = this.cartService.updateCart(secureKey, items, isMerge, additional_info);
         CartResponse response = new CartResponse();

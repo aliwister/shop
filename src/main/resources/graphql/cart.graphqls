@@ -14,7 +14,7 @@ type Cart {
     currency: String
     adjustments: AdjustmentProfile
     cartRule: TenantCartRule
-    additionalInfo: String
+    additionalInfo: AdditionalInfoDto
 }
 
 type Wishlist {
@@ -200,4 +200,124 @@ input TenantCartRuleInput{
     discountType: DiscountType!
     reductionType: DiscountReductionType!
     discount: String
+}
+
+
+type AdditionalInfoDto {
+    date: String
+    zipcode: String
+    sender_zipcode: String
+    email: String
+    name: String
+    company: String
+    city: String
+    state: String
+    address: String
+    address_opt: String
+    sender_name: String
+    sender_company: String
+    sender_address: String
+    sender_address_opt: String
+    sender_city: String
+    items: [Item]
+    requestedPackageLineItems: [PackageLineItem]
+    sender_phone: String
+    receiver_phone: String
+    receiver_countryCode: String
+}
+
+type Item {
+    name: String
+    description: String
+    harmonizedCode: String
+    countryOfManufacture: String
+    quantity: Int
+    quantityUnits: String
+    weight: Weight
+    customsValue: CustomsValue
+    partNumber: String
+    numberOfPieces: Int
+    unitPrice: String# Assuming unitPrice is an object, can be customized as needed
+}
+
+type Weight {
+    value: Float
+    units: String
+}
+
+type CustomsValue {
+    amount: Float
+    currency: String
+}
+
+type PackageLineItem {
+    weight: Weight
+    dimensions: Dimensions
+}
+
+type Dimensions {
+    length: Float
+    width: Float
+    height: Float
+    units: String
+}
+
+input WeightInput {
+    value: Float
+    units: String
+}
+
+input CustomsValueInput {
+    amount: Float
+    currency: String
+}
+
+input ItemInput {
+    name: String
+    description: String
+    harmonizedCode: String
+    countryOfManufacture: String
+    quantity: Int
+    quantityUnits: String
+    weight: WeightInput
+    customsValue: CustomsValueInput
+    partNumber: String
+    numberOfPieces: Int
+    unitPrice: String
+}
+
+input DimensionsInput {
+    length: Float
+    width: Float
+    height: Float
+    units: String
+}
+
+input PackageLineItemInput {
+    weight: WeightInput
+    dimensions: DimensionsInput
+}
+
+
+input AdditionalInfoInputDto {
+    date: String
+    zipcode: String
+    sender_zipcode: String
+    email: String
+    name: String
+    company: String
+    city: String
+    state: String
+    address: String
+    address_opt: String
+    sender_name: String
+    sender_company: String
+    sender_address: String
+    sender_address_opt: String
+    sender_city: String
+    items: [ItemInput]
+    requestedPackageLineItems: [PackageLineItemInput]
+    sender_phone: String
+    receiver_phone: String
+    receiver_countryCode: String
 }
