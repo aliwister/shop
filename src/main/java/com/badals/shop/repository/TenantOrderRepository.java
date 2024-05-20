@@ -42,6 +42,9 @@ public interface TenantOrderRepository extends JpaRepository<TenantOrder, Long> 
 
     Page<TenantOrder> findAllByOrderStateInOrderByCreatedDateDesc(List<OrderState> orderState, Pageable page);
 
+    Page<TenantOrder> findAllByOrderStateInAndEmailIsOrderByCreatedDateDesc(List<OrderState> orderState, String email, Pageable page);
+
+
     @Query("select count(u) from TenantOrder u where u.orderState in ?1")
     Integer countForState(List<OrderState> orderState);
 

@@ -12,6 +12,7 @@ import com.badals.shop.domain.tenant.TenantOrder;
 import com.badals.shop.domain.tenant.TenantOrderItem;
 import com.badals.shop.domain.tenant.TenantReward;
 import com.badals.shop.repository.*;
+import com.badals.shop.security.jwt.ProfileUser;
 import com.badals.shop.service.mapper.CheckoutAddressMapper;
 import com.badals.shop.domain.enumeration.OrderState;
 import com.badals.shop.graph.OrderResponse;
@@ -35,6 +36,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -199,8 +201,8 @@ public class TenantOrderService {
     }
 
     public OrderResponse getOrders(List<OrderState> orderState, Integer offset, Integer limit) {
-
-        Page<TenantOrder> orders = orderRepository.findAllByOrderStateInOrderByCreatedDateDesc(orderState, PageRequest.of((int) offset/limit,limit));
+        ProfileUser profileUser = (ProfileUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Page<TenantOrder> orders = orderRepository.findAllByOrderStateInAndEmailIsOrderByCreatedDateDesc(orderState,profileUser.getUsername(), PageRequest.of((int) offset/limit,limit));
         OrderResponse response = new OrderResponse();
         response.setTotal(orders.getSize());
         response.setItems(orders.stream().map(orderMapper::toDto).collect(Collectors.toList()));
