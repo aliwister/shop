@@ -475,4 +475,10 @@ public class TenantOrderService {
         Integer used = usedPoints.stream().mapToInt(PointUsageHistory::getPoints).sum();
         return earned - used;
     }
+
+    public OrderDTO updateOrderState(Long id, OrderState state) {
+        TenantOrder order = orderRepository.getOne(id);
+        order.setOrderState(state);
+        return save(order);
+    }
 }

@@ -43,6 +43,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     private final TenantCartService cartService;
     private final TenantWishListService wishlistService;
     private final PricingRequestService pricingRequestService;
+    private final TenantOrderService orderService;
 
     private final CustomerService customerService;
 
@@ -56,7 +57,7 @@ public class ShopMutation implements GraphQLMutationResolver {
     private String cdnUrl;
 
 
-    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantWishListService wishlistService, CustomerService customerService) {
+    public ShopMutation(TenantProductService productService, TenantSetupService tenantSetupService, TenantCartService cartService, PricingRequestService pricingRequestService, MessageSource messageSource, UserService userService, AwsService awsService, TenantWishListService wishlistService, CustomerService customerService, TenantOrderService orderService) {
         this.productService = productService;
         this.tenantSetupService = tenantSetupService;
         this.cartService = cartService;
@@ -66,6 +67,7 @@ public class ShopMutation implements GraphQLMutationResolver {
         this.awsService = awsService;
         this.wishlistService = wishlistService;
         this.customerService = customerService;
+        this.orderService = orderService;
     }
 
     //@PreAuthorize("hasRole('ROLE_USER')")
@@ -170,6 +172,10 @@ public class ShopMutation implements GraphQLMutationResolver {
         String token = cartService.createCheckout(secureKey, null); // items wasnt being used in createCheckout
 //        return new CheckoutSession("/checkout/" + token + "/address", token);
         return response;
+    }
+
+    public OrderDTO updateOrderState(Long id, OrderState state) {
+        return orderService.updateOrderState(id, state);
     }
 }
 
