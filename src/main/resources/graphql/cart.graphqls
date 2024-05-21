@@ -205,6 +205,7 @@ input TenantCartRuleInput{
 
 type AdditionalInfoDto {
     date: String
+    price: Float
     zipcode: String
     sender_zipcode: String
     email: String
@@ -237,7 +238,12 @@ type Item {
     customsValue: CustomsValue
     partNumber: String
     numberOfPieces: Int
-    unitPrice: String# Assuming unitPrice is an object, can be customized as needed
+    unitPrice: UnitPrice
+}
+
+type UnitPrice {
+    amount: Float
+    currency: String
 }
 
 type Weight {
@@ -283,7 +289,12 @@ input ItemInput {
     customsValue: CustomsValueInput
     partNumber: String
     numberOfPieces: Int
-    unitPrice: String
+    unitPrice: UnitPriceInput
+}
+
+input UnitPriceInput {
+    amount: Float
+    currency: String
 }
 
 input DimensionsInput {
@@ -301,6 +312,7 @@ input PackageLineItemInput {
 
 input AdditionalInfoInputDto {
     date: String
+    price: Float
     zipcode: String
     sender_zipcode: String
     email: String

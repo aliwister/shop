@@ -14,5 +14,5 @@ public class ItemInput {
     private CustomsValueInput customsValue;
     private String partNumber;
     private Integer numberOfPieces;
-    private String unitPrice;
+    private UnitPriceInput unitPrice;
 }

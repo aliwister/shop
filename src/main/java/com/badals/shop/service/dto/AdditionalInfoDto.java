@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class AdditionalInfoDto {
     private String date;
+    private Float price;
     private String zipcode;
     private String sender_zipcode;
     private String email;
@@ -40,7 +41,13 @@ class Item {
     private CustomsValue customsValue;
     private String partNumber;
     private int numberOfPieces;
-    private String unitPrice;  // Assuming unitPrice is a String
+    private UnitPrice unitPrice;  // Assuming unitPrice is a String
+}
+
+@Data
+class UnitPrice {
+    private float amount;
+    private String currency;
 }
 
 @Data
