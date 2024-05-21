@@ -205,6 +205,7 @@ input TenantCartRuleInput{
 
 type AdditionalInfoDto {
     date: String
+    sender_state: String
     price: Float
     zipcode: String
     sender_zipcode: String
@@ -312,6 +313,7 @@ input PackageLineItemInput {
 
 input AdditionalInfoInputDto {
     date: String
+    sender_state: String
     price: Float
     zipcode: String
     sender_zipcode: String

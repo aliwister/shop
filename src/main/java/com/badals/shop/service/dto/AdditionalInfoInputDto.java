@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class AdditionalInfoInputDto {
     private String date;
+    private String sender_state;
     private Float price;
     private String zipcode;
     private String sender_zipcode;

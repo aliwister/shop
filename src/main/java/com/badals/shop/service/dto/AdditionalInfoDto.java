@@ -8,6 +8,7 @@ import java.util.List;
 public class AdditionalInfoDto {
     private String date;
     private Float price;
+    private String sender_state;
     private String zipcode;
     private String sender_zipcode;
     private String email;
